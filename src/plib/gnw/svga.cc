@@ -149,7 +149,10 @@ bool svga_init(VideoOptions* video_options)
     #endif
 
     if (video_options->fullscreen) {
-        windowFlags |= SDL_WINDOW_FULLSCREEN;
+        if (video_options->exclusive)
+            windowFlags |= SDL_WINDOW_FULLSCREEN;
+        else
+            windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
 
     gSdlWindow = SDL_CreateWindow(GNW95_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
