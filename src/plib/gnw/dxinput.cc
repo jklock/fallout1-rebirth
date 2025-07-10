@@ -1,4 +1,10 @@
 #include "plib/gnw/dxinput.h"
+#include "plib/gnw/mouse.h"
+#include "plib/gnw/svga.h"
+#include <SDL.h>
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
 
 namespace fallout {
 
@@ -9,6 +15,12 @@ static void dxinput_keyboard_exit();
 
 static int gMouseWheelDeltaX = 0;
 static int gMouseWheelDeltaY = 0;
+
+#if defined(__APPLE__) && TARGET_OS_IOS
+static bool last_input_was_mouse = false;
+static Uint32 last_mouse_input_time = 0;
+static Uint32 last_touch_input_time = 0;
+#endif
 
 // 0x4E0400
 bool dxinput_init()
@@ -63,15 +75,80 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // update mouse position manually.
     SDL_PumpEvents();
 
+#if defined(__APPLE__) && TARGET_OS_IOS
+    SDL_Event event;
+    Uint32 current_time = SDL_GetTicks();
+    
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION) == 1) {
+        last_input_was_mouse = true;
+        last_mouse_input_time = current_time;
+    }
+    
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP) == 1) {
+        last_input_was_mouse = true;
+        last_mouse_input_time = current_time;
+    }
+    
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERDOWN, SDL_FINGERUP) == 1) {
+        last_input_was_mouse = false;
+        last_touch_input_time = current_time;
+    }
+    
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERMOTION, SDL_FINGERMOTION) == 1) {
+        last_input_was_mouse = false;
+        last_touch_input_time = current_time;
+    }
+    
+    int system_x, system_y;
+    Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
+    
+    if (last_input_was_mouse && (current_time - last_mouse_input_time < 2000)) {
+        int game_x, game_y;
+        mouse_get_position(&game_x, &game_y);
+        
+        float logical_x, logical_y;
+        SDL_RenderWindowToLogical(gSdlRenderer, system_x, system_y, &logical_x, &logical_y);
+        
+        int mapped_x = (int)logical_x;
+        int mapped_y = (int)logical_y;
+        
+        if (mapped_x < 0) mapped_x = 0;
+        if (mapped_x >= screenGetWidth()) mapped_x = screenGetWidth() - 1;
+        if (mapped_y < 0) mapped_y = 0;
+        if (mapped_y >= screenGetHeight()) mapped_y = screenGetHeight() - 1;
+        
+        int delta_x = mapped_x - game_x;
+        int delta_y = mapped_y - game_y;
+        
+        if (mapped_x >= 0 && mapped_x < screenGetWidth() && 
+            mapped_y >= 0 && mapped_y < screenGetHeight()) {
+            mouseState->x = delta_x;
+            mouseState->y = delta_y;
+        } else {
+            mouseState->x = 0;
+            mouseState->y = 0;
+        }
+    } else {
+        mouseState->x = 0;
+        mouseState->y = 0;
+    }
+    
+    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    mouseState->wheelX = gMouseWheelDeltaX;
+    mouseState->wheelY = gMouseWheelDeltaY;
+    gMouseWheelDeltaX = 0;
+    gMouseWheelDeltaY = 0;
+    return true;
+#endif
+
     Uint32 buttons = SDL_GetRelativeMouseState(&(mouseState->x), &(mouseState->y));
     mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
-
     gMouseWheelDeltaX = 0;
     gMouseWheelDeltaY = 0;
-
     return true;
 }
 
@@ -103,7 +180,11 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
+#if defined(__APPLE__) && TARGET_OS_IOS
+    return true;
+#else
     return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
+#endif
 }
 
 // 0x4E078C
