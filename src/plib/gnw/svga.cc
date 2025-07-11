@@ -90,6 +90,12 @@ bool svga_init(VideoOptions* video_options)
 
     Uint32 windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 
+    // This hides the status bar on iPadOS, which otherwise interferes
+    // with the cursor in the top margin of the screen.
+    #if __APPLE__ && TARGET_OS_IOS
+    windowFlags |= SDL_WINDOW_BORDERLESS;
+    #endif
+
     if (video_options->fullscreen) {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
