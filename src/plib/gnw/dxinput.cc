@@ -18,8 +18,6 @@ static int gMouseWheelDeltaY = 0;
 
 #if defined(__APPLE__) && TARGET_OS_IOS
 static bool last_input_was_mouse = false;
-static Uint32 last_mouse_input_time = 0;
-static Uint32 last_touch_input_time = 0;
 #endif
 
 // 0x4E0400
@@ -81,28 +79,24 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION) == 1) {
         last_input_was_mouse = true;
-        last_mouse_input_time = current_time;
     }
     
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP) == 1) {
         last_input_was_mouse = true;
-        last_mouse_input_time = current_time;
     }
     
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERDOWN, SDL_FINGERUP) == 1) {
         last_input_was_mouse = false;
-        last_touch_input_time = current_time;
     }
     
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERMOTION, SDL_FINGERMOTION) == 1) {
         last_input_was_mouse = false;
-        last_touch_input_time = current_time;
     }
     
     int system_x, system_y;
     Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
     
-    if (last_input_was_mouse && (current_time - last_mouse_input_time < 2000)) {
+    if (last_input_was_mouse) {
         int game_x, game_y;
         mouse_get_position(&game_x, &game_y);
         
