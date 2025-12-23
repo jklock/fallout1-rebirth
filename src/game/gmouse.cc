@@ -15,10 +15,11 @@
 #include "game/item.h"
 #include "game/map.h"
 #include "game/object.h"
-#include "game/protinst.h"
 #include "game/proto.h"
+#include "game/protinst.h"
 #include "game/skilldex.h"
 #include "game/tile.h"
+#include "game/tweaks.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
 #include "plib/gnw/gnw.h"
@@ -46,6 +47,9 @@ static int gmouse_3d_set_flat_fid(int fid, Rect* rect);
 static int gmouse_3d_reset_flat_fid(Rect* rect);
 static int gmouse_3d_move_to(int x, int y, int elevation, Rect* a4);
 static int gmouse_check_scrolling(int x, int y, int cursor);
+static int gmouse_3d_determine_auto_mode(int mouseX, int mouseY, int elevation);
+static void gmouse_tooltip_hide();
+static void gmouse_tooltip_update(Object* target, int mouseX, int mouseY);
 
 // 0x505258
 static bool gmouse_initialized = false;
@@ -287,6 +291,15 @@ static Object* outlined_object = NULL;
 // 0x5053F4
 bool gmouse_clicked_on_edge = false;
 
+// Object tooltip window
+static int gmouse_tooltip_win = -1;
+static bool gmouse_tooltip_visible = false;
+static Object* gmouse_tooltip_object = NULL;
+
+// Maximum width for tooltip (characters can have long names)
+static const int GMOUSE_TOOLTIP_MAX_WIDTH = 200;
+static const int GMOUSE_TOOLTIP_PADDING = 4;
+
 // 0x5951E0
 static int gmouse_3d_menu_frame_actions[GAME_MOUSE_ACTION_MENU_ITEM_COUNT];
 
@@ -473,6 +486,91 @@ int gmouse_is_scrolling()
     return is_scrolling;
 }
 
+void hide_roof_on_hover(int mouseX, int mouseY)
+{
+    // Hover-hide roof tracking
+    static int gmouse_hover_roof_x = -1;
+    static int gmouse_hover_roof_y = -1;
+    static int gmouse_hover_roof_elev = -1;
+
+    int roofX;
+    int roofY;
+    square_xy_roof(mouseX, mouseY, map_elevation, &roofX, &roofY);
+
+    // Check bounds
+    if (roofX >= 0 && roofX < 100 && roofY >= 0 && roofY < 100) {
+        int currentSquare = square[map_elevation]->field_0[roofX + 100 * roofY];
+        int roofData = (currentSquare >> 16) & 0xFFFF;
+        int roofTileId = roofData & 0xFFF;
+        int roofFlags = (roofData >> 12) & 0xF;
+        int emptyRoofTileId = 1;
+
+        int emptyRoofArtId = art_id(OBJ_TYPE_TILE, emptyRoofTileId, 0, 0, 0);
+        bool hasRoof = art_id(OBJ_TYPE_TILE, roofTileId, 0, 0, 0) != emptyRoofArtId;
+        bool isHidden = (roofFlags & 0x01) != 0;
+
+        // Check if player is under a roof (to avoid conflicts with player-hide system)
+        int playerRoofX, playerRoofY, playerElev;
+        bool playerUnderRoof = obj_get_player_roof_info(&playerRoofX, &playerRoofY, &playerElev);
+
+        if (hasRoof) {
+            bool isNewPosition = roofX != gmouse_hover_roof_x || roofY != gmouse_hover_roof_y || map_elevation != gmouse_hover_roof_elev;
+
+            if (isNewPosition) {
+                if (isHidden) {
+                    // Roof is already hidden - could be our hover-hide or player-inside-hide
+                    if (playerUnderRoof && map_elevation == playerElev) {
+                        // Player is under a roof on same elevation - assume this is player-hidden
+                        // Restore our tracked roof if it's on a different elevation
+                        if (gmouse_hover_roof_x != -1 && gmouse_hover_roof_elev != playerElev) {
+                            tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                            tile_refresh_display();
+                        }
+                        gmouse_hover_roof_x = -1;
+                        gmouse_hover_roof_y = -1;
+                        gmouse_hover_roof_elev = -1;
+                    } else if (gmouse_hover_roof_x != -1 && map_elevation == gmouse_hover_roof_elev) {
+                        // No player conflict, same elevation as our tracked roof
+                        // This tile was hidden by our flood-fill - just update tracking position
+                        gmouse_hover_roof_x = roofX;
+                        gmouse_hover_roof_y = roofY;
+                    } else if (gmouse_hover_roof_x != -1) {
+                        // Tracking a roof on different elevation - restore it
+                        tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                        gmouse_hover_roof_x = -1;
+                        gmouse_hover_roof_y = -1;
+                        gmouse_hover_roof_elev = -1;
+                        tile_refresh_display();
+                    }
+                    // else: not tracking anything and roof is hidden (by player), ignore it
+                } else {
+                    // Roof is visible - we need to hide it
+                    // First restore any previously hidden roof
+                    if (gmouse_hover_roof_x != -1) {
+                        tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                    }
+
+                    // Hide the new roof
+                    tile_fill_roof(roofX, roofY, map_elevation, false);
+                    gmouse_hover_roof_x = roofX;
+                    gmouse_hover_roof_y = roofY;
+                    gmouse_hover_roof_elev = map_elevation;
+                    tile_refresh_display();
+                }
+            }
+            // else: same position as we're already tracking, do nothing
+        } else {
+            // No roof at this position - restore any previously hidden roof
+            if (gmouse_hover_roof_x != -1) {
+                tile_fill_roof(gmouse_hover_roof_x, gmouse_hover_roof_y, gmouse_hover_roof_elev, true);
+                gmouse_hover_roof_x = -1;
+                gmouse_hover_roof_y = -1;
+                gmouse_hover_roof_elev = -1;
+                tile_refresh_display();
+            }
+        }
+    }
+}
 // 0x443274
 void gmouse_bk_process()
 {
@@ -716,6 +814,12 @@ void gmouse_bk_process()
                         last_object = target;
                         obj_look_at(obj_dude, last_object);
                     }
+
+                    // Update tooltip for the hovered object
+                    gmouse_tooltip_update(target, mouseX, mouseY);
+                } else {
+                    // No object under cursor, hide tooltip
+                    gmouse_tooltip_update(NULL, mouseX, mouseY);
                 }
             } else if (gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR) {
                 Object* pointedObject = object_under_mouse(OBJ_TYPE_CRITTER, false, map_elevation);
@@ -802,8 +906,25 @@ void gmouse_bk_process()
     gmouse_3d_last_mouse_x = mouseX;
     gmouse_3d_last_mouse_y = mouseY;
 
+    // Hide tooltip when mouse moves
+    gmouse_tooltip_update(NULL, mouseX, mouseY);
+
+    // Auto-switch between MOVE and ARROW modes based on what's under cursor
     if (!gmouse_mapper_mode) {
+        if (tweaks_auto_mouse_mode()) {
+            if (gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
+                int autoMode = gmouse_3d_determine_auto_mode(mouseX, mouseY, map_elevation);
+                if (autoMode != gmouse_3d_current_mode) {
+                    gmouse_3d_set_mode(autoMode);
+                }
+            }
+        }
         gmouse_3d_reset_fid();
+    }
+
+    // Hover-hide roof: hide roofs when mouse hovers over them
+    if (tweaks_hover_hide_roof() && tile_roof_visible()) {
+        hide_roof_on_hover(mouseX, mouseY);
     }
 
     int v34 = 0;
@@ -1369,18 +1490,51 @@ int gmouse_3d_get_mode()
 // 0x444608
 void gmouse_3d_toggle_mode()
 {
-    int mode = (gmouse_3d_current_mode + 1) % 3;
+    int mode;
 
-    if (isInCombat()) {
-        Object* item;
-        if (intface_get_current_item(&item) == 0) {
-            if (item != NULL && item_get_type(item) != ITEM_TYPE_WEAPON && mode == GAME_MOUSE_MODE_CROSSHAIR) {
-                mode = GAME_MOUSE_MODE_MOVE;
+    if (tweaks_auto_mouse_mode()) {
+        // With auto-switching between MOVE and ARROW, right-click now toggles
+        // between the auto modes and CROSSHAIR (combat targeting)
+        if (gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
+            // From auto mode: switch to CROSSHAIR in combat, otherwise no-op
+            if (isInCombat()) {
+                Object* item;
+                if (intface_get_current_item(&item) == 0) {
+                    // Only allow CROSSHAIR if holding a weapon
+                    if (item != NULL && item_get_type(item) != ITEM_TYPE_WEAPON) {
+                        return;
+                    }
+                }
+                mode = GAME_MOUSE_MODE_CROSSHAIR;
+            } else {
+                // Outside combat, no toggle needed (auto-switching handles MOVE/ARROW)
+                return;
             }
+        } else if (gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR) {
+            // From CROSSHAIR: return to auto-determined mode
+            int mouseX;
+            int mouseY;
+            mouse_get_position(&mouseX, &mouseY);
+            mode = gmouse_3d_determine_auto_mode(mouseX, mouseY, map_elevation);
+        } else {
+            // From other modes (skill modes, USE_CROSSHAIR): return to MOVE
+            mode = GAME_MOUSE_MODE_MOVE;
         }
     } else {
-        if (mode == GAME_MOUSE_MODE_CROSSHAIR) {
-            mode = GAME_MOUSE_MODE_MOVE;
+        // Original toggle behavior: cycle through MOVE -> ARROW -> CROSSHAIR
+        mode = (gmouse_3d_current_mode + 1) % 3;
+
+        if (isInCombat()) {
+            Object* item;
+            if (intface_get_current_item(&item) == 0) {
+                if (item != NULL && item_get_type(item) != ITEM_TYPE_WEAPON && mode == GAME_MOUSE_MODE_CROSSHAIR) {
+                    mode = GAME_MOUSE_MODE_MOVE;
+                }
+            }
+        } else {
+            if (mode == GAME_MOUSE_MODE_CROSSHAIR) {
+                mode = GAME_MOUSE_MODE_MOVE;
+            }
         }
     }
 
@@ -1982,6 +2136,9 @@ static int gmouse_3d_reset()
         return -1;
     }
 
+    // Hide any visible tooltip
+    gmouse_tooltip_hide();
+
     // NOTE: Uninline.
     gmouse_3d_enable_modes();
 
@@ -2379,6 +2536,149 @@ static int gmouse_check_scrolling(int x, int y, int cursor)
     }
 
     return 0;
+}
+
+// Determines the appropriate mouse mode based on what's under the cursor.
+// Returns GAME_MOUSE_MODE_ARROW if an object is under the cursor,
+// GAME_MOUSE_MODE_MOVE if hovering over an empty walkable tile.
+static int gmouse_3d_determine_auto_mode(int mouseX, int mouseY, int elevation)
+{
+    Object* target = object_under_mouse(-1, true, elevation);
+    if (target != NULL) {
+        const auto fidType = FID_TYPE(target->fid);
+        if (fidType != OBJ_TYPE_INTERFACE && fidType != OBJ_TYPE_WALL
+            // exit grids
+            && !(target->pid >= PROTO_ID_0x5000010 && target->pid <= PROTO_ID_0x5000017))
+            return GAME_MOUSE_MODE_ARROW;
+    }
+    return GAME_MOUSE_MODE_MOVE;
+}
+
+// Checks if a tooltip should be shown for the given object.
+// Returns true if the object passes the same basic checks as obj_look_at.
+// Note: target must be non-NULL (caller should check).
+static bool gmouse_tooltip_should_show(Object* viewer, Object* target)
+{
+    if (critter_is_dead(viewer)) {
+        return false;
+    }
+
+    if (FID_TYPE(target->fid) == OBJ_TYPE_TILE) {
+        return false;
+    }
+
+    Proto* proto;
+    if (proto_ptr(target->pid, &proto) == -1) {
+        return false;
+    }
+
+    return true;
+}
+
+// Creates and shows the tooltip window at the given position.
+static void gmouse_tooltip_show(const char* text, int mouseX, int mouseY)
+{
+    if (gmouse_tooltip_win != -1) {
+        win_delete(gmouse_tooltip_win);
+        gmouse_tooltip_win = -1;
+    }
+
+    int oldFont = text_curr();
+    text_font(101);
+
+    int textWidth = text_width(text);
+    int textHeight = text_height();
+
+    // Limit text width and calculate window dimensions
+    if (textWidth > GMOUSE_TOOLTIP_MAX_WIDTH) {
+        textWidth = GMOUSE_TOOLTIP_MAX_WIDTH;
+    }
+
+    int winWidth = textWidth + GMOUSE_TOOLTIP_PADDING * 2;
+    int winHeight = textHeight + GMOUSE_TOOLTIP_PADDING * 2;
+
+    // Position tooltip below and to the right of the cursor
+    int winX = mouseX - 16;
+    int winY = mouseY + 16;
+
+    // Keep tooltip on screen
+    if (winX + winWidth > scr_size.lrx) {
+        winX = mouseX - winWidth - 4;
+    }
+    if (winY + winHeight > scr_size.lry - 100) { // Account for interface bar
+        winY = mouseY - winHeight - 4;
+    }
+    if (winX < scr_size.ulx) {
+        winX = scr_size.ulx;
+    }
+    if (winY < scr_size.uly) {
+        winY = scr_size.uly;
+    }
+
+    gmouse_tooltip_win = win_add(winX, winY, winWidth, winHeight, colorTable[0], WINDOW_TRANSPARENT | WINDOW_MOVE_ON_TOP);
+    if (gmouse_tooltip_win != -1) {
+        unsigned char* buf = win_get_buf(gmouse_tooltip_win);
+        if (buf != NULL) {
+            // Fill background with a semi-dark color
+            buf_fill(buf, winWidth, winHeight, winWidth, colorTable[0]);
+
+            // Draw border
+            draw_box(buf, winWidth, 0, 0, winWidth - 1, winHeight - 1, colorTable[8947]);
+
+            // Draw text
+            text_to_buf(buf + GMOUSE_TOOLTIP_PADDING * winWidth + GMOUSE_TOOLTIP_PADDING,
+                text,
+                winWidth - GMOUSE_TOOLTIP_PADDING * 2,
+                winWidth,
+                colorTable[32747]);
+
+            win_draw(gmouse_tooltip_win);
+        }
+    }
+
+    text_font(oldFont);
+    gmouse_tooltip_visible = true;
+}
+
+// Hides and destroys the tooltip window.
+static void gmouse_tooltip_hide()
+{
+    if (gmouse_tooltip_win != -1) {
+        win_delete(gmouse_tooltip_win);
+        gmouse_tooltip_win = -1;
+    }
+    gmouse_tooltip_visible = false;
+    gmouse_tooltip_object = NULL;
+}
+
+// Updates the tooltip based on the current hover state.
+// Should be called from gmouse_bk_process when hovering in ARROW mode.
+static void gmouse_tooltip_update(Object* target, int mouseX, int mouseY)
+{
+    if (!tweaks_object_tooltip()) {
+        if (gmouse_tooltip_visible) {
+            gmouse_tooltip_hide();
+        }
+        return;
+    }
+
+    if (target == NULL || !gmouse_tooltip_should_show(obj_dude, target)) {
+        if (gmouse_tooltip_visible) {
+            gmouse_tooltip_hide();
+        }
+        return;
+    }
+
+    // Only update if the target changed
+    if (target != gmouse_tooltip_object) {
+        gmouse_tooltip_object = target;
+        const char* name = object_name(target);
+        if (name != NULL && name[0] != '\0') {
+            gmouse_tooltip_show(name, mouseX, mouseY);
+        } else {
+            gmouse_tooltip_hide();
+        }
+    }
 }
 
 // 0x445FD0
