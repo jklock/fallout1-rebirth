@@ -628,6 +628,8 @@ static unsigned char first_skill_list;
 // 0x42C40C
 int editor_design(bool isCreationMode)
 {
+    gmouse_tooltip_hide();
+
     char* messageListItemText;
     char line1[128];
     char line2[128];

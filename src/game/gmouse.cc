@@ -48,7 +48,7 @@ static int gmouse_3d_reset_flat_fid(Rect* rect);
 static int gmouse_3d_move_to(int x, int y, int elevation, Rect* a4);
 static int gmouse_check_scrolling(int x, int y, int cursor);
 static int gmouse_3d_determine_auto_mode(int mouseX, int mouseY, int elevation);
-static void gmouse_tooltip_hide();
+// declared in gmouse.h
 static void gmouse_tooltip_update(Object* target, int mouseX, int mouseY);
 
 // 0x505258
@@ -2641,7 +2641,7 @@ static void gmouse_tooltip_show(const char* text, int mouseX, int mouseY)
 }
 
 // Hides and destroys the tooltip window.
-static void gmouse_tooltip_hide()
+void gmouse_tooltip_hide()
 {
     if (gmouse_tooltip_win != -1) {
         win_delete(gmouse_tooltip_win);
