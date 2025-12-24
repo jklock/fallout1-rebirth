@@ -909,10 +909,15 @@ void gmouse_bk_process()
     // Hide tooltip when mouse moves
     gmouse_tooltip_update(NULL, mouseX, mouseY);
 
-    // Auto-switch between MOVE and ARROW modes based on what's under cursor
+    // Auto-switch between MOVE, ARROW, and CROSSHAIR modes based on what's under cursor
     if (!gmouse_mapper_mode) {
         if (tweaks_auto_mouse_mode()) {
-            if (gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
+            // Include CROSSHAIR in auto-switchable modes when in combat
+            bool isAutoSwitchableMode = gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE
+                || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW
+                || (isInCombat() && gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR);
+
+            if (isAutoSwitchableMode) {
                 int autoMode = gmouse_3d_determine_auto_mode(mouseX, mouseY, map_elevation);
                 if (autoMode != gmouse_3d_current_mode) {
                     gmouse_3d_set_mode(autoMode);
@@ -2539,12 +2544,33 @@ static int gmouse_check_scrolling(int x, int y, int cursor)
 }
 
 // Determines the appropriate mouse mode based on what's under the cursor.
-// Returns GAME_MOUSE_MODE_ARROW if an object is under the cursor,
+// Returns GAME_MOUSE_MODE_CROSSHAIR if in combat and hovering over a targetable critter,
+// GAME_MOUSE_MODE_ARROW if an interactable object is under the cursor,
 // GAME_MOUSE_MODE_MOVE if hovering over an empty walkable tile.
 static int gmouse_3d_determine_auto_mode(int mouseX, int mouseY, int elevation)
 {
+    // In combat, check if hovering over a targetable critter
+    if (isInCombat()) {
+        // Check if player has a weapon equipped
+        Object* item;
+        if (intface_get_current_item(&item) == 0) {
+            if (item == nullptr || item_get_type(item) == ITEM_TYPE_WEAPON) {
+                // Check for critters under cursor (excluding player)
+                Object* critterTarget = object_under_mouse(OBJ_TYPE_CRITTER, false, elevation);
+                if (critterTarget != nullptr && critter_is_active(critterTarget)) {
+                    // Verify we can actually target this critter
+                    int accuracy;
+                    if (combat_to_hit(critterTarget, &accuracy)) {
+                        return GAME_MOUSE_MODE_CROSSHAIR;
+                    }
+                }
+            }
+        }
+    }
+
+    // Check for interactable objects (items, scenery, critters for non-combat interaction)
     Object* target = object_under_mouse(-1, true, elevation);
-    if (target != NULL) {
+    if (target != nullptr) {
         const auto fidType = FID_TYPE(target->fid);
         if (fidType != OBJ_TYPE_INTERFACE && fidType != OBJ_TYPE_WALL
             // exit grids
