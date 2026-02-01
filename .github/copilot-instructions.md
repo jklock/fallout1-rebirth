@@ -4,6 +4,20 @@
 
 Short, actionable instructions to help an AI coding agent get productive quickly.
 
+## ⚠️ CRITICAL: Use Project Scripts
+
+**ALWAYS use the provided scripts for testing and building. Do NOT run raw cmake/xcodebuild commands.**
+
+| Task | Script | NOT This |
+|------|--------|----------|
+| Test iOS | `./scripts/test-ios-simulator.sh` | ❌ `cmake ...` or `xcrun simctl` directly |
+| Test macOS | `./scripts/test-macos.sh` | ❌ `./build/fallout1-rebirth` |
+| Build iOS | `./scripts/build-ios.sh` | ❌ `cmake -B build-ios ...` |
+| Build macOS | `./scripts/build-macos.sh` | ❌ `cmake -B build-macos ...` |
+| Pre-commit | `./scripts/dev-check.sh` | ❌ `clang-format` manually |
+
+The scripts handle simulator management, proper build configs, and cleanup. Ignoring them causes test failures and wastes time.
+
 ## Project Status
 
 All development phases are complete:

@@ -5,6 +5,13 @@
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/winmain.h"
 
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#if TARGET_OS_IOS
+#include "platform/ios/pencil.h"
+#endif
+#endif
+
 namespace fallout {
 
 static bool createRenderer(int width, int height);
@@ -206,11 +213,21 @@ bool svga_init(VideoOptions* video_options)
     scr_blit = GNW95_ShowRect;
     mouse_blit = GNW95_ShowRect;
 
+#if defined(__APPLE__) && TARGET_OS_IOS
+    // Initialize Apple Pencil detection and gesture handling
+    pencil_init(gSdlWindow);
+#endif
+
     return true;
 }
 
 void svga_exit()
 {
+#if defined(__APPLE__) && TARGET_OS_IOS
+    // Shutdown Apple Pencil detection
+    pencil_shutdown();
+#endif
+
     destroyRenderer();
 
     if (gSdlWindow != NULL) {

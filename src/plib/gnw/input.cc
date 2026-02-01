@@ -12,11 +12,19 @@
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/memory.h"
+#include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 #include "plib/gnw/touch.h"
 #include "plib/gnw/vcr.h"
 #include "plib/gnw/winmain.h"
+
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#if TARGET_OS_IOS
+#include "platform/ios/pencil.h"
+#endif
+#endif
 
 namespace fallout {
 
@@ -1139,6 +1147,16 @@ void GNW95_process_message()
     }
 
     touch_process_gesture();
+
+#if defined(__APPLE__) && TARGET_OS_IOS
+    // Poll for Apple Pencil body gestures (double-tap, squeeze)
+    // These trigger right-click at current cursor position
+    PencilGestureType pencilGesture = pencil_poll_gesture();
+    if (pencilGesture == PENCIL_GESTURE_DOUBLE_TAP || pencilGesture == PENCIL_GESTURE_SQUEEZE) {
+        // Inject right-click at current cursor position
+        mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
+    }
+#endif
 
     if (GNW95_isActive && !kb_is_disabled()) {
         // NOTE: Uninline
