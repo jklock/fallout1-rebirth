@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
-# Run automated tests for Fallout CE Rebirth
+# =============================================================================
+# Fallout 1 Rebirth - Automated Test Suite
+# =============================================================================
+# Runs build verification, static analysis, and configuration tests.
+# Does NOT include manual gameplay testing.
+#
+# USAGE:
+#   ./scripts/test.sh                  # Run all tests
+#   BUILD_DIR=build-alt ./scripts/test.sh  # Use alternate build dir
+#
+# TESTS PERFORMED:
+#   1. Build verification (CMake + compile)
+#   2. Binary execution check (with game data if available)
+#   3. Static analysis (cppcheck)
+#   4. Code formatting verification (clang-format)
+#   5. Source file inventory
+#   6. iOS CMake configuration validation
+#
+# CONFIGURATION:
+#   BUILD_DIR  - Build output directory (default: "build")
+#   GAME_DATA  - Path to game files (default: "GOG/Fallout1")
+# =============================================================================
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -8,8 +29,10 @@ ERRORS=0
 BUILD_DIR="${BUILD_DIR:-build}"
 GAME_DATA="${GAME_DATA:-GOG/Fallout1}"
 
-echo "=== Fallout CE Rebirth Test Suite ==="
-echo "Game data: $GAME_DATA"
+echo ""
+echo "=== Fallout 1 Rebirth Test Suite ==="
+echo "Build directory: $BUILD_DIR"
+echo "Game data:       $GAME_DATA"
 echo ""
 
 # Check game data
@@ -40,7 +63,7 @@ fi
 # 2. Binary exists and runs
 echo ""
 echo ">>> Test 2: Binary Execution Test"
-BINARY="$BUILD_DIR/fallout-ce"
+BINARY="$BUILD_DIR/fallout1-rebirth"
 if [[ -f "$BINARY" ]]; then
     if [[ "$HAS_GAME_DATA" == "true" ]]; then
         # Create a temp directory with symlinks to game data
@@ -53,7 +76,7 @@ if [[ -f "$BINARY" ]]; then
         
         # Try to launch and capture if it starts (timeout after 3 seconds)
         cd "$TEST_DIR"
-        if timeout 3 ./fallout-ce 2>&1 | head -5; then
+        if timeout 3 ./fallout1-rebirth 2>&1 | head -5; then
             echo "✅ Binary launches with game data"
         else
             echo "✅ Binary executes (timed out - expected for GUI app)"
@@ -96,7 +119,7 @@ if command -v clang-format &> /dev/null; then
     if [[ "$FORMAT_ERRORS" -eq 0 ]]; then
         echo "✅ Code formatting correct"
     else
-        echo "⚠️  Found formatting issues (run ./scripts/format.sh)"
+        echo "⚠️  Found formatting issues (run ./scripts/dev-format.sh)"
     fi
 else
     echo "⚠️  clang-format not installed, skipping"
@@ -128,7 +151,7 @@ fi
 # Summary
 echo ""
 echo "=== Test Summary ==="
-echo "Build:            $([ -f "$BUILD_DIR/fallout-ce" ] && echo "✅" || echo "⚠️")"
+echo "Build:            $([ -f "$BUILD_DIR/fallout1-rebirth" ] && echo "✅" || echo "⚠️")"
 echo "Static Analysis:  $(command -v cppcheck &>/dev/null && echo "✅" || echo "⚠️ skipped")"
 echo "Formatting:       $(command -v clang-format &>/dev/null && echo "✅" || echo "⚠️ skipped")"
 echo "iOS Config:       ✅"
@@ -139,7 +162,7 @@ if [[ $ERRORS -eq 0 ]]; then
     if [[ "$HAS_GAME_DATA" == "true" ]]; then
         echo ""
         echo "Run game manually for gameplay testing:"
-        echo "  cd $GAME_DATA && ../build/fallout-ce"
+        echo "  cd $GAME_DATA && ../build/fallout1-rebirth"
     fi
     echo ""
     echo "See: FCE/TODO/PHASE_4_TESTING_POLISH.md for full test matrix"

@@ -1,11 +1,29 @@
 #!/usr/bin/env bash
-# Pre-commit checks for Fallout CE Rebirth
+# =============================================================================
+# Fallout 1 Rebirth - Pre-Commit Checks
+# =============================================================================
+# Runs code quality checks before committing. Should pass before pushing.
+#
+# USAGE:
+#   ./scripts/check.sh         # Run all checks
+#
+# CHECKS PERFORMED:
+#   1. Code formatting (clang-format)
+#   2. Static analysis (cppcheck)
+#   3. CMake configuration validation
+#   4. Platform-specific code audit
+#
+# REQUIREMENTS:
+#   - clang-format (brew install clang-format)
+#   - cppcheck (brew install cppcheck)
+# =============================================================================
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
 ERRORS=0
 
+echo ""
 echo "=== Running Pre-Commit Checks ==="
 echo ""
 
@@ -14,7 +32,7 @@ echo ">>> Checking code formatting..."
 if command -v clang-format &> /dev/null; then
     FORMAT_ISSUES=$(find src -type f \( -name "*.cc" -o -name "*.h" \) -exec clang-format --dry-run --Werror {} \; 2>&1 || true)
     if [[ -n "$FORMAT_ISSUES" ]]; then
-        echo "❌ Formatting issues found. Run: ./scripts/format.sh"
+        echo "❌ Formatting issues found. Run: ./scripts/dev-format.sh"
         ERRORS=$((ERRORS + 1))
     else
         echo "✅ Code formatting OK"
@@ -43,9 +61,9 @@ fi
 # 3. Check CMakeLists.txt syntax
 echo ""
 echo ">>> Checking CMake configuration..."
-if cmake -B /tmp/fallout-ce-check -D CMAKE_BUILD_TYPE=Debug > /dev/null 2>&1; then
+if cmake -B /tmp/fallout1-rebirth-check -D CMAKE_BUILD_TYPE=Debug > /dev/null 2>&1; then
     echo "✅ CMake configuration OK"
-    rm -rf /tmp/fallout-ce-check
+    rm -rf /tmp/fallout1-rebirth-check
 else
     echo "❌ CMake configuration failed"
     ERRORS=$((ERRORS + 1))

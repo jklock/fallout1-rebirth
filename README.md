@@ -1,12 +1,16 @@
-# Fallout Community Edition - Rebirth
+<p align="center">
+  <img src="img/RebirthLogo.png" alt="Fallout 1 Rebirth" width="512">
+</p>
+
+# Fallout 1 Rebirth
 
 **Apple-Only Fork** — This project exclusively targets **macOS** and **iOS/iPadOS**.
 
-Fallout Community Edition Rebirth is a fully working re-implementation of Fallout, with the same original gameplay, engine bugfixes, and quality of life improvements, optimized for Apple platforms.
+Fallout 1 Rebirth is a fully working re-implementation of Fallout, with the same original gameplay, engine bugfixes, and quality of life improvements, optimized for Apple platforms.
 
 > For Windows, Linux, or Android support, use the upstream project: [alexbatalov/fallout1-ce](https://github.com/alexbatalov/fallout1-ce)
 
-There is also [Fallout 2 Community Edition](https://github.com/alexbatalov/fallout2-ce).
+I did this because I love Fallout. Fallout 1 was the first computer game I ever bought. I got it at Target for $10 when I was a kid. It was the first game I ever installed on MY computer and the first computer game I really fell in love with. 
 
 ## Features
 
@@ -38,9 +42,9 @@ $ innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
 $ mv app /Applications/Fallout
 ```
 
-- Download and copy `fallout-ce.app` to this folder.
+- Download and copy `Fallout 1 Rebirth.app` to this folder.
 
-- Run `fallout-ce.app`.
+- Run `Fallout 1 Rebirth.app`.
 
 ### iOS/iPadOS
 
@@ -54,7 +58,7 @@ $ mv app /Applications/Fallout
 
 > **iPad with Magic Keyboard/Trackpad**: Full mouse and keyboard support including F-keys.
 
-- Download `fallout-ce.ipa`. Use sideloading applications ([AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)) to install it to your device. Alternatively you can always build from source with your own signing certificate.
+- Download `fallout1-rebirth.ipa`. Use sideloading applications ([AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)) to install it to your device. Alternatively you can always build from source with your own signing certificate.
 
 - Run the game once. You'll see error message saying "Could not find the master datafile...". This step is needed for iOS to expose the game via File Sharing feature.
 
@@ -96,7 +100,7 @@ cmake --build build-macos --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build -j $(sysctl -n hw.physicalcpu)
-./build/fallout-ce
+./build/fallout1-rebirth
 ```
 
 ### iOS Build
@@ -111,9 +115,22 @@ cmake -B build-ios \
 cmake --build build-ios --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
 ```
 
+## Documentation
+
+Comprehensive documentation is available in the [docs/](docs/) directory:
+
+- [Setup Guide](docs/setup_guide.md) - Complete installation instructions for macOS and iOS
+- [Building](docs/building.md) - Build from source instructions
+- [Architecture](docs/architecture.md) - Codebase structure and how it works
+- [Testing](docs/testing.md) - Running tests and validation
+- [Scripts](docs/scripts.md) - Available automation scripts
+- [Contributing](docs/contributing.md) - How to contribute
+
 ## Contributing
 
 This is an Apple-focused fork. Contributions related to macOS and iOS/iPadOS are welcome!
+
+See [docs/contributing.md](docs/contributing.md) for detailed contribution guidelines.
 
 Current goals:
 

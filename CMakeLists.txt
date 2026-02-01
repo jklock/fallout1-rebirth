@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-set(EXECUTABLE_NAME fallout-ce)
+set(EXECUTABLE_NAME fallout1-rebirth)
 
 # Platform check - Apple only (macOS and iOS)
 if(NOT APPLE)
     message(FATAL_ERROR 
-        "Fallout CE Rebirth only supports Apple platforms (macOS and iOS).\n"
+        "Fallout 1 Rebirth only supports Apple platforms (macOS and iOS).\n"
         "For other platforms, use the upstream: https://github.com/alexbatalov/fallout1-ce"
     )
 endif()
@@ -296,34 +296,34 @@ if(IOS)
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/ios/Info.plist"
         XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
-        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.alexbatalov.fallout-ce"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.fallout1rebirth.game"
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
     )
 
-    set(MACOSX_BUNDLE_BUNDLE_NAME "${EXECUTABLE_NAME}")
-    set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout 1 Rebirth")
+    set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout 1 Rebirth")
 else()
     # macOS
     set(RESOURCES
-        "os/macos/fallout-ce.icns"
+        "os/macos/fallout1-rebirth.icns"
     )
 
     target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
     set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-        OUTPUT_NAME "Fallout Community Edition"
+        OUTPUT_NAME "Fallout 1 Rebirth"
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/macos/Info.plist"
         XCODE_ATTRIBUTE_EXECUTABLE_NAME "${EXECUTABLE_NAME}"
-        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.alexbatalov.fallout-ce"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.fallout1rebirth.game"
     )
 
-    set(MACOSX_BUNDLE_ICON_FILE "fallout-ce.icns")
-    set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout: Community Edition")
-    set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
+    set(MACOSX_BUNDLE_ICON_FILE "fallout1-rebirth.icns")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout 1 Rebirth")
+    set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout 1 Rebirth")
 endif()
 
-set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.alexbatalov.fallout-ce")
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.fallout1rebirth.game")
 set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0")
 set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0.0")
 
@@ -345,7 +345,7 @@ if(IOS)
 
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-    set(CPACK_PACKAGE_FILE_NAME "fallout-ce")
+    set(CPACK_PACKAGE_FILE_NAME "fallout1-rebirth")
     set(CPACK_ARCHIVE_FILE_EXTENSION "ipa")
 else()
     # macOS
@@ -353,7 +353,7 @@ else()
 
     set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
-    set(CPACK_PACKAGE_FILE_NAME "Fallout Community Edition")
+    set(CPACK_PACKAGE_FILE_NAME "Fallout 1 Rebirth")
 endif()
 
 include(CPack)

@@ -1,6 +1,9 @@
 name: Release
 
 on:
+  push:
+    tags:
+      - 'v*'
   release:
     types:
       - published
@@ -13,7 +16,7 @@ jobs:
   ios:
     name: iOS
 
-    runs-on: macos-12
+    runs-on: macos-14
 
     steps:
       - name: Clone
@@ -23,7 +26,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build
-          key: ios-cmake-v1
+          key: ios-release-cmake-v2
 
       - name: Configure
         run: |
@@ -52,23 +55,27 @@ jobs:
       - name: Upload
         run: |
           cd build
-          cp fallout-ce.ipa fallout-ce-ios.ipa
-          gh release upload ${{ github.event.release.tag_name }} fallout-ce-ios.ipa
-          rm fallout-ce-ios.ipa
+          VERSION_TAG="${{ github.event.release.tag_name }}"
+          if [ -z "$VERSION_TAG" ]; then
+            VERSION_TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          cp fallout1-rebirth.ipa fallout1-rebirth-ios.ipa
+          gh release upload "$VERSION_TAG" fallout1-rebirth-ios.ipa
+          rm fallout1-rebirth-ios.ipa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   macos:
     name: macOS
 
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Clone
         uses: actions/checkout@v4
 
       - name: Import code signing certificates
-        uses: apple-actions/import-codesign-certs@v2
+        uses: apple-actions/import-codesign-certs@v3
         with:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_FILE_BASE64 }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_PASSWORD }}
@@ -77,7 +84,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build
-          key: macos-cmake-v3
+          key: macos-release-cmake-v4
 
       - name: Configure
         run: |
@@ -104,28 +111,29 @@ jobs:
 
       - name: Notarize
         run: |
-          brew install mitchellh/gon/gon
-          cat << EOF > config.json
-          {
-            "notarize": {
-              "path": "build/Fallout Community Edition.dmg",
-              "bundle_id": "$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "build/RelWithDebInfo/Fallout Community Edition.app/Contents/Info.plist")",
-              "staple": true
-            }
-          }
-          EOF
-          gon config.json
-          rm config.json
+          # Submit for notarization using Apple's notarytool
+          xcrun notarytool submit "build/Fallout 1 Rebirth.dmg" \
+            --apple-id "${{ secrets.APPLE_DEVELOPER_AC_USERNAME }}" \
+            --password "${{ secrets.APPLE_DEVELOPER_AC_PASSWORD }}" \
+            --team-id "${{ secrets.APPLE_DEVELOPER_TEAM_ID }}" \
+            --wait
+          
+          # Staple the notarization ticket to the DMG
+          xcrun stapler staple "build/Fallout 1 Rebirth.dmg"
         env:
-          AC_USERNAME: ${{ secrets.APPLE_DEVELOPER_AC_USERNAME }}
-          AC_PASSWORD: ${{ secrets.APPLE_DEVELOPER_AC_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_DEVELOPER_AC_USERNAME }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_DEVELOPER_AC_PASSWORD }}
 
       - name: Upload
         run: |
           cd build
-          cp "Fallout Community Edition.dmg" fallout-ce-macos.dmg
-          gh release upload ${{ github.event.release.tag_name }} fallout-ce-macos.dmg
-          rm fallout-ce-macos.dmg
+          VERSION_TAG="${{ github.event.release.tag_name }}"
+          if [ -z "$VERSION_TAG" ]; then
+            VERSION_TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          cp "Fallout 1 Rebirth.dmg" fallout1-rebirth-macos.dmg
+          gh release upload "$VERSION_TAG" fallout1-rebirth-macos.dmg
+          rm fallout1-rebirth-macos.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

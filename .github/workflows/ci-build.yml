@@ -9,6 +9,10 @@ on:
       - opened
       - synchronize
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
@@ -46,7 +50,7 @@ jobs:
   ios:
     name: iOS
 
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Clone
@@ -86,14 +90,14 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: fallout-ce.ipa
-          path: build/fallout-ce.ipa
+          name: fallout1-rebirth.ipa
+          path: build/fallout1-rebirth.ipa
           retention-days: 7
 
   macos:
     name: macOS
 
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Clone
@@ -103,7 +107,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build
-          key: macos-cmake-v4
+          key: macos-cmake-v5
 
       - name: Configure
         run: |
@@ -129,6 +133,6 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: fallout-ce-macos.dmg
-          path: build/Fallout Community Edition.dmg
+          name: fallout1-rebirth-macos.dmg
+          path: build/Fallout 1 Rebirth.dmg
           retention-days: 7

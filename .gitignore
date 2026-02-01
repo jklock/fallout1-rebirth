@@ -400,14 +400,17 @@ master.dat
 critter.dat
 *.sav
 
-# Local research folder — keep placeholders tracked, ignore other contents
-FCE/*
-!FCE/.gitkeep
-!FCE/README.md
+# Project documentation and research (internal use)
+FCE/
+
+# Journal files (AI agent notes - not for version control)
+**/JOURNAL.md
+src/README.md
 
 # macOS
 .DS_Store
 *.dmg
 
-# Distribution
-/dist/
+# Distribution builds (generated)
+/dist/*.dmg
+/dist/*.ipa
