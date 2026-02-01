@@ -213,8 +213,9 @@ bool svga_init(VideoOptions* video_options)
     scr_blit = GNW95_ShowRect;
     mouse_blit = GNW95_ShowRect;
 
-#if defined(__APPLE__) && TARGET_OS_IOS
+#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
     // Initialize Apple Pencil detection and gesture handling
+    // Only on real iOS devices, not simulator
     pencil_init(gSdlWindow);
 #endif
 
@@ -223,8 +224,9 @@ bool svga_init(VideoOptions* video_options)
 
 void svga_exit()
 {
-#if defined(__APPLE__) && TARGET_OS_IOS
+#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
     // Shutdown Apple Pencil detection
+    // Only on real iOS devices, not simulator
     pencil_shutdown();
 #endif
 

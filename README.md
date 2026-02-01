@@ -43,11 +43,16 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
 
 > **Requirements**: macOS 11.0 (Big Sur) or higher. Runs natively on Intel-based Macs and Apple Silicon.
 
-1. **Get game data** from your Windows installation, or extract from GOG installer:
-   ```console
-   brew install innoextract
-   innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
-   mv app ~/Games/Fallout
+1. **Get game data** — Search archive.org for "Fallout 1 GOG Linux" and download the Linux installer. Extract and lowercase the files:
+   ```bash
+   # Extract the Linux installer (no special tools needed)
+   unzip fallout_classic_linux_*.zip -d ~/Games/Fallout
+   cd ~/Games/Fallout
+   
+   # Lowercase all filenames (required for macOS/iOS)
+   find . -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
+   # Or if you don't have 'rename', use this:
+   find . -depth -name '*[A-Z]*' -execdir bash -c 'mv "$1" "${1,,}"' _ {} \;
    ```
 
 2. **Download** `Fallout 1 Rebirth.dmg` from Releases and copy the app to your Fallout folder.
@@ -56,7 +61,7 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
 
 ### iOS/iPadOS
 
-> **Primary target**: iPad is the main platform for this fork. Fallout was designed for mouse input, so touch controls emulate cursor movement.
+> **Primary target**: iPad is the main platform for this fork. **Landscape orientation only** — the game locks to landscape mode for optimal gameplay.
 
 **Touch Controls:**
 | Gesture | Action |
@@ -163,11 +168,15 @@ The `GOG/` folder is gitignored — game files are never committed to the reposi
 
 **Getting game files:**
 ```bash
-# From GOG installer (recommended)
-brew install innoextract
-innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
-mkdir -p GOG
-mv app GOG/Fallout1
+# Search archive.org for "Fallout 1 GOG Linux" and download the Linux installer
+# Extract and lowercase:
+unzip fallout_classic_linux_*.zip -d GOG/Fallout1
+cd GOG/Fallout1
+
+# Lowercase all filenames (required for macOS/iOS)
+find . -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
+# Or if you don't have 'rename':
+find . -depth -name '*[A-Z]*' -execdir bash -c 'mv "$1" "${1,,}"' _ {} \;
 ```
 
 The test scripts automatically copy these files to the appropriate locations:
@@ -226,27 +235,6 @@ Comprehensive documentation is available in the [docs/](docs/) directory:
 - [Testing](docs/testing.md) — Running tests and validation
 - [Scripts](docs/scripts.md) — Available automation scripts
 - [Contributing](docs/contributing.md) — How to contribute
-
-## Project Status
-
-All development phases are complete:
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 0 | Environment Setup | ✅ Complete |
-| 1 | Vanilla Build | ✅ Complete |
-| 2 | Fork Integration | ✅ Complete |
-| 3 | RME Integration | ✅ Complete |
-| 4 | Testing Infrastructure | ✅ Complete |
-| 5 | Distribution Structure | ✅ Complete |
-| 6 | Engine Fixes | ✅ Complete |
-| 7 | Platform Cleanup | ✅ Complete |
-
-### Future Roadmap
-
-- ProMotion 120Hz display support
-- Game controller support (MFi/Xbox/PlayStation)
-- In-game settings interface for resolution and scaling
 
 ## Contributing
 
