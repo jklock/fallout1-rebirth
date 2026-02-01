@@ -91,6 +91,25 @@ cd build-ios && cpack -C RelWithDebInfo  # creates .ipa
 - Manual testing required for gameplay - see `FCE/TODO/PHASE_4_TESTING_POLISH.md`.
 - Game data files (master.dat, critter.dat) are NOT included - obtain from GOG/Steam.
 
+### iOS Simulator Testing (PRIMARY TARGET) 📱
+**iPad is the primary use case for this project.** Always use the dedicated script:
+```bash
+./scripts/test-ios-simulator.sh              # Full flow: build + install + launch
+./scripts/test-ios-simulator.sh --build-only # Just build
+./scripts/test-ios-simulator.sh --launch     # Launch existing install
+./scripts/test-ios-simulator.sh --shutdown   # Shutdown all simulators
+./scripts/test-ios-simulator.sh --list       # Show available iPad sims
+```
+
+**CRITICAL RULES:**
+- **ONE SIMULATOR AT A TIME** — multiple simulators cause severe memory pressure and system instability
+- Always run `--shutdown` before starting a new simulator
+- Check for running simulators: `xcrun simctl list devices | grep Booted`
+- Default target: `iPad Pro 13-inch (M4)` (configurable via `SIMULATOR_NAME` env var)
+- Game data goes in the app's **data container**, not the app bundle (read-only at runtime)
+
+**DO NOT** manually run `xcrun simctl boot` on multiple devices or use raw CMake commands for simulator builds — use the script.
+
 ## Fork Enhancements (Rebirth) 🍎
 This fork includes cherry-picked improvements:
 - iPad mouse/trackpad + F-key support (evaera)
