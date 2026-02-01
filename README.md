@@ -1,42 +1,30 @@
-# Fallout Community Edition
+# Fallout Community Edition - Rebirth
 
-Fallout Community Edition is a fully working re-implementation of Fallout, with the same original gameplay, engine bugfixes, and some quality of life improvements, that works (mostly) hassle-free on multiple platforms.
+**Apple-Only Fork** — This project exclusively targets **macOS** and **iOS/iPadOS**.
+
+Fallout Community Edition Rebirth is a fully working re-implementation of Fallout, with the same original gameplay, engine bugfixes, and quality of life improvements, optimized for Apple platforms.
+
+> For Windows, Linux, or Android support, use the upstream project: [alexbatalov/fallout1-ce](https://github.com/alexbatalov/fallout1-ce)
 
 There is also [Fallout 2 Community Edition](https://github.com/alexbatalov/fallout2-ce).
 
+## Features
+
+This fork includes cherry-picked improvements:
+- **iPad mouse/trackpad + F-key support** (evaera)
+- **Touch control optimization** (zverinapavel)
+- **Borderless window mode** (radozd)
+- **QoL features + bugfixes** (korri123)
+- **TeamX Patch 1.3.5 compatibility**
+- **RME 1.1e data integration**
+
 ## Installation
 
-You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400). Download latest [release](https://github.com/alexbatalov/fallout1-ce/releases) or build from source. You can also check latest [debug](https://github.com/alexbatalov/fallout1-ce/actions) build intended for testers.
-
-### Windows
-
-Download and copy `fallout-ce.exe` to your `Fallout` folder. It serves as a drop-in replacement for `falloutw.exe`.
-
-### Linux
-
-- Use Windows installation as a base - it contains data assets needed to play. Copy `Fallout` folder somewhere, for example `/home/john/Desktop/Fallout`.
-
-- Alternatively you can extract the needed files from the GoG installer:
-
-```console
-$ sudo apt install innoextract
-$ innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
-$ mv app Fallout
-```
-
-- Download and copy `fallout-ce` to this folder.
-
-- Install [SDL2](https://libsdl.org/download-2.0.php):
-
-```console
-$ sudo apt install libsdl2-2.0-0
-```
-
-- Run `./fallout-ce`.
+You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400). Download latest [release](https://github.com/alexbatalov/fallout1-ce/releases) or build from source.
 
 ### macOS
 
-> **NOTE**: macOS 10.11 (El Capitan) or higher is required. Runs natively on Intel-based Macs and Apple Silicon.
+> **NOTE**: macOS 11.0 (Big Sur) or higher is required. Runs natively on Intel-based Macs and Apple Silicon.
 
 - Use Windows installation as a base - it contains data assets needed to play. Copy `Fallout` folder somewhere, for example `/Applications/Fallout`.
 
@@ -54,32 +42,17 @@ $ mv app /Applications/Fallout
 
 - Run `fallout-ce.app`.
 
-### Android
+### iOS/iPadOS
 
-> **NOTE**: Fallout was designed with mouse in mind. There are many controls that require precise cursor positioning, which is not possible with fingers. Current control scheme resembles trackpad usage:
+> **NOTE**: iPad is the primary target platform for this fork. Fallout was designed with mouse in mind. There are many controls that require precise cursor positioning. Current control scheme:
 
-> - One finger tap moves mouse cursor to the tapped position and does left mouse click. (new!)
-> - One finger drag moves mouse cursor around. The finger doesn't have to be at the cursor position, but anywhere on the screen. This is useful for accurate selection of dialogue options, and precise aiming during combat.
-> - Tap one finger for left mouse click.
-> - Tap two fingers for right mouse click (switches mouse cursor mode).
-> - Move two fingers to scroll current view (map view, worldmap view, inventory scrollers).
-> - Tap with three fingers to simulate a left mouse button click at the cursor's current location without moving it. This is ideal for accurately selecting dialogue options or executing precise attacks during combat.
+> - **Single tap**: Move cursor and left-click
+> - **One finger drag**: Move cursor around
+> - **Two-finger tap**: Right-click (switch cursor mode)
+> - **Two fingers**: Scroll views
+> - **Three-finger tap**: Left-click at cursor position without moving
 
-> **NOTE**: To activate UI buttons, you need to double-tap on them.
-
-
-
-> **NOTE**: From Android standpoint release and debug builds are different apps. Both apps require their own copy of game assets and have their own savegames. This is intentional. As a gamer just stick with release version and check for updates.
-
-- Use Windows installation as a base - it contains data assets needed to play. Copy `Fallout` folder to your device, for example to `Downloads`. You need `master.dat`, `critter.dat`, and `data` folder. Watch for file names - keep (or make) them lowercased (see [Configuration](#configuration)).
-
-- Download `fallout-ce.apk` and copy it to your device. Open it with file explorer, follow instructions (install from unknown source).
-
-- When you run the game for the first time it will immediately present file picker. Select the folder from the first step. Wait until this data is copied. A loading dialog will appear, just wait for about 30 seconds. The game will start automatically.
-
-### iOS
-
-> **NOTE**: See Android note on controls.
+> **iPad with Magic Keyboard/Trackpad**: Full mouse and keyboard support including F-keys.
 
 - Download `fallout-ce.ipa`. Use sideloading applications ([AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)) to install it to your device. Alternatively you can always build from source with your own signing certificate.
 
@@ -103,20 +76,58 @@ WINDOWED=1
 ```
 
 Recommendations:
-- **Desktops**: Use any size you see fit.
-- **Tablets**: Set these values to logical resolution of your device, for example iPad Pro 11 is 1668x2388 (pixels), but it's logical resolution is 834x1194 (points).
-- **Mobile phones**: Set height to 480, calculate width according to your device screen (aspect) ratio, for example Samsung S21 is 20:9 device, so the width should be 480 * 20 / 9 = 1067.
+
+- **macOS**: Use any resolution you see fit.
+- **iPad**: Set these values to logical resolution of your device, for example iPad Pro 11 is 1668x2388 (pixels), but its logical resolution is 834x1194 (points). Recommended: `1024x768` with `SCALE_2X=1`.
 
 In time this stuff will receive in-game interface, right now you have to do it manually.
 
+## Building from Source
+
+### macOS (Xcode)
+
+```bash
+cmake -B build-macos -G Xcode -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
+cmake --build build-macos --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
+```
+
+### macOS (Makefiles - faster iteration)
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build -j $(sysctl -n hw.physicalcpu)
+./build/fallout-ce
+```
+
+### iOS Build
+
+```bash
+cmake -B build-ios \
+  -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
+  -D ENABLE_BITCODE=0 \
+  -D PLATFORM=OS64 \
+  -G Xcode \
+  -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
+cmake --build build-ios --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
+```
+
 ## Contributing
 
-Here is a couple of current goals. Open up an issue if you have suggestion or feature request.
+This is an Apple-focused fork. Contributions related to macOS and iOS/iPadOS are welcome!
 
-- **Update to v1.2**. This project is based on Reference Edition which implements v1.1 released in November 1997. There is a newer v1.2 released in March 1998 which at least contains important multilingual support.
+Current goals:
 
-- **Backport some Fallout 2 features**. Fallout 2 (with some Sfall additions) added many great improvements and quality of life enhancements to the original Fallout engine. Many deserve to be backported to Fallout 1. Keep in mind this is a different game, with slightly different gameplay balance (which is a fragile thing on its own).
+- **Engine bug fixes**: Port fixes from ETTU/Fo1in2 analysis for Fallout 1-specific issues
+- **iPad optimization**: Improve touch controls and UI scaling for tablets
+- **Quality of life**: Backport relevant Fallout 2 improvements
+
+## Credits
+
+- **Original game**: Interplay/Black Isle Studios
+- **Community Edition**: [alexbatalov](https://github.com/alexbatalov/fallout1-ce)
+- **Fork contributors**: evaera, zverinapavel, radozd, korri123
+- **Mods**: TeamX, Wasteland Ghost, Sduibek, and many others
 
 ## License
 
-The source code is this repository is available under the [Sustainable Use License](LICENSE.md).
+The source code in this repository is available under the [Sustainable Use License](LICENSE.md).
