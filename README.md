@@ -142,6 +142,38 @@ SCALE_2X=1         # 0=native, 1=2x integer scaling
 - Xcode 15+ with Command Line Tools
 - CMake 3.21+
 
+### Game Data for Development
+
+When developing or testing locally, place your game files in `GOG/Fallout1/` in the repository root:
+
+```
+fallout1-rebirth/
+├── GOG/
+│   └── Fallout1/           # Create this folder
+│       ├── master.dat      # ~300 MB - Required
+│       ├── critter.dat     # ~25 MB  - Required
+│       └── data/           # Override folder
+│           └── sound/
+│               └── music/  # Music files
+└── src/
+    └── ...
+```
+
+The `GOG/` folder is gitignored — game files are never committed to the repository.
+
+**Getting game files:**
+```bash
+# From GOG installer (recommended)
+brew install innoextract
+innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
+mkdir -p GOG
+mv app GOG/Fallout1
+```
+
+The test scripts automatically copy these files to the appropriate locations:
+- **iOS Simulator**: Copies to app's Documents container
+- **macOS**: The app reads from its bundle Resources folder
+
 ### macOS (Xcode)
 
 ```bash
@@ -212,7 +244,6 @@ All development phases are complete:
 
 ### Future Roadmap
 
-- Apple Pencil support with precise cursor positioning
 - ProMotion 120Hz display support
 - Game controller support (MFi/Xbox/PlayStation)
 - In-game settings interface for resolution and scaling
