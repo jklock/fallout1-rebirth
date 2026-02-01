@@ -14,15 +14,10 @@ include(FetchContent)
 
 FetchContent_Declare(sdl2
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
-    GIT_TAG "release-2.26.1"
+    GIT_TAG "release-2.30.10"
 )
 
-FetchContent_GetProperties(sdl2)
-if (NOT sdl2_POPULATED)
-    FetchContent_Populate(sdl2)
-endif()
+FetchContent_MakeAvailable(sdl2)
 
-add_subdirectory(${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-set(SDL2_INCLUDE_DIRS ${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR} PARENT_SCOPE)
+set(SDL2_INCLUDE_DIRS ${sdl2_SOURCE_DIR}/include ${sdl2_BINARY_DIR}/include PARENT_SCOPE)
 set(SDL2_LIBRARIES SDL2-static SDL2::SDL2main PARENT_SCOPE)

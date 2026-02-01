@@ -391,3 +391,18 @@ FodyWeavers.xsd
 # CMake
 /out
 /build
+/build-*
+/_deps
+
+# Game data (must not be committed - copyrighted)
+GOG/
+master.dat
+critter.dat
+*.sav
+
+# macOS
+.DS_Store
+*.dmg
+
+# Distribution
+/dist/
