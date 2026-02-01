@@ -80,7 +80,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // update mouse position manually.
     SDL_PumpEvents();
 
-#if defined(__APPLE__) && TARGET_OS_IOS
+#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
+    // Real iOS device: Use absolute positioning with touch/pencil priority
     SDL_Event event;
     Uint32 current_time = SDL_GetTicks();
 
@@ -204,9 +205,11 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-#if defined(__APPLE__) && TARGET_OS_IOS
+#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
+    // Real iOS device: Skip relative mouse mode, use absolute touch positioning
     return true;
 #else
+    // macOS, iOS Simulator, and other platforms: Use relative mouse mode
     return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
 #endif
 }

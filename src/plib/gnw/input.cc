@@ -1103,6 +1103,9 @@ void GNW95_process_message()
         case SDL_MOUSEWHEEL:
             handleMouseEvent(&e);
             break;
+#if !defined(__APPLE__) || !TARGET_OS_IOS || !TARGET_OS_SIMULATOR
+        // Touch events: Only process on platforms that actually have touch input
+        // (Skip for iOS Simulator which uses desktop mouse)
         case SDL_FINGERDOWN:
             touch_handle_start(&(e.tfinger));
             break;
@@ -1112,6 +1115,7 @@ void GNW95_process_message()
         case SDL_FINGERUP:
             touch_handle_end(&(e.tfinger));
             break;
+#endif
         case SDL_KEYDOWN:
         case SDL_KEYUP:
             if (!kb_is_disabled()) {
@@ -1146,11 +1150,15 @@ void GNW95_process_message()
         }
     }
 
+#if !defined(__APPLE__) || !TARGET_OS_IOS || !TARGET_OS_SIMULATOR
+    // Touch gestures: Only process on platforms with touch input
     touch_process_gesture();
+#endif
 
-#if defined(__APPLE__) && TARGET_OS_IOS
+#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
     // Poll for Apple Pencil body gestures (double-tap, squeeze)
     // These trigger right-click at current cursor position
+    // Only on real iOS devices, not simulator
     PencilGestureType pencilGesture = pencil_poll_gesture();
     if (pencilGesture == PENCIL_GESTURE_DOUBLE_TAP || pencilGesture == PENCIL_GESTURE_SQUEEZE) {
         // Inject right-click at current cursor position

@@ -9,11 +9,15 @@
 #endif
 
 #include "game/main.h"
+#include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/svga.h"
 
-#if __APPLE__ && TARGET_OS_IOS
+#if __APPLE__
+#include <TargetConditionals.h>
+#if TARGET_OS_IOS
 #include "platform/ios/paths.h"
+#endif
 #endif
 
 namespace fallout {
@@ -41,8 +45,15 @@ int main(int argc, char* argv[])
 #endif
 
 #if __APPLE__ && TARGET_OS_IOS
+#if TARGET_OS_SIMULATOR
+    // Simulator: Allow mouse events to flow through normally (desktop mode)
+    debug_printf("[Input] iOS Simulator detected - using desktop mouse mode\n");
+#else
+    // Real device: Disable mouse<->touch conversion, use native touch/pencil
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+    debug_printf("[Input] Real iOS device - using touch/pencil mode\n");
+#endif
     chdir(iOSGetDocumentsPath());
 #endif
 
