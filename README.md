@@ -33,7 +33,7 @@ I did this because I love Fallout. Fallout 1 was the first computer game I ever 
 | Mouse | ✅ Full | ✅ Magic Keyboard/Trackpad |
 | Keyboard | ✅ Full | ✅ External keyboards |
 | Touch | — | ✅ Gesture-based (see below) |
-| Apple Pencil | — | ⏳ Planned (not yet implemented) |
+| Apple Pencil | — | ✅ Full support (see below) |
 
 ## Installation
 
@@ -66,6 +66,19 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
 | Two-finger tap | Right-click (switch cursor mode) |
 | Two fingers drag | Scroll views |
 | Three-finger tap | Left-click without moving cursor |
+
+**Apple Pencil Controls:**
+| Gesture | Action |
+|---------|--------|
+| Tap near cursor | Left-click |
+| Tap away from cursor | Move cursor only (no click) |
+| Long-press | Right-click (examine/context menu) |
+| Pencil body double-tap | Right-click (2nd gen+ pencils) |
+| Squeeze | Right-click (Apple Pencil Pro only) |
+| Drag from cursor | Click + drag |
+| Drag from away | Move cursor (no button) |
+
+Apple Pencil uses absolute positioning — the cursor follows exactly where you touch. The "click radius" concept separates positioning from clicking, just like a mouse.
 
 **With Magic Keyboard/Trackpad:** Full mouse and keyboard support including F-keys.
 
