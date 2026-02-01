@@ -594,6 +594,8 @@ bool dialog_active()
 // 0x43DE28
 void gdialog_enter(Object* target, int a2)
 {
+    gmouse_tooltip_hide();
+
     gdDialogWentOff = false;
 
     if (isInCombat()) {
@@ -614,7 +616,7 @@ void gdialog_enter(Object* target, int a2)
                 if (a2) {
                     display_print(messageListItem.text);
                 } else {
-                    debug_printf(messageListItem.text);
+                    debug_printf("%s", messageListItem.text);
                 }
             } else {
                 debug_printf("\nError: gdialog: Can't find message!");
@@ -629,7 +631,7 @@ void gdialog_enter(Object* target, int a2)
                 if (a2) {
                     display_print(messageListItem.text);
                 } else {
-                    debug_printf(messageListItem.text);
+                    debug_printf("%s", messageListItem.text);
                 }
             } else {
                 debug_printf("\nError: gdialog: Can't find message!");

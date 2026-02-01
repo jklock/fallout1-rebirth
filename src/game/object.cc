@@ -1494,6 +1494,17 @@ int obj_reset_roof()
     return 0;
 }
 
+bool obj_get_player_roof_info(int* outRoofX, int* outRoofY, int* outElev)
+{
+    if (obj_last_is_empty) {
+        return false;
+    }
+    if (outRoofX != nullptr) *outRoofX = obj_last_roof_x;
+    if (outRoofY != nullptr) *outRoofY = obj_last_roof_y;
+    if (outElev != nullptr) *outElev = obj_last_elev;
+    return true;
+}
+
 // Sets object fid.
 //
 // 0x47C624

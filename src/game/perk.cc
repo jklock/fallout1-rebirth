@@ -398,6 +398,9 @@ int perk_adjust_skill(int skill)
             modifier += 20;
         }
         break;
+    case SKILL_OUTDOORSMAN:
+        modifier += perk_level(PERK_SURVIVALIST) * 20;
+        break;
     }
 
     return modifier;

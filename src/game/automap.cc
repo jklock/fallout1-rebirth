@@ -197,6 +197,8 @@ int automap_save(DB_FILE* stream)
 // 0x41A80C
 void automap(bool isInGame, bool isUsingScanner)
 {
+    gmouse_tooltip_hide();
+
     // 0x41A738
     static const int frmIds[AUTOMAP_FRM_COUNT] = {
         171, // automap.frm - automap window

@@ -148,6 +148,7 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
     video_options.height = 480;
     video_options.fullscreen = true;
     video_options.scale = 1;
+    video_options.exclusive = 1;
 
     Config resolutionConfig;
     if (config_init(&resolutionConfig)) {
@@ -167,11 +168,20 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
                 video_options.fullscreen = !windowed;
             }
 
+            bool exclusive;
+            if (configGetBool(&resolutionConfig, "MAIN", "EXCLUSIVE", &exclusive)) {
+                video_options.exclusive = exclusive;
+            }
+
             int scaleValue;
             if (config_get_value(&resolutionConfig, "MAIN", "SCALE_2X", &scaleValue)) {
                 video_options.scale = scaleValue + 1;
                 video_options.width /= video_options.scale;
                 video_options.height /= video_options.scale;
+
+                // Keep logical surface large enough for 640px-wide interface assets.
+                video_options.width = std::max(video_options.width, 640);
+                video_options.height = std::max(video_options.height, 480);
             }
         }
         config_exit(&resolutionConfig);

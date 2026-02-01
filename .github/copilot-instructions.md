@@ -1,17 +1,48 @@
-# Copilot / AI Agent Guide for Fallout CE Rebirth ✅
+# Copilot / AI Agent Guide for Fallout 1 Rebirth
 
-**Apple-Only Fork** - This project targets macOS and iOS/iPadOS exclusively.
+**Apple-Only Fork** — This project targets macOS and iOS/iPadOS exclusively.
 
 Short, actionable instructions to help an AI coding agent get productive quickly.
 
-## Quick high-level architecture (big picture)
-- Core gameplay: `src/game/` (game logic, save/load, world/map, UI hooks). See `src/game/game.h` and `src/game/main.cc` for startup and main loop.
-- Script engine: `src/int/` (interpreter + Fallout script opcodes). Script handlers live in `src/int/support/intextra.cc` and are registered via `interpretAddFunc(...)`.
-- Platform & UI layer: `src/plib/` (`plib/gnw` implements graphics/input/dialogs via SDL/OS APIs).
-- Platform-specific bits: `src/platform/` and `os/ios/`, `os/macos/`.
-- Third-party: `third_party/` (SDL2, adecode, fpattern). These use CMake FetchContent and pinned commits.
+## Project Status
 
-## Build & run (concrete commands) 💻
+All development phases are complete:
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 0 | Environment Setup | COMPLETED |
+| 1 | Vanilla Build | COMPLETED |
+| 2 | Fork Integration | COMPLETED |
+| 3 | RME Integration | COMPLETED |
+| 4 | Testing Infrastructure | COMPLETED |
+| 5 | Distribution Structure | COMPLETED |
+| 6 | Engine Fixes | COMPLETED |
+| 7 | Platform Cleanup | COMPLETED |
+
+Key completions:
+- All Android/Windows/Linux code removed — Apple platforms only
+- CI/CD workflows operational (ci-build.yml, release.yml)
+- Distribution structure in `dist/macos/` and `dist/ios/`
+- Engine fixes verified (Survivalist perk, bug fixes)
+- Testing infrastructure in place with simulator support
+
+## Architecture Overview
+
+| Directory | Purpose |
+|-----------|---------|
+| `src/game/` | Core gameplay (game logic, save/load, world/map, UI hooks) |
+| `src/int/` | Script engine (interpreter + Fallout script opcodes) |
+| `src/plib/` | Platform & UI layer (graphics/input/dialogs via SDL) |
+| `src/platform/` | Platform-specific abstractions |
+| `os/ios/`, `os/macos/` | Platform resources (Info.plist, icons, storyboards) |
+| `third_party/` | Dependencies (SDL2, adecode, fpattern) via FetchContent |
+| `dist/` | Distribution files for packaging |
+| `FCE/` | Project documentation, analysis, and phase guides |
+
+Entry points: `src/game/game.h` and `src/game/main.cc` for startup and main loop.
+Script handlers: `src/int/support/intextra.cc` registered via `interpretAddFunc(...)`.
+
+## Build Commands
 
 ### macOS (Xcode)
 ```bash
@@ -20,14 +51,14 @@ cmake --build build-macos --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
 cd build-macos && cpack -C RelWithDebInfo  # creates DMG
 ```
 
-### macOS (Makefiles - faster iteration)
+### macOS (Makefiles — faster iteration)
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build -j $(sysctl -n hw.physicalcpu)
-./build/fallout-ce
+./build/fallout1-rebirth
 ```
 
-### iOS/iPadOS
+### iOS/iPadOS (Device)
 ```bash
 cmake -B build-ios \
   -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
@@ -39,60 +70,109 @@ cmake --build build-ios --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
 cd build-ios && cpack -C RelWithDebInfo  # creates .ipa
 ```
 
-### Quick rebuild
+### Quick Build Scripts
 ```bash
-./scripts/build-macos.sh   # or build-ios.sh
+./scripts/build-macos.sh   # Build for macOS
+./scripts/build-ios.sh     # Build for iOS device
 ```
 
-## CI & checks (what to make green) ✅
-- See `.github/workflows/ci-build.yml`:
-  - Static analysis: `cppcheck --std=c++17 src/`
-  - Formatting: `find src -type f -name "*.cc" -o -name "*.h" | xargs clang-format --dry-run --Werror` (use `clang-format -i` to fix locally).
-  - macOS and iOS builds only.
-- Release artifacts are produced by `.github/workflows/release.yml` and uploaded to GitHub Releases.
-- Run `./scripts/check.sh` locally before committing.
+## Available Scripts
 
-## Project-specific conventions & patterns (do these precisely) 🔧
-- Add new C++ sources: update `CMakeLists.txt` — sources are enumerated under `target_sources(${EXECUTABLE_NAME} PUBLIC ...)`. Forgetting to add files → build failure.
-- Script opcodes: implement handler in `src/int/support/intextra.cc` and register with `interpretAddFunc(OPCODE, handler)`. Use `dbg_error(...)` and `debug_printf(...)` for consistent script error logging.
-- Formatting: `.clang-format` (BasedOnStyle: WebKit) + `.editorconfig`. Run `clang-format -i` on changed files before PR.
-- Memory & error handling: codebase uses C-style memory and global state (many `extern`s). Be cautious with ownership/pointers and avoid introducing complex RAII changes without tests.
-- Naming: file names and headers use lowercase + underscores; header guards follow `FALLOUT_<PATH>_H_`; most sources are in namespace `fallout`.
+| Script | Purpose |
+|--------|---------|
+| `./scripts/build-macos.sh` | Build for macOS |
+| `./scripts/build-ios.sh` | Build for iOS device |
+| `./scripts/test-ios-simulator.sh` | Build and test on iOS Simulator |
+| `./scripts/test-macos.sh` | Build and verify macOS app |
+| `./scripts/test-macos-headless.sh` | Headless macOS app validation |
+| `./scripts/test-ios-headless.sh` | Headless iOS Simulator validation |
+| `./scripts/dev-verify.sh` | Run verification (build + static checks) |
+| `./scripts/dev-check.sh` | Pre-commit checks (format + lint) |
+| `./scripts/dev-format.sh` | Format code with clang-format |
+| `./scripts/dev-clean.sh` | Clean all build artifacts |
 
-## Dependencies & integration notes ⚠️
-- SDL2: bundled via `third_party/sdl2` using FetchContent (currently release-2.30.10).
-- Third-party libraries are pinned in `third_party/*` via FetchContent (update GIT_TAG when upgrading and add a brief PR note).
-- Xcode and Command Line Tools required for all builds.
+## CI/CD Workflows
 
-## Debugging & sanitizers 🐞
-- Useful helpers: `debug_printf(...)`, `GNWSystemError(...)`, `dbg_error(...)` for script/runtime errors.
-- ASAN/UBSAN: enable using CMake options: `-DASAN=ON` / `-DUBSAN=ON` while configuring.
+### ci-build.yml (Continuous Integration)
+Triggered on push to `main` and pull requests:
+- **Static analysis**: `cppcheck --std=c++17 src/`
+- **Code format check**: clang-format validation
+- **iOS build**: Full build on macos-14 runner
+- **macOS build**: Full build on macos-14 runner
 
-## Assets & licensing (very important) ⚖️
-- You MUST NOT add original game assets (`master.dat`, `critter.dat`, `data/`) to the repo or commits. See `README.md` and `LICENSE.md` (Sustainable Use License). Tests that require assets must include clear local reproduction steps and not ship binaries.
-- Asset filename case matters on case-sensitive file systems; config keys are in `fallout.cfg` (`master_dat`, `critter_dat`) and default to `master.dat`/`critter.dat` in `src/game/gconfig.cc`.
+### release.yml (Release Automation)
+Triggered on version tags (`v*`) and published releases:
+- Builds iOS .ipa and macOS .dmg
+- Code signs with Apple Developer certificate (from secrets)
+- Notarizes macOS app with Apple
+- Uploads artifacts to GitHub Releases
 
-## Tests & PR checklist (what to include in PRs) ✅
-- Run `clang-format` and `cppcheck` locally and fix issues.
-- Ensure CI builds for at least the platform(s) your change affects.
-- If you add sources, update `CMakeLists.txt` and (if needed) platform packaging steps.
-- Document manual reproduction steps and required assets (if any) in the PR description.
-- Never include secrets or signing keys in PRs—CI uses repository secrets for signing/notarization.
+Run `./scripts/dev-check.sh` locally before committing.
 
-## Where to look for examples ⛏️
-- Source struct: `src/game/`, `src/int/`, `src/plib/`.
-- Opcode registration: `src/int/support/intextra.cc` (look for `interpretAddFunc(...)`).
-- Build & CI examples: `.github/workflows/ci-build.yml`, `.github/workflows/release.yml`.
-- iOS platform: `os/ios/` and `cmake/toolchain/ios.toolchain.cmake`.
-- Packaging (macOS/iOS): `CMakeLists.txt` CPACK setup.
+## Distribution Structure
 
-## Testing 🧪
-- Automated: `./scripts/test.sh` runs build verification and static checks.
-- Manual testing required for gameplay - see `FCE/TODO/PHASE_4_TESTING_POLISH.md`.
-- Game data files (master.dat, critter.dat) are NOT included - obtain from GOG/Steam.
+The `dist/` directory contains platform-specific distribution files:
 
-### iOS Simulator Testing (PRIMARY TARGET) 📱
-**iPad is the primary use case for this project.** Always use the dedicated script:
+```
+dist/
+├── macos/
+│   ├── README.md
+│   ├── README.txt
+│   ├── f1_res.ini
+│   └── fallout.cfg
+└── ios/
+    ├── README.md
+    ├── README.txt
+    ├── f1_res.ini
+    └── fallout.cfg
+```
+
+These files are bundled with the app during packaging (DMG for macOS, IPA for iOS).
+
+## Project Conventions
+
+- **Adding sources**: Update `CMakeLists.txt` under `target_sources(${EXECUTABLE_NAME} PUBLIC ...)`. Missing files cause build failures.
+- **Script opcodes**: Implement in `src/int/support/intextra.cc`, register with `interpretAddFunc(OPCODE, handler)`.
+- **Formatting**: `.clang-format` (BasedOnStyle: WebKit) + `.editorconfig`. Run `clang-format -i` on changed files.
+- **Memory handling**: C-style memory with global state (many `extern`s). Avoid complex RAII without tests.
+- **Naming**: Lowercase + underscores for files; header guards `FALLOUT_<PATH>_H_`; namespace `fallout`.
+- **Logging**: Use `debug_printf(...)`, `dbg_error(...)`, `GNWSystemError(...)` for runtime errors.
+
+## Dependencies
+
+- **SDL2**: Bundled via `third_party/sdl2` using FetchContent (release-2.30.10)
+- **adecode**: Audio decoding library in `third_party/adecode`
+- **fpattern**: File pattern matching in `third_party/fpattern`
+
+All dependencies are pinned via FetchContent GIT_TAG. Update tags when upgrading.
+
+**Requirements**: Xcode and Command Line Tools for all builds.
+
+## Debugging
+
+- **Helpers**: `debug_printf(...)`, `GNWSystemError(...)`, `dbg_error(...)` for runtime errors
+- **ASAN**: Enable with `-DASAN=ON` during CMake configuration
+- **UBSAN**: Enable with `-DUBSAN=ON` during CMake configuration
+
+## Assets & Licensing
+
+- **Never commit** original game assets (`master.dat`, `critter.dat`, `data/`) to the repo
+- See `README.md` and `LICENSE.md` (Sustainable Use License)
+- Asset filename case matters on case-sensitive file systems
+- Config keys in `fallout.cfg`: `master_dat`, `critter_dat`
+- Obtain game data from GOG or Steam
+
+## Testing
+
+### Automated Testing
+```bash
+./scripts/dev-verify.sh   # Build verification + static checks
+./scripts/dev-check.sh    # Pre-commit format + lint checks
+```
+
+### iOS Simulator Testing (Primary Target)
+
+**iPad is the primary use case.** Use the dedicated script:
 ```bash
 ./scripts/test-ios-simulator.sh              # Full flow: build + install + launch
 ./scripts/test-ios-simulator.sh --build-only # Just build
@@ -101,17 +181,36 @@ cd build-ios && cpack -C RelWithDebInfo  # creates .ipa
 ./scripts/test-ios-simulator.sh --list       # Show available iPad sims
 ```
 
-**CRITICAL RULES:**
-- **ONE SIMULATOR AT A TIME** — multiple simulators cause severe memory pressure and system instability
-- Always run `--shutdown` before starting a new simulator
-- Check for running simulators: `xcrun simctl list devices | grep Booted`
-- Default target: `iPad Pro 13-inch (M4)` (configurable via `SIMULATOR_NAME` env var)
-- Game data goes in the app's **data container**, not the app bundle (read-only at runtime)
+**Critical rules:**
+- **One simulator at a time** — multiple simulators cause memory pressure
+- Run `--shutdown` before starting a new simulator
+- Check running: `xcrun simctl list devices | grep Booted`
+- Default: `iPad Pro 13-inch (M4)` (override via `SIMULATOR_NAME` env var)
+- Game data goes in app's data container, not app bundle
 
-**DO NOT** manually run `xcrun simctl boot` on multiple devices or use raw CMake commands for simulator builds — use the script.
+**Do not** manually run `xcrun simctl boot` on multiple devices or use raw CMake for simulator builds.
 
-## Fork Enhancements (Rebirth) 🍎
-This fork includes cherry-picked improvements:
+## PR Checklist
+
+- [ ] Run `clang-format` and `cppcheck` locally
+- [ ] Ensure CI builds pass for affected platforms
+- [ ] Update `CMakeLists.txt` if adding sources
+- [ ] Document manual reproduction steps if assets required
+- [ ] Never include secrets or signing keys
+
+## Code Examples
+
+| What | Where |
+|------|-------|
+| Source structure | `src/game/`, `src/int/`, `src/plib/` |
+| Opcode registration | `src/int/support/intextra.cc` (`interpretAddFunc(...)`) |
+| CI workflows | `.github/workflows/ci-build.yml`, `.github/workflows/release.yml` |
+| iOS platform | `os/ios/`, `cmake/toolchain/ios.toolchain.cmake` |
+| Packaging | `CMakeLists.txt` CPACK setup |
+
+## Fork Enhancements
+
+This fork includes cherry-picked improvements from community contributors:
 - iPad mouse/trackpad + F-key support (evaera)
 - Touch control optimization (zverinapavel)
 - Borderless window mode (radozd)
@@ -119,7 +218,7 @@ This fork includes cherry-picked improvements:
 - TeamX Patch 1.3.5 compatibility
 - RME 1.1e data integration
 
-See `FCE/` directory for project documentation and phase guides.
+See `FCE/` directory for full project documentation and phase guides.
 
 ---
 For other platforms, use upstream: https://github.com/alexbatalov/fallout1-ce

@@ -2,16 +2,22 @@ cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-set(EXECUTABLE_NAME fallout-ce)
+set(EXECUTABLE_NAME fallout1-rebirth)
 
-if (APPLE)
-    if(IOS)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0" CACHE STRING "")
-        set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "")
-    else()
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0" CACHE STRING "")
-        set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "")
-    endif()
+# Platform check - Apple only (macOS and iOS)
+if(NOT APPLE)
+    message(FATAL_ERROR 
+        "Fallout 1 Rebirth only supports Apple platforms (macOS and iOS).\n"
+        "For other platforms, use the upstream: https://github.com/alexbatalov/fallout1-ce"
+    )
+endif()
+
+if(IOS)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "")
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "")
+else()
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "")
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "")
 endif()
 
 project(${EXECUTABLE_NAME})
@@ -23,11 +29,7 @@ set(CMAKE_CXX_EXTENSIONS NO)
 option(ASAN "Enable address sanitizer" OFF)
 option(UBSAN "Enable undefined behaviour sanitizer" OFF)
 
-if (ANDROID)
-    add_library(${EXECUTABLE_NAME} SHARED)
-else()
-    add_executable(${EXECUTABLE_NAME} WIN32 MACOSX_BUNDLE)
-endif()
+add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE)
 
 if(ASAN)
     target_compile_options(${EXECUTABLE_NAME} PUBLIC "-fsanitize=address;-fsanitize-recover=address")
@@ -171,6 +173,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/game/tile.h"
     "src/game/trait.cc"
     "src/game/trait.h"
+    "src/game/tweaks.cc"
+    "src/game/tweaks.h"
     "src/game/version.cc"
     "src/game/version.h"
     "src/game/wordwrap.cc"
@@ -279,77 +283,52 @@ if(IOS)
     )
 endif()
 
-if(WIN32)
-    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
-        _CRT_SECURE_NO_WARNINGS
-        _CRT_NONSTDC_NO_WARNINGS
-        NOMINMAX
-        WIN32_LEAN_AND_MEAN
+# Platform-specific resources and settings
+if(IOS)
+    set(RESOURCES
+        "os/ios/AppIcon.xcassets"
+        "os/ios/LaunchScreen.storyboard"
     )
-endif()
 
-if(WIN32)
-    target_link_libraries(${EXECUTABLE_NAME}
-        winmm
+    target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
+    set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/ios/Info.plist"
+        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.fallout1rebirth.game"
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
     )
-endif()
 
-if (WIN32)
-    target_sources(${EXECUTABLE_NAME} PUBLIC
-        "os/windows/fallout-ce.ico"
-        "os/windows/fallout-ce.rc"
-    )
-endif()
-
-if(APPLE)
-    if(IOS)
-        set(RESOURCES
-            "os/ios/AppIcon.xcassets"
-            "os/ios/LaunchScreen.storyboard"
-        )
-
-        target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
-        set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-
-        set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/ios/Info.plist"
-            XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.alexbatalov.fallout-ce"
-            XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
-        )
-
-        set(MACOSX_BUNDLE_BUNDLE_NAME "${EXECUTABLE_NAME}")
-        set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
-    else()
-        set(RESOURCES
-            "os/macos/fallout-ce.icns"
-        )
-
-        target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
-        set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-
-        set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-            OUTPUT_NAME "Fallout Community Edition"
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/macos/Info.plist"
-            XCODE_ATTRIBUTE_EXECUTABLE_NAME "${EXECUTABLE_NAME}"
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.alexbatalov.fallout-ce"
-        )
-
-        set(MACOSX_BUNDLE_ICON_FILE "fallout-ce.icns")
-        set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout: Community Edition")
-        set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout")
-    endif()
-
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.alexbatalov.fallout-ce")
-    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0.0")
-endif()
-
-if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux") AND (NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") AND (NOT ${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD"))
-    add_subdirectory("third_party/sdl2")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout 1 Rebirth")
+    set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout 1 Rebirth")
 else()
-    find_package(SDL2)
+    # macOS
+    set(RESOURCES
+        "os/macos/fallout1-rebirth.icns"
+    )
+
+    target_sources(${EXECUTABLE_NAME} PUBLIC ${RESOURCES})
+    set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        OUTPUT_NAME "Fallout 1 Rebirth"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/macos/Info.plist"
+        XCODE_ATTRIBUTE_EXECUTABLE_NAME "${EXECUTABLE_NAME}"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.fallout1rebirth.game"
+    )
+
+    set(MACOSX_BUNDLE_ICON_FILE "fallout1-rebirth.icns")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "Fallout 1 Rebirth")
+    set(MACOSX_BUNDLE_DISPLAY_NAME "Fallout 1 Rebirth")
 endif()
+
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.fallout1rebirth.game")
+set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0")
+set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0.0")
+
+# SDL2 - always use bundled version for Apple
+add_subdirectory("third_party/sdl2")
 
 add_subdirectory("third_party/adecode")
 target_link_libraries(${EXECUTABLE_NAME} adecode::adecode)
@@ -360,21 +339,21 @@ target_link_libraries(${EXECUTABLE_NAME} fpattern::fpattern)
 target_link_libraries(${EXECUTABLE_NAME} ${SDL2_LIBRARIES})
 target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
 
-if(APPLE)
-    if(IOS)
-        install(TARGETS ${EXECUTABLE_NAME} DESTINATION "Payload")
+# Packaging
+if(IOS)
+    install(TARGETS ${EXECUTABLE_NAME} DESTINATION "Payload")
 
-        set(CPACK_GENERATOR "ZIP")
-        set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-        set(CPACK_PACKAGE_FILE_NAME "fallout-ce")
-        set(CPACK_ARCHIVE_FILE_EXTENSION "ipa")
-    else()
-        install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
+    set(CPACK_GENERATOR "ZIP")
+    set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+    set(CPACK_PACKAGE_FILE_NAME "fallout1-rebirth")
+    set(CPACK_ARCHIVE_FILE_EXTENSION "ipa")
+else()
+    # macOS
+    install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
 
-        set(CPACK_GENERATOR "DragNDrop")
-        set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
-        set(CPACK_PACKAGE_FILE_NAME "Fallout Community Edition")
-    endif()
-
-    include(CPack)
+    set(CPACK_GENERATOR "DragNDrop")
+    set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
+    set(CPACK_PACKAGE_FILE_NAME "Fallout 1 Rebirth")
 endif()
+
+include(CPack)
