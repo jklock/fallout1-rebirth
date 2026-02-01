@@ -400,6 +400,11 @@ master.dat
 critter.dat
 *.sav
 
+# Local research folder — keep placeholders tracked, ignore other contents
+FCE/*
+!FCE/.gitkeep
+!FCE/README.md
+
 # macOS
 .DS_Store
 *.dmg

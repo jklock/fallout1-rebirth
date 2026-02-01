@@ -1,0 +1,3 @@
+This file ensures the `FCE/` folder is present in the repository.
+
+The contents of `FCE/` are intentionally ignored to avoid committing large or sensitive research files. See `README.md` in this folder for context.
