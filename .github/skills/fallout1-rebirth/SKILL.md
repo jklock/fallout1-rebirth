@@ -10,6 +10,27 @@ This skill provides guidance for working with the Fallout 1 Rebirth project, an 
 
 **Primary target: iPad** — this is the main use case for this project.
 
+## ⚠️ CRITICAL: ALWAYS Use Project Scripts
+
+**NEVER run raw cmake, xcodebuild, or xcrun simctl commands directly. ALWAYS use the provided scripts.**
+
+| Task | ALWAYS Use | NEVER Do This |
+|------|------------|---------------|
+| iOS Testing | `./scripts/test-ios-simulator.sh` | ❌ `cmake ...` or `xcrun simctl boot` |
+| macOS Testing | `./scripts/test-macos.sh` | ❌ `./build/fallout1-rebirth` directly |
+| iOS Build | `./scripts/build-ios.sh` | ❌ `cmake -B build-ios ...` |
+| macOS Build | `./scripts/build-macos.sh` | ❌ `cmake -B build-macos ...` |
+| Pre-commit | `./scripts/dev-check.sh` | ❌ running `clang-format` manually |
+
+### iOS Simulator Rules (MUST FOLLOW)
+1. **ALWAYS** use `./scripts/test-ios-simulator.sh` for iOS testing
+2. **NEVER** run multiple simulators simultaneously — causes memory pressure
+3. **NEVER** use raw cmake commands for simulator builds
+4. **ALWAYS** run `./scripts/test-ios-simulator.sh --shutdown` before starting a new simulator
+5. Check running simulators: `xcrun simctl list devices | grep Booted`
+
+The scripts handle proper build configuration, simulator lifecycle management, and cleanup. Ignoring them causes test failures and wastes significant debugging time.
+
 ## Build Commands
 
 ### macOS (fast iteration)

@@ -4,6 +4,9 @@
 #include <SDL.h>
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
+#if TARGET_OS_IOS
+#include "platform/ios/pencil.h"
+#endif
 #endif
 
 namespace fallout {
@@ -18,6 +21,10 @@ static int gMouseWheelDeltaY = 0;
 
 #if defined(__APPLE__) && TARGET_OS_IOS
 static bool last_input_was_mouse = false;
+// Grace period (ms) after pencil lifts before trackpad can resume control
+// Prevents cursor jumping when user's palm rests on trackpad while using pencil
+static const Uint32 PENCIL_GRACE_PERIOD_MS = 100;
+static Uint32 last_pencil_lift_time = 0;
 #endif
 
 // 0x4E0400
@@ -77,12 +84,29 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_Event event;
     Uint32 current_time = SDL_GetTicks();
     
+    // Check if Apple Pencil is currently active
+    bool pencil_touching = pencil_is_touching();
+    bool pencil_was_recent = (current_time - last_pencil_lift_time) < PENCIL_GRACE_PERIOD_MS;
+    
+    // Track when pencil lifts for grace period
+    static bool was_pencil_touching = false;
+    if (was_pencil_touching && !pencil_touching) {
+        last_pencil_lift_time = current_time;
+    }
+    was_pencil_touching = pencil_touching;
+    
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION) == 1) {
-        last_input_was_mouse = true;
+        // Only accept mouse/trackpad input if pencil is not active
+        if (!pencil_touching && !pencil_was_recent) {
+            last_input_was_mouse = true;
+        }
     }
     
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP) == 1) {
-        last_input_was_mouse = true;
+        // Only accept mouse/trackpad input if pencil is not active
+        if (!pencil_touching && !pencil_was_recent) {
+            last_input_was_mouse = true;
+        }
     }
     
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERDOWN, SDL_FINGERUP) == 1) {
@@ -96,7 +120,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     int system_x, system_y;
     Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
     
-    if (last_input_was_mouse) {
+    // Process mouse/trackpad only if pencil is not overriding
+    if (last_input_was_mouse && !pencil_touching && !pencil_was_recent) {
         int game_x, game_y;
         mouse_get_position(&game_x, &game_y);
         
@@ -127,8 +152,14 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->y = 0;
     }
     
-    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
-    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    // Only report mouse buttons if pencil is not active
+    if (pencil_touching || pencil_was_recent) {
+        mouseState->buttons[0] = 0;
+        mouseState->buttons[1] = 0;
+    } else {
+        mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+        mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    }
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;

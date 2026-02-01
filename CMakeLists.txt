@@ -280,6 +280,8 @@ if(IOS)
     target_sources(${EXECUTABLE_NAME} PUBLIC
         "src/platform/ios/paths.h"
         "src/platform/ios/paths.mm"
+        "src/platform/ios/pencil.h"
+        "src/platform/ios/pencil.mm"
     )
 endif()
 
