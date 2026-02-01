@@ -171,6 +171,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/game/tile.h"
     "src/game/trait.cc"
     "src/game/trait.h"
+    "src/game/tweaks.cc"
+    "src/game/tweaks.h"
     "src/game/version.cc"
     "src/game/version.h"
     "src/game/wordwrap.cc"
