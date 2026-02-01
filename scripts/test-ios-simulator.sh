@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Fallout CE Rebirth — iOS Simulator Test Script
+# Fallout 1 Rebirth — iOS Simulator Test Script
 # =============================================================================
 # PRIMARY TARGET: iPad (the main use case for this project)
 #
@@ -26,6 +26,7 @@
 #   GAME_DATA       - Path to game files (default: "GOG/Fallout1")
 #   BUILD_DIR       - Build output dir (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
+#   CLEAN           - Set to "1" to force reconfigure
 # =============================================================================
 set -euo pipefail
 
@@ -41,6 +42,7 @@ GAME_DATA="${GAME_DATA:-GOG/Fallout1}"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
+CLEAN="${CLEAN:-0}"
 TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
 
 # Bundle ID will be auto-detected from built app (not hardcoded)
@@ -63,7 +65,7 @@ log_error() { echo -e "${RED}❌${NC} $1"; }
 
 # Auto-detect bundle ID from built app's Info.plist
 detect_bundle_id() {
-    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout-ce.app"
+    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout1-rebirth.app"
     local plist="$app_path/Info.plist"
     
     if [[ ! -f "$plist" ]]; then
@@ -188,13 +190,20 @@ build_for_simulator() {
     
     if [[ ! -f "$TOOLCHAIN" ]]; then
         log_error "iOS toolchain not found: $TOOLCHAIN"
+        log_info "Ensure you're running from the project root"
         exit 1
+    fi
+    
+    # Clean if requested
+    if [[ "$CLEAN" == "1" && -d "$BUILD_DIR" ]]; then
+        log_warn "CLEAN=1 set, removing $BUILD_DIR..."
+        rm -rf "$BUILD_DIR"
     fi
     
     # Configure if needed
     if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
         log_info "Configuring CMake for Simulator..."
-        cmake -B "$BUILD_DIR" \
+        if ! cmake -B "$BUILD_DIR" \
             -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
             -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
             -D ENABLE_BITCODE=0 \
@@ -202,20 +211,29 @@ build_for_simulator() {
             -D DEPLOYMENT_TARGET=26.0 \
             -G Xcode \
             -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO
+            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO; then
+            log_error "CMake configuration failed"
+            exit 1
+        fi
+        log_ok "Configuration complete"
+    else
+        log_info "Using existing CMake configuration"
     fi
     
     # Build
-    log_info "Compiling (this may take a few minutes)..."
-    cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS" -- \
+    log_info "Compiling ($BUILD_TYPE, $JOBS parallel jobs)..."
+    if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS" -- \
         -destination "generic/platform=iOS Simulator" \
-        EXCLUDED_ARCHS=""
+        EXCLUDED_ARCHS=""; then
+        log_error "Build failed"
+        exit 1
+    fi
     
     # Verify executable exists
-    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout-ce.app"
-    if [[ -f "$app_path/fallout-ce" ]]; then
+    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout1-rebirth.app"
+    if [[ -f "$app_path/fallout1-rebirth" ]]; then
         log_ok "Build complete: $app_path"
-        file "$app_path/fallout-ce"
+        file "$app_path/fallout1-rebirth"
     else
         log_error "Build failed: executable not found"
         exit 1
@@ -225,7 +243,7 @@ build_for_simulator() {
 # Install app to simulator (with retries)
 install_to_simulator() {
     local udid="$1"
-    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout-ce.app"
+    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout1-rebirth.app"
     
     log_info "Installing to simulator..."
     
@@ -385,7 +403,7 @@ launch_app() {
 main() {
     echo ""
     echo "=============================================="
-    echo " Fallout CE Rebirth — iOS Simulator Testing"
+    echo " Fallout 1 Rebirth — iOS Simulator Testing"
     echo "=============================================="
     echo " Target: $SIMULATOR_NAME"
     echo " Game data: $GAME_DATA"
