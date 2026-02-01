@@ -45,6 +45,9 @@ JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 CLEAN="${CLEAN:-0}"
 TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
 
+# iOS Simulator output directory suffix
+SIM_SUFFIX="iphonesimulator"
+
 # Bundle ID will be auto-detected from built app (not hardcoded)
 APP_BUNDLE_ID=""
 
@@ -65,7 +68,7 @@ log_error() { echo -e "${RED}❌${NC} $1"; }
 
 # Auto-detect bundle ID from built app's Info.plist
 detect_bundle_id() {
-    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout1-rebirth.app"
+    local app_path="$BUILD_DIR/$BUILD_TYPE-$SIM_SUFFIX/fallout1-rebirth.app"
     local plist="$app_path/Info.plist"
     
     if [[ ! -f "$plist" ]]; then
@@ -230,7 +233,7 @@ build_for_simulator() {
     fi
     
     # Verify executable exists
-    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout1-rebirth.app"
+    local app_path="$BUILD_DIR/$BUILD_TYPE-$SIM_SUFFIX/fallout1-rebirth.app"
     if [[ -f "$app_path/fallout1-rebirth" ]]; then
         log_ok "Build complete: $app_path"
         file "$app_path/fallout1-rebirth"
@@ -243,7 +246,7 @@ build_for_simulator() {
 # Install app to simulator (with retries)
 install_to_simulator() {
     local udid="$1"
-    local app_path="$BUILD_DIR/$BUILD_TYPE/fallout1-rebirth.app"
+    local app_path="$BUILD_DIR/$BUILD_TYPE-$SIM_SUFFIX/fallout1-rebirth.app"
     
     log_info "Installing to simulator..."
     

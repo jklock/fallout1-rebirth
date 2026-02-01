@@ -395,13 +395,13 @@ FodyWeavers.xsd
 /_deps
 
 # Game data (must not be committed - copyrighted)
-GOG/
+
 master.dat
 critter.dat
 *.sav
+development/
+# Project documentation and research (internal use)#FCE/
 
-# Project documentation and research (internal use)
-FCE/
 
 # Journal files (AI agent notes - not for version control)
 **/JOURNAL.md
