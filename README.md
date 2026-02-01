@@ -10,11 +10,16 @@ Fallout 1 Rebirth is a fully working re-implementation of Fallout, with the same
 
 > For Windows, Linux, or Android support, use the upstream project: [alexbatalov/fallout1-ce](https://github.com/alexbatalov/fallout1-ce)
 
-I did this because I love Fallout. Fallout 1 was the first computer game I ever bought. I got it at Target for $10 when I was a kid. It was the first game I ever installed on MY computer and the first computer game I really fell in love with. 
+I did this because I love Fallout. Fallout 1 was the first computer game I ever bought. I got it at Target for $10 when I was a kid. It was the first game I ever installed on MY computer and the first computer game I really fell in love with.
 
 ## Features
 
-This fork includes cherry-picked improvements:
+### Core Features
+- **Native Apple Silicon support** — Runs natively on M1/M2/M3/M4 Macs and all modern iPads
+- **Engine bug fixes** — Survivalist perk fix, combat improvements, and script corrections
+- **High-DPI Retina support** — Sharp rendering with 2X integer scaling option
+
+### Cherry-Picked Community Improvements
 - **iPad mouse/trackpad + F-key support** (evaera)
 - **Touch control optimization** (zverinapavel)
 - **Borderless window mode** (radozd)
@@ -22,71 +27,107 @@ This fork includes cherry-picked improvements:
 - **TeamX Patch 1.3.5 compatibility**
 - **RME 1.1e data integration**
 
+### Input Support
+| Input Method | macOS | iPad |
+|--------------|-------|------|
+| Mouse | ✅ Full | ✅ Magic Keyboard/Trackpad |
+| Keyboard | ✅ Full | ✅ External keyboards |
+| Touch | — | ✅ Gesture-based (see below) |
+| Apple Pencil | — | ⏳ Planned (not yet implemented) |
+
 ## Installation
 
-You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400). Download latest [release](https://github.com/alexbatalov/fallout1-ce/releases) or build from source.
+You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400). Download the latest release or build from source.
 
 ### macOS
 
-> **NOTE**: macOS 11.0 (Big Sur) or higher is required. Runs natively on Intel-based Macs and Apple Silicon.
+> **Requirements**: macOS 11.0 (Big Sur) or higher. Runs natively on Intel-based Macs and Apple Silicon.
 
-- Use Windows installation as a base - it contains data assets needed to play. Copy `Fallout` folder somewhere, for example `/Applications/Fallout`.
+1. **Get game data** from your Windows installation, or extract from GOG installer:
+   ```console
+   brew install innoextract
+   innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
+   mv app ~/Games/Fallout
+   ```
 
-- Alternatively you can use Fallout from MacPlay/The Omni Group as a base - you need to extract game assets from the original bundle. Mount CD/DMG, right click `Fallout` -> `Show Package Contents`, navigate to `Contents/Resources`. Copy `GameData` folder somewhere, for example `/Applications/Fallout`.
+2. **Download** `Fallout 1 Rebirth.dmg` from Releases and copy the app to your Fallout folder.
 
-- Or if you're a Terminal user and have Homebrew installed you can extract the needed files from the GoG installer:
-
-```console
-$ brew install innoextract
-$ innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
-$ mv app /Applications/Fallout
-```
-
-- Download and copy `Fallout 1 Rebirth.app` to this folder.
-
-- Run `Fallout 1 Rebirth.app`.
+3. **Run** `Fallout 1 Rebirth.app`.
 
 ### iOS/iPadOS
 
-> **NOTE**: iPad is the primary target platform for this fork. Fallout was designed with mouse in mind. There are many controls that require precise cursor positioning. Current control scheme:
+> **Primary target**: iPad is the main platform for this fork. Fallout was designed for mouse input, so touch controls emulate cursor movement.
 
-> - **Single tap**: Move cursor and left-click
-> - **One finger drag**: Move cursor around
-> - **Two-finger tap**: Right-click (switch cursor mode)
-> - **Two fingers**: Scroll views
-> - **Three-finger tap**: Left-click at cursor position without moving
+**Touch Controls:**
+| Gesture | Action |
+|---------|--------|
+| Single tap | Move cursor + left-click |
+| One finger drag | Move cursor |
+| Two-finger tap | Right-click (switch cursor mode) |
+| Two fingers drag | Scroll views |
+| Three-finger tap | Left-click without moving cursor |
 
-> **iPad with Magic Keyboard/Trackpad**: Full mouse and keyboard support including F-keys.
+**With Magic Keyboard/Trackpad:** Full mouse and keyboard support including F-keys.
 
-- Download `fallout1-rebirth.ipa`. Use sideloading applications ([AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)) to install it to your device. Alternatively you can always build from source with your own signing certificate.
-
-- Run the game once. You'll see error message saying "Could not find the master datafile...". This step is needed for iOS to expose the game via File Sharing feature.
-
-- Use Finder (macOS Catalina and later) or iTunes (Windows and macOS Mojave or earlier) to copy `master.dat`, `critter.dat`, and `data` folder to "Fallout" app ([how-to](https://support.apple.com/HT210598)). Watch for file names - keep (or make) them lowercased (see [Configuration](#configuration)).
+**Installation:**
+1. Download `fallout1-rebirth.ipa` from Releases
+2. Sideload using [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)
+3. Run the game once (you'll see a "Could not find the master datafile..." error — this is expected)
+4. Use Finder or iTunes to copy `master.dat`, `critter.dat`, and `data` folder to the app ([how-to](https://support.apple.com/HT210598))
 
 ## Configuration
 
-The main configuration file is `fallout.cfg`. There are several important settings you might need to adjust for your installation. Depending on your Fallout distribution main game assets `master.dat`, `critter.dat`, and `data` folder might be either all lowercased, or all uppercased. You can either update `master_dat`, `critter_dat`, `master_patches` and `critter_patches` settings to match your file names, or rename files to match entries in your `fallout.cfg`.
+The game uses two configuration files:
 
-The `sound` folder (with `music` folder inside) might be located either in `data` folder, or be in the Fallout folder. Update `music_path1` setting to match your hierarchy, usually it's `data/sound/music/` or `sound/music/`. Make sure it match your path exactly (so it might be `SOUND/MUSIC/` if you've installed Fallout from CD). Music files themselves (with `ACM` extension) should be all uppercased, regardless of `sound` and `music` folders.
+### fallout.cfg — Game Settings
 
-The second configuration file is `f1_res.ini`. Use it to change game window size and enable/disable fullscreen mode.
+Controls game logic, data paths, sound, and preferences.
+
+```ini
+[system]
+master_dat=master.dat        # Main game data archive
+master_patches=data          # Override folder for master.dat
+critter_dat=critter.dat      # Critter/NPC data archive
+critter_patches=data         # Override folder for critter.dat
+
+[sound]
+music_path1=data/sound/music/  # Path to music files (case-sensitive!)
+
+[preferences]
+combat_speed=0               # 0-5 (0=normal, 5=fastest)
+game_difficulty=1            # 0=easy, 1=normal, 2=hard
+```
+
+> **Important**: File paths are case-sensitive! If your game data uses `MASTER.DAT` instead of `master.dat`, update the config accordingly.
+
+### f1_res.ini — Display Settings
+
+Controls resolution, scaling, and window mode.
 
 ```ini
 [MAIN]
-SCR_WIDTH=1280
-SCR_HEIGHT=720
-WINDOWED=1
+SCR_WIDTH=1024     # Screen width in pixels
+SCR_HEIGHT=768     # Screen height in pixels
+WINDOWED=0         # 0=fullscreen, 1=windowed
+SCALE_2X=1         # 0=native, 1=2x integer scaling
 ```
 
-Recommendations:
+### Platform-Specific Recommendations
 
-- **macOS**: Use any resolution you see fit.
-- **iPad**: Set these values to logical resolution of your device, for example iPad Pro 11 is 1668x2388 (pixels), but its logical resolution is 834x1194 (points). Recommended: `1024x768` with `SCALE_2X=1`.
+| Platform | Resolution | WINDOWED | SCALE_2X | Notes |
+|----------|------------|----------|----------|-------|
+| **macOS** | 1920x1080 | 1 | 0 | Any resolution works; windowed recommended |
+| **iPad Pro 13"** | 1024x768 | 0 | 1 | Use logical resolution, not pixel resolution |
+| **iPad Pro 11"** | 1024x768 | 0 | 1 | Logical res is 834x1194 (portrait) |
+| **iPad Air** | 1024x768 | 0 | 1 | Standard 4:3 ratio works well |
 
-In time this stuff will receive in-game interface, right now you have to do it manually.
+> **iPad resolution note**: iPads report logical points, not pixels. iPad Pro 11" is 1668x2388 pixels but 834x1194 logical points. Use `1024x768` with `SCALE_2X=1` for optimal display.
 
 ## Building from Source
+
+### Requirements
+- Xcode 15+ with Command Line Tools
+- CMake 3.21+
 
 ### macOS (Xcode)
 
@@ -95,7 +136,7 @@ cmake -B build-macos -G Xcode -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
 cmake --build build-macos --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
 ```
 
-### macOS (Makefiles - faster iteration)
+### macOS (Makefiles — faster iteration)
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -103,7 +144,7 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 ./build/fallout1-rebirth
 ```
 
-### iOS Build
+### iOS/iPadOS (Device)
 
 ```bash
 cmake -B build-ios \
@@ -115,16 +156,53 @@ cmake -B build-ios \
 cmake --build build-ios --config RelWithDebInfo -j $(sysctl -n hw.physicalcpu)
 ```
 
+### iOS Simulator Testing
+
+```bash
+./scripts/test-ios-simulator.sh              # Full flow: build + install + launch
+./scripts/test-ios-simulator.sh --build-only # Just build
+./scripts/test-ios-simulator.sh --shutdown   # Shutdown all simulators
+```
+
+### Packaging
+
+```bash
+cd build-macos && cpack -C RelWithDebInfo  # Creates .dmg
+cd build-ios && cpack -C RelWithDebInfo    # Creates .ipa
+```
+
 ## Documentation
 
 Comprehensive documentation is available in the [docs/](docs/) directory:
 
-- [Setup Guide](docs/setup_guide.md) - Complete installation instructions for macOS and iOS
-- [Building](docs/building.md) - Build from source instructions
-- [Architecture](docs/architecture.md) - Codebase structure and how it works
-- [Testing](docs/testing.md) - Running tests and validation
-- [Scripts](docs/scripts.md) - Available automation scripts
-- [Contributing](docs/contributing.md) - How to contribute
+- [Setup Guide](docs/setup_guide.md) — Complete installation instructions
+- [Building](docs/building.md) — Build from source instructions
+- [Architecture](docs/architecture.md) — Codebase structure and how it works
+- [Testing](docs/testing.md) — Running tests and validation
+- [Scripts](docs/scripts.md) — Available automation scripts
+- [Contributing](docs/contributing.md) — How to contribute
+
+## Project Status
+
+All development phases are complete:
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 0 | Environment Setup | ✅ Complete |
+| 1 | Vanilla Build | ✅ Complete |
+| 2 | Fork Integration | ✅ Complete |
+| 3 | RME Integration | ✅ Complete |
+| 4 | Testing Infrastructure | ✅ Complete |
+| 5 | Distribution Structure | ✅ Complete |
+| 6 | Engine Fixes | ✅ Complete |
+| 7 | Platform Cleanup | ✅ Complete |
+
+### Future Roadmap
+
+- Apple Pencil support with precise cursor positioning
+- ProMotion 120Hz display support
+- Game controller support (MFi/Xbox/PlayStation)
+- In-game settings interface for resolution and scaling
 
 ## Contributing
 
@@ -133,10 +211,9 @@ This is an Apple-focused fork. Contributions related to macOS and iOS/iPadOS are
 See [docs/contributing.md](docs/contributing.md) for detailed contribution guidelines.
 
 Current goals:
-
-- **Engine bug fixes**: Port fixes from ETTU/Fo1in2 analysis for Fallout 1-specific issues
-- **iPad optimization**: Improve touch controls and UI scaling for tablets
-- **Quality of life**: Backport relevant Fallout 2 improvements
+- **Engine bug fixes** — Port fixes from ETTU/Fo1in2 analysis
+- **iPad optimization** — Improve touch controls and UI scaling
+- **Quality of life** — Backport relevant Fallout 2 improvements
 
 ## Credits
 
