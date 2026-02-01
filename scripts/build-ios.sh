@@ -29,6 +29,7 @@ if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
         -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
         -D ENABLE_BITCODE=0 \
         -D PLATFORM=OS64 \
+        -D DEPLOYMENT_TARGET=26.0 \
         -G Xcode \
         -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
 fi
