@@ -443,11 +443,11 @@ void mouse_info()
         // Track if current pan/drag started near cursor (for click+drag) vs far (just positioning)
         static bool pencil_dragging = false;
 
-    #if defined(__APPLE__) && TARGET_OS_IOS
+#if defined(__APPLE__) && TARGET_OS_IOS
         const bool pencil_active = pencil_is_active();
-    #else
+#else
         const bool pencil_active = false;
-    #endif
+#endif
 
         switch (gesture.type) {
         case kTap:
