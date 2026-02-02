@@ -1,5 +1,7 @@
 #include "plib/gnw/mouse.h"
 
+#include "game/config.h"
+#include "game/gconfig.h"
 #include "plib/color/color.h"
 #include "plib/gnw/dxinput.h"
 #include "plib/gnw/gnw.h"
@@ -445,8 +447,14 @@ void mouse_info()
 
 #if defined(__APPLE__) && TARGET_OS_IOS
         const bool pencil_active = pencil_is_active();
+        // Check if pencil right-click is enabled in config
+        int pencil_right_click_enabled = 1;
+        config_get_value(&game_config, GAME_CONFIG_INPUT_KEY, GAME_CONFIG_PENCIL_RIGHT_CLICK_KEY, &pencil_right_click_enabled);
+        // When pencil_right_click is disabled, treat pencil as left-click only (precise mode)
+        const bool pencil_precise_mode = pencil_active && !pencil_right_click_enabled;
 #else
         const bool pencil_active = false;
+        const bool pencil_precise_mode = false;
 #endif
 
         switch (gesture.type) {
@@ -544,8 +552,8 @@ void mouse_info()
             if (gesture.type == kLongPress) {
                 if (gesture.numberOfTouches == 1 && gesture.state == kBegan) {
 #if defined(__APPLE__) && TARGET_OS_IOS
-                    if (pencil_active) {
-                        // Pencil long-press behaves like a left-button drag (no right-click).
+                    if (pencil_precise_mode) {
+                        // Pencil in precise mode: long-press behaves like a left-button drag (no right-click).
                         int cursor_x, cursor_y;
                         mouse_get_position(&cursor_x, &cursor_y);
                         mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_LEFT_BUTTON_DOWN);
@@ -559,7 +567,7 @@ void mouse_info()
                     }
                 } else if (gesture.numberOfTouches == 1 && gesture.state == kChanged) {
 #if defined(__APPLE__) && TARGET_OS_IOS
-                    if (pencil_active) {
+                    if (pencil_precise_mode) {
                         mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
                     }
 #endif

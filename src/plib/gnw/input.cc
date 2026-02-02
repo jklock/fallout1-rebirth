@@ -4,6 +4,8 @@
 #include <stdio.h>
 
 #include "audio_engine.h"
+#include "game/config.h"
+#include "game/gconfig.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
 #include "plib/gnw/button.h"
@@ -1172,9 +1174,12 @@ void GNW95_process_message()
 
 #if defined(__APPLE__) && TARGET_OS_IOS
     // Poll for Apple Pencil body gestures (double-tap, squeeze)
-    // These trigger right-click at current cursor position
+    // Only trigger right-click if pencil_right_click is enabled in config
+    int pencil_right_click_enabled = 1;
+    config_get_value(&game_config, GAME_CONFIG_INPUT_KEY, GAME_CONFIG_PENCIL_RIGHT_CLICK_KEY, &pencil_right_click_enabled);
+
     PencilGestureType pencilGesture = pencil_poll_gesture();
-    if (pencilGesture == PENCIL_GESTURE_DOUBLE_TAP || pencilGesture == PENCIL_GESTURE_SQUEEZE) {
+    if (pencil_right_click_enabled && (pencilGesture == PENCIL_GESTURE_DOUBLE_TAP || pencilGesture == PENCIL_GESTURE_SQUEEZE)) {
         mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
         mouse_simulate_input(0, 0, 0);
     }

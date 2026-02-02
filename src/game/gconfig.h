@@ -13,6 +13,7 @@ namespace fallout {
 #define GAME_CONFIG_SOUND_KEY "sound"
 #define GAME_CONFIG_MAPPER_KEY "mapper"
 #define GAME_CONFIG_DEBUG_KEY "debug"
+#define GAME_CONFIG_INPUT_KEY "input"
 
 #define GAME_CONFIG_EXECUTABLE_KEY "executable"
 #define GAME_CONFIG_MASTER_DAT_KEY "master_dat"
@@ -81,6 +82,8 @@ namespace fallout {
 #define GAME_CONFIG_RUN_MAPPER_AS_GAME_KEY "run_mapper_as_game"
 #define GAME_CONFIG_DEFAULT_F8_AS_GAME_KEY "default_f8_as_game"
 #define GAME_CONFIG_PLAYER_SPEEDUP_KEY "player_speedup"
+#define GAME_CONFIG_PENCIL_RIGHT_CLICK_KEY "pencil_right_click"
+#define GAME_CONFIG_MAP_SCROLL_DELAY_KEY "map_scroll_delay"
 
 #define ENGLISH "english"
 #define FRENCH "french"

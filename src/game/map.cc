@@ -712,7 +712,10 @@ int map_get_index_number()
 // 0x474284
 int map_scroll(int dx, int dy)
 {
-    if (elapsed_time(map_last_scroll_time) < 33) {
+    // Default 66ms = half speed of original 33ms. Configurable via map_scroll_delay.
+    int scroll_delay = 66;
+    config_get_value(&game_config, GAME_CONFIG_INPUT_KEY, GAME_CONFIG_MAP_SCROLL_DELAY_KEY, &scroll_delay);
+    if (elapsed_time(map_last_scroll_time) < static_cast<unsigned int>(scroll_delay)) {
         return -2;
     }
 
