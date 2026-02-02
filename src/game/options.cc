@@ -374,7 +374,7 @@ static PreferenceDescription btndat[PREF_COUNT] = {
     { 4, 0, 374, 298, 0, 0, { 202, 221, 209, 222 }, 0, GAME_CONFIG_SNDFX_VOLUME_KEY, 0, 32767.0, &sndfx_volume },
     { 4, 0, 374, 349, 0, 0, { 202, 221, 209, 222 }, 0, GAME_CONFIG_SPEECH_VOLUME_KEY, 0, 32767.0, &speech_volume },
     { 2, 0, 374, 400, 0, 0, { 207, 223, 0, 0 }, 0, GAME_CONFIG_BRIGHTNESS_KEY, 1.0, 1.17999267578125, NULL },
-    { 2, 0, 374, 451, 0, 0, { 207, 218, 0, 0 }, 0, GAME_CONFIG_MOUSE_SENSITIVITY_KEY, 1.0, 2.5, NULL },
+    { 2, 0, 374, 451, 0, 0, { 207, 218, 0, 0 }, 0, GAME_CONFIG_MOUSE_SENSITIVITY_KEY, 0.1, 2.5, NULL },
 };
 
 // 0x481328
@@ -1591,7 +1591,7 @@ static void UpdateThing(int index)
             break;
         case PREF_MOUSE_SENSITIVIY:
             if (1) {
-                mouse_sens = std::clamp(mouse_sens, 1.0, 2.5);
+                mouse_sens = std::clamp(mouse_sens, 0.1, 2.5);
 
                 int x = (int)((mouse_sens - meta->minValue) * (219.0 / (meta->maxValue - meta->minValue)) + 384.0);
                 trans_buf_to_buf(prfbmp[PREFERENCES_WINDOW_FRM_KNOB_OFF], 21, 12, 21, prefbuf + 640 * meta->knobY + x, 640);
@@ -1918,7 +1918,7 @@ static void JustUpdate()
     sndfx_volume = std::clamp(sndfx_volume, 0, VOLUME_MAX);
     speech_volume = std::clamp(speech_volume, 0, VOLUME_MAX);
     gamma_value = std::clamp(gamma_value, 1.0, 1.17999267578125);
-    mouse_sens = std::clamp(mouse_sens, 1.0, 2.5);
+    mouse_sens = std::clamp(mouse_sens, 0.1, 2.5);
 
     text_object_set_base_delay(text_delay);
     gmouse_3d_synch_item_highlight();

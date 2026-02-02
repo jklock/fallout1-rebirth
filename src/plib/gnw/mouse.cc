@@ -450,29 +450,48 @@ void mouse_info()
 #endif
 
         switch (gesture.type) {
+        case kUnrecognized:
+            break;
         case kTap:
             if (gesture.numberOfTouches == 1) {
-                // Get current cursor position
-                int cursor_x, cursor_y;
-                mouse_get_position(&cursor_x, &cursor_y);
+#if defined(__APPLE__) && TARGET_OS_IOS
+                if (pencil_active) {
+                    int cursor_x, cursor_y;
+                    mouse_get_position(&cursor_x, &cursor_y);
+                    int dx = gesture.x - cursor_x;
+                    int dy = gesture.y - cursor_y;
 
-                // Calculate distance from tap to cursor (for click radius check)
-                int dx = gesture.x - cursor_x;
-                int dy = gesture.y - cursor_y;
-                int distance_sq = dx * dx + dy * dy;
+                    if (dx != 0 || dy != 0) {
+                        mouse_simulate_input(dx, dy, 0);
+                    }
 
-                // Scale click radius based on screen resolution (base is 640x480)
-                // Taps within this distance of cursor trigger a click
-                int screen_width = screenGetWidth();
-                int radius = (40 * screen_width) / 640;
-                int radius_sq = radius * radius;
-
-                if (distance_sq < radius_sq) {
-                    // Tap NEAR cursor = click at cursor position (no movement needed)
+                    // Pencil tap always clicks at the exact tip location.
                     mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                } else {
-                    // Tap FAR from cursor = move cursor only (no click)
-                    mouse_simulate_input(dx, dy, 0);
+                } else
+#endif
+                {
+                    // Get current cursor position
+                    int cursor_x, cursor_y;
+                    mouse_get_position(&cursor_x, &cursor_y);
+
+                    // Calculate distance from tap to cursor (for click radius check)
+                    int dx = gesture.x - cursor_x;
+                    int dy = gesture.y - cursor_y;
+                    int distance_sq = dx * dx + dy * dy;
+
+                    // Scale click radius based on screen resolution (base is 640x480)
+                    // Taps within this distance of cursor trigger a click
+                    int screen_width = screenGetWidth();
+                    int radius = (40 * screen_width) / 640;
+                    int radius_sq = radius * radius;
+
+                    if (distance_sq < radius_sq) {
+                        // Tap NEAR cursor = click at cursor position (no movement needed)
+                        mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                    } else {
+                        // Tap FAR from cursor = move cursor only (no click)
+                        mouse_simulate_input(dx, dy, 0);
+                    }
                 }
             } else if (gesture.numberOfTouches == 2) {
                 // Two-finger tap = right-click at cursor position
@@ -524,10 +543,26 @@ void mouse_info()
 
             if (gesture.type == kLongPress) {
                 if (gesture.numberOfTouches == 1 && gesture.state == kBegan) {
-                    // Long-press = RIGHT-click for examine/context menu
-                    int cursor_x, cursor_y;
-                    mouse_get_position(&cursor_x, &cursor_y);
-                    mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_RIGHT_BUTTON_DOWN);
+#if defined(__APPLE__) && TARGET_OS_IOS
+                    if (pencil_active) {
+                        // Pencil long-press behaves like a left-button drag (no right-click).
+                        int cursor_x, cursor_y;
+                        mouse_get_position(&cursor_x, &cursor_y);
+                        mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                    } else
+#endif
+                    {
+                        // Long-press = RIGHT-click for examine/context menu
+                        int cursor_x, cursor_y;
+                        mouse_get_position(&cursor_x, &cursor_y);
+                        mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_RIGHT_BUTTON_DOWN);
+                    }
+                } else if (gesture.numberOfTouches == 1 && gesture.state == kChanged) {
+#if defined(__APPLE__) && TARGET_OS_IOS
+                    if (pencil_active) {
+                        mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                    }
+#endif
                 } else if (gesture.numberOfTouches == 2 && (gesture.state == kBegan || gesture.state == kChanged)) {
                     // Two-finger long-press = LEFT-click + drag
                     mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
@@ -907,7 +942,7 @@ bool mouse_is_disabled()
 // 0x4B54C4
 void mouse_set_sensitivity(double value)
 {
-    if (value > 0 && value < 2.0) {
+    if (value > 0 && value <= 2.5) {
         mouse_sensitivity = value;
     }
 }

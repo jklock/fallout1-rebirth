@@ -893,6 +893,8 @@ int db_fgetc(DB_FILE* stream)
         } else {
             switch (stream->flags & 0xF0) {
             case 16:
+                db_preload_buffer(stream);
+
                 if (stream->field_10 != 0) {
                     ch = *stream->field_20;
                     stream->field_20++;

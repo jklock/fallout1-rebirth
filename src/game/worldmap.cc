@@ -1292,18 +1292,20 @@ int world_map(WorldMapContext ctx)
 
             scroll_dx = 0;
             scroll_dy = 0;
-            if (abs_mouse_x == 0) {
+            const int edge_margin = 8;
+            int scroll_step = 16;
+            if (abs_mouse_x <= edge_margin) {
                 scroll_dx = -1;
                 autofollow = 0;
-            } else if (abs_mouse_x == screenGetWidth() - 1) {
+            } else if (abs_mouse_x >= screenGetWidth() - 1 - edge_margin) {
                 scroll_dx = 1;
                 autofollow = 0;
             }
 
-            if (abs_mouse_y == 0) {
+            if (abs_mouse_y <= edge_margin) {
                 scroll_dy = -1;
                 autofollow = 0;
-            } else if (abs_mouse_y == screenGetHeight() - 1) {
+            } else if (abs_mouse_y >= screenGetHeight() - 1 - edge_margin) {
                 scroll_dy = 1;
                 autofollow = 0;
             }
@@ -1312,12 +1314,12 @@ int world_map(WorldMapContext ctx)
             scroll_invalid_x = 0;
             scroll_invalid_y = 0;
 
-            candidate_viewport_x = viewport_x + 16 * scroll_dx;
+            candidate_viewport_x = viewport_x + scroll_step * scroll_dx;
             if (candidate_viewport_x < 0 || candidate_viewport_x > VIEWPORT_MAX_X) {
                 scroll_invalid_x = 1;
             }
 
-            candidate_viewport_y = viewport_y + 16 * scroll_dy;
+            candidate_viewport_y = viewport_y + scroll_step * scroll_dy;
             if (candidate_viewport_y < 0 || candidate_viewport_y > VIEWPORT_MAX_Y) {
                 scroll_invalid_y = 1;
             }
@@ -1341,24 +1343,28 @@ int world_map(WorldMapContext ctx)
 
             switch (input) {
             case KEY_ARROW_LEFT:
+                scroll_step = 32;
                 if (viewport_x != 0) {
                     scroll_dx = -1;
                     autofollow = 0;
                 }
                 break;
             case KEY_ARROW_RIGHT:
+                scroll_step = 32;
                 if (viewport_x < VIEWPORT_MAX_X) {
                     scroll_dx = 1;
                     autofollow = 0;
                 }
                 break;
             case KEY_ARROW_UP:
+                scroll_step = 32;
                 if (viewport_y != 0) {
                     scroll_dy = -1;
                     autofollow = 0;
                 }
                 break;
             case KEY_ARROW_DOWN:
+                scroll_step = 32;
                 if (viewport_y < VIEWPORT_MAX_Y) {
                     scroll_dy = 1;
                     autofollow = 0;
@@ -1402,8 +1408,8 @@ int world_map(WorldMapContext ctx)
             }
 
             if (scroll_dx != 0 || scroll_dy != 0) {
-                viewport_x += 16 * scroll_dx;
-                viewport_y += 16 * scroll_dy;
+                viewport_x += scroll_step * scroll_dx;
+                viewport_y += scroll_step * scroll_dy;
 
                 if (viewport_x < 0) {
                     viewport_x = 0;
