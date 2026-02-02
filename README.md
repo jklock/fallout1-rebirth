@@ -55,9 +55,20 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
    find . -depth -name '*[A-Z]*' -execdir bash -c 'mv "$1" "${1,,}"' _ {} \;
    ```
 
-2. **Download** `Fallout 1 Rebirth.dmg` from Releases and copy the app to your Fallout folder.
+2. **Download** `Fallout 1 Rebirth.dmg` from Releases and install `Fallout 1 Rebirth.app`.
 
-3. **Run** `Fallout 1 Rebirth.app`.
+3. **Open the app bundle** — right-click `Fallout 1 Rebirth.app` → **Show Package Contents** → open `Contents/Resources/app/` (create the `app` folder if it doesn't exist).
+
+4. **Copy game files** into `Contents/Resources/app/`:
+  - `master.dat`
+  - `critter.dat`
+  - `data/` (entire folder)
+
+5. **Copy config files** from [gameconfig/macos](gameconfig/macos) into the same `Contents/Resources/app/` folder:
+  - `fallout.cfg`
+  - `fallout.ini`
+
+6. **Run** `Fallout 1 Rebirth.app`.
 
 ### iOS/iPadOS
 
@@ -91,15 +102,19 @@ Apple Pencil uses absolute positioning — the cursor follows exactly where you 
 1. Download `fallout1-rebirth.ipa` from Releases
 2. Sideload using [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)
 3. Run the game once (you'll see a "Could not find the master datafile..." error — this is expected)
-4. Use Finder or iTunes to copy `master.dat`, `critter.dat`, and `data` folder to the app ([how-to](https://support.apple.com/HT210598))
+4. Use Finder to copy `master.dat`, `critter.dat`, `data/`, plus config files from [gameconfig/ios](gameconfig/ios) (`fallout.cfg`, `fallout.ini`) into the Fallout app’s Files container ([how-to](https://support.apple.com/HT210598))
 
 ## Configuration
+
+Copies of the platform-specific configuration files live in [gameconfig/macos](gameconfig/macos) and [gameconfig/ios](gameconfig/ios). These are based on [GOG/Fallout1/fallout.cfg](GOG/Fallout1/fallout.cfg) and [GOG/Fallout1/f1_res.ini](GOG/Fallout1/f1_res.ini) with platform-appropriate resolution defaults. Each option is documented inline for Apple platforms, and legacy options that do not affect Apple builds are labeled as ignored. Put `fallout.cfg` and `fallout.ini` in the same Fallout folder as your game data:
+- **macOS**: `Fallout 1 Rebirth.app/Contents/Resources/app/`
+- **iOS/iPadOS**: the app’s Files container (via Finder)
 
 The game uses two configuration files:
 
 ### fallout.cfg — Game Settings
 
-Controls game logic, data paths, sound, and preferences.
+Controls game logic, data paths, sound, and preferences. See the platform-specific files in [gameconfig/macos](gameconfig/macos) or [gameconfig/ios](gameconfig/ios) for the full list and per-option explanations.
 
 ```ini
 [system]
@@ -118,9 +133,9 @@ game_difficulty=1            # 0=easy, 1=normal, 2=hard
 
 > **Important**: File paths are case-sensitive! If your game data uses `MASTER.DAT` instead of `master.dat`, update the config accordingly.
 
-### f1_res.ini — Display Settings
+### fallout.ini — Display Settings
 
-Controls resolution, scaling, and window mode.
+Controls resolution, scaling, UI layout, movies, and other display-related behavior. See the platform-specific files in [gameconfig/macos](gameconfig/macos) or [gameconfig/ios](gameconfig/ios) for full documentation.
 
 ```ini
 [MAIN]
