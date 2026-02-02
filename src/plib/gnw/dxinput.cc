@@ -21,10 +21,6 @@ static int gMouseWheelDeltaY = 0;
 
 #if defined(__APPLE__) && TARGET_OS_IOS
 static bool last_input_was_mouse = false;
-// Grace period (ms) after pencil lifts before trackpad can resume control
-// Prevents cursor jumping when user's palm rests on trackpad while using pencil
-static const Uint32 PENCIL_GRACE_PERIOD_MS = 100;
-static Uint32 last_pencil_lift_time = 0;
 #endif
 
 // 0x4E0400
@@ -80,67 +76,49 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // update mouse position manually.
     SDL_PumpEvents();
 
-#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
-    // Real iOS device: Use absolute positioning with touch/pencil priority
+#if defined(__APPLE__) && TARGET_OS_IOS
     SDL_Event event;
     Uint32 current_time = SDL_GetTicks();
-
-    // Check if Apple Pencil is currently active
-    bool pencil_touching = pencil_is_touching();
-    bool pencil_was_recent = (current_time - last_pencil_lift_time) < PENCIL_GRACE_PERIOD_MS;
-
-    // Track when pencil lifts for grace period
-    static bool was_pencil_touching = false;
-    if (was_pencil_touching && !pencil_touching) {
-        last_pencil_lift_time = current_time;
-    }
-    was_pencil_touching = pencil_touching;
-
+    
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION) == 1) {
-        // Only accept mouse/trackpad input if pencil is not active
-        if (!pencil_touching && !pencil_was_recent) {
-            last_input_was_mouse = true;
-        }
+        last_input_was_mouse = true;
     }
-
+    
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP) == 1) {
-        // Only accept mouse/trackpad input if pencil is not active
-        if (!pencil_touching && !pencil_was_recent) {
-            last_input_was_mouse = true;
-        }
+        last_input_was_mouse = true;
     }
-
+    
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERDOWN, SDL_FINGERUP) == 1) {
         last_input_was_mouse = false;
     }
-
+    
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERMOTION, SDL_FINGERMOTION) == 1) {
         last_input_was_mouse = false;
     }
-
+    
     int system_x, system_y;
     Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
-
-    // Process mouse/trackpad only if pencil is not overriding
-    if (last_input_was_mouse && !pencil_touching && !pencil_was_recent) {
+    
+    if (last_input_was_mouse) {
         int game_x, game_y;
         mouse_get_position(&game_x, &game_y);
-
+        
         float logical_x, logical_y;
         SDL_RenderWindowToLogical(gSdlRenderer, system_x, system_y, &logical_x, &logical_y);
-
+        
         int mapped_x = (int)logical_x;
         int mapped_y = (int)logical_y;
-
+        
         if (mapped_x < 0) mapped_x = 0;
         if (mapped_x >= screenGetWidth()) mapped_x = screenGetWidth() - 1;
         if (mapped_y < 0) mapped_y = 0;
         if (mapped_y >= screenGetHeight()) mapped_y = screenGetHeight() - 1;
-
+        
         int delta_x = mapped_x - game_x;
         int delta_y = mapped_y - game_y;
-
-        if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
+        
+        if (mapped_x >= 0 && mapped_x < screenGetWidth() && 
+            mapped_y >= 0 && mapped_y < screenGetHeight()) {
             mouseState->x = delta_x;
             mouseState->y = delta_y;
         } else {
@@ -151,15 +129,9 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->x = 0;
         mouseState->y = 0;
     }
-
-    // Only report mouse buttons if pencil is not active
-    if (pencil_touching || pencil_was_recent) {
-        mouseState->buttons[0] = 0;
-        mouseState->buttons[1] = 0;
-    } else {
-        mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
-        mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
-    }
+    
+    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;
@@ -205,11 +177,9 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
-    // Real iOS device: Skip relative mouse mode, use absolute touch positioning
+#if defined(__APPLE__) && TARGET_OS_IOS
     return true;
 #else
-    // macOS, iOS Simulator, and other platforms: Use relative mouse mode
     return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
 #endif
 }
