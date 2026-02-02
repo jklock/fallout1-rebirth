@@ -881,16 +881,16 @@ int game_handle_input(int eventCode, bool isInCombatMode)
         }
         break;
     case KEY_ARROW_LEFT:
-        map_scroll(-1, 0);
+        map_scroll(-2, 0);
         break;
     case KEY_ARROW_RIGHT:
-        map_scroll(1, 0);
+        map_scroll(2, 0);
         break;
     case KEY_ARROW_UP:
-        map_scroll(0, -1);
+        map_scroll(0, -2);
         break;
     case KEY_ARROW_DOWN:
-        map_scroll(0, 1);
+        map_scroll(0, 2);
         break;
     }
 

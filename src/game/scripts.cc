@@ -2107,7 +2107,7 @@ int scr_remove(int sid)
     }
 
     Script* script = &(scriptListExtent->scripts[index]);
-    if ((script->scr_flags & SCRIPT_FLAG_0x02) != 0) {
+    if ((script->scr_flags & SCRIPT_FLAG_0x01) != 0) {
         if (script->program != NULL) {
             script->program = NULL;
         }
