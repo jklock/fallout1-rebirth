@@ -79,46 +79,45 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
 #if defined(__APPLE__) && TARGET_OS_IOS
     SDL_Event event;
     Uint32 current_time = SDL_GetTicks();
-    
+
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION) == 1) {
         last_input_was_mouse = true;
     }
-    
+
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP) == 1) {
         last_input_was_mouse = true;
     }
-    
+
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERDOWN, SDL_FINGERUP) == 1) {
         last_input_was_mouse = false;
     }
-    
+
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERMOTION, SDL_FINGERMOTION) == 1) {
         last_input_was_mouse = false;
     }
-    
+
     int system_x, system_y;
     Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
-    
+
     if (last_input_was_mouse) {
         int game_x, game_y;
         mouse_get_position(&game_x, &game_y);
-        
+
         float logical_x, logical_y;
         SDL_RenderWindowToLogical(gSdlRenderer, system_x, system_y, &logical_x, &logical_y);
-        
+
         int mapped_x = (int)logical_x;
         int mapped_y = (int)logical_y;
-        
+
         if (mapped_x < 0) mapped_x = 0;
         if (mapped_x >= screenGetWidth()) mapped_x = screenGetWidth() - 1;
         if (mapped_y < 0) mapped_y = 0;
         if (mapped_y >= screenGetHeight()) mapped_y = screenGetHeight() - 1;
-        
+
         int delta_x = mapped_x - game_x;
         int delta_y = mapped_y - game_y;
-        
-        if (mapped_x >= 0 && mapped_x < screenGetWidth() && 
-            mapped_y >= 0 && mapped_y < screenGetHeight()) {
+
+        if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
             mouseState->x = delta_x;
             mouseState->y = delta_y;
         } else {
@@ -129,7 +128,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->x = 0;
         mouseState->y = 0;
     }
-    
+
     mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;

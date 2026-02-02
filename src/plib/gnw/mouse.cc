@@ -589,7 +589,6 @@ void mouse_info()
     }
 }
 
-
 // 0x4B4ECC
 void mouse_simulate_input(int delta_x, int delta_y, int buttons)
 {
@@ -722,10 +721,7 @@ bool mouse_click_in(int left, int top, int right, int bottom)
         return false;
     }
 
-    return (mouse_hoty + mouse_y >= top - expand) &&
-           (mouse_hotx + mouse_x <= right + expand) &&
-           (mouse_hotx + mouse_x >= left - expand) &&
-           (mouse_hoty + mouse_y <= bottom + expand);
+    return (mouse_hoty + mouse_y >= top - expand) && (mouse_hotx + mouse_x <= right + expand) && (mouse_hotx + mouse_x >= left - expand) && (mouse_hoty + mouse_y <= bottom + expand);
 }
 
 /*
