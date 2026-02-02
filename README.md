@@ -62,6 +62,7 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
 > **Requirements**: macOS 11.0 (Big Sur) or higher. Runs natively on Intel-based Macs and Apple Silicon.
 
 1. **Get game data** — Search archive.org for "Fallout 1 GOG Linux Assets" and download the Linux assets file in your archive of choice. Extract and lowercase the files using bash below or do it inside of a Finder Window:
+
    ```bash
    # Extract the Linux installer (no special tools needed)
    unzip Name_Of_Your_Downladed_Archive.tar -d ~/Games/Fallout
@@ -69,6 +70,7 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
    
    # Lowercase all filenames (required for macOS/iOS)
    find . -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
+   
    # Or if you don't have 'rename', use this:
    find . -depth -name '*[A-Z]*' -execdir bash -c 'mv "$1" "${1,,}"' _ {} \;
    ```
@@ -228,7 +230,7 @@ find . -depth -name '*[A-Z]*' -execdir bash -c 'mv "$1" "${1,,}"' _ {} \;
 
 The test scripts automatically copy these files to the appropriate locations:
 - **iOS Simulator**: Copies to app's Documents container
-- **macOS**: The app reads from its bundle Resources folder
+- **macOS**: The app reads from its bundle Contents/MacOS folder
 
 ### macOS (Xcode)
 
