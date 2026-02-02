@@ -9,6 +9,13 @@
 #include "plib/gnw/touch.h"
 #include "plib/gnw/vcr.h"
 
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#if TARGET_OS_IOS
+#include "platform/ios/pencil.h"
+#endif
+#endif
+
 namespace fallout {
 
 static void mouse_colorize();
@@ -436,6 +443,12 @@ void mouse_info()
         // Track if current pan/drag started near cursor (for click+drag) vs far (just positioning)
         static bool pencil_dragging = false;
 
+    #if defined(__APPLE__) && TARGET_OS_IOS
+        const bool pencil_active = pencil_is_active();
+    #else
+        const bool pencil_active = false;
+    #endif
+
         switch (gesture.type) {
         case kTap:
             if (gesture.numberOfTouches == 1) {
@@ -475,40 +488,60 @@ void mouse_info()
                 prevx = gesture.x;
                 prevy = gesture.y;
 
-                // Check if pan/drag started near cursor (determines if it's a drag or reposition)
-                if (gesture.numberOfTouches == 1) {
-                    int cursor_x, cursor_y;
-                    mouse_get_position(&cursor_x, &cursor_y);
-                    int dx = gesture.x - cursor_x;
-                    int dy = gesture.y - cursor_y;
-                    int distance_sq = dx * dx + dy * dy;
-                    int screen_width = screenGetWidth();
-                    int radius = (40 * screen_width) / 640;
-                    int radius_sq = radius * radius;
-
-                    if (distance_sq < radius_sq) {
-                        // Started ON/NEAR cursor = this is a drag operation
+                if (gesture.type == kPan && gesture.numberOfTouches == 1) {
+#if defined(__APPLE__) && TARGET_OS_IOS
+                    if (pencil_active) {
+                        // Pencil pan always starts a drag.
                         pencil_dragging = true;
-                    } else {
-                        // Started AWAY from cursor = just repositioning
-                        pencil_dragging = false;
-                        // Move cursor to touch position immediately
-                        mouse_simulate_input(dx, dy, 0);
+                        int cursor_x, cursor_y;
+                        mouse_get_position(&cursor_x, &cursor_y);
+                        mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                    } else
+#endif
+                    {
+                        // Check if pan/drag started near cursor (determines if it's a drag or reposition)
+                        int cursor_x, cursor_y;
+                        mouse_get_position(&cursor_x, &cursor_y);
+                        int dx = gesture.x - cursor_x;
+                        int dy = gesture.y - cursor_y;
+                        int distance_sq = dx * dx + dy * dy;
+                        int screen_width = screenGetWidth();
+                        int radius = (40 * screen_width) / 640;
+                        int radius_sq = radius * radius;
+
+                        if (distance_sq < radius_sq) {
+                            // Started ON/NEAR cursor = this is a drag operation
+                            pencil_dragging = true;
+                        } else {
+                            // Started AWAY from cursor = just repositioning
+                            pencil_dragging = false;
+                            // Move cursor to touch position immediately
+                            mouse_simulate_input(dx, dy, 0);
+                        }
                     }
                 }
             }
 
             if (gesture.type == kLongPress) {
-                if (gesture.numberOfTouches == 1) {
+                if (gesture.numberOfTouches == 1 && gesture.state == kBegan) {
                     // Long-press = RIGHT-click for examine/context menu
                     int cursor_x, cursor_y;
                     mouse_get_position(&cursor_x, &cursor_y);
                     mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_RIGHT_BUTTON_DOWN);
-                } else if (gesture.numberOfTouches == 2) {
+                } else if (gesture.numberOfTouches == 2 && (gesture.state == kBegan || gesture.state == kChanged)) {
                     // Two-finger long-press = LEFT-click + drag
                     mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
                 }
+
+                if (gesture.state == kEnded) {
+                    mouse_simulate_input(0, 0, 0);
+                }
             } else if (gesture.type == kPan) {
+                if (gesture.state == kEnded && gesture.numberOfTouches == 1 && pencil_dragging) {
+                    mouse_simulate_input(0, 0, 0);
+                    pencil_dragging = false;
+                }
+
                 if (gesture.numberOfTouches == 1) {
                     // Use absolute positioning: cursor follows touch/pencil exactly
                     int cursor_x, cursor_y;

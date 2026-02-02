@@ -166,6 +166,7 @@ int GNW_input_init(int use_msec_timer)
     screendump_key = KEY_ALT_C;
 
     set_idle_func(idleImpl);
+    touch_reset();
 
     return 0;
 }
@@ -1101,15 +1102,19 @@ void GNW95_process_message()
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEWHEEL:
+            dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
         case SDL_FINGERDOWN:
+            dxinput_notify_touch();
             touch_handle_start(&(e.tfinger));
             break;
         case SDL_FINGERMOTION:
+            dxinput_notify_touch();
             touch_handle_move(&(e.tfinger));
             break;
         case SDL_FINGERUP:
+            dxinput_notify_touch();
             touch_handle_end(&(e.tfinger));
             break;
         case SDL_KEYDOWN:
@@ -1131,15 +1136,32 @@ void GNW95_process_message()
                 break;
             case SDL_WINDOWEVENT_FOCUS_GAINED:
                 GNW95_isActive = true;
+                touch_reset();
                 win_refresh_all(&scr_size);
                 audioEngineResume();
                 break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
                 GNW95_isActive = false;
+                touch_reset();
                 audioEnginePause();
                 break;
             }
             break;
+#if defined(__APPLE__) && TARGET_OS_IOS
+        case SDL_APP_WILLENTERBACKGROUND:
+        case SDL_APP_DIDENTERBACKGROUND:
+            GNW95_isActive = false;
+            touch_reset();
+            audioEnginePause();
+            break;
+        case SDL_APP_WILLENTERFOREGROUND:
+        case SDL_APP_DIDENTERFOREGROUND:
+            GNW95_isActive = true;
+            touch_reset();
+            win_refresh_all(&scr_size);
+            audioEngineResume();
+            break;
+#endif
         case SDL_QUIT:
             exit(EXIT_SUCCESS);
             break;
@@ -1154,6 +1176,7 @@ void GNW95_process_message()
     PencilGestureType pencilGesture = pencil_poll_gesture();
     if (pencilGesture == PENCIL_GESTURE_DOUBLE_TAP || pencilGesture == PENCIL_GESTURE_SQUEEZE) {
         mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
+        mouse_simulate_input(0, 0, 0);
     }
 #endif
 

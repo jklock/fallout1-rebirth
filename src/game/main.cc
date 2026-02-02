@@ -12,6 +12,11 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <stdlib.h>
+
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
 
 #include "game/amutex.h"
 #include "game/art.h"
@@ -253,6 +258,10 @@ static void main_exit_system()
 
     // TODO: Find a better place for this call.
     SDL_Quit();
+
+#if defined(__APPLE__) && TARGET_OS_IOS
+    exit(EXIT_SUCCESS);
+#endif
 }
 
 // 0x472958
