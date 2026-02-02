@@ -149,11 +149,11 @@ bool svga_init(VideoOptions* video_options)
 
     Uint32 windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 
-// This hides the status bar on iPadOS, which otherwise interferes
-// with the cursor in the top margin of the screen.
-#if __APPLE__ && TARGET_OS_IOS
+    // This hides the status bar on iPadOS, which otherwise interferes
+    // with the cursor in the top margin of the screen.
+    #if __APPLE__ && TARGET_OS_IOS
     windowFlags |= SDL_WINDOW_BORDERLESS;
-#endif
+    #endif
 
     if (video_options->fullscreen) {
         if (video_options->exclusive)
@@ -213,9 +213,8 @@ bool svga_init(VideoOptions* video_options)
     scr_blit = GNW95_ShowRect;
     mouse_blit = GNW95_ShowRect;
 
-#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
+#if defined(__APPLE__) && TARGET_OS_IOS
     // Initialize Apple Pencil detection and gesture handling
-    // Only on real iOS devices, not simulator
     pencil_init(gSdlWindow);
 #endif
 
@@ -224,9 +223,8 @@ bool svga_init(VideoOptions* video_options)
 
 void svga_exit()
 {
-#if defined(__APPLE__) && TARGET_OS_IOS && !TARGET_OS_SIMULATOR
+#if defined(__APPLE__) && TARGET_OS_IOS
     // Shutdown Apple Pencil detection
-    // Only on real iOS devices, not simulator
     pencil_shutdown();
 #endif
 

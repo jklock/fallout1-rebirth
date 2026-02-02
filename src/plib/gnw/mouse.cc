@@ -11,11 +11,6 @@
 
 namespace fallout {
 
-// Apple Pencil / Touch click radius in pixels (at 640x480 base resolution).
-// Taps within this distance of the cursor trigger a click.
-// Taps outside this radius only move the cursor (no click).
-#define PENCIL_CLICK_RADIUS_BASE 40
-
 static void mouse_colorize();
 static void mouse_anim();
 static void mouse_clip();
@@ -454,17 +449,16 @@ void mouse_info()
                 int distance_sq = dx * dx + dy * dy;
 
                 // Scale click radius based on screen resolution (base is 640x480)
+                // Taps within this distance of cursor trigger a click
                 int screen_width = screenGetWidth();
-                int radius = (PENCIL_CLICK_RADIUS_BASE * screen_width) / 640;
+                int radius = (40 * screen_width) / 640;
                 int radius_sq = radius * radius;
 
                 if (distance_sq < radius_sq) {
                     // Tap NEAR cursor = click at cursor position (no movement needed)
-                    // This mimics mouse behavior: cursor is already there, just click
                     mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
                 } else {
                     // Tap FAR from cursor = move cursor only (no click)
-                    // This allows positioning before clicking, like moving a mouse
                     mouse_simulate_input(dx, dy, 0);
                 }
             } else if (gesture.numberOfTouches == 2) {
@@ -489,7 +483,7 @@ void mouse_info()
                     int dy = gesture.y - cursor_y;
                     int distance_sq = dx * dx + dy * dy;
                     int screen_width = screenGetWidth();
-                    int radius = (PENCIL_CLICK_RADIUS_BASE * screen_width) / 640;
+                    int radius = (40 * screen_width) / 640;
                     int radius_sq = radius * radius;
 
                     if (distance_sq < radius_sq) {
@@ -506,13 +500,12 @@ void mouse_info()
 
             if (gesture.type == kLongPress) {
                 if (gesture.numberOfTouches == 1) {
-                    // Apple Pencil / single finger long-press = RIGHT-click for examine/context menu
-                    // Use absolute positioning to cursor follows touch
+                    // Long-press = RIGHT-click for examine/context menu
                     int cursor_x, cursor_y;
                     mouse_get_position(&cursor_x, &cursor_y);
                     mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_RIGHT_BUTTON_DOWN);
                 } else if (gesture.numberOfTouches == 2) {
-                    // Two-finger long-press = LEFT-click + drag (for dragging operations)
+                    // Two-finger long-press = LEFT-click + drag
                     mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
                 }
             } else if (gesture.type == kPan) {
@@ -595,6 +588,7 @@ void mouse_info()
         raw_buttons |= MOUSE_EVENT_WHEEL;
     }
 }
+
 
 // 0x4B4ECC
 void mouse_simulate_input(int delta_x, int delta_y, int buttons)
@@ -728,7 +722,10 @@ bool mouse_click_in(int left, int top, int right, int bottom)
         return false;
     }
 
-    return (mouse_hoty + mouse_y >= top - expand) && (mouse_hotx + mouse_x <= right + expand) && (mouse_hotx + mouse_x >= left - expand) && (mouse_hoty + mouse_y <= bottom + expand);
+    return (mouse_hoty + mouse_y >= top - expand) &&
+           (mouse_hotx + mouse_x <= right + expand) &&
+           (mouse_hotx + mouse_x >= left - expand) &&
+           (mouse_hoty + mouse_y <= bottom + expand);
 }
 
 /*
