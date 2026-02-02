@@ -54,7 +54,7 @@ static bool defaultCompressionFunc(char* filePath)
 // 0x419910
 static unsigned int decodeRead(void* stream, void* buffer, unsigned int size)
 {
-    return db_fread(buffer, 1, size, (DB_FILE*)stream);
+    return static_cast<unsigned int>(db_fread(buffer, 1, size, (DB_FILE*)stream));
 }
 
 // 0x41992C
@@ -122,7 +122,7 @@ int audioOpen(const char* fname, int flags)
         audioFile->audioDecoder = Create_AudioDecoder(decodeRead, audioFile->stream, &(audioFile->channels), &(audioFile->sampleRate), &(audioFile->fileSize));
         audioFile->fileSize *= 2;
     } else {
-        audioFile->fileSize = db_filelength(stream);
+        audioFile->fileSize = static_cast<int>(db_filelength(stream));
     }
 
     audioFile->position = 0;
@@ -154,7 +154,7 @@ int audioRead(int fileHandle, void* buffer, unsigned int size)
     if ((audioFile->flags & AUDIO_FILE_COMPRESSED) != 0) {
         bytesRead = AudioDecoder_Read(audioFile->audioDecoder, buffer, size);
     } else {
-        bytesRead = db_fread(buffer, 1, size, audioFile->stream);
+        bytesRead = static_cast<int>(db_fread(buffer, 1, size, audioFile->stream));
     }
 
     audioFile->position += bytesRead;
@@ -173,13 +173,13 @@ long audioSeek(int fileHandle, long offset, int origin)
 
     switch (origin) {
     case SEEK_SET:
-        pos = offset;
+        pos = static_cast<int>(offset);
         break;
     case SEEK_CUR:
-        pos = offset + audioFile->position;
+        pos = static_cast<int>(offset) + audioFile->position;
         break;
     case SEEK_END:
-        pos = offset + audioFile->fileSize;
+        pos = static_cast<int>(offset) + audioFile->fileSize;
         break;
     default:
         assert(false && "Should be unreachable");

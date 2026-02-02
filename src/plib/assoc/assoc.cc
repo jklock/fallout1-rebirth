@@ -376,10 +376,10 @@ static int assoc_read_assoc_array(FILE* fp, assoc_array* a)
     long temp;
 
     if (assoc_read_long(fp, &temp) != 0) return -1;
-    a->size = temp;
+    a->size = static_cast<int>(temp);
 
     if (assoc_read_long(fp, &temp) != 0) return -1;
-    a->max = temp;
+    a->max = static_cast<int>(temp);
 
     if (assoc_read_long(fp, &temp) != 0) return -1;
     a->datasize = temp;
@@ -518,7 +518,7 @@ int assoc_save(FILE* fp, assoc_array* a, int flags)
 
     for (int index = 0; index < a->size; index++) {
         assoc_pair* entry = &(a->list[index]);
-        int keyLength = strlen(entry->name);
+        int keyLength = static_cast<int>(strlen(entry->name));
         if (fputc(keyLength, fp) == -1) {
             return -1;
         }

@@ -657,7 +657,7 @@ int automap_pip_save()
             return -1;
         }
 
-        int automapDataSize = db_filelength(stream1);
+        long automapDataSize = db_filelength(stream1);
         if (automapDataSize == -1) {
             debug_printf("\nAUTOMAP: Error reading database #2!\n");
             db_fclose(stream1);
@@ -668,7 +668,7 @@ int automap_pip_save()
         }
 
         int nextEntryOffset = entryOffset + nextEntryDataSize + 5;
-        if (automapDataSize != nextEntryOffset) {
+        if (automapDataSize != static_cast<long>(nextEntryOffset)) {
             if (db_fseek(stream1, nextEntryOffset, SEEK_SET) == -1) {
                 debug_printf("\nAUTOMAP: Error writing temp data!\n");
                 db_fclose(stream1);
@@ -678,7 +678,8 @@ int automap_pip_save()
                 return -1;
             }
 
-            if (copy_file_data(stream1, stream2, automapDataSize - nextEntryOffset) == -1) {
+            int remainingDataSize = static_cast<int>(automapDataSize - nextEntryOffset);
+            if (copy_file_data(stream1, stream2, remainingDataSize) == -1) {
                 debug_printf("\nAUTOMAP: Error copying file data!\n");
                 db_fclose(stream1);
                 db_fclose(stream2);

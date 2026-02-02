@@ -389,7 +389,6 @@ build_for_simulator() {
     # Build
     log_info "Compiling ($BUILD_TYPE, $JOBS parallel jobs)..."
     if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS" -- \
-        -destination "generic/platform=iOS Simulator" \
         EXCLUDED_ARCHS=""; then
         log_error "Build failed"
         exit 1

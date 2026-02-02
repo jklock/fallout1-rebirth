@@ -1,5 +1,6 @@
 #include "game/combatai.h"
 
+#include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1452,7 +1453,7 @@ int combatai_msg(Object* critter, Attack* attack, int type, int delay)
     strcpy(string, messageListItem.text);
 
     // TODO: Get rid of casts.
-    return register_object_call(critter, (void*)type, (AnimationCallback*)ai_print_msg, delay);
+    return register_object_call(critter, reinterpret_cast<void*>(static_cast<intptr_t>(type)), (AnimationCallback*)ai_print_msg, delay);
 }
 
 // 0x4260B0
