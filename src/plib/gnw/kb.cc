@@ -1,5 +1,13 @@
 #include "plib/gnw/kb.h"
 
+#include <SDL.h>
+#include <SDL_version.h>
+
+// Ensure SDL_VERSION_ATLEAST is defined for static analysis tools
+#ifndef SDL_VERSION_ATLEAST
+#define SDL_VERSION_ATLEAST(X, Y, Z) 0
+#endif
+
 #include "plib/gnw/dxinput.h"
 #include "plib/gnw/input.h"
 #include "plib/gnw/vcr.h"

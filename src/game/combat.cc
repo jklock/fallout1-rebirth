@@ -3704,6 +3704,7 @@ void combat_display(Attack* attack)
     }
 
     char text[280];
+    text[0] = '\0';
     if (attack->defender != NULL
         && attack->oops != NULL
         && attack->defender != attack->oops
@@ -3748,9 +3749,11 @@ void combat_display(Attack* attack)
             }
         }
 
-        strcat(text, ".");
+        if (text[0] != '\0') {
+            strcat(text, ".");
 
-        display_print(text);
+            display_print(text);
+        }
     }
 
     if ((attack->attackerFlags & DAM_HIT) != 0) {

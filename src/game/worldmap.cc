@@ -3521,6 +3521,10 @@ static void HvrOffBtn(int btn, int input)
         }
     }
 
+    if (entrance >= 7) {
+        return;
+    }
+
     for (px = 0; px < 4100; px++) {
         mask[px] = hvrbtn[entrance][px] | btnmsk[px];
     }

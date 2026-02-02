@@ -116,7 +116,7 @@ void sfxl_exit()
 // 0x497A68
 int sfxl_name_to_tag(char* name, int* tagPtr)
 {
-    SoundEffectsListEntry dummy;
+    SoundEffectsListEntry dummy {};
     SoundEffectsListEntry* entry;
     int tag;
 

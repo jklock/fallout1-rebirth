@@ -32,6 +32,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+build-outputs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -399,6 +400,7 @@ GOG/
 master.dat
 critter.dat
 *.sav
+**/journal.sh
 
 # Project documentation and research (internal use)#FCE/
 /development

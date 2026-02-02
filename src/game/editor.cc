@@ -3452,11 +3452,9 @@ static int OptionWindow()
         int size = width * height;
         int y = 17;
         int index;
+        int failedIndex = -1;
 
         for (index = 0; index < 5; index++) {
-            if (err != 0) {
-                break;
-            }
 
             do {
                 down[index] = (unsigned char*)mem_malloc(size);
@@ -3486,15 +3484,20 @@ static int OptionWindow()
                 }
             } while (0);
 
+            if (err != 0) {
+                failedIndex = index;
+                break;
+            }
+
             y += height + 3;
         }
 
         if (err != 0) {
-            if (err == 2) {
-                mem_free(down[index]);
+            if (err == 2 && failedIndex >= 0) {
+                mem_free(down[failedIndex]);
             }
 
-            while (--index >= 0) {
+            for (index = failedIndex - 1; index >= 0; index--) {
                 mem_free(up[index]);
                 mem_free(down[index]);
             }

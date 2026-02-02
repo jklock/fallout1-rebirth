@@ -74,7 +74,11 @@ echo ""
 echo ">>> Checking for common issues..."
 
 # Check for Windows-only code accidentally added
-WIN_REFS=$(grep -rn "WIN32\|_WIN32\|Windows" src/ --include="*.cc" --include="*.h" 2>/dev/null | grep -v "// " | head -5 || true)
+# Allowlist known false positives from game window APIs and platform_compat.
+WIN_REFS=$(grep -rn "WIN32\|_WIN32\|Windows" src/ --include="*.cc" --include="*.h" 2>/dev/null \
+    | grep -v "// " \
+    | grep -vE "updateWindows\(|src/platform_compat\.cc:" \
+    | head -5 || true)
 if [[ -n "$WIN_REFS" ]]; then
     echo "⚠️  Found Windows references (this is Apple-only fork):"
     echo "$WIN_REFS"

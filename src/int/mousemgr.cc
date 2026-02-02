@@ -25,8 +25,8 @@ typedef struct MouseManagerStaticData {
     unsigned char* data;
     int field_4;
     int field_8;
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
 } MouseManagerStaticData;
 
 typedef struct MouseManagerAnimatedData {
@@ -445,8 +445,8 @@ int mouseSetFrame(char* fileName, int a2)
         animatedData->field_20 = 1;
     }
 
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
     for (int index = 0; index < v3; index++) {
         string[0] = '\0';
         db_fgets(string, sizeof(string), stream);

@@ -18,12 +18,30 @@ I did this because I love Fallout. Fallout 1 was the first computer game I ever 
 - **Native Apple Silicon support** — Runs natively on M1/M2/M3/M4 Macs and all modern iPads
 - **Engine bug fixes** — Survivalist perk fix, combat improvements, and script corrections
 - **High-DPI Retina support** — Sharp rendering with 2X integer scaling option
+- **Static analysis clean** — All cppcheck warnings and errors resolved
+
+### Bug Fixes (Verified via Git History)
+
+| Fix | Description | Commit |
+|-----|-------------|--------|
+| Survivalist Perk | HP bonus calculation now works correctly (+20 HP per level) | Implemented in perk.cc |
+| Line-of-Sight | Fixed undefined behavior in `obj_can_see_obj` | `d94e777` |
+| Movie Library | Fixed incorrect return type of `getOffset` | `63f63d0` |
+| Format Strings | Fixed vulnerabilities and creature examination `%s` bug | `533637b` |
+| Combat AI | Fixed undefined behavior causing crashes in release mode | `f4e74d8` |
+| Container Highlight | Fixed containers highlighting issues | `a6aca82` |
+| Integer Underflow | Fixed underflow bug | `8b34acc` |
+| Uninitialized Variables | Fixed in actions.cc, anim.cc, combat.cc, editor.cc, intrpret.cc, mousemgr.cc | 2026-02 |
+| Array Bounds | Fixed out-of-bounds access in editor.cc and worldmap.cc | 2026-02 |
+| Null Pointer Check | Added malloc failure check in color.cc | 2026-02 |
 
 ### Cherry-Picked Community Improvements
 - **iPad mouse/trackpad + F-key support** (evaera)
 - **Touch control optimization** (zverinapavel)
 - **Borderless window mode** (radozd)
 - **QoL features + bugfixes** (korri123)
+- **Object tooltips** — Hover tooltips for game objects
+- **Auto-mouse combat** — Improved combat input handling
 - **TeamX Patch 1.3.5 compatibility**
 - **RME 1.1e data integration**
 
@@ -43,10 +61,10 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
 
 > **Requirements**: macOS 11.0 (Big Sur) or higher. Runs natively on Intel-based Macs and Apple Silicon.
 
-1. **Get game data** — Search archive.org for "Fallout 1 GOG Linux" and download the Linux installer. Extract and lowercase the files:
+1. **Get game data** — Search archive.org for "Fallout 1 GOG Linux Assets" and download the Linux assets file in your archive of choice. Extract and lowercase the files using bash below or do it inside of a Finder Window:
    ```bash
    # Extract the Linux installer (no special tools needed)
-   unzip fallout_classic_linux_*.zip -d ~/Games/Fallout
+   unzip Name_Of_Your_Downladed_Archive.tar -d ~/Games/Fallout
    cd ~/Games/Fallout
    
    # Lowercase all filenames (required for macOS/iOS)
@@ -57,16 +75,28 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
 
 2. **Download** `Fallout 1 Rebirth.dmg` from Releases and install `Fallout 1 Rebirth.app`.
 
-3. **Open the app bundle** — right-click `Fallout 1 Rebirth.app` → **Show Package Contents** → open `Contents/Resources/app/` (create the `app` folder if it doesn't exist).
+3. **Open the app bundle** — right-click `Fallout 1 Rebirth.app` → **Show Package Contents** → open `Contents/MacOS/` (this is the runtime working directory).
 
-4. **Copy game files** into `Contents/Resources/app/`:
+<p align="center">
+  <img src="img/RebirthLogo.png" alt="Fallout 1 Rebirth" width="512">
+</p>
+
+4. **Copy game files** into `Contents/MacOS/`:
   - `master.dat`
   - `critter.dat`
   - `data/` (entire folder)
 
-5. **Copy config files** from [gameconfig/macos](gameconfig/macos) into the same `Contents/Resources/app/` folder:
+<p align="center">
+  <img src="img/RebirthLogo.png" alt="Fallout 1 Rebirth" width="512">
+</p>
+
+5. **Copy config files** from this repo in the folder [gameconfig/macos](gameconfig/macos) into the same `Contents/MacOS/` folder on your local machine:
   - `fallout.cfg`
-  - `fallout.ini`
+  - `f1_res.ini` (rename from `fallout.ini`)
+
+<p align="center">
+  <img src="img/RebirthLogo.png" alt="Fallout 1 Rebirth" width="512">
+</p>
 
 6. **Run** `Fallout 1 Rebirth.app`.
 
@@ -94,7 +124,9 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
 | Drag from cursor | Click + drag |
 | Drag from away | Move cursor (no button) |
 
-Apple Pencil uses absolute positioning — the cursor follows exactly where you touch. The "click radius" concept separates positioning from clicking, just like a mouse.
+Apple Pencil uses absolute positioning — the cursor follows exactly where you touch. The "click radius" concept separates positioning from clicking, just like a mouse. 
+
+> **Right click is DISABLED by default**: In my testing, using your fingers to initiate the right click switch and then using the Apple Pencil as a precision pointing device works really well. Since the Apple Pencil lacks a physical button, it makes the gameplay flow a little awkward. The option to enable it is in the [gameconfig/ios/fallout.cfg](gameconfig/ios/fallout.cfg) and the option is pencil_right_click=0/1 - Please read the comments above it to understand what it does. 
 
 **With Magic Keyboard/Trackpad:** Full mouse and keyboard support including F-keys.
 
@@ -102,12 +134,12 @@ Apple Pencil uses absolute positioning — the cursor follows exactly where you 
 1. Download `fallout1-rebirth.ipa` from Releases
 2. Sideload using [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)
 3. Run the game once (you'll see a "Could not find the master datafile..." error — this is expected)
-4. Use Finder to copy `master.dat`, `critter.dat`, `data/`, plus config files from [gameconfig/ios](gameconfig/ios) (`fallout.cfg`, `fallout.ini`) into the Fallout app’s Files container ([how-to](https://support.apple.com/HT210598))
+4. Use Finder to copy `master.dat`, `critter.dat`, `data/`, plus config files from [gameconfig/ios](gameconfig/ios) (`fallout.cfg`, `f1_res.ini` — rename from `fallout.ini`) into the Fallout app’s Files container ([how-to](https://support.apple.com/HT210598))
 
 ## Configuration
 
-Copies of the platform-specific configuration files live in [gameconfig/macos](gameconfig/macos) and [gameconfig/ios](gameconfig/ios). These are based on [GOG/Fallout1/fallout.cfg](GOG/Fallout1/fallout.cfg) and [GOG/Fallout1/f1_res.ini](GOG/Fallout1/f1_res.ini) with platform-appropriate resolution defaults. Each option is documented inline for Apple platforms, and legacy options that do not affect Apple builds are labeled as ignored. Put `fallout.cfg` and `fallout.ini` in the same Fallout folder as your game data:
-- **macOS**: `Fallout 1 Rebirth.app/Contents/Resources/app/`
+Copies of the platform-specific configuration files live in [gameconfig/macos](gameconfig/macos) and [gameconfig/ios](gameconfig/ios). These are based on [GOG/Fallout1/fallout.cfg](GOG/Fallout1/fallout.cfg) and [GOG/Fallout1/f1_res.ini](GOG/Fallout1/f1_res.ini) with platform-appropriate resolution defaults. Each option is documented inline for Apple platforms, and legacy options that do not affect Apple builds are labeled as ignored. Put `fallout.cfg` and `f1_res.ini` (rename from `fallout.ini`) in the same Fallout folder as your game data:
+- **macOS**: `Fallout 1 Rebirth.app/Contents/MacOS/`
 - **iOS/iPadOS**: the app’s Files container (via Finder)
 
 The game uses two configuration files:
@@ -133,7 +165,7 @@ game_difficulty=1            # 0=easy, 1=normal, 2=hard
 
 > **Important**: File paths are case-sensitive! If your game data uses `MASTER.DAT` instead of `master.dat`, update the config accordingly.
 
-### fallout.ini — Display Settings
+### f1_res.ini — Display Settings
 
 Controls resolution, scaling, UI layout, movies, and other display-related behavior. See the platform-specific files in [gameconfig/macos](gameconfig/macos) or [gameconfig/ios](gameconfig/ios) for full documentation.
 
@@ -261,6 +293,10 @@ Current goals:
 - **Engine bug fixes** — Port fixes from ETTU/Fo1in2 analysis
 - **iPad optimization** — Improve touch controls and UI scaling
 - **Quality of life** — Backport relevant Fallout 2 improvements
+
+### Contributing Back to Upstream
+
+Platform-agnostic bug fixes from this fork can be contributed back to the upstream [fallout1-ce](https://github.com/alexbatalov/fallout1-ce) repository. See [CEPR.md](CEPR.md) for a list of changes suitable for upstream contribution.
 
 ## Credits
 
