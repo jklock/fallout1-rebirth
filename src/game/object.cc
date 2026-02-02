@@ -3759,7 +3759,9 @@ static int obj_adjust_light(Object* obj, int a2, Rect* rect)
         obj->lightIntensity = 65536;
     }
 
+    // clang-format off
     int (*v70)[36] = light_offsets[obj->tile & 1];
+    // clang-format on
     int v7 = (obj->lightIntensity - 655) / (obj->lightDistance + 1);
     int v28[36];
     v28[0] = obj->lightIntensity - v7;
