@@ -25,7 +25,7 @@ Before you begin, you'll need:
 - **Display**: Any resolution (the game scales to fit)
 
 #### iOS/iPadOS
-- **Operating System**: iOS 14.0 / iPadOS 14.0 or later
+- **Operating System**: iOS 14.0+ / iPadOS 14.0+ or later
 - **Device**: iPhone or iPad (iPad recommended for best experience)
 - **Storage**: At least 1 GB free space
 
@@ -134,7 +134,8 @@ Follow these steps to install and run Fallout 1 Rebirth on your Mac.
 
 ### Step 1: Download the DMG
 
-1. Go to the [Fallout 1 Rebirth Releases page](https://github.com/user/fallout1-rebirth/releases)
+1. Go to the [Fallout 1 Rebirth Releases page](https://github.com/YOUR_USERNAME/fallout1-rebirth/releases)
+   > **Note:** Update the URL above with the correct repository location.
 2. Download the latest `.dmg` file for macOS
 3. Wait for the download to complete
 
@@ -254,6 +255,8 @@ SCALE_2X=0
 - `2560x1440` - 2K
 - `3840x2160` - 4K
 
+> **📖 Advanced Resolution:** For detailed information about iPad resolution and scaling settings, see [development/IPAD_RESOLUTION.md](../development/IPAD_RESOLUTION.md).
+
 ### Step 8: Configure Game Settings (Optional)
 
 The game uses `fallout.cfg` for gameplay settings.
@@ -337,7 +340,8 @@ Sideloadly gives you more control over the signing process.
 
 ### Step 2: Get the IPA File
 
-1. Go to the [Fallout 1 Rebirth Releases page](https://github.com/user/fallout1-rebirth/releases)
+1. Go to the [Fallout 1 Rebirth Releases page](https://github.com/YOUR_USERNAME/fallout1-rebirth/releases)
+   > **Note:** Update the URL above with the correct repository location.
 2. Download the latest `.ipa` file for iOS
 3. Save it somewhere easy to find (like your Downloads folder)
 
@@ -611,14 +615,29 @@ If you have a Magic Keyboard or external keyboard/trackpad, Fallout 1 Rebirth fu
 
 ### Configuration File Reference
 
+> **📁 Config Templates:** Platform-specific configuration templates are available in the [gameconfig/](../gameconfig/) folder. Copy the appropriate files from `gameconfig/macos/` or `gameconfig/ios/` to get started.
+
 #### f1_res.ini (Resolution Settings)
 
-| Setting | Description | Values |
-|---------|-------------|--------|
-| WINDOWED | Window mode | 0=Fullscreen, 1=Windowed |
-| SCR_WIDTH | Screen width | 0=Auto, or pixels |
-| SCR_HEIGHT | Screen height | 0=Auto, or pixels |
-| SCALE_2X | Graphics scaling | 0=Off, 1=On |
+| Setting | Section | Description | Values |
+|---------|---------|-------------|--------|
+| WINDOWED | [MAIN] | Window mode | 0=Fullscreen, 1=Windowed |
+| SCR_WIDTH | [MAIN] | Screen width | 0=Auto, or pixels |
+| SCR_HEIGHT | [MAIN] | Screen height | 0=Auto, or pixels |
+| SCALE_2X | [MAIN] | Graphics scaling | 0=Off, 1=On |
+| VSYNC | [DISPLAY] | Vertical sync | 0=Off, 1=On (default) |
+| FPS_LIMIT | [DISPLAY] | Frame rate limit | -1=Match display, 0=Unlimited, or FPS value |
+
+**VSync Settings (Recommended Defaults):**
+```ini
+[DISPLAY]
+; VSync enabled by default for smooth scrolling and reduced tearing
+VSYNC=1
+; FPS_LIMIT=-1 matches the display refresh rate (60Hz, 120Hz ProMotion, etc.)
+FPS_LIMIT=-1
+```
+
+> **Note:** VSync is enabled by default in Fallout 1 Rebirth for smooth gameplay. On ProMotion displays (iPad Pro, newer MacBooks), the game automatically adapts to the display's variable refresh rate.
 
 #### fallout.cfg (Game Settings)
 
@@ -630,12 +649,31 @@ If you have a Magic Keyboard or external keyboard/trackpad, Fallout 1 Rebirth fu
 | [sound] | sndfx_volume | Sound volume (0-100) |
 | [preferences] | combat_speed | Combat animation speed (1-10) |
 | [preferences] | violence_level | Gore level (0-3) |
+| [input] | pencil_right_click | Apple Pencil right-click (0=Off, 1=On) |
+
+**Apple Pencil Settings (iOS/iPadOS):**
+
+> **🖊️ Note:** Apple Pencil support is actively being developed. Configure via the `[input]` section in `fallout.cfg`.
+
+```ini
+[input]
+; Apple Pencil right-click behavior
+; 0 = disabled (DEFAULT) - Pencil is a precise left-click-only device
+; 1 = enabled - Pencil long-press and gestures trigger right-click
+pencil_right_click=0
+```
+
+When `pencil_right_click=0` (recommended):
+- Apple Pencil acts as a precise pointing device (left-click only)
+- Finger touch handles general navigation with long-press for right-click
+- This provides the most natural workflow: pencil for precision, fingers for navigation
 
 ### Getting Help
 
 If you continue to experience issues:
 
-1. Check the [GitHub Issues](https://github.com/user/fallout1-rebirth/issues) page for known problems
+1. Check the [GitHub Issues](https://github.com/YOUR_USERNAME/fallout1-rebirth/issues) page for known problems
+   > **Note:** Update the URL above with the correct repository location.
 2. Search existing issues before creating a new one
 3. When reporting issues, include:
    - Your device and OS version

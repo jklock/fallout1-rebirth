@@ -11,7 +11,8 @@ macOS Installation Instructions
    - data/ folder
 
 2. INSTALLATION
-   Copy ALL of these files to the SAME folder:
+   Copy ALL of these files to the SAME folder (either alongside the app, or inside
+   the app at Contents/MacOS — the game will detect both locations):
    - Fallout 1 Rebirth.app (this app)
    - master.dat
    - critter.dat

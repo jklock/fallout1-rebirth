@@ -26,9 +26,9 @@ cd /path/to/fallout1-rebirth
 
 | Category | Scripts | Purpose |
 |----------|---------|---------|
-| Build | `build-macos.sh`, `build-ios.sh` | Compile the project |
-| Test | `test-macos.sh`, `test-ios-simulator.sh`, `test-ios-headless.sh` | Verify builds |
-| Dev | `dev-check.sh`, `dev-format.sh`, `dev-verify.sh`, `dev-clean.sh` | Development utilities |
+| Build | `build-macos.sh`, `build-ios.sh`, `build-macos-dmg.sh`, `build-ios-ipa.sh` | Compile and package |
+| Test | `test-macos.sh`, `test-macos-headless.sh`, `test-ios-simulator.sh`, `test-ios-headless.sh` | Verify builds |
+| Dev | `dev-check.sh`, `dev-format.sh`, `dev-verify.sh`, `dev-clean.sh`, `journal.sh` | Development utilities |
 
 ---
 
@@ -88,6 +88,58 @@ build-ios/
 **Notes**:
 - For simulator builds, use `test-ios-simulator.sh --build-only`
 - Code signing is disabled by default; use Xcode for signed builds
+
+---
+
+### build-macos-dmg.sh
+
+Build and package macOS app as a DMG installer.
+
+**Usage**:
+```bash
+./scripts/build-macos-dmg.sh
+```
+
+**Options** (via environment variables):
+```bash
+BUILD_TYPE=Debug ./scripts/build-macos-dmg.sh    # Debug build
+BUILD_DIR=custom-dir ./scripts/build-macos-dmg.sh # Custom build directory
+```
+
+**Output**:
+```
+build-outputs/macOS/
+└── Fallout1Rebirth-X.X.X-Darwin.dmg
+```
+
+**Requirements**:
+- `create-dmg`: `brew install create-dmg`
+
+**Notes**:
+- Game data is NOT bundled — users add their own files
+- DMG includes the app bundle and distribution README
+
+---
+
+### build-ios-ipa.sh
+
+Build and package iOS app as an IPA file.
+
+**Usage**:
+```bash
+./scripts/build-ios-ipa.sh
+```
+
+**Output**:
+```
+build-outputs/iOS/
+└── fallout1-rebirth-X.X.X-iphoneos.ipa
+```
+
+**Notes**:
+- Runs `build-ios.sh` first, then packages with CPack
+- Code signing disabled; sideload via AltStore, Sideloadly, or similar
+- IPA is copied to `build-outputs/iOS/` for easy access
 
 ---
 
@@ -297,6 +349,24 @@ Remove all build directories.
 
 ---
 
+### journal.sh
+
+Toggle visibility of JOURNAL.md files in git. Run before pushing to hide development journals.
+
+**Usage**:
+```bash
+./scripts/journal.sh          # Toggle journal ignore state
+./scripts/journal.sh --status # Show current state
+```
+
+**Behavior**:
+- When ignored: JOURNAL.md files are excluded from commits
+- When tracked: JOURNAL.md files are visible and can be committed
+
+**Use case**: Keep development notes locally without pushing to remote.
+
+---
+
 ## Environment Variables
 
 ### Global Variables
@@ -359,16 +429,19 @@ CLEAN=1 GAME_DATA=/Users/me/fallout ./scripts/test-ios-simulator.sh
 ./scripts/test-ios-headless.sh --build
 ```
 
-### Before Pull Request
+### Before Pushing
 
 ```bash
+# Run pre-commit checks
+./scripts/dev-check.sh
+
 # Full verification suite
 ./scripts/dev-verify.sh
 
 # macOS verification
 ./scripts/test-macos.sh
 
-# iOS verification
+# iOS verification (optional, if iOS changes)
 ./scripts/test-ios-headless.sh --build
 ```
 
@@ -409,12 +482,30 @@ cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug -DASAN=ON
 cmake --build build-debug -j $(sysctl -n hw.physicalcpu)
 ```
 
-### CI/CD Simulation
+### Pre-Push Verification
 
 ```bash
-# Mirror what CI does
-cppcheck --std=c++17 src/
-find src -type f \( -name '*.cc' -o -name '*.h' \) | xargs clang-format --dry-run --Werror
-./scripts/build-macos.sh
-./scripts/build-ios.sh
+# Run all checks before pushing
+./scripts/dev-check.sh
+./scripts/dev-verify.sh
 ```
+
+> **Note**: This project has no CI/CD pipeline. All verification is done locally before pushing.
+
+---
+
+### Creating a Release
+
+Builds are created locally and uploaded to GitHub Releases:
+
+```bash
+# Build macOS DMG
+./scripts/build-macos-dmg.sh
+# Output: build-outputs/macOS/*.dmg
+
+# Build iOS IPA
+./scripts/build-ios-ipa.sh
+# Output: build-outputs/iOS/*.ipa
+```
+
+Then upload the artifacts to GitHub Releases manually.

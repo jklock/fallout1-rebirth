@@ -257,11 +257,24 @@ Your PR should include:
 - **Clear title**: Summarize the change
 - **Description**: What, why, and how
 - **Testing done**: What you tested
+- **Local checks passed**: Confirm you ran `./scripts/dev-check.sh` and `./scripts/dev-verify.sh`
 - **Related issues**: Link any related issues
 
-### 3. CI Checks
+> **Important**: No automated CI will run on your PR. Maintainers will verify changes locally before merging.
 
-The following checks run automatically:
+### 3. Required Checks (Run Locally)
+
+> **Note**: This project has no automated CI. Contributors MUST run all checks locally before submitting PRs.
+
+Run these scripts before submitting:
+
+```bash
+# Format + lint checks
+./scripts/dev-check.sh
+
+# Full verification (build + static analysis)
+./scripts/dev-verify.sh
+```
 
 | Check | Requirement |
 |-------|-------------|
@@ -270,7 +283,7 @@ The following checks run automatically:
 | iOS build | Compiles successfully |
 | macOS build | Compiles successfully |
 
-All checks must pass before merging.
+All checks must pass locally before submitting a pull request.
 
 ### 4. Review Process
 
@@ -287,6 +300,16 @@ All checks must pass before merging.
   git pull upstream main
   git push origin main
   ```
+
+### 6. Release Workflow
+
+Releases are built and distributed locally:
+
+- **macOS**: `./scripts/build-macos-dmg.sh` creates a DMG installer
+- **iOS**: `./scripts/build-ios.sh` followed by `cd build-ios && cpack -C RelWithDebInfo` creates an IPA
+- Artifacts are uploaded to [GitHub Releases](https://github.com/ORIGINAL_OWNER/fallout1-rebirth/releases)
+
+Contributors do not need to create releases—maintainers handle this for each version.
 
 ---
 

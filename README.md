@@ -10,6 +10,8 @@ Fallout 1 Rebirth is a fully working re-implementation of Fallout, with the same
 
 > For Windows, Linux, or Android support, use the upstream project: [alexbatalov/fallout1-ce](https://github.com/alexbatalov/fallout1-ce)
 
+> **⚠️ LOCAL BUILDS ONLY** — This project is built locally; there is no CI/CD. Download pre-built binaries from [GitHub Releases](https://github.com/yourusername/fallout1-rebirth/releases) or build from source. Game data files (master.dat, critter.dat, data/) are **NOT bundled** — you must own the game.
+
 I did this because I love Fallout. Fallout 1 was the first computer game I ever bought. I got it at Target for $10 when I was a kid. It was the first game I ever installed on MY computer and the first computer game I really fell in love with.
 
 ## Features
@@ -17,8 +19,11 @@ I did this because I love Fallout. Fallout 1 was the first computer game I ever 
 ### Core Features
 - **Native Apple Silicon support** — Runs natively on M1/M2/M3/M4 Macs and all modern iPads
 - **Engine bug fixes** — Survivalist perk fix, combat improvements, and script corrections
+- **VSync enabled by default** — Eliminates screen tearing; supports ProMotion 120Hz displays
+- **Touch coordinate fixes** — Clicks register at exact cursor position (no offset issues)
 - **High-DPI Retina support** — Sharp rendering with 2X integer scaling option
 - **Static analysis clean** — All cppcheck warnings and errors resolved
+- **Game files NOT bundled** — You must own the game (GOG/Steam) and provide your own data files
 
 ### Bug Fixes (Verified via Git History)
 
@@ -83,7 +88,7 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
   <img src="img/RebirthLogo.png" alt="Fallout 1 Rebirth" width="512">
 </p>
 
-4. **Copy game files** into `Contents/MacOS/`:
+4. **Copy game files** into `Contents/MacOS/` (or place them next to the `.app`; the game will detect either location):
   - `master.dat`
   - `critter.dat`
   - `data/` (entire folder)
@@ -92,9 +97,10 @@ You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/g
   <img src="img/RebirthLogo.png" alt="Fallout 1 Rebirth" width="512">
 </p>
 
-5. **Copy config files** from this repo in the folder [gameconfig/macos](gameconfig/macos) into the same `Contents/MacOS/` folder on your local machine:
+5. **Copy config files** from this repo in the folder [gameconfig/macos](gameconfig/macos) into the same folder where you placed the game data (either `Contents/MacOS/` or alongside the `.app`):
   - `fallout.cfg`
   - `f1_res.ini` (rename from `fallout.ini`)
+   - The engine reads `f1_res.ini` at startup to set resolution/windowing; without it you’ll get the 640x480 defaults.
 
 <p align="center">
   <img src="img/RebirthLogo.png" alt="Fallout 1 Rebirth" width="512">
@@ -144,7 +150,7 @@ Copies of the platform-specific configuration files live in [gameconfig/macos](g
 - **macOS**: `Fallout 1 Rebirth.app/Contents/MacOS/`
 - **iOS/iPadOS**: the app’s Files container (via Finder)
 
-The game uses two configuration files:
+The game uses two configuration files (both must live alongside your game data, either inside `Contents/MacOS/` or next to the `.app`):
 
 ### fallout.cfg — Game Settings
 
@@ -177,7 +183,13 @@ SCR_WIDTH=1024     # Screen width in pixels
 SCR_HEIGHT=768     # Screen height in pixels
 WINDOWED=0         # 0=fullscreen, 1=windowed
 SCALE_2X=1         # 0=native, 1=2x integer scaling
+
+[DISPLAY]
+VSYNC=1            # 1=enabled (default), 0=disabled
+FPS_LIMIT=0        # 0=unlimited when vsync off, or target FPS
 ```
+
+> For complete configuration reference, see [docs/configuration.md](docs/configuration.md). For VSync details, see [docs/vsync.md](docs/vsync.md).
 
 ### Platform-Specific Recommendations
 
@@ -195,6 +207,17 @@ SCALE_2X=1         # 0=native, 1=2x integer scaling
 ### Requirements
 - Xcode 15+ with Command Line Tools
 - CMake 3.21+
+
+### Quick Build (Recommended)
+
+Use the provided build scripts for consistent builds:
+
+```bash
+./scripts/build-macos.sh   # Build for macOS (creates .app)
+./scripts/build-ios.sh     # Build for iOS device (creates .ipa)
+```
+
+> **Note**: Game data files are NOT bundled in releases. Users must provide their own `master.dat`, `critter.dat`, and `data/` folder. See [docs/building.md](docs/building.md) for detailed build instructions.
 
 ### Game Data for Development
 
@@ -278,12 +301,21 @@ cd build-ios && cpack -C RelWithDebInfo    # Creates .ipa
 
 Comprehensive documentation is available in the [docs/](docs/) directory:
 
-- [Setup Guide](docs/setup_guide.md) — Complete installation instructions
-- [Building](docs/building.md) — Build from source instructions
-- [Architecture](docs/architecture.md) — Codebase structure and how it works
-- [Testing](docs/testing.md) — Running tests and validation
-- [Scripts](docs/scripts.md) — Available automation scripts
-- [Contributing](docs/contributing.md) — How to contribute
+| Document | Description |
+|----------|-------------|
+| [docs/readme.md](docs/readme.md) | Documentation index |
+| [docs/setup_guide.md](docs/setup_guide.md) | End-user installation guide |
+| [docs/configuration.md](docs/configuration.md) | Complete config file reference |
+| [docs/vsync.md](docs/vsync.md) | VSync and display settings |
+| [docs/building.md](docs/building.md) | Build from source instructions |
+| [docs/architecture.md](docs/architecture.md) | Codebase structure |
+| [docs/testing.md](docs/testing.md) | Running tests and validation |
+| [docs/scripts.md](docs/scripts.md) | Available automation scripts |
+| [docs/contributing.md](docs/contributing.md) | How to contribute |
+
+**Platform config templates**: See [gameconfig/macos](gameconfig/macos) and [gameconfig/ios](gameconfig/ios) for ready-to-use configuration files.
+
+**Internal development docs**: The [development/](development/) directory contains internal development notes (not user-facing).
 
 ## Contributing
 

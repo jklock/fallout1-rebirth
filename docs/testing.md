@@ -1,5 +1,7 @@
 # Testing
 
+> **⚠️ LOCAL BUILDS ONLY**: This project does not use CI/CD. All testing and verification must be performed locally before submitting pull requests.
+
 Testing procedures for Fallout 1 Rebirth: automated tests, simulator testing, and manual verification.
 
 ## Table of Contents
@@ -11,11 +13,15 @@ Testing procedures for Fallout 1 Rebirth: automated tests, simulator testing, an
 - [macOS Testing](#macos-testing)
 - [Headless Testing](#headless-testing)
 - [Manual Testing](#manual-testing)
-- [CI/CD Testing](#cicd-testing)
+- [Local Verification](#local-verification)
 
 ---
 
 ## Overview
+
+### Local-Only Testing
+
+**All testing happens locally.** There is no CI/CD pipeline—contributors must run verification scripts before submitting PRs. This ensures code quality while keeping the development workflow simple and fast.
 
 ### Test Categories
 
@@ -359,61 +365,49 @@ Before submitting changes, manually verify:
 
 ---
 
-## CI/CD Testing
+## Local Verification
 
-### GitHub Actions Workflows
+### Why Local-Only?
 
-The project uses two CI workflows:
+This project uses **local builds exclusively**. CI/CD workflows have been removed to simplify the development process. Contributors are responsible for running verification before submitting pull requests.
 
-#### ci-build.yml (Continuous Integration)
+### Pre-Commit Checklist
 
-Triggered on:
-- Push to `main` branch
-- Pull request opened or updated
-
-Jobs:
-1. **Static Analysis** (Ubuntu)
-   - `cppcheck --std=c++17 src/`
-
-2. **Code Format Check** (Ubuntu)
-   - `clang-format --dry-run --Werror`
-
-3. **iOS Build** (macOS-14)
-   - Full build with Xcode generator
-   - Produces `fallout1-rebirth.ipa` artifact
-
-4. **macOS Build** (macOS-14)
-   - Full build with Xcode generator
-   - Produces `fallout1-rebirth.dmg` artifact
-
-#### release.yml (Release Automation)
-
-Triggered on:
-- Version tags (`v*`)
-- Published releases
-
-Additional steps:
-- Code signing (if secrets configured)
-- Notarization (macOS)
-- Upload to GitHub Releases
-
-### Running CI Checks Locally
-
-Mirror CI checks before pushing:
+Before every commit, run:
 
 ```bash
-# Static analysis (same as CI)
+./scripts/dev-check.sh
+```
+
+Before submitting a PR, run:
+
+```bash
+./scripts/dev-verify.sh
+```
+
+### Running All Checks
+
+Complete verification mirrors what would happen in CI:
+
+```bash
+# Static analysis
 cppcheck --std=c++17 src/
 
-# Format check (same as CI)
+# Format check
 find src -type f -name '*.cc' -o -name '*.h' | \
   xargs clang-format --dry-run --Werror
 
 # Full build verification
 ./scripts/dev-verify.sh
+
+# Test on iOS Simulator
+./scripts/test-ios-simulator.sh
+
+# Test macOS build
+./scripts/test-macos.sh
 ```
 
-### Interpreting CI Results
+### Verification Results
 
 | Check | Pass Criteria | Fix |
 |-------|--------------|-----|
@@ -421,3 +415,27 @@ find src -type f -name '*.cc' -o -name '*.h' | \
 | Code format | No differences | Run `./scripts/dev-format.sh` |
 | iOS build | Compiles successfully | Fix build errors |
 | macOS build | Compiles successfully | Fix build errors |
+
+### Releasing
+
+Builds are created locally and uploaded to GitHub Releases:
+
+```bash
+# Create macOS DMG
+./scripts/build-macos-dmg.sh
+
+# Create iOS IPA
+./scripts/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo
+```
+
+Then upload artifacts to GitHub Releases manually.
+
+### Contributor Responsibility
+
+Since there's no automated CI, **you are responsible** for ensuring:
+
+1. ✅ Code compiles on both macOS and iOS
+2. ✅ No formatting violations (`dev-check.sh` passes)
+3. ✅ Static analysis clean (`dev-verify.sh` passes)
+4. ✅ App launches successfully on target platform
+5. ✅ No regressions in existing functionality

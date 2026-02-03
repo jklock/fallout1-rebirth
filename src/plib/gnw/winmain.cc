@@ -1,6 +1,8 @@
 #include "plib/gnw/winmain.h"
 
 #include <stdlib.h>
+#include <string>
+#include <string.h>
 #include <unistd.h>
 
 #include <SDL.h>
@@ -33,8 +35,52 @@ int main(int argc, char* argv[])
 
 #if __APPLE__ && TARGET_OS_OSX
     char* basePath = SDL_GetBasePath();
-    chdir(basePath);
-    SDL_free(basePath);
+    if (basePath != NULL) {
+        std::string workingDir(basePath);
+
+        auto hasGameFiles = [](const std::string& dir) {
+            std::string cfg = dir + "fallout.cfg";
+            std::string master = dir + "master.dat";
+            std::string critter = dir + "critter.dat";
+            return access(cfg.c_str(), R_OK) == 0
+                || (access(master.c_str(), R_OK) == 0 && access(critter.c_str(), R_OK) == 0);
+        };
+
+        const char resourcesMarker[] = "/Contents/Resources/";
+        const char macosMarker[] = "/Contents/MacOS/";
+        char* resources = strstr(basePath, resourcesMarker);
+        char* macos = strstr(basePath, macosMarker);
+
+        if (resources != NULL || macos != NULL) {
+            std::string appRoot;
+
+            if (resources != NULL) {
+                appRoot.assign(basePath, resources - basePath);
+            } else {
+                appRoot.assign(basePath, macos - basePath);
+            }
+
+            std::string macosPath = appRoot + "/Contents/MacOS/";
+            std::string resourcesPath = appRoot + "/Contents/Resources/";
+
+            std::string parentDir;
+            size_t sep = appRoot.find_last_of('/');
+            if (sep != std::string::npos) {
+                parentDir = appRoot.substr(0, sep + 1);
+            }
+
+            const std::string candidates[] = { macosPath, resourcesPath, parentDir };
+            for (const auto& candidate : candidates) {
+                if (!candidate.empty() && hasGameFiles(candidate)) {
+                    workingDir = candidate;
+                    break;
+                }
+            }
+        }
+
+        chdir(workingDir.c_str());
+        SDL_free(basePath);
+    }
 #endif
 
     SDL_ShowCursor(SDL_DISABLE);

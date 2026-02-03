@@ -57,6 +57,8 @@ Fallout 1 Rebirth is a C++17 re-implementation of the original Fallout engine. T
 | `third_party/` | Bundled dependencies (SDL2, adecode, fpattern) |
 | `dist/` | Distribution files for packaging |
 | `scripts/` | Build and development automation scripts |
+| `gameconfig/` | Platform-specific configuration templates (iOS and macOS) |
+| `development/` | Internal development documentation (not user-facing) |
 
 ### Source Code (`src/`)
 
@@ -72,7 +74,7 @@ Fallout 1 Rebirth is a C++17 re-implementation of the original Fallout engine. T
 | File | Purpose |
 |------|---------|
 | `audio_engine.cc/h` | SDL-based audio engine wrapper |
-| `fps_limiter.cc/h` | Frame rate limiting and timing |
+| `fps_limiter.cc/h` | Frame rate limiting with configurable FPS |
 | `movie_lib.cc/h` | MVE video playback library |
 | `platform_compat.cc/h` | Cross-platform compatibility utilities |
 | `pointer_registry.cc/h` | Pointer tracking for serialization |
@@ -124,7 +126,14 @@ main_init_system()
 4. **Cursor**: Mouse cursor drawn last
 5. **Present**: Frame presented via SDL
 
-The rendering uses a software blitter with palette-based graphics (256 colors). Key files:
+The rendering uses a software blitter with palette-based graphics (256 colors).
+
+**Frame Timing**:
+- VSync is enabled by default via `SDL_RENDERER_PRESENTVSYNC`
+- `FpsLimiter` class in `fps_limiter.cc` handles frame rate control
+- Display refresh rate is logged at startup
+
+Key files:
 
 - `src/plib/gnw/svga.cc` - Screen management
 - `src/plib/gnw/grbuf.cc` - Graphics buffer operations
@@ -143,6 +152,15 @@ Key files:
 - `src/plib/gnw/input.cc` - Input queue management
 - `src/plib/gnw/gnw.cc` - Window and event management
 - `src/game/gmouse.cc` - Game mouse handling
+
+#### Touch Input (iOS/iPadOS)
+
+- `src/plib/gnw/touch.cc` handles touch input for iOS/iPadOS
+- Uses `SDL_RenderWindowToLogical` for coordinate transformation
+- Touch coordinates are normalized (0.0-1.0) by SDL, then converted to logical coordinates
+- Same transformation path as mouse input in `dxinput.cc`
+
+> **Note**: Apple Pencil support is in development. See `development/applepencil/` for current progress.
 
 ### Audio System
 

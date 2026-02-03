@@ -1,6 +1,8 @@
 # Building from Source
 
-Build instructions for Fallout 1 Rebirth on all supported platforms.
+> ⚠️ **LOCAL BUILDS ONLY** — This project has no CI/CD pipeline. All builds are performed locally on your machine. See [Distribution Workflow](#distribution-workflow) for how to create and share release artifacts.
+
+Build instructions for Fallout 1 Rebirth on all supported platforms (macOS and iOS/iPadOS).
 
 ## Table of Contents
 
@@ -10,6 +12,7 @@ Build instructions for Fallout 1 Rebirth on all supported platforms.
 - [iOS Simulator Build](#ios-simulator-build)
 - [Build Configuration Options](#build-configuration-options)
 - [Packaging](#packaging)
+- [Distribution Workflow](#distribution-workflow)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -50,9 +53,9 @@ clang-format --version
 
 ## macOS Build
 
-### Method 1: Using Build Script (Recommended)
+### Method 1: Using Build Script (Recommended) ✅
 
-The simplest way to build for macOS:
+**Always use the build script for standard builds.** It handles configuration, parallelization, and output paths correctly:
 
 ```bash
 ./scripts/build-macos.sh
@@ -139,7 +142,9 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 
 ## iOS Device Build
 
-### Using Build Script (Recommended)
+### Using Build Script (Recommended) ✅
+
+**Always use the build script for standard builds:**
 
 ```bash
 ./scripts/build-ios.sh
@@ -296,9 +301,26 @@ Note: Sanitizers significantly slow down execution but catch many bugs.
 
 ## Packaging
 
-### macOS DMG
+> **Important**: Distribution packages contain the game **engine only**. Game data files (`master.dat`, `critter.dat`, `data/`) are NOT bundled. Users must provide their own legally-obtained game files.
 
-Create a distributable disk image:
+### macOS DMG (Recommended) ✅
+
+Use the packaging script to create a distributable disk image:
+
+```bash
+./scripts/build-macos-dmg.sh
+```
+
+This script:
+- Builds the app if needed
+- Creates a styled DMG installer
+- Outputs to `build-outputs/macOS/`
+
+**Requirements**: Install `create-dmg` via `brew install create-dmg`
+
+#### Manual DMG Creation
+
+If you need more control:
 
 ```bash
 # Build first
@@ -313,9 +335,22 @@ cpack -C RelWithDebInfo
 
 Output: `build-macos/fallout1-rebirth.dmg`
 
-### iOS IPA
+### iOS IPA (Recommended) ✅
 
-Create a distributable iOS package:
+Use the packaging script to create a distributable iOS package:
+
+```bash
+./scripts/build-ios-ipa.sh
+```
+
+This script:
+- Builds the app using `build-ios.sh`
+- Runs CPack to create the IPA
+- Outputs to `build-outputs/iOS/`
+
+#### Manual IPA Creation
+
+If you need more control:
 
 ```bash
 # Build first
@@ -333,6 +368,48 @@ cpack -C RelWithDebInfo
 ```
 
 Output: `build-ios/fallout1-rebirth.ipa`
+
+---
+
+## Distribution Workflow
+
+This project uses **local builds only** with manual GitHub Releases uploads. There is no automated CI/CD pipeline.
+
+### Creating a Release
+
+1. **Build the distribution packages locally:**
+   ```bash
+   # macOS DMG
+   ./scripts/build-macos-dmg.sh
+   
+   # iOS IPA
+   ./scripts/build-ios-ipa.sh
+   ```
+
+2. **Verify the outputs:**
+   ```bash
+   ls -la build-outputs/macOS/   # Contains .dmg
+   ls -la build-outputs/iOS/     # Contains .ipa
+   ```
+
+3. **Upload to GitHub Releases:**
+   - Go to the repository's Releases page
+   - Create a new release with an appropriate version tag
+   - Upload the DMG and IPA files from `build-outputs/`
+   - Add release notes describing changes
+
+### Why No CI/CD?
+
+- **Code signing complexity**: iOS/macOS builds require Apple Developer credentials
+- **Asset licensing**: Game data cannot be included in public builds
+- **Simplicity**: Local builds give developers full control over the process
+
+### Version Tags
+
+When creating releases, use semantic versioning:
+- `v1.0.0` — Major releases
+- `v1.1.0` — Feature additions
+- `v1.1.1` — Bug fixes
 
 ---
 

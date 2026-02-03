@@ -35,10 +35,11 @@ All development phases are complete:
 
 Key completions:
 - All Android/Windows/Linux code removed — Apple platforms only
-- CI/CD workflows operational (ci-build.yml, release.yml)
+- Local builds only (no CI/CD) — use GitHub Releases for distribution
 - Distribution structure in `dist/macos/` and `dist/ios/`
 - Engine fixes verified (Survivalist perk, bug fixes)
 - Testing infrastructure in place with simulator support
+- VSync enabled by default, touch coordinate fixes applied
 
 ## Architecture Overview
 
@@ -105,23 +106,25 @@ cd build-ios && cpack -C RelWithDebInfo  # creates .ipa
 | `./scripts/dev-format.sh` | Format code with clang-format |
 | `./scripts/dev-clean.sh` | Clean all build artifacts |
 
-## CI/CD Workflows
+## Local Development (No CI)
 
-### ci-build.yml (Continuous Integration)
-Triggered on push to `main` and pull requests:
-- **Static analysis**: `cppcheck --std=c++17 src/`
-- **Code format check**: clang-format validation
-- **iOS build**: Full build on macos-14 runner
-- **macOS build**: Full build on macos-14 runner
+**This project is built locally only.** CI/CD workflows have been removed.
 
-### release.yml (Release Automation)
-Triggered on version tags (`v*`) and published releases:
-- Builds iOS .ipa and macOS .dmg
-- Code signs with Apple Developer certificate (from secrets)
-- Notarizes macOS app with Apple
-- Uploads artifacts to GitHub Releases
+Run validation before every commit:
+```bash
+./scripts/dev-check.sh    # Pre-commit format + lint checks
+./scripts/dev-verify.sh   # Full build verification + static analysis
+```
 
-Run `./scripts/dev-check.sh` locally before committing.
+### Releasing
+
+Builds are created locally and uploaded to GitHub Releases:
+```bash
+./scripts/build-macos-dmg.sh   # Creates macOS DMG
+./scripts/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo  # Creates iOS IPA
+```
+
+Then upload artifacts to GitHub Releases manually.
 
 ## Distribution Structure
 
@@ -204,10 +207,10 @@ All dependencies are pinned via FetchContent GIT_TAG. Update tags when upgrading
 
 **Do not** manually run `xcrun simctl boot` on multiple devices or use raw CMake for simulator builds.
 
-## PR Checklist
+## Commit Checklist
 
-- [ ] Run `clang-format` and `cppcheck` locally
-- [ ] Ensure CI builds pass for affected platforms
+- [ ] Run `./scripts/dev-check.sh` (format + lint)
+- [ ] Run `./scripts/dev-verify.sh` (full build verification)
 - [ ] Update `CMakeLists.txt` if adding sources
 - [ ] Document manual reproduction steps if assets required
 - [ ] Never include secrets or signing keys
@@ -218,7 +221,6 @@ All dependencies are pinned via FetchContent GIT_TAG. Update tags when upgrading
 |------|-------|
 | Source structure | `src/game/`, `src/int/`, `src/plib/` |
 | Opcode registration | `src/int/support/intextra.cc` (`interpretAddFunc(...)`) |
-| CI workflows | `.github/workflows/ci-build.yml`, `.github/workflows/release.yml` |
 | iOS platform | `os/ios/`, `cmake/toolchain/ios.toolchain.cmake` |
 | Packaging | `CMakeLists.txt` CPACK setup |
 

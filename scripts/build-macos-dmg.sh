@@ -1,4 +1,21 @@
 #!/usr/bin/env bash
+# =============================================================================
+# Fallout 1 Rebirth — macOS DMG Build Script
+# =============================================================================
+# Creates a macOS DMG installer (app only, no game data).
+#
+# USAGE:
+#   ./scripts/build-macos-dmg.sh
+#
+# CONFIGURATION (environment variables):
+#   BUILD_DIR   - Build output directory (default: "build-macos")
+#   BUILD_TYPE  - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
+#
+# NOTES:
+#   - Requires 'create-dmg' tool (brew install create-dmg)
+#   - Game data is NOT bundled — users add their own files
+#   - Output goes to build-outputs/macOS/
+# =============================================================================
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -7,23 +24,33 @@ BUILD_DIR="${BUILD_DIR:-build-macos}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 VOLUME_NAME="Fallout 1 Rebirth"
 APP_NAME="Fallout 1 Rebirth.app"
-BUNDLE_DATA=0
 
-for arg in "$@"; do
-    case "$arg" in
-        --bundle)
-            BUNDLE_DATA=1
-            ;;
-        --help|-h)
-            echo "Usage: $0 [--bundle]"
-            echo "  --bundle   Include game data (GOG/Fallout1) and config in DMG"
-            exit 0
-            ;;
-    esac
-done
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log_info()  { echo -e "${BLUE}>>>${NC} $1"; }
+log_ok()    { echo -e "${GREEN}✅${NC} $1"; }
+log_warn()  { echo -e "${YELLOW}⚠️${NC}  $1"; }
+log_error() { echo -e "${RED}❌${NC} $1"; }
+
+echo ""
+echo "=============================================="
+echo " Fallout 1 Rebirth — macOS DMG"
+echo "=============================================="
+echo " Build directory: $BUILD_DIR"
+echo " Build type:      $BUILD_TYPE"
+echo " Output:          $OUTPUT_DIR"
+echo "=============================================="
+echo ""
 
 mkdir -p "$OUTPUT_DIR"
 
+# Run the build
+log_info "Building macOS app..."
 "$ROOT_DIR/scripts/build-macos.sh"
 
 CREATE_DMG="$ROOT_DIR/third_party/create-dmg/create-dmg"
@@ -32,7 +59,7 @@ if [[ -x "$CREATE_DMG" ]]; then
 elif command -v create-dmg >/dev/null 2>&1; then
     CREATE_DMG="$(command -v create-dmg)"
 else
-    echo "❌ create-dmg not found. Install with: brew install create-dmg"
+    log_error "create-dmg not found. Install with: brew install create-dmg"
     echo "   Or add submodule: git submodule add https://github.com/create-dmg/create-dmg third_party/create-dmg"
     exit 1
 fi
@@ -43,9 +70,11 @@ if [[ ! -d "$APP_PATH" ]]; then
 fi
 
 if [[ -z "${APP_PATH}" || ! -d "$APP_PATH" ]]; then
-    echo "❌ App bundle not found: $APP_NAME"
+    log_error "App bundle not found: $APP_NAME"
     exit 1
 fi
+
+log_ok "Found app bundle: $APP_PATH"
 
 TMP_DIR=$(mktemp -d)
 STAGING_DIR="$TMP_DIR/staging"
@@ -58,55 +87,26 @@ trap cleanup EXIT
 mkdir -p "$STAGING_DIR/.background"
 ditto "$APP_PATH" "$STAGING_DIR/$APP_NAME"
 
-if [[ "$BUNDLE_DATA" -eq 1 ]]; then
-    GAME_DATA="$ROOT_DIR/GOG/Fallout1"
-    CONFIG_DIR="$ROOT_DIR/gameconfig/macos"
-
-    if [[ ! -d "$GAME_DATA/data" ]]; then
-        echo "❌ Missing $GAME_DATA/data"
-        exit 1
-    fi
-
-    for file in "$GAME_DATA/master.dat" "$GAME_DATA/critter.dat"; do
-        if [[ ! -f "$file" ]]; then
-            echo "❌ Missing $file"
-            exit 1
-        fi
-    done
-
-    for file in "$CONFIG_DIR/fallout.cfg" "$CONFIG_DIR/fallout.ini"; do
-        if [[ ! -f "$file" ]]; then
-            echo "❌ Missing $file"
-            exit 1
-        fi
-    done
-
-    TARGET_DIR="$STAGING_DIR/$APP_NAME/Contents/MacOS"
-    mkdir -p "$TARGET_DIR"
-    ditto "$GAME_DATA/data" "$TARGET_DIR/data"
-    cp -f "$GAME_DATA/master.dat" "$TARGET_DIR/"
-    cp -f "$GAME_DATA/critter.dat" "$TARGET_DIR/"
-    cp -f "$CONFIG_DIR/fallout.cfg" "$TARGET_DIR/"
-    cp -f "$CONFIG_DIR/fallout.ini" "$TARGET_DIR/f1_res.ini"
-
-    cat > "$STAGING_DIR/HOW2INSTALL.txt" << 'EOF'
-Fallout 1 Rebirth (Bundled)
-
-1) Drag "Fallout 1 Rebirth.app" into the Applications folder.
-2) Game data is already bundled. You can launch the app right away.
-
-Need help? See README.md in the repository.
-EOF
-else
-    cat > "$STAGING_DIR/HOW2INSTALL.txt" << 'EOF'
+cat > "$STAGING_DIR/HOW2INSTALL.txt" << 'EOF'
 Fallout 1 Rebirth
 
+INSTALLATION:
 1) Drag "Fallout 1 Rebirth.app" into the Applications folder.
-2) Open the app once, then copy your game data into the app folder as described in README.
 
-Need help? See README.md in the repository.
+2) Copy your Fallout 1 game data into the app bundle:
+   - Right-click app → "Show Package Contents"
+   - Navigate to Contents/MacOS/
+   - Copy: master.dat, critter.dat, data/ folder
+   - Copy: fallout.cfg and f1_res.ini (config files)
+
+3) Launch the app!
+
+GETTING GAME DATA:
+- Purchase Fallout 1 from GOG.com or Steam
+- See README.md in the repository for detailed instructions
+
+Need help? https://github.com/fallout1-rebirth/fallout1-rebirth
 EOF
-fi
 
 BACKGROUND_IMAGE="$ROOT_DIR/img/dmgbackground.png"
 ICON_FILE="$ROOT_DIR/os/macos/fallout1-rebirth.icns"
@@ -127,17 +127,9 @@ README_X=320
 README_Y=330
 
 SIZE_KB=$(du -sk "$STAGING_DIR" | awk '{print $1}')
-if [[ "$BUNDLE_DATA" -eq 1 ]]; then
-    SIZE_MB=$((SIZE_KB / 1024 + 300))
-else
-    SIZE_MB=$((SIZE_KB / 1024 + 80))
-fi
+SIZE_MB=$((SIZE_KB / 1024 + 80))
 
-if [[ "$BUNDLE_DATA" -eq 1 ]]; then
-    FINAL_DMG="$OUTPUT_DIR/${VOLUME_NAME}-with-data.dmg"
-else
-    FINAL_DMG="$OUTPUT_DIR/${VOLUME_NAME}.dmg"
-fi
+FINAL_DMG="$OUTPUT_DIR/${VOLUME_NAME}.dmg"
 
 CREATE_ARGS=(
     --volname "$VOLUME_NAME"
@@ -169,9 +161,10 @@ if [[ -f "$ICON_FILE" ]]; then
     CREATE_ARGS+=(--volicon "$ICON_FILE")
 fi
 
+log_info "Creating DMG..."
 CREATE_LOG="$TMP_DIR/create-dmg.log"
 if ! "$CREATE_DMG" "${CREATE_ARGS[@]}" "$FINAL_DMG" "$STAGING_DIR" >"$CREATE_LOG" 2>&1; then
-    echo "❌ create-dmg failed. Log:"
+    log_error "create-dmg failed. Log:"
     cat "$CREATE_LOG"
     exit 1
 fi
@@ -179,4 +172,7 @@ fi
 trap - EXIT
 cleanup
 
-echo "✅ DMG created at $FINAL_DMG"
+echo ""
+log_ok "DMG created: $FINAL_DMG"
+echo "   Size: $(du -sh "$FINAL_DMG" | cut -f1)"
+echo ""

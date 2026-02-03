@@ -113,11 +113,11 @@ BUILD_TYPE=Debug ./scripts/build-macos.sh
 # Clean rebuild for iOS device
 CLEAN=1 ./scripts/build-ios.sh
 
-# Run all automated tests
-./scripts/test.sh
+# Pre-commit verification
+./scripts/dev-verify.sh
 
 # Clean all build artifacts
-./scripts/clean.sh
+./scripts/dev-clean.sh
 ```
 
 ---
