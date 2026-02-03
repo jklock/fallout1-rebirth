@@ -403,7 +403,7 @@ critter.dat
 **/journal.sh
 
 # Project documentation and research (internal use)#FCE/
-/development
+development/
 
 # Journal files (AI agent notes - not for version control)
 **/JOURNAL.md
