@@ -474,7 +474,9 @@ void mouse_info()
                     }
 
                     // Pencil tap always clicks at the exact tip location.
+                    // Send button down immediately followed by button up to complete the click.
                     mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                    mouse_simulate_input(0, 0, 0);
                 } else
 #endif
                 {
@@ -495,7 +497,9 @@ void mouse_info()
 
                     if (distance_sq < radius_sq) {
                         // Tap NEAR cursor = click at cursor position (no movement needed)
+                        // Send button down immediately followed by button up to complete the click.
                         mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                        mouse_simulate_input(0, 0, 0);
                     } else {
                         // Tap FAR from cursor = move cursor only (no click)
                         mouse_simulate_input(dx, dy, 0);
@@ -503,10 +507,14 @@ void mouse_info()
                 }
             } else if (gesture.numberOfTouches == 2) {
                 // Two-finger tap = right-click at cursor position
+                // Send button down immediately followed by button up to complete the click.
                 mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
+                mouse_simulate_input(0, 0, 0);
             } else if (gesture.numberOfTouches == 3) {
                 // Three-finger tap = left-click at cursor position
+                // Send button down immediately followed by button up to complete the click.
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                mouse_simulate_input(0, 0, 0);
             }
             break;
         case kLongPress:

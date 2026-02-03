@@ -2189,6 +2189,12 @@ int scr_remove_all()
                 Script* script = &(scriptListExtent->scripts[index]);
 
                 if ((script->scr_flags & SCRIPT_FLAG_0x10) != 0) {
+                    // NOTE: Clear dangling program pointer if script was loaded.
+                    // Fixes sanitizer issue #223: program points to freed memory after load.
+                    if ((script->scr_flags & SCRIPT_FLAG_0x01) != 0) {
+                        script->program = NULL;
+                        script->scr_flags &= ~SCRIPT_FLAG_0x01;
+                    }
                     index++;
                 } else {
                     if (index == 0 && scriptListExtent->length == 1) {

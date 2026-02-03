@@ -400,14 +400,16 @@ GOG/
 master.dat
 critter.dat
 *.sav
-**/journal.sh
 
-# Project documentation and research (internal use)#FCE/
+# Project documentation and research (internal use)
 development/
 
-# Journal files (AI agent notes - not for version control)
+# Development files (AI agent notes - toggle with scripts/hideall.sh)
 **/JOURNAL.md
 src/README.md
+.github/copilot-instructions.md
+.github/skills/
+scripts/hideall.sh
 
 # macOS
 .DS_Store
