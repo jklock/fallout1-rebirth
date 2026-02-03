@@ -403,11 +403,11 @@ critter.dat
 **/journal.sh
 
 # Project documentation and research (internal use)#FCE/
-#/development
+/development
 
 # Journal files (AI agent notes - not for version control)
-#**/JOURNAL.md
-#src/README.md
+**/JOURNAL.md
+src/README.md
 
 # macOS
 .DS_Store

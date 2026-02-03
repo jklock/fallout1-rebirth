@@ -52,7 +52,8 @@ Key completions:
 | `os/ios/`, `os/macos/` | Platform resources (Info.plist, icons, storyboards) |
 | `third_party/` | Dependencies (SDL2, adecode, fpattern) via FetchContent |
 | `dist/` | Distribution files for packaging |
-| `FCE/` | Project documentation, analysis, and phase guides |
+| `docs/` | Project documentation |
+| `development/` | Internal development docs and research |
 
 Entry points: `src/game/game.h` and `src/game/main.cc` for startup and main loop.
 Script handlers: `src/int/support/intextra.cc` registered via `interpretAddFunc(...)`.
@@ -234,7 +235,7 @@ This fork includes cherry-picked improvements from community contributors:
 - TeamX Patch 1.3.5 compatibility
 - RME 1.1e data integration
 
-See `FCE/` directory for full project documentation and phase guides.
+See `docs/` for user documentation and `development/` for internal development docs.
 
 ---
 For other platforms, use upstream: https://github.com/alexbatalov/fallout1-ce

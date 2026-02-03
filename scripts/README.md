@@ -11,7 +11,9 @@ All scripts should be run from the repository root directory.
 | Script | Description |
 |--------|-------------|
 | `build-macos.sh` | Build for macOS (Xcode generator, creates .app bundle) |
+| `build-macos-dmg.sh` | Build macOS and create DMG installer |
 | `build-ios.sh` | Build for iOS devices (arm64, requires iOS SDK) |
+| `build-ios-ipa.sh` | Build iOS and create IPA package |
 
 **Environment Variables** (all build scripts):
 - `BUILD_DIR` - Output directory (default varies by script)
@@ -36,6 +38,7 @@ All scripts should be run from the repository root directory.
 | `dev-check.sh` | Pre-commit checks (formatting, static analysis, CMake) |
 | `dev-format.sh` | Apply clang-format to all C++ source files |
 | `dev-clean.sh` | Remove all build directories |
+| `journal.sh` | Update JOURNAL.md files with current state |
 
 ---
 

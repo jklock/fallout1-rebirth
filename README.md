@@ -330,7 +330,7 @@ Current goals:
 
 ### Contributing Back to Upstream
 
-Platform-agnostic bug fixes from this fork can be contributed back to the upstream [fallout1-ce](https://github.com/alexbatalov/fallout1-ce) repository. See [CEPR.md](CEPR.md) for a list of changes suitable for upstream contribution.
+Platform-agnostic bug fixes from this fork can be contributed back to the upstream [fallout1-ce](https://github.com/alexbatalov/fallout1-ce) repository. See [docs/features.md](docs/features.md) for a list of all changes made in this fork.
 
 ## Credits
 

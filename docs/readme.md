@@ -10,11 +10,13 @@ Documentation for Fallout 1 Rebirth — an Apple-only fork of Fallout 1 Communit
 |----------|-------------|
 | [architecture.md](architecture.md) | Codebase architecture, directory structure, engine internals |
 | [building.md](building.md) | Build instructions for all platforms |
-| [testing.md](testing.md) | Testing procedures and scripts |
-| [scripts.md](scripts.md) | Reference for all automation scripts |
 | [configuration.md](configuration.md) | Config file reference (fallout.cfg, f1_res.ini) |
-| [vsync.md](vsync.md) | VSync and display settings |
 | [contributing.md](contributing.md) | How to contribute |
+| [features.md](features.md) | Complete feature history and changelog |
+| [scripts.md](scripts.md) | Reference for all automation scripts |
+| [setup_guide.md](setup_guide.md) | Step-by-step setup guide for end users |
+| [testing.md](testing.md) | Testing procedures and scripts |
+| [vsync.md](vsync.md) | VSync and display settings |
 
 ## Quick Links
 

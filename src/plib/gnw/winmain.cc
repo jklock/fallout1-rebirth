@@ -1,8 +1,8 @@
 #include "plib/gnw/winmain.h"
 
 #include <stdlib.h>
-#include <string>
 #include <string.h>
+#include <string>
 #include <unistd.h>
 
 #include <SDL.h>
