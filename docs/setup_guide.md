@@ -238,22 +238,25 @@ The game uses `f1_res.ini` for resolution settings.
 
 ```ini
 [MAIN]
-; Set to 1 for fullscreen, 0 for windowed
-WINDOWED=0
+; Set to 0 for fullscreen, 1 for windowed
+WINDOWED=1
 
-; Screen resolution (set to 0 for automatic)
-SCR_WIDTH=0
-SCR_HEIGHT=0
+; Screen resolution (default: 640x480 minimum enforced)
+; The game enforces a minimum of 640x480 for interface compatibility
+SCR_WIDTH=1280
+SCR_HEIGHT=960
 
-; Graphics scaling mode
+; Graphics scaling mode (0=off, 1=2x integer scaling)
 SCALE_2X=0
 ```
 
 **Common Resolutions:**
-- `0x0` - Automatic (uses your display resolution)
-- `1920x1080` - Full HD
-- `2560x1440` - 2K
-- `3840x2160` - 4K
+- `1280x960` - 4:3 ratio, recommended for MacBook/iMac
+- `1920x1080` - Full HD (16:9)
+- `2560x1440` - 2K (16:9)
+- `3840x2160` - 4K (16:9)
+
+**Note:** The game enforces a minimum resolution of 640x480 to ensure the interface assets (which are 640 pixels wide) display correctly. Setting values lower than this will be automatically increased to 640x480.
 
 > **📖 Advanced Resolution:** For detailed information about iPad resolution and scaling settings, see [development/IPAD_RESOLUTION.md](../development/IPAD_RESOLUTION.md).
 
@@ -632,12 +635,13 @@ If you have a Magic Keyboard or external keyboard/trackpad, Fallout 1 Rebirth fu
 ```ini
 [DISPLAY]
 ; VSync enabled by default for smooth scrolling and reduced tearing
+; ProMotion displays (iPad Pro 120Hz, MacBook Pro 120Hz) automatically supported
 VSYNC=1
 ; FPS_LIMIT=-1 matches the display refresh rate (60Hz, 120Hz ProMotion, etc.)
 FPS_LIMIT=-1
 ```
 
-> **Note:** VSync is enabled by default in Fallout 1 Rebirth for smooth gameplay. On ProMotion displays (iPad Pro, newer MacBooks), the game automatically adapts to the display's variable refresh rate.
+> **Note:** VSync is **enabled by default** in Fallout 1 Rebirth for smooth gameplay. On ProMotion displays (iPad Pro 120Hz, newer MacBook Pro), the game automatically adapts to the display's variable refresh rate, providing silky-smooth scrolling and animations.
 
 #### fallout.cfg (Game Settings)
 
@@ -649,26 +653,83 @@ FPS_LIMIT=-1
 | [sound] | sndfx_volume | Sound volume (0-100) |
 | [preferences] | combat_speed | Combat animation speed (1-10) |
 | [preferences] | violence_level | Gore level (0-3) |
-| [input] | pencil_right_click | Apple Pencil right-click (0=Off, 1=On) |
 
 **Apple Pencil Settings (iOS/iPadOS):**
 
-> **🖊️ Note:** Apple Pencil support is actively being developed. Configure via the `[input]` section in `fallout.cfg`.
+> **🖊️ Note:** Apple Pencil support is **fully implemented** as of version 1.0. Configure via `f1_res.ini`.
+
+Apple Pencil provides precise pointing and natural gestures when configured properly. The `[PENCIL]` section in `f1_res.ini` provides extensive customization options:
 
 ```ini
-[input]
-; Apple Pencil right-click behavior
-; 0 = disabled (DEFAULT) - Pencil is a precise left-click-only device
-; 1 = enabled - Pencil long-press and gestures trigger right-click
-pencil_right_click=0
+[PENCIL]
+; Enable Apple Pencil-specific handling (1=enabled, 0=disabled)
+; When disabled, Apple Pencil is treated identically to finger touch
+ENABLE_PENCIL=1
+
+; Click radius in pixels (at 640x480 base resolution)
+; Taps within this distance of the cursor trigger a click
+; Taps outside this radius only move the cursor (no click)
+CLICK_RADIUS=40
+
+; Long press gesture action (hold for 500ms)
+; 0 = Disabled
+; 1 = Left-click + drag
+; 2 = Right-click (examine items, context menus)
+LONG_PRESS_ACTION=2
+
+; Double-tap on pencil body (2nd gen and Pro)
+; 0 = Disabled
+; 1 = Left-click  
+; 2 = Right-click
+DOUBLE_TAP_ACTION=2
 ```
 
-When `pencil_right_click=0` (recommended):
-- Apple Pencil acts as a precise pointing device (left-click only)
-- Finger touch handles general navigation with long-press for right-click
-- This provides the most natural workflow: pencil for precision, fingers for navigation
+**Pencil Behavior:**
+- **Tap near cursor**: Left-click at current position
+- **Tap away from cursor**: Move cursor to tap position (no click)
+- **Drag from cursor**: Click + drag (for inventory, map scrolling)
+- **Long-press**: Configurable action (default: right-click for examine)
+- **Body double-tap**: Quick right-click (2nd gen Pencil and Pencil Pro)
+- **Squeeze gesture**: Right-click (Pencil Pro only)
 
-### Getting Help
+---
+
+## Engine Improvements
+
+Fallout 1 Rebirth includes several important bug fixes and improvements over the original game:
+
+### Bug Fixes
+
+| Fix | Description |
+|-----|-------------|
+| **Survivalist Perk** | Now correctly grants +20% Outdoorsman skill per rank (was not working in original) |
+| **Touch Coordinates** | Touch/pencil input now uses proper coordinate transformation, fixing cursor offset issues on iPad |
+| **Combat AI** | Fixed uninitialized pointer that caused crashes in release builds with Clang optimization |
+| **Line of Sight** | Fixed undefined behavior in `obj_can_see_obj` visibility calculations |
+| **Format Strings** | Fixed creature examination displaying '%s' instead of actual condition text |
+| **Movie Playback** | Corrected return type mismatches in video library |
+
+### Display Improvements
+
+| Feature | Description |
+|---------|-------------|
+| **VSync** | Enabled by default for tear-free rendering |
+| **ProMotion Support** | Automatically adapts to 120Hz displays on iPad Pro and MacBook Pro |
+| **Touch Precision** | Cursor appears exactly where touched (fixed coordinate mapping) |
+| **Background Refresh** | Screen properly updates when returning from background on iOS/macOS |
+
+### Quality of Life
+
+| Feature | Description |
+|---------|-------------|
+| **Object Tooltips** | Hover tooltips showing object names |
+| **Borderless Window** | Non-exclusive fullscreen mode for seamless macOS experience |
+| **F-Key Support** | Function keys work with iPad Magic Keyboard |
+| **Mouse/Trackpad** | Full pointer support on iPad |
+
+---
+
+## Getting Help
 
 If you continue to experience issues:
 

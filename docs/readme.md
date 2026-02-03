@@ -52,14 +52,16 @@ Fallout 1 Rebirth is a working re-implementation of Fallout with:
 
 - **VSync enabled by default** for smooth display
 - **Touch input** with proper coordinate handling
-- **Apple Pencil support** (in development)
+- **Apple Pencil support** with gesture recognition and precise positioning
 - **f1_res.ini configuration system** for display and resolution settings
 - **Local-only builds** (no CI/CD) — use provided scripts
-- iPad mouse/trackpad and F-key support
-- Touch control optimization
-- Borderless window mode
-- TeamX Patch 1.3.5 compatibility
-- RME 1.1e data integration
+- **ProMotion support** — automatic 120Hz adaptation on compatible devices
+- **iPad mouse/trackpad and F-key support**
+- **Touch control optimization**
+- **Borderless window mode**
+- **Engine bug fixes** including Survivalist perk, combat AI, and coordinate transformation
+- **TeamX Patch 1.3.5 compatibility**
+- **RME 1.1e data integration**
 
 ### Additional Documentation
 

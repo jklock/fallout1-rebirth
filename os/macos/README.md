@@ -31,8 +31,23 @@ Multi-resolution icon file containing sizes from 16x16 to 1024x1024 pixels. Used
 
 These resources are bundled into the macOS .app via CMake. The Info.plist is processed and the icon is set via `MACOSX_BUNDLE_ICON_FILE`.
 
-## Notarization
+## Code Signing and Notarization
 
-For distribution, the app must be signed and notarized. CI handles this using repository secrets for:
-- Developer ID certificate
-- Apple notarization credentials
+For public distribution, the app must be signed with a Developer ID certificate and notarized by Apple. This is a manual process:
+
+1. Sign the app with Developer ID certificate:
+   ```bash
+   codesign --deep --force --verify --verbose --sign "Developer ID Application: Your Name" "Fallout 1 Rebirth.app"
+   ```
+
+2. Create DMG and submit for notarization:
+   ```bash
+   xcrun notarytool submit fallout1-rebirth.dmg --keychain-profile "notarytool-profile" --wait
+   ```
+
+3. Staple notarization ticket:
+   ```bash
+   xcrun stapler staple "Fallout 1 Rebirth.app"
+   ```
+
+Alternatively, distribute unsigned builds with instructions for users to remove the quarantine flag using `xattr -cr`.

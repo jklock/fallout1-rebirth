@@ -144,8 +144,8 @@ Primary display settings.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `SCR_WIDTH` | int | 1024 (iOS) / 1280 (macOS) | Logical screen width in pixels |
-| `SCR_HEIGHT` | int | 768 (iOS) / 960 (macOS) | Logical screen height in pixels |
+| `SCR_WIDTH` | int | 1024 (iOS) / 1280 (macOS) | Logical screen width in pixels. Minimum: 640 |
+| `SCR_HEIGHT` | int | 768 (iOS) / 960 (macOS) | Logical screen height in pixels. Minimum: 480 |
 | `SCALE_2X` | int | 1 (iOS) / 0 (macOS) | Double internal 640x480 to 1280x960 before output |
 | `WINDOWED` | int | 0 (iOS) / 1 (macOS) | 0=fullscreen, 1=windowed. **Ignored on iOS** |
 | `WINDOWED_FULLSCREEN` | int | `0` | Borderless fullscreen (requires WINDOWED=1). **Ignored on iOS** |
@@ -154,6 +154,8 @@ Primary display settings.
 | `GRAPHICS_MODE` | int | `2` | Legacy renderer selector (ignored) |
 | `UAC_AWARE` | int | `1` | Legacy Windows setting (ignored) |
 | `WIN_DATA` | int | `0` | Internal window placement data |
+
+**Resolution Minimums**: The game enforces a minimum resolution of **640×480** to ensure interface assets (which are 640 pixels wide) display correctly. Values lower than this are automatically increased to 640×480.
 
 #### Resolution Recommendations
 

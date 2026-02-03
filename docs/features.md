@@ -362,6 +362,7 @@ These fixes were in upstream and are preserved:
 
 | Fix | Commit | Description |
 |-----|--------|-------------|
+| **Survivalist Perk** | Inherited | Now properly grants +20% Outdoorsman skill per rank (fixed in `src/game/perk.cc`) |
 | First Aid skill | `5d1e415` | Skill usage fixed |
 | Fast Metabolism trait | `cbf01f9` | Trait effect corrected |
 | Buffer overflow | `7a8711c` | Long speech filenames |
@@ -379,6 +380,15 @@ These fixes were in upstream and are preserved:
 | Movie subtitles | `a37415f` | Rendering fix |
 | Weight calculation | `931abf5` | Item weight |
 | Door sound | `bc367fd` | Open door sound |
+
+**Survivalist Perk Implementation** (`src/game/perk.cc` line 402):
+```cpp
+case SKILL_OUTDOORSMAN:
+    modifier += perk_level(PERK_SURVIVALIST) * 20;  // +20% per rank
+    break;
+```
+
+The original Fallout 1 had the Survivalist perk defined but non-functional. This implementation correctly applies the bonus to Outdoorsman skill checks.
 
 ### Database/File Fixes
 
