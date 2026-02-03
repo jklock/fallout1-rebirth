@@ -12,7 +12,7 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 
 ---
 
-## ✨ Features
+## Features
 
 - **Native Apple Silicon** — Runs natively on M1/M2/M3/M4 Macs and modern iPads
 - **Full touch support** — Intuitive gestures + Apple Pencil integration on iPad
@@ -24,9 +24,9 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 
 ---
 
-## 📥 Download
+## Download
 
-**[Download the latest release →](https://github.com/nicholasmorgan/fallout1-rebirth/releases)**
+**[Download the latest release →](https://github.com/jklock/fallout1-rebirth/releases)**
 
 | Platform | Download | Requirements |
 |----------|----------|--------------|
@@ -35,11 +35,11 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### What You Need
 
-1. **The app** — Download from [Releases](https://github.com/nicholasmorgan/fallout1-rebirth/releases)
+1. **The app** — Download from [Releases](https://github.com/jklock/fallout1-rebirth/releases)
 2. **Game data** — From your GOG or Steam copy of Fallout 1:
    - `master.dat` (~300 MB)
    - `critter.dat` (~25 MB)
@@ -68,7 +68,7 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 
 ---
 
-## 🎮 Controls
+## Controls
 
 ### iPad Touch Controls
 
@@ -94,7 +94,7 @@ Full mouse and keyboard support — works just like on Mac.
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 | Guide | Description |
 |-------|-------------|
@@ -104,7 +104,7 @@ Full mouse and keyboard support — works just like on Mac.
 
 ---
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 **"Could not find the master datafile"**  
 → Game data files aren't in the right location. See [setup guide](docs/setup_guide.md).
@@ -117,7 +117,7 @@ Full mouse and keyboard support — works just like on Mac.
 
 ---
 
-## 🔧 For Developers
+## For Developers
 
 Want to build from source or contribute? See:
 
@@ -127,7 +127,7 @@ Want to build from source or contribute? See:
 
 ---
 
-## 🙏 Credits
+## Credits
 
 - **Original game**: Interplay / Black Isle Studios
 - **Engine reimplementation**: [alexbatalov/fallout1-ce](https://github.com/alexbatalov/fallout1-ce)
@@ -137,6 +137,6 @@ Want to build from source or contribute? See:
 
 ---
 
-## 📄 License
+## License
 
 Source code is available under the [Sustainable Use License](LICENSE.md).
