@@ -1663,7 +1663,14 @@ int combat_load(DB_FILE* stream)
             if (j == list_total) {
                 combat_list[i]->data.critter.combat.whoHitMe = NULL;
             } else {
-                combat_list[i]->data.critter.combat.whoHitMe = combat_list[j];
+                // BUGFIX: Validate that restored whoHitMe is not self (prevents self-attack bug)
+                // Also prevent same-team targeting to avoid infinite combat loops
+                Object* candidate = combat_list[j];
+                if (candidate == combat_list[i] || candidate->data.critter.combat.team == combat_list[i]->data.critter.combat.team) {
+                    combat_list[i]->data.critter.combat.whoHitMe = NULL;
+                } else {
+                    combat_list[i]->data.critter.combat.whoHitMe = candidate;
+                }
             }
         }
     }
