@@ -22,7 +22,7 @@
 #   ./scripts/test-ios-simulator.sh --list       # List available iPad sims
 #
 # CONFIGURATION (environment variables):
-#   SIMULATOR_NAME  - Device name (default: "iPad Pro 13-inch (M4)")
+#   SIMULATOR_NAME  - Device name (default: "iPad Pro 13-inch (M5)")
 #   GAME_DATA       - Path to game files (default: "GOG/Fallout1")
 #   BUILD_DIR       - Build output dir (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
@@ -36,7 +36,7 @@ cd "$(dirname "$0")/.."
 # Configuration
 # -----------------------------------------------------------------------------
 # Preferred iPad simulator — change this to match your installed runtimes
-SIMULATOR_NAME="${SIMULATOR_NAME:-iPad Pro 13-inch (M4)}"
+SIMULATOR_NAME="${SIMULATOR_NAME:-iPad Pro 13-inch (M5)}"
 
 GAME_DATA="${GAME_DATA:-GOG/Fallout1}"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
