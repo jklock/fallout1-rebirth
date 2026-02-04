@@ -253,6 +253,9 @@ int screenGetHeight()
 
 static bool createRenderer(int width, int height)
 {
+    // Use nearest-neighbor scaling for crisp pixel art (no bilinear blur)
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
     gSdlRenderer = SDL_CreateRenderer(gSdlWindow, -1, SDL_RENDERER_PRESENTVSYNC);
     if (gSdlRenderer == NULL) {
         return false;
