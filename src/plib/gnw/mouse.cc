@@ -426,6 +426,13 @@ void mouse_hide()
 // New version of mouse_info for touch devices
 void mouse_info()
 {
+    // Deferred button-up for tap gestures: send button-up on the NEXT frame after a tap.
+    // This gives the game one full frame to see the button-down state before we release it.
+    // Without this deferral, immediate button-up in the same frame causes clicks to not register.
+    // Without any button-up at all, touch input becomes inconsistent (buttons get stuck).
+    static bool pending_tap_release = false;
+    static int pending_tap_button = 0;
+
     if (!have_mouse) {
         return;
     }
@@ -436,6 +443,13 @@ void mouse_info()
 
     if (mouse_disabled) {
         return;
+    }
+
+    // Process any pending button release from a previous tap (deferred by one frame)
+    if (pending_tap_release) {
+        mouse_simulate_input(0, 0, 0);
+        pending_tap_release = false;
+        pending_tap_button = 0;
     }
 
     Gesture gesture;
@@ -474,9 +488,10 @@ void mouse_info()
                     }
 
                     // Pencil tap always clicks at the exact tip location.
-                    // Send button down immediately followed by button up to complete the click.
+                    // Defer button-up to next frame so game has time to process button-down.
                     mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                    mouse_simulate_input(0, 0, 0);
+                    pending_tap_release = true;
+                    pending_tap_button = MOUSE_STATE_LEFT_BUTTON_DOWN;
                 } else
 #endif
                 {
@@ -497,9 +512,10 @@ void mouse_info()
 
                     if (distance_sq < radius_sq) {
                         // Tap NEAR cursor = click at cursor position (no movement needed)
-                        // Send button down immediately followed by button up to complete the click.
+                        // Defer button-up to next frame so game has time to process button-down.
                         mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                        mouse_simulate_input(0, 0, 0);
+                        pending_tap_release = true;
+                        pending_tap_button = MOUSE_STATE_LEFT_BUTTON_DOWN;
                     } else {
                         // Tap FAR from cursor = move cursor only (no click)
                         mouse_simulate_input(dx, dy, 0);
@@ -507,14 +523,16 @@ void mouse_info()
                 }
             } else if (gesture.numberOfTouches == 2) {
                 // Two-finger tap = right-click at cursor position
-                // Send button down immediately followed by button up to complete the click.
+                // Defer button-up to next frame so game has time to process button-down.
                 mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
-                mouse_simulate_input(0, 0, 0);
+                pending_tap_release = true;
+                pending_tap_button = MOUSE_STATE_RIGHT_BUTTON_DOWN;
             } else if (gesture.numberOfTouches == 3) {
                 // Three-finger tap = left-click at cursor position
-                // Send button down immediately followed by button up to complete the click.
+                // Defer button-up to next frame so game has time to process button-down.
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                mouse_simulate_input(0, 0, 0);
+                pending_tap_release = true;
+                pending_tap_button = MOUSE_STATE_LEFT_BUTTON_DOWN;
             }
             break;
         case kLongPress:
