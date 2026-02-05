@@ -290,8 +290,8 @@ int mouse_set_shape(unsigned char* buf, int width, int length, int full, int hot
     mouse_y += v12;
 
     SDL_Log("mouse_set_shape: size=%dx%d hotspot=(%d,%d) mouse_pos=(%d,%d) click_pos=(%d,%d)",
-            width, length, mouse_hotx, mouse_hoty, mouse_x, mouse_y,
-            mouse_x + mouse_hotx, mouse_y + mouse_hoty);
+        width, length, mouse_hotx, mouse_hoty, mouse_x, mouse_y,
+        mouse_x + mouse_hotx, mouse_y + mouse_hoty);
 
     mouse_clip();
 
@@ -379,9 +379,9 @@ void mouse_show()
         static int show_log_count = 0;
         if (show_log_count++ % 60 == 0) {
             SDL_Log("MOUSE_SHOW: render at raw=(%d,%d) size=(%d,%d) hot=(%d,%d)",
-                    mouse_x, mouse_y, mouse_width, mouse_length, mouse_hotx, mouse_hoty);
+                mouse_x, mouse_y, mouse_width, mouse_length, mouse_hotx, mouse_hoty);
         }
-        
+
         if (!mouse_blit_trans || !mouse_is_hidden) {
             win_get_mouse_buf(mouse_buf);
             v2 = mouse_buf;
@@ -477,7 +477,7 @@ void mouse_info()
             int buttons = 0;
             if (mouseData.buttons[0]) buttons |= MOUSE_STATE_LEFT_BUTTON_DOWN;
             if (mouseData.buttons[1]) buttons |= MOUSE_STATE_RIGHT_BUTTON_DOWN;
-            
+
             // Update position and buttons via simulate_input
             mouse_simulate_input(mouseData.x, mouseData.y, buttons);
         }
@@ -491,18 +491,22 @@ void mouse_info()
         int cur_x, cur_y;
         mouse_get_position(&cur_x, &cur_y);
         SDL_Log("GESTURE: type=%d(%s) state=%d(%s) fingers=%d pos=(%d,%d) cursor=(%d,%d)",
-                gesture.type,
-                gesture.type == kTap ? "TAP" : gesture.type == kPan ? "PAN" : gesture.type == kLongPress ? "LONGPRESS" : "OTHER",
-                gesture.state,
-                gesture.state == kBegan ? "BEGAN" : gesture.state == kChanged ? "CHANGED" : gesture.state == kEnded ? "ENDED" : "OTHER",
-                gesture.numberOfTouches, gesture.x, gesture.y, cur_x, cur_y);
-        
+            gesture.type,
+            gesture.type == kTap ? "TAP" : gesture.type == kPan ? "PAN"
+                : gesture.type == kLongPress                    ? "LONGPRESS"
+                                                                : "OTHER",
+            gesture.state,
+            gesture.state == kBegan ? "BEGAN" : gesture.state == kChanged ? "CHANGED"
+                : gesture.state == kEnded                                 ? "ENDED"
+                                                                          : "OTHER",
+            gesture.numberOfTouches, gesture.x, gesture.y, cur_x, cur_y);
+
         // If mouse is hidden but we have a gesture, show it so input works
         if (mouse_is_hidden) {
             SDL_Log("GESTURE: mouse was hidden, showing it now");
             mouse_show();
         }
-        
+
         static int prevx;
         static int prevy;
         // Track if current pan/drag started near cursor (for click+drag) vs far (just positioning)
@@ -539,7 +543,7 @@ void mouse_info()
                     // Pencil tap always clicks at the exact tip location.
                     // Send DOWN then immediately UP to complete the click
                     mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                    mouse_simulate_input(0, 0, 0);  // Button UP
+                    mouse_simulate_input(0, 0, 0); // Button UP
                 } else
 #endif
                 {
@@ -559,14 +563,14 @@ void mouse_info()
                     int radius_sq = radius * radius;
 
                     SDL_Log("TAP CHECK: cursor=(%d,%d) tap=(%d,%d) dx=%d dy=%d dist_sq=%d radius_sq=%d",
-                            cursor_x, cursor_y, gesture.x, gesture.y, dx, dy, distance_sq, radius_sq);
+                        cursor_x, cursor_y, gesture.x, gesture.y, dx, dy, distance_sq, radius_sq);
 
                     if (distance_sq < radius_sq) {
                         // Tap NEAR cursor = click at cursor position (no movement needed)
                         // Send DOWN then immediately UP to complete the click
                         SDL_Log("TAP CLICK: near cursor, clicking");
                         mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                        mouse_simulate_input(0, 0, 0);  // Button UP
+                        mouse_simulate_input(0, 0, 0); // Button UP
                     } else {
                         // Tap FAR from cursor = move cursor only (no click)
                         SDL_Log("TAP MOVE: far from cursor, moving only");
@@ -577,12 +581,12 @@ void mouse_info()
                 // Two-finger tap = right-click at cursor position
                 // Send DOWN then immediately UP to complete the click
                 mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
-                mouse_simulate_input(0, 0, 0);  // Button UP
+                mouse_simulate_input(0, 0, 0); // Button UP
             } else if (gesture.numberOfTouches == 3) {
                 // Three-finger tap = left-click at cursor position
                 // Send DOWN then immediately UP to complete the click
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                mouse_simulate_input(0, 0, 0);  // Button UP
+                mouse_simulate_input(0, 0, 0); // Button UP
             }
             break;
         case kLongPress:
@@ -759,7 +763,7 @@ void mouse_simulate_input(int delta_x, int delta_y, int buttons)
     static int old;
 
     SDL_Log("MOUSE_SIMULATE: delta=(%d,%d) buttons=0x%x have=%d hidden=%d",
-            delta_x, delta_y, buttons, have_mouse, mouse_is_hidden);
+        delta_x, delta_y, buttons, have_mouse, mouse_is_hidden);
 
     if (!have_mouse || mouse_is_hidden) {
         SDL_Log("MOUSE_SIMULATE: SKIPPED (have_mouse=%d, hidden=%d)", have_mouse, mouse_is_hidden);
@@ -919,12 +923,12 @@ void mouse_get_position(int* x, int* y)
 {
     *x = mouse_hotx + mouse_x;
     *y = mouse_hoty + mouse_y;
-    
+
     // Debug: Log position info periodically
     static int log_count = 0;
     if (log_count++ % 60 == 0) {
         SDL_Log("MOUSE_POS: raw=(%d,%d) hot=(%d,%d) result=(%d,%d)",
-                mouse_x, mouse_y, mouse_hotx, mouse_hoty, *x, *y);
+            mouse_x, mouse_y, mouse_hotx, mouse_hoty, *x, *y);
     }
 }
 

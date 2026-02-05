@@ -229,6 +229,7 @@ The SDL3 migration enabled better touch handling:
 - **Coordinate conversion**: `SDL_RenderCoordinatesFromWindow()` properly converts touch coordinates to game logical coordinates
 - **Timestamp precision**: Event timestamps now in nanoseconds for more precise gesture detection
 - **Multi-touch reliability**: Better finger tracking for iOS gesture recognition
+- **Click offset calibration**: `CLICK_OFFSET_X`/`CLICK_OFFSET_Y` settings in `f1_res.ini` allow fine-tuning where clicks register (iOS default: Y=-12 to compensate for touch offset)
 
 From [touch.cc](src/plib/gnw/touch.cc):
 ```c

@@ -185,13 +185,25 @@ Frame rate and synchronization settings.
 
 ### [INPUT]
 
-Input handling settings.
+Input handling and click calibration settings.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| `CLICK_OFFSET_X` | int | `0` | Horizontal click position adjustment in game pixels. Positive shifts clicks RIGHT, negative shifts LEFT. Use to calibrate if clicks don't align with cursor |
+| `CLICK_OFFSET_Y` | int | `0` (macOS), `-12` (iOS) | Vertical click position adjustment in game pixels. Positive shifts clicks DOWN, negative shifts UP. iOS default compensates for touch coordinate offset |
 | `ALT_MOUSE_INPUT` | int | `0` | Alternate mouse input path. Keep 0 unless experiencing input issues |
 | `SCROLLWHEEL_FOCUS_PRIMARY_MENU` | int | `1` | Focus scroll wheel on primary list by default |
 | `EXTRA_WIN_MSG_CHECKS` | int | `1` | Legacy loop checks; keep 1 for stability |
+
+#### Click Offset Calibration
+
+The click offset settings allow fine-tuning where clicks register relative to the cursor position. This is particularly useful on iOS where touch input may have a slight offset from where the cursor tip appears.
+
+**iOS**: The default `CLICK_OFFSET_Y=-12` compensates for a common issue where touch clicks register slightly below the cursor tip. If your clicks still seem off, adjust these values:
+- If clicks register too far **right**, decrease `CLICK_OFFSET_X` (use negative value)
+- If clicks register too far **down**, decrease `CLICK_OFFSET_Y` (use more negative value)
+
+**macOS**: Usually no adjustment needed. Set both to `0`
 
 ### [MOVIES]
 
