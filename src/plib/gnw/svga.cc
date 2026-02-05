@@ -468,23 +468,37 @@ void renderPresent()
 // This accounts for the custom dest rect used on iOS
 bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* game_y)
 {
+    SDL_Log("iOS_screenToGameCoords: screen=(%.1f, %.1f)", screen_x, screen_y);
+    
     if (!g_iOS_useCustomRect || g_iOS_destRect.w <= 0 || g_iOS_destRect.h <= 0) {
         // Fallback: direct mapping
+        SDL_Log("iOS_screenToGameCoords: FALLBACK - no custom rect (useCustomRect=%d, destRect=%.0fx%.0f)",
+                g_iOS_useCustomRect, g_iOS_destRect.w, g_iOS_destRect.h);
         *game_x = (int)screen_x;
         *game_y = (int)screen_y;
         return false;
     }
     
+    SDL_Log("iOS_screenToGameCoords: destRect=(%.1f, %.1f, %.1f, %.1f) game=%dx%d",
+            g_iOS_destRect.x, g_iOS_destRect.y, g_iOS_destRect.w, g_iOS_destRect.h,
+            g_iOS_gameWidth, g_iOS_gameHeight);
+    
     // Check if the point is within the dest rect
     float local_x = screen_x - g_iOS_destRect.x;
     float local_y = screen_y - g_iOS_destRect.y;
+    
+    SDL_Log("iOS_screenToGameCoords: local=(%.1f, %.1f)", local_x, local_y);
     
     // Scale from dest rect size to game resolution
     float scale_x = (float)g_iOS_gameWidth / g_iOS_destRect.w;
     float scale_y = (float)g_iOS_gameHeight / g_iOS_destRect.h;
     
+    SDL_Log("iOS_screenToGameCoords: scale=(%.6f, %.6f)", scale_x, scale_y);
+    
     int result_x = (int)(local_x * scale_x);
     int result_y = (int)(local_y * scale_y);
+    
+    SDL_Log("iOS_screenToGameCoords: pre-clamp result=(%d, %d)", result_x, result_y);
     
     // Clamp to game bounds
     if (result_x < 0) result_x = 0;
@@ -496,8 +510,12 @@ bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* ga
     *game_y = result_y;
     
     // Return true if the point was within the dest rect
-    return (local_x >= 0 && local_x < g_iOS_destRect.w &&
-            local_y >= 0 && local_y < g_iOS_destRect.h);
+    bool in_bounds = (local_x >= 0 && local_x < g_iOS_destRect.w &&
+                      local_y >= 0 && local_y < g_iOS_destRect.h);
+    
+    SDL_Log("iOS_screenToGameCoords: RESULT=(%d, %d) in_bounds=%d", result_x, result_y, in_bounds);
+    
+    return in_bounds;
 }
 
 // Get the iOS dest rect for external use

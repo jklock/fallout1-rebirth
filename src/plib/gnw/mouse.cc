@@ -267,6 +267,10 @@ int mouse_set_shape(unsigned char* buf, int width, int length, int full, int hot
 
     mouse_y += v12;
 
+    SDL_Log("mouse_set_shape: size=%dx%d hotspot=(%d,%d) mouse_pos=(%d,%d) click_pos=(%d,%d)",
+            width, length, mouse_hotx, mouse_hoty, mouse_x, mouse_y,
+            mouse_x + mouse_hotx, mouse_y + mouse_hoty);
+
     mouse_clip();
 
     if (!cursorWasHidden) {
@@ -349,6 +353,13 @@ void mouse_show()
 
     v2 = mouse_buf;
     if (have_mouse) {
+        // Debug: Log cursor render position
+        static int show_log_count = 0;
+        if (show_log_count++ % 60 == 0) {
+            SDL_Log("MOUSE_SHOW: render at raw=(%d,%d) size=(%d,%d) hot=(%d,%d)",
+                    mouse_x, mouse_y, mouse_width, mouse_length, mouse_hotx, mouse_hoty);
+        }
+        
         if (!mouse_blit_trans || !mouse_is_hidden) {
             win_get_mouse_buf(mouse_buf);
             v2 = mouse_buf;
@@ -880,6 +891,13 @@ void mouse_get_position(int* x, int* y)
 {
     *x = mouse_hotx + mouse_x;
     *y = mouse_hoty + mouse_y;
+    
+    // Debug: Log position info periodically
+    static int log_count = 0;
+    if (log_count++ % 60 == 0) {
+        SDL_Log("MOUSE_POS: raw=(%d,%d) hot=(%d,%d) result=(%d,%d)",
+                mouse_x, mouse_y, mouse_hotx, mouse_hoty, *x, *y);
+    }
 }
 
 // 0x4B528C
