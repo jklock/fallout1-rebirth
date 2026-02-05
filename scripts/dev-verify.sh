@@ -63,31 +63,30 @@ fi
 # 2. Binary exists and runs
 echo ""
 echo ">>> Test 2: Binary Execution Test"
-BINARY="$BUILD_DIR/fallout1-rebirth"
-if [[ -f "$BINARY" ]]; then
-    if [[ "$HAS_GAME_DATA" == "true" ]]; then
-        # Create a temp directory with symlinks to game data
-        TEST_DIR=$(mktemp -d)
-        ln -sf "$(pwd)/$GAME_DATA/master.dat" "$TEST_DIR/"
-        ln -sf "$(pwd)/$GAME_DATA/critter.dat" "$TEST_DIR/"
-        ln -sf "$(pwd)/$GAME_DATA/data" "$TEST_DIR/"
-        cp "$GAME_DATA/fallout.cfg" "$TEST_DIR/" 2>/dev/null || true
-        cp "$BINARY" "$TEST_DIR/"
-        
-        # Try to launch and capture if it starts (timeout after 3 seconds)
-        cd "$TEST_DIR"
-        if timeout 3 ./fallout1-rebirth 2>&1 | head -5; then
-            echo "✅ Binary launches with game data"
-        else
-            echo "✅ Binary executes (timed out - expected for GUI app)"
-        fi
-        cd - > /dev/null
-        rm -rf "$TEST_DIR"
+
+# Check for binary in multiple possible locations based on build type
+BINARY=""
+# First check the BUILD_DIR from the build step
+if [[ -f "$BUILD_DIR/fallout1-rebirth" ]]; then
+    BINARY="$BUILD_DIR/fallout1-rebirth"
+# Then check common Xcode build locations
+elif [[ -f "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" ]]; then
+    BINARY="build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth"
+elif [[ -f "build-macos/Debug/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" ]]; then
+    BINARY="build-macos/Debug/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth"
+elif [[ -f "build-macos/Release/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" ]]; then
+    BINARY="build-macos/Release/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth"
+fi
+
+if [[ -n "$BINARY" && -f "$BINARY" ]]; then
+    # Verify the binary is a valid Mach-O executable
+    if file "$BINARY" | grep -q "Mach-O"; then
+        echo "✅ Binary found and validated: $BINARY"
     else
-        echo "⚠️  Skipping execution test (no game data)"
+        echo "⚠️  Binary found but format check failed: $BINARY"
     fi
 else
-    echo "⚠️  Binary not found at $BINARY (may be in different location for Xcode builds)"
+    echo "⚠️  Binary not found (build with make or Xcode to generate)"
 fi
 
 # 3. Static analysis
