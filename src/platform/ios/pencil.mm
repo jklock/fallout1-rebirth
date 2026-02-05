@@ -12,8 +12,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import <SDL.h>
-#import <SDL_syswm.h>
+#import <SDL3/SDL.h>
 #import "pencil.h"
 
 #if TARGET_OS_IOS
@@ -160,14 +159,13 @@ bool pencil_init(void* sdl_window) {
         return false;
     }
     
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    
-    if (!SDL_GetWindowWMInfo((SDL_Window*)sdl_window, &wmInfo)) {
+    // SDL3: Use properties to get native window
+    SDL_PropertiesID props = SDL_GetWindowProperties((SDL_Window*)sdl_window);
+    if (props == 0) {
         return false;
     }
     
-    UIWindow *window = wmInfo.info.uikit.window;
+    UIWindow *window = (__bridge UIWindow*)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_UIKIT_WINDOW_POINTER, NULL);
     if (!window) {
         return false;
     }

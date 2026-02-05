@@ -329,8 +329,8 @@ set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.fallout1rebirth.game")
 set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0")
 set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0.0")
 
-# SDL2 - always use bundled version for Apple
-add_subdirectory("third_party/sdl2")
+# SDL3 - always use bundled version for Apple
+add_subdirectory("third_party/sdl3")
 
 add_subdirectory("third_party/adecode")
 target_link_libraries(${EXECUTABLE_NAME} adecode::adecode)
@@ -338,8 +338,8 @@ target_link_libraries(${EXECUTABLE_NAME} adecode::adecode)
 add_subdirectory("third_party/fpattern")
 target_link_libraries(${EXECUTABLE_NAME} fpattern::fpattern)
 
-target_link_libraries(${EXECUTABLE_NAME} ${SDL2_LIBRARIES})
-target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(${EXECUTABLE_NAME} ${SDL3_LIBRARIES})
+target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SDL3_INCLUDE_DIRS})
 
 # Packaging
 if(IOS)

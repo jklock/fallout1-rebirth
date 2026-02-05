@@ -5,7 +5,7 @@
 #include <string>
 #include <unistd.h>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "game/main.h"
 #include "plib/gnw/gnw.h"
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 #endif
 
 #if __APPLE__ && TARGET_OS_OSX
-    char* basePath = SDL_GetBasePath();
+    const char* basePath = SDL_GetBasePath();
     if (basePath != NULL) {
         std::string workingDir(basePath);
 
@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
 
         const char resourcesMarker[] = "/Contents/Resources/";
         const char macosMarker[] = "/Contents/MacOS/";
-        char* resources = strstr(basePath, resourcesMarker);
-        char* macos = strstr(basePath, macosMarker);
+        const char* resources = strstr(basePath, resourcesMarker);
+        const char* macos = strstr(basePath, macosMarker);
 
         if (resources != NULL || macos != NULL) {
             std::string appRoot;
@@ -79,11 +79,12 @@ int main(int argc, char* argv[])
         }
 
         chdir(workingDir.c_str());
-        SDL_free(basePath);
+        // SDL3 returns const char* but it's still allocated memory that needs freeing
+        SDL_free((void*)basePath);
     }
 #endif
 
-    SDL_ShowCursor(SDL_DISABLE);
+    SDL_HideCursor();
 
     GNW95_isActive = true;
     rc = gnw_main(argc, argv);

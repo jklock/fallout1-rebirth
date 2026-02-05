@@ -23,7 +23,7 @@
 #include <chrono>
 #endif
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 namespace fallout {
 

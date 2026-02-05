@@ -1,5 +1,7 @@
 #include "plib/gnw/svga.h"
 
+#include <SDL3/SDL.h>
+
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -36,38 +38,44 @@ FpsLimiter sharedFpsLimiter;
 // 0x4CB310
 void GNW95_SetPaletteEntries(unsigned char* palette, int start, int count)
 {
-    if (gSdlSurface != NULL && gSdlSurface->format->palette != NULL) {
-        SDL_Color colors[256];
+    if (gSdlSurface != NULL) {
+        SDL_Palette* pal = SDL_GetSurfacePalette(gSdlSurface);
+        if (pal != NULL) {
+            SDL_Color colors[256];
 
-        if (count != 0) {
-            for (int index = 0; index < count; index++) {
-                colors[index].r = palette[index * 3] << 2;
-                colors[index].g = palette[index * 3 + 1] << 2;
-                colors[index].b = palette[index * 3 + 2] << 2;
-                colors[index].a = 255;
+            if (count != 0) {
+                for (int index = 0; index < count; index++) {
+                    colors[index].r = palette[index * 3] << 2;
+                    colors[index].g = palette[index * 3 + 1] << 2;
+                    colors[index].b = palette[index * 3 + 2] << 2;
+                    colors[index].a = 255;
+                }
             }
-        }
 
-        SDL_SetPaletteColors(gSdlSurface->format->palette, colors, start, count);
-        SDL_BlitSurface(gSdlSurface, NULL, gSdlTextureSurface, NULL);
+            SDL_SetPaletteColors(pal, colors, start, count);
+            SDL_BlitSurface(gSdlSurface, NULL, gSdlTextureSurface, NULL);
+        }
     }
 }
 
 // 0x4CB568
 void GNW95_SetPalette(unsigned char* palette)
 {
-    if (gSdlSurface != NULL && gSdlSurface->format->palette != NULL) {
-        SDL_Color colors[256];
+    if (gSdlSurface != NULL) {
+        SDL_Palette* pal = SDL_GetSurfacePalette(gSdlSurface);
+        if (pal != NULL) {
+            SDL_Color colors[256];
 
-        for (int index = 0; index < 256; index++) {
-            colors[index].r = palette[index * 3] << 2;
-            colors[index].g = palette[index * 3 + 1] << 2;
-            colors[index].b = palette[index * 3 + 2] << 2;
-            colors[index].a = 255;
+            for (int index = 0; index < 256; index++) {
+                colors[index].r = palette[index * 3] << 2;
+                colors[index].g = palette[index * 3 + 1] << 2;
+                colors[index].b = palette[index * 3 + 2] << 2;
+                colors[index].a = 255;
+            }
+
+            SDL_SetPaletteColors(pal, colors, 0, 256);
+            SDL_BlitSurface(gSdlSurface, NULL, gSdlTextureSurface, NULL);
         }
-
-        SDL_SetPaletteColors(gSdlSurface->format->palette, colors, 0, 256);
-        SDL_BlitSurface(gSdlSurface, NULL, gSdlTextureSurface, NULL);
     }
 }
 
@@ -142,14 +150,13 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
 
 bool svga_init(VideoOptions* video_options)
 {
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
 
-    if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
+    if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
         return false;
     }
 
-    Uint32 windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
+    SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
 // This hides the status bar on iPadOS, which otherwise interferes
 // with the cursor in the top margin of the screen.
@@ -158,13 +165,10 @@ bool svga_init(VideoOptions* video_options)
 #endif
 
     if (video_options->fullscreen) {
-        if (video_options->exclusive)
-            windowFlags |= SDL_WINDOW_FULLSCREEN;
-        else
-            windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    gSdlWindow = SDL_CreateWindow(GNW95_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    gSdlWindow = SDL_CreateWindow(GNW95_title,
         video_options->width * video_options->scale,
         video_options->height * video_options->scale,
         windowFlags);
@@ -181,14 +185,10 @@ bool svga_init(VideoOptions* video_options)
         return false;
     }
 
-    gSdlSurface = SDL_CreateRGBSurface(0,
+    gSdlSurface = SDL_CreateSurface(
         video_options->width,
         video_options->height,
-        8,
-        0,
-        0,
-        0,
-        0);
+        SDL_PIXELFORMAT_INDEX8);
     if (gSdlSurface == NULL) {
         destroyRenderer();
 
@@ -204,7 +204,12 @@ bool svga_init(VideoOptions* video_options)
         colors[index].a = 255;
     }
 
-    SDL_SetPaletteColors(gSdlSurface->format->palette, colors, 0, 256);
+    SDL_Palette* palette = SDL_CreatePalette(256);
+    if (palette != NULL) {
+        SDL_SetPaletteColors(palette, colors, 0, 256);
+        SDL_SetSurfacePalette(gSdlSurface, palette);
+        SDL_DestroyPalette(palette);
+    }
 
     scr_size.ulx = 0;
     scr_size.uly = 0;
@@ -254,36 +259,44 @@ int screenGetHeight()
 
 static bool createRenderer(int width, int height)
 {
-    gSdlRenderer = SDL_CreateRenderer(gSdlWindow, -1, SDL_RENDERER_PRESENTVSYNC);
+    gSdlRenderer = SDL_CreateRenderer(gSdlWindow, NULL);
     if (gSdlRenderer == NULL) {
         return false;
     }
 
+    // Enable VSync
+    SDL_SetRenderVSync(gSdlRenderer, 1);
+
     // Log display refresh rate for diagnostic purposes
-    int displayIndex = SDL_GetWindowDisplayIndex(gSdlWindow);
-    SDL_DisplayMode mode;
-    if (SDL_GetCurrentDisplayMode(displayIndex, &mode) == 0) {
-        debug_printf("Display refresh rate: %d Hz\n", mode.refresh_rate);
-        debug_printf("Display resolution: %dx%d\n", mode.w, mode.h);
+    SDL_DisplayID displayID = SDL_GetDisplayForWindow(gSdlWindow);
+    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(displayID);
+    if (mode != NULL) {
+        debug_printf("Display refresh rate: %.2f Hz\n", mode->refresh_rate);
+        debug_printf("Display resolution: %dx%d\n", mode->w, mode->h);
     } else {
         debug_printf("Could not query display mode: %s\n", SDL_GetError());
     }
 
-    if (SDL_RenderSetLogicalSize(gSdlRenderer, width, height) != 0) {
+    if (!SDL_SetRenderLogicalPresentation(gSdlRenderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
         return false;
     }
 
-    gSdlTexture = SDL_CreateTexture(gSdlRenderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
+    gSdlTexture = SDL_CreateTexture(gSdlRenderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (gSdlTexture == NULL) {
         return false;
     }
 
-    Uint32 format;
-    if (SDL_QueryTexture(gSdlTexture, &format, NULL, NULL, NULL) != 0) {
+    // Enable nearest neighbor (pixel-perfect) scaling for crisp retro graphics
+    SDL_SetTextureScaleMode(gSdlTexture, SDL_SCALEMODE_NEAREST);
+
+    // SDL3: Get texture format via properties instead of SDL_QueryTexture
+    SDL_PropertiesID props = SDL_GetTextureProperties(gSdlTexture);
+    SDL_PixelFormat format = (SDL_PixelFormat)SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_FORMAT_NUMBER, SDL_PIXELFORMAT_UNKNOWN);
+    if (format == SDL_PIXELFORMAT_UNKNOWN) {
         return false;
     }
 
-    gSdlTextureSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, SDL_BITSPERPIXEL(format), format);
+    gSdlTextureSurface = SDL_CreateSurface(width, height, format);
     if (gSdlTextureSurface == NULL) {
         return false;
     }
@@ -294,7 +307,7 @@ static bool createRenderer(int width, int height)
 static void destroyRenderer()
 {
     if (gSdlTextureSurface != NULL) {
-        SDL_FreeSurface(gSdlTextureSurface);
+        SDL_DestroySurface(gSdlTextureSurface);
         gSdlTextureSurface = NULL;
     }
 
@@ -319,7 +332,7 @@ void renderPresent()
 {
     SDL_UpdateTexture(gSdlTexture, NULL, gSdlTextureSurface->pixels, gSdlTextureSurface->pitch);
     SDL_RenderClear(gSdlRenderer);
-    SDL_RenderCopy(gSdlRenderer, gSdlTexture, NULL, NULL);
+    SDL_RenderTexture(gSdlRenderer, gSdlTexture, NULL, NULL);
     SDL_RenderPresent(gSdlRenderer);
 }
 
