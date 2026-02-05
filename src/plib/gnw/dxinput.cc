@@ -89,7 +89,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_MouseButtonFlags mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
     if (log_count < 20 || (log_count % 100 == 0)) {
         SDL_Log("DXINPUT: SDL_GetMouseState raw=(%.1f,%.1f) buttons=0x%x",
-                system_x, system_y, mouse_buttons);
+            system_x, system_y, mouse_buttons);
     }
     log_count++;
 
@@ -100,7 +100,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
     float scale_x = (float)window_pw / (float)window_w;
     float scale_y = (float)window_ph / (float)window_h;
-    
+
     // Convert points to pixels
     float pixel_x = system_x * scale_x;
     float pixel_y = system_y * scale_y;
@@ -134,10 +134,10 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
 
         int delta_x = mapped_x - game_x;
         int delta_y = mapped_y - game_y;
-        
+
         if ((log_count - 1) < 20 || ((log_count - 1) % 100 == 0)) {
             SDL_Log("DXINPUT: pixel=(%.1f,%.1f) mapped=(%d,%d) cursor=(%d,%d) delta=(%d,%d)",
-                    pixel_x, pixel_y, mapped_x, mapped_y, game_x, game_y, delta_x, delta_y);
+                pixel_x, pixel_y, mapped_x, mapped_y, game_x, game_y, delta_x, delta_y);
         }
 
         if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
@@ -238,7 +238,7 @@ void handleMouseEvent(SDL_Event* event)
         gMouseWheelDeltaX += (int)event->wheel.x;
         gMouseWheelDeltaY += (int)event->wheel.y;
     }
-    
+
 #if defined(__APPLE__) && TARGET_OS_IOS
     // Track button state from events for iOS
     if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -284,7 +284,7 @@ bool dxinput_is_using_mouse()
 #if defined(__APPLE__) && TARGET_OS_IOS
     return last_input_was_mouse;
 #else
-    return true;  // Non-iOS always uses mouse
+    return true; // Non-iOS always uses mouse
 #endif
 }
 

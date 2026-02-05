@@ -113,6 +113,9 @@ Full mouse and keyboard support — works just like on Mac.
 **Game runs at wrong resolution**  
 → Make sure `f1_res.ini` is in the same folder as your game data.
 
+**Touch/click doesn't hit the target (iOS)**  
+→ Adjust `CLICK_OFFSET_Y` in `f1_res.ini` `[INPUT]` section. Default is `-12`. See [configuration docs](docs/configuration.md).
+
 **Files have wrong case (MASTER.DAT vs master.dat)**  
 → Filenames must be lowercase. See [setup guide](docs/setup_guide.md#part-2-getting-game-data-files).
 
@@ -143,15 +146,3 @@ Want to build from source or contribute? See:
 Source code is available under the [Sustainable Use License](LICENSE.md).
 
 ---
-
-## Proof of Work
-
-**Last Verified**: February 5, 2026
-
-**Files read to verify content**:
-- img/RebirthLogo.png (confirmed exists)
-- third_party/sdl3/CMakeLists.txt (SDL3 release-3.2.4 confirmed)
-- docs/ directory structure (setup_guide.md, configuration.md, features.md confirmed)
-- gameconfig/ directory (macos/ and ios/ subdirectories confirmed)
-
-**Updates made**: No updates needed - content verified accurate. SDL3 reference correct, documentation links valid, directory paths verified.

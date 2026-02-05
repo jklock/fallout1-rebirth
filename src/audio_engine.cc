@@ -185,12 +185,12 @@ int audioEngineCreateSoundBuffer(unsigned int size, int bitsPerSample, int chann
             soundBuffer->looping = false;
             soundBuffer->pos = 0;
             soundBuffer->data = malloc(size);
-            
+
             SDL_AudioSpec srcSpec;
             srcSpec.format = (bitsPerSample == 16) ? SDL_AUDIO_S16 : SDL_AUDIO_S8;
             srcSpec.channels = channels;
             srcSpec.freq = rate;
-            
+
             soundBuffer->stream = SDL_CreateAudioStream(&srcSpec, &gAudioEngineSpec);
             return index;
         }

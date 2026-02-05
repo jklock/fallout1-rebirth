@@ -21,7 +21,8 @@ namespace fallout {
 #define LONG_PRESS_MINIMUM_DURATION 500
 
 // Helper to convert SDL3 event timestamp (nanoseconds) to milliseconds
-static inline Uint64 timestamp_to_ms(Uint64 timestamp_ns) {
+static inline Uint64 timestamp_to_ms(Uint64 timestamp_ns)
+{
     return timestamp_ns / 1000000ULL;
 }
 
@@ -34,9 +35,9 @@ struct Touch {
     bool used;
     SDL_FingerID fingerId;
     TouchLocation startLocation;
-    Uint64 startTimestamp;  // Now in milliseconds (converted from event nanoseconds)
+    Uint64 startTimestamp; // Now in milliseconds (converted from event nanoseconds)
     TouchLocation currentLocation;
-    Uint64 currentTimestamp;  // Now in milliseconds (converted from event nanoseconds)
+    Uint64 currentTimestamp; // Now in milliseconds (converted from event nanoseconds)
     int phase;
 };
 
@@ -100,24 +101,24 @@ static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
     // Get window dimensions in both points and pixels for debugging
     int window_w, window_h;
     SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
-    
+
     // Get window pixel dimensions to de-normalize touch coordinates
     int window_pw, window_ph;
     SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
-    
+
     // Calculate and log scale factor
     float scale_factor = (window_pw > 0 && window_w > 0) ? (float)window_pw / (float)window_w : 1.0f;
-    
+
     SDL_Log("TOUCH_CONVERT: window_points=%dx%d window_pixels=%dx%d scale_factor=%.3f",
-            window_w, window_h, window_pw, window_ph, scale_factor);
+        window_w, window_h, window_pw, window_ph, scale_factor);
     SDL_Log("TOUCH_CONVERT: normalized coords=(%.6f, %.6f)", event->x, event->y);
-    
+
     // Convert normalized (0...1) to window pixel coordinates
     float pixel_x = event->x * window_pw;
     float pixel_y = event->y * window_ph;
-    
+
     SDL_Log("TOUCH_CONVERT: pixel_coords=(%.1f, %.1f)", pixel_x, pixel_y);
-    
+
 #if __APPLE__ && TARGET_OS_IOS
     // On iOS, we use a custom dest rect, so we need to use our own conversion
     // that accounts for the letterbox/pillarbox offset and scaling
@@ -140,7 +141,7 @@ static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
     if (SDL_RenderCoordinatesFromWindow(gSdlRenderer, pixel_x, pixel_y, &logical_x, &logical_y)) {
         *out_x = static_cast<int>(logical_x);
         *out_y = static_cast<int>(logical_y);
-        
+
         // Clamp to valid screen bounds
         if (*out_x < 0) *out_x = 0;
         if (*out_y < 0) *out_y = 0;
@@ -156,9 +157,9 @@ static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
 
 void touch_handle_start(SDL_TouchFingerEvent* event)
 {
-    SDL_Log("TOUCH START: fingerID=%lld x=%.3f y=%.3f timestamp=%llu", 
-            (long long)event->fingerID, event->x, event->y, (unsigned long long)event->timestamp);
-    
+    SDL_Log("TOUCH START: fingerID=%lld x=%.3f y=%.3f timestamp=%llu",
+        (long long)event->fingerID, event->x, event->y, (unsigned long long)event->timestamp);
+
     // On iOS `fingerId` is an address of underlying `UITouch` object. When
     // `touchesBegan` is called this object might be reused, but with
     // incresed `tapCount` (which is ignored in this implementation).
@@ -173,16 +174,16 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
         touch->fingerId = event->fingerID;
         // Convert SDL3 nanosecond timestamp to milliseconds for consistent time comparisons
         touch->startTimestamp = timestamp_to_ms(event->timestamp);
-        
+
         // Convert touch coordinates from window space to logical/render space
         convert_touch_to_logical(event, &touch->startLocation.x, &touch->startLocation.y);
-        
+
         touch->currentTimestamp = touch->startTimestamp;
         touch->currentLocation = touch->startLocation;
         touch->phase = TOUCH_PHASE_BEGAN;
-        
+
         SDL_Log("TOUCH START: index=%d logical_x=%d logical_y=%d timestamp_ms=%llu",
-                index, touch->startLocation.x, touch->startLocation.y, (unsigned long long)touch->startTimestamp);
+            index, touch->startLocation.x, touch->startLocation.y, (unsigned long long)touch->startTimestamp);
     }
 }
 
@@ -193,35 +194,35 @@ void touch_handle_move(SDL_TouchFingerEvent* event)
         Touch* touch = &(touches[index]);
         // Convert SDL3 nanosecond timestamp to milliseconds
         touch->currentTimestamp = timestamp_to_ms(event->timestamp);
-        
+
         // Convert touch coordinates from window space to logical/render space
         convert_touch_to_logical(event, &touch->currentLocation.x, &touch->currentLocation.y);
-        
+
         touch->phase = TOUCH_PHASE_MOVED;
     }
 }
 
 void touch_handle_end(SDL_TouchFingerEvent* event)
 {
-    SDL_Log("TOUCH END: fingerID=%lld x=%.3f y=%.3f timestamp=%llu", 
-            (long long)event->fingerID, event->x, event->y, (unsigned long long)event->timestamp);
-            
+    SDL_Log("TOUCH END: fingerID=%lld x=%.3f y=%.3f timestamp=%llu",
+        (long long)event->fingerID, event->x, event->y, (unsigned long long)event->timestamp);
+
     int index = find_touch(event->fingerID);
     if (index != -1) {
         Touch* touch = &(touches[index]);
         // Convert SDL3 nanosecond timestamp to milliseconds
         touch->currentTimestamp = timestamp_to_ms(event->timestamp);
-        
+
         // Convert touch coordinates from window space to logical/render space
         convert_touch_to_logical(event, &touch->currentLocation.x, &touch->currentLocation.y);
-        
+
         touch->phase = TOUCH_PHASE_ENDED;
-        
+
         SDL_Log("TOUCH END: index=%d phase=%d start_ts=%llu current_ts=%llu diff=%llu",
-                index, touch->phase, 
-                (unsigned long long)touch->startTimestamp, 
-                (unsigned long long)touch->currentTimestamp,
-                (unsigned long long)(touch->currentTimestamp - touch->startTimestamp));
+            index, touch->phase,
+            (unsigned long long)touch->startTimestamp,
+            (unsigned long long)touch->currentTimestamp,
+            (unsigned long long)(touch->currentTimestamp - touch->startTimestamp));
     } else {
         SDL_Log("TOUCH END: fingerID not found!");
     }
@@ -342,7 +343,7 @@ void touch_process_gesture()
                 currentGesture.x = currentCentroid.x;
                 currentGesture.y = currentCentroid.y;
                 gestureEventsQueue.push(currentGesture);
-                
+
                 SDL_Log("TAP GESTURE: fingers=%d x=%d y=%d", endedCount, currentCentroid.x, currentCentroid.y);
 
                 // Reset tap gesture immediately.

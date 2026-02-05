@@ -1102,19 +1102,19 @@ void GNW95_process_message()
         switch (e.type) {
         case SDL_EVENT_MOUSE_MOTION:
             SDL_Log("INPUT: MOUSE_MOTION x=%.1f y=%.1f rel=(%.1f,%.1f)",
-                    e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
+                e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
             dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
             SDL_Log("INPUT: MOUSE_BUTTON_DOWN button=%d x=%.1f y=%.1f",
-                    e.button.button, e.button.x, e.button.y);
+                e.button.button, e.button.x, e.button.y);
             dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
             SDL_Log("INPUT: MOUSE_BUTTON_UP button=%d x=%.1f y=%.1f",
-                    e.button.button, e.button.x, e.button.y);
+                e.button.button, e.button.x, e.button.y);
             dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
@@ -1125,21 +1125,21 @@ void GNW95_process_message()
             break;
         case SDL_EVENT_FINGER_DOWN:
             SDL_Log("INPUT: FINGER_DOWN fingerID=%lld touchID=%lld x=%.4f y=%.4f pressure=%.3f",
-                    (long long)e.tfinger.fingerID, (long long)e.tfinger.touchID,
-                    e.tfinger.x, e.tfinger.y, e.tfinger.pressure);
+                (long long)e.tfinger.fingerID, (long long)e.tfinger.touchID,
+                e.tfinger.x, e.tfinger.y, e.tfinger.pressure);
             dxinput_notify_touch();
             touch_handle_start(&(e.tfinger));
             break;
         case SDL_EVENT_FINGER_MOTION:
             SDL_Log("INPUT: FINGER_MOTION fingerID=%lld x=%.4f y=%.4f dx=%.4f dy=%.4f",
-                    (long long)e.tfinger.fingerID, e.tfinger.x, e.tfinger.y,
-                    e.tfinger.dx, e.tfinger.dy);
+                (long long)e.tfinger.fingerID, e.tfinger.x, e.tfinger.y,
+                e.tfinger.dx, e.tfinger.dy);
             dxinput_notify_touch();
             touch_handle_move(&(e.tfinger));
             break;
         case SDL_EVENT_FINGER_UP:
             SDL_Log("INPUT: FINGER_UP fingerID=%lld x=%.4f y=%.4f",
-                    (long long)e.tfinger.fingerID, e.tfinger.x, e.tfinger.y);
+                (long long)e.tfinger.fingerID, e.tfinger.x, e.tfinger.y);
             dxinput_notify_touch();
             touch_handle_end(&(e.tfinger));
             break;
