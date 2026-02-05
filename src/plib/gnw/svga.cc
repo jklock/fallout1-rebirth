@@ -150,11 +150,35 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
 
 bool svga_init(VideoOptions* video_options)
 {
+#ifdef FALLOUT_IOS_BUILD
+    FILE* logfile = fopen("svga_debug.log", "w");
+    if (logfile) {
+        fprintf(logfile, "iOS: svga_init called with %dx%d (scale=%d)\n", 
+                video_options->width, video_options->height, video_options->scale);
+        fflush(logfile);
+    }
+#endif
+
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
 
+#if defined(__APPLE__) && TARGET_OS_IOS
+    // Force landscape orientation on iOS - the game requires landscape layout
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
+
     if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+#ifdef FALLOUT_IOS_BUILD
+        if (logfile) {
+            fprintf(logfile, "iOS ERROR: SDL_InitSubSystem failed: %s\n", SDL_GetError());
+            fclose(logfile);
+        }
+#endif
         return false;
     }
+
+#ifdef FALLOUT_IOS_BUILD
+    if (logfile) fprintf(logfile, "SDL video subsystem initialized\n"), fflush(logfile);
+#endif
 
     SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
@@ -162,21 +186,45 @@ bool svga_init(VideoOptions* video_options)
 // with the cursor in the top margin of the screen.
 #if __APPLE__ && TARGET_OS_IOS
     windowFlags |= SDL_WINDOW_BORDERLESS;
-#endif
-
+    // On iOS, use resizable instead of fullscreen to avoid orientation issues
+    windowFlags |= SDL_WINDOW_RESIZABLE;
+#else
     if (video_options->fullscreen) {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
+#endif
+
+#ifdef FALLOUT_IOS_BUILD
+    if (logfile) fprintf(logfile, "Creating window with flags: 0x%x\n", windowFlags), fflush(logfile);
+#endif
 
     gSdlWindow = SDL_CreateWindow(GNW95_title,
         video_options->width * video_options->scale,
         video_options->height * video_options->scale,
         windowFlags);
     if (gSdlWindow == NULL) {
+#ifdef FALLOUT_IOS_BUILD
+        if (logfile) {
+            fprintf(logfile, "iOS ERROR: SDL_CreateWindow failed: %s\n", SDL_GetError());
+            fclose(logfile);
+        }
+#endif
+        debug_printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
         return false;
     }
 
+#ifdef FALLOUT_IOS_BUILD
+    if (logfile) fprintf(logfile, "iOS: SDL window created successfully\n"), fflush(logfile);
+#endif
+
     if (!createRenderer(video_options->width, video_options->height)) {
+#ifdef FALLOUT_IOS_BUILD
+        if (logfile) {
+            fprintf(logfile, "iOS ERROR: createRenderer failed\n");
+            fclose(logfile);
+        }
+#endif
+        debug_printf("createRenderer failed\n");
         destroyRenderer();
 
         SDL_DestroyWindow(gSdlWindow);

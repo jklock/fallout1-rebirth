@@ -159,7 +159,7 @@ int win_add_text_input_region(int textRegionId, char* text, int a3, int a4)
     textInputRegions[textInputRegionIndex].field_8 = a3;
     textInputRegions[textInputRegionIndex].field_C = 0;
     textInputRegions[textInputRegionIndex].text = text;
-    textInputRegions[textInputRegionIndex].field_10 = strlen(text);
+    textInputRegions[textInputRegionIndex].field_10 = static_cast<int>(strlen(text));
     textInputRegions[textInputRegionIndex].deleteFunc = NULL;
     textInputRegions[textInputRegionIndex].deleteFuncUserData = NULL;
 
@@ -319,7 +319,7 @@ int win_print_text_region(int textRegionId, char* string)
 
             windowPrintBuf(textRegions[textRegionIndex].win,
                 string,
-                strlen(string),
+                static_cast<int>(strlen(string)),
                 textRegions[textRegionIndex].width,
                 win_height(textRegions[textRegionIndex].win),
                 textRegions[textRegionIndex].x,

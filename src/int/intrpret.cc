@@ -436,7 +436,7 @@ Program* allocateProgram(const char* path)
         return NULL;
     }
 
-    int fileSize = db_filelength(stream);
+    int fileSize = static_cast<int>(db_filelength(stream));
     unsigned char* data = (unsigned char*)mymalloc(fileSize, __FILE__, __LINE__); // ..\int\INTRPRET.C, 398
 
     db_fread(data, 1, fileSize, stream);
@@ -511,7 +511,7 @@ int interpretAddString(Program* program, char* string)
         return 0;
     }
 
-    v27 = strlen(string) + 1;
+    v27 = static_cast<int>(strlen(string)) + 1;
 
     // Align memory
     if (v27 & 1) {
@@ -526,7 +526,7 @@ int interpretAddString(Program* program, char* string)
             if (v2 >= 0) {
                 if (v2 == v27) {
                     if (strcmp(string, (char*)(heap + 4)) == 0) {
-                        return (heap + 4) - (program->dynamicStrings + 4);
+                        return static_cast<int>((heap + 4) - (program->dynamicStrings + 4));
                     }
                 }
             } else {
@@ -544,7 +544,7 @@ int interpretAddString(Program* program, char* string)
                     strcpy((char*)(heap + 4), string);
 
                     *(heap + v27 + 3) = '\0';
-                    return (heap + 4) - (program->dynamicStrings + 4);
+                    return static_cast<int>((heap + 4) - (program->dynamicStrings + 4));
                 }
             }
             heap += v2 + 4;
@@ -575,7 +575,7 @@ int interpretAddString(Program* program, char* string)
     *(unsigned short*)(v23 + 4) = 0x8000;
     *(short*)(v23 + 6) = 1;
 
-    return v20 + 4 - (program->dynamicStrings + 4);
+    return static_cast<int>(v20 + 4 - (program->dynamicStrings + 4));
 }
 
 // 0x45BDB4
@@ -606,7 +606,7 @@ static void op_push_base(Program* program)
 {
     int argumentCount = programStackPopInteger(program);
     programReturnStackPushInteger(program, program->framePointer);
-    program->framePointer = program->stackValues->size() - argumentCount;
+    program->framePointer = static_cast<int>(program->stackValues->size()) - argumentCount;
 }
 
 // 0x45BE5C
@@ -627,7 +627,7 @@ static void op_pop_to_base(Program* program)
 // 0x45BEEC
 static void op_set_global(Program* program)
 {
-    program->basePointer = program->stackValues->size();
+    program->basePointer = static_cast<int>(program->stackValues->size());
 }
 
 // 0x45BEF8

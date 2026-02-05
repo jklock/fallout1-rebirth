@@ -188,12 +188,12 @@ void compat_makepath(char* path, const char* drive, const char* dir, const char*
 
 int compat_read(int fileHandle, void* buf, unsigned int size)
 {
-    return read(fileHandle, buf, size);
+    return static_cast<int>(read(fileHandle, buf, size));
 }
 
 int compat_write(int fileHandle, const void* buf, unsigned int size)
 {
-    return write(fileHandle, buf, size);
+    return static_cast<int>(write(fileHandle, buf, size));
 }
 
 long compat_lseek(int fileHandle, long offset, int origin)

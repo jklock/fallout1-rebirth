@@ -1676,7 +1676,7 @@ static int gsound_read(int fileHandle, void* buffer, unsigned int size)
         return -1;
     }
 
-    return db_fread(buffer, 1, size, (DB_FILE*)intToPtr(fileHandle));
+    return static_cast<int>(db_fread(buffer, 1, size, (DB_FILE*)intToPtr(fileHandle)));
 }
 
 // 0x449378
@@ -1883,7 +1883,7 @@ static int gsound_background_find_dont_copy(char* dest, const char* src)
     char path[COMPAT_MAX_PATH];
     int len;
 
-    len = strlen(src) + strlen(".ACM");
+    len = static_cast<int>(strlen(src) + strlen(".ACM"));
     if (strlen(sound_music_path1) + len > COMPAT_MAX_PATH || strlen(sound_music_path2) + len > COMPAT_MAX_PATH) {
         if (gsound_debug) {
             debug_printf("Full background path too long.\n");
@@ -2031,7 +2031,7 @@ static int gsound_get_music_path(char** out_value, const char* key)
     config_get_string(&game_config, GAME_CONFIG_SOUND_KEY, key, out_value);
 
     value = *out_value;
-    len = strlen(value);
+    len = static_cast<int>(strlen(value));
 
     if (value[len - 1] == '\\' || value[len - 1] == '/') {
         return 0;

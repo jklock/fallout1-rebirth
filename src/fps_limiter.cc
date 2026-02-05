@@ -13,7 +13,7 @@ FpsLimiter::FpsLimiter(unsigned int fps)
 
 void FpsLimiter::mark()
 {
-    _ticks = SDL_GetTicks();
+    _ticks = static_cast<unsigned int>(SDL_GetTicks());
 }
 
 void FpsLimiter::throttle() const
@@ -22,8 +22,8 @@ void FpsLimiter::throttle() const
         return;
     }
 
-    if (1000 / _fps > SDL_GetTicks() - _ticks) {
-        SDL_Delay(1000 / _fps - (SDL_GetTicks() - _ticks));
+    if (1000 / _fps > static_cast<unsigned int>(SDL_GetTicks()) - _ticks) {
+        SDL_Delay(1000 / _fps - (static_cast<unsigned int>(SDL_GetTicks()) - _ticks));
     }
 }
 

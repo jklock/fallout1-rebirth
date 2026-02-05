@@ -1463,7 +1463,7 @@ int get_input_str(int win, int cancelKeyCode, char* text, int maxLength, int x, 
     char copy[257];
     strcpy(copy, text);
 
-    int nameLength = strlen(text);
+    int nameLength = static_cast<int>(strlen(text));
     copy[nameLength] = ' ';
     copy[nameLength + 1] = '\0';
 
@@ -1558,7 +1558,7 @@ bool isdoschar(int ch)
         return true;
     }
 
-    int length = strlen(punctuations);
+    int length = static_cast<int>(strlen(punctuations));
     for (int index = 0; index < length; index++) {
         if (punctuations[index] == ch) {
             return true;
@@ -3877,7 +3877,7 @@ static int Save_as_ASCII(const char* fileName)
 
     // NOTE: Uninline.
     padding[0] = '\0';
-    AddSpaces(padding, (80 - strlen(title1)) / 2 - 2);
+    AddSpaces(padding, static_cast<int>((80 - strlen(title1)) / 2 - 2));
 
     strcat(padding, title1);
     strcat(padding, "\n");
@@ -3888,7 +3888,7 @@ static int Save_as_ASCII(const char* fileName)
 
     // NOTE: Uninline.
     padding[0] = '\0';
-    AddSpaces(padding, (80 - strlen(title1)) / 2 - 2);
+    AddSpaces(padding, static_cast<int>((80 - strlen(title1)) / 2 - 2));
 
     strcat(padding, title1);
     strcat(padding, "\n");
@@ -3908,7 +3908,7 @@ static int Save_as_ASCII(const char* fileName)
 
     // NOTE: Uninline.
     padding[0] = '\0';
-    AddSpaces(padding, (80 - strlen(title1)) / 2 - 2);
+    AddSpaces(padding, static_cast<int>((80 - strlen(title1)) / 2 - 2));
 
     strcat(padding, title1);
     strcat(padding, "\n");
@@ -3923,7 +3923,7 @@ static int Save_as_ASCII(const char* fileName)
         getmsg(&editor_message_file, &mesg, 642),
         critter_name(obj_dude));
 
-    int paddingLength = 27 - strlen(title1);
+    int paddingLength = static_cast<int>(27 - strlen(title1));
     if (paddingLength > 0) {
         // NOTE: Uninline.
         padding[0] = '\0';
@@ -3956,7 +3956,7 @@ static int Save_as_ASCII(const char* fileName)
         getmsg(&editor_message_file, &mesg, 648),
         itostndn(stat_pc_get(PC_STAT_EXPERIENCE), title3));
 
-    paddingLength = 12 - strlen(title3);
+    paddingLength = static_cast<int>(12 - strlen(title3));
     if (paddingLength > 0) {
         // NOTE: Uninline.
         padding[0] = '\0';
@@ -4214,7 +4214,7 @@ static int Save_as_ASCII(const char* fileName)
         snprintf(title1, sizeof(title1), "%s ", skill_name(skill));
 
         // NOTE: Uninline.
-        AddDots(title1 + strlen(title1), 16 - strlen(title1));
+        AddDots(title1 + strlen(title1), static_cast<int>(16 - strlen(title1)));
 
         bool hasKillType = false;
 
@@ -4224,7 +4224,7 @@ static int Save_as_ASCII(const char* fileName)
                 snprintf(title2, sizeof(title2), "%s ", critter_kill_name(killType));
 
                 // NOTE: Uninline.
-                AddDots(title2 + strlen(title2), 16 - strlen(title2));
+                AddDots(title2 + strlen(title2), static_cast<int>(16 - strlen(title2)));
 
                 snprintf(title3, sizeof(title3),
                     "  %s %.3d%%        %s %.3d\n",
@@ -4269,7 +4269,7 @@ static int Save_as_ASCII(const char* fileName)
                 itostndn(inventoryItem->quantity, title3),
                 object_name(inventoryItem->item));
 
-            int length = 25 - strlen(title2);
+            int length = static_cast<int>(25 - strlen(title2));
             if (length < 0) {
                 length = 0;
             }

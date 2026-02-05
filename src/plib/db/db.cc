@@ -379,7 +379,7 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
             size = getFileSize(stream);
             if (read_callback != NULL) {
                 remaining_size = size;
-                chunk_size = read_threshold - read_count;
+                chunk_size = static_cast<int>(read_threshold - read_count);
 
                 while (remaining_size >= chunk_size) {
                     bytes_read = fread(buf, 1, chunk_size, stream);
@@ -389,7 +389,7 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
                     read_count = 0;
                     read_callback();
 
-                    chunk_size = read_threshold;
+                    chunk_size = static_cast<int>(read_threshold);
                 }
 
                 if (remaining_size != 0) {
@@ -439,7 +439,7 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
     case 32:
         if (read_callback != NULL) {
             remaining_size = de.length;
-            chunk_size = read_threshold - read_count;
+            chunk_size = static_cast<int>(read_threshold - read_count);
 
             while (remaining_size >= chunk_size) {
                 bytes_read = fread(buf, 1, chunk_size, current_database->stream);
@@ -449,7 +449,7 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
                 read_count = 0;
                 read_callback();
 
-                chunk_size = read_threshold;
+                chunk_size = static_cast<int>(read_threshold);
             }
 
             if (remaining_size != 0) {
@@ -703,9 +703,9 @@ size_t db_fread(void* ptr, size_t size, size_t count, DB_FILE* stream)
                         }
 
                         if (elements_read != 0) {
-                            remaining_size = elements_read * size;
+                            remaining_size = static_cast<int>(elements_read * size);
                             if (read_callback != NULL) {
-                                chunk_size = read_threshold - read_count;
+                                chunk_size = static_cast<int>(read_threshold - read_count);
                                 while (remaining_size >= chunk_size) {
                                     remaining_size -= chunk_size;
                                     memcpy(buf, stream->field_20, chunk_size);
@@ -717,7 +717,7 @@ size_t db_fread(void* ptr, size_t size, size_t count, DB_FILE* stream)
                                     read_count = 0;
                                     read_callback();
 
-                                    chunk_size = read_threshold;
+                                    chunk_size = static_cast<int>(read_threshold);
                                 }
 
                                 if (remaining_size != 0) {

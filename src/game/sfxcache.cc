@@ -233,7 +233,7 @@ int sfxc_cached_read(int handle, void* buf, unsigned int size)
         memcpy(buf, soundEffect->data + soundEffect->position, bytesToRead);
         break;
     case 1:
-        if (sfxc_decode(handle, buf, bytesToRead) != 0) {
+        if (sfxc_decode(handle, buf, static_cast<unsigned int>(bytesToRead)) != 0) {
             return -1;
         }
         break;
@@ -243,7 +243,7 @@ int sfxc_cached_read(int handle, void* buf, unsigned int size)
 
     soundEffect->position += bytesToRead;
 
-    return bytesToRead;
+    return static_cast<int>(bytesToRead);
 }
 
 // 0x4974D0
@@ -294,7 +294,7 @@ long sfxc_cached_seek(int handle, long offset, int origin)
 
     soundEffect->position = offset;
 
-    return offset;
+    return static_cast<long>(offset);
 }
 
 // 0x497574

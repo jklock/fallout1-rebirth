@@ -40,6 +40,17 @@ if(UBSAN)
     target_link_options(${EXECUTABLE_NAME} PUBLIC "-fsanitize=undefined")
 endif()
 
+# Suppress warnings
+if(IOS)
+    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE
+        FALLOUT_IOS_BUILD=1               # Mark as iOS build for platform-specific code
+    )
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE
+        -DGLES_SILENCE_DEPRECATION        # Silence SDL3 OpenGL ES deprecation
+        -Wno-deprecated-declarations      # Silence UIKit deprecation warnings
+    )
+endif()
+
 target_include_directories(${EXECUTABLE_NAME} PUBLIC src)
 
 target_sources(${EXECUTABLE_NAME} PUBLIC
