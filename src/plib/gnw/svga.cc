@@ -143,6 +143,7 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
 bool svga_init(VideoOptions* video_options)
 {
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
         return false;
@@ -253,9 +254,6 @@ int screenGetHeight()
 
 static bool createRenderer(int width, int height)
 {
-    // Use nearest-neighbor scaling for crisp pixel art (no bilinear blur)
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-
     gSdlRenderer = SDL_CreateRenderer(gSdlWindow, -1, SDL_RENDERER_PRESENTVSYNC);
     if (gSdlRenderer == NULL) {
         return false;
