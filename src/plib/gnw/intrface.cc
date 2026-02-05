@@ -1058,7 +1058,7 @@ int win_input_str(int win, char* dest, int maxLength, int x, int y, int textColo
     Window* window = GNW_find(win);
     unsigned char* buffer = window->buffer + window->width * y + x;
 
-    int cursorPos = strlen(dest);
+    int cursorPos = static_cast<int>(strlen(dest));
     dest[cursorPos] = '_';
     dest[cursorPos + 1] = '\0';
 
@@ -1176,10 +1176,10 @@ static int calc_max_field_chars_wcursor(int value1, int value2)
     }
 
     snprintf(str, 17, "%d", value1);
-    int len1 = strlen(str);
+    int len1 = static_cast<int>(strlen(str));
 
     snprintf(str, 17, "%d", value2);
-    int len2 = strlen(str);
+    int len2 = static_cast<int>(strlen(str));
 
     mem_free(str);
 

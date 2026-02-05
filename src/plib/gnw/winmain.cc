@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
 #include "game/main.h"
 #include "plib/gnw/gnw.h"
@@ -28,8 +29,9 @@ int main(int argc, char* argv[])
     int rc;
 
 #if __APPLE__ && TARGET_OS_IOS
+    // Enable touch-to-mouse event conversion so iPad touch input works as mouse
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
-    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
     chdir(iOSGetDocumentsPath());
 #endif
 

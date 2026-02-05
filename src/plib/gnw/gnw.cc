@@ -2,6 +2,10 @@
 
 #include <algorithm>
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 #include "game/palette.h"
 #include "plib/color/color.h"
 #include "plib/db/db.h"
@@ -1276,7 +1280,7 @@ static void* colorOpen(const char* path)
 // 0x4C4298
 static int colorRead(void* handle, void* buf, size_t count)
 {
-    return db_fread(buf, 1, count, reinterpret_cast<DB_FILE*>(handle));
+    return static_cast<int>(db_fread(buf, 1, count, reinterpret_cast<DB_FILE*>(handle)));
 }
 
 // 0x4C42A0
@@ -1288,6 +1292,14 @@ static int colorClose(void* handle)
 // 0x4C42B8
 bool GNWSystemError(const char* text)
 {
+#ifdef FALLOUT_IOS_BUILD
+    // On iOS/Simulator, showing modal dialogs during app initialization causes watchdog timeout (0x8BADF00D)
+    // Log to console instead - developers can see this via Xcode console or device logs
+    debug_printf("FATAL ERROR: %s\n", text);
+    fprintf(stderr, "FATAL ERROR: %s\n", text);
+    fflush(stderr);
+#else
+    // On macOS and other platforms, use modal dialog
     SDL_Cursor* prev = SDL_GetCursor();
     SDL_Cursor* cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
     SDL_SetCursor(cursor);
@@ -1296,6 +1308,7 @@ bool GNWSystemError(const char* text)
     SDL_HideCursor();
     SDL_SetCursor(prev);
     SDL_DestroyCursor(cursor);
+#endif
     return true;
 }
 

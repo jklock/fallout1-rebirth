@@ -642,7 +642,7 @@ void register_screendump(int new_screendump_key, ScreenDumpFunc* new_screendump_
 // 0x4B3BB8
 unsigned int get_time()
 {
-    return SDL_GetTicks();
+    return static_cast<unsigned int>(SDL_GetTicks());
 }
 
 // 0x4B3BC4
@@ -667,7 +667,7 @@ void pause_for_tocks(unsigned int delay)
 // 0x4B3C00
 void block_for_tocks(unsigned int ms)
 {
-    unsigned int start = SDL_GetTicks();
+    unsigned int start = static_cast<unsigned int>(SDL_GetTicks());
     unsigned int diff;
     do {
         // NOTE: Uninline
@@ -678,7 +678,7 @@ void block_for_tocks(unsigned int ms)
 // 0x4B3C28
 unsigned int elapsed_time(unsigned int start)
 {
-    unsigned int end = SDL_GetTicks();
+    unsigned int end = static_cast<unsigned int>(SDL_GetTicks());
 
     // NOTE: Uninline.
     return elapsed_tocks(end, start);

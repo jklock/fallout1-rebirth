@@ -204,13 +204,13 @@ static long soundTellData(int fileHandle)
 // 0x499CE8
 static int soundWriteData(int fileHandle, const void* buf, unsigned int size)
 {
-    return write(fileHandle, buf, size);
+    return static_cast<int>(write(fileHandle, buf, size));
 }
 
 // 0x499CF0
 static int soundReadData(int fileHandle, void* buf, unsigned int size)
 {
-    return read(fileHandle, buf, size);
+    return static_cast<int>(read(fileHandle, buf, size));
 }
 
 // 0x499CF8
@@ -347,7 +347,7 @@ static void refreshSoundBuffers(Sound* sound)
                 }
             }
 
-            bytesRead = sound->io.read(sound->io.fd, sound->data, bytesToRead);
+            bytesRead = static_cast<int>(sound->io.read(sound->io.fd, sound->data, bytesToRead));
             if (bytesRead < sound->dataSize) {
                 if (!(sound->soundFlags & 0x20) || (sound->soundFlags & 0x0100)) {
                     memset(sound->data + bytesRead, 0, sound->dataSize - bytesRead);
@@ -389,7 +389,7 @@ static void refreshSoundBuffers(Sound* sound)
                             }
                         }
 
-                        int v20 = sound->io.read(sound->io.fd, sound->data + bytesRead, bytesToRead);
+                        int v20 = static_cast<int>(sound->io.read(sound->io.fd, sound->data + bytesRead, bytesToRead));
                         bytesRead += v20;
                         if (v20 < bytesToRead) {
                             break;
@@ -533,7 +533,7 @@ static int preloadBuffers(Sound* sound)
     unsigned char* v14;
     int size;
 
-    size = sound->io.filelength(sound->io.fd);
+    size = static_cast<int>(sound->io.filelength(sound->io.fd));
     sound->fileSize = size;
 
     if ((sound->type & SOUND_TYPE_STREAMING) != 0) {

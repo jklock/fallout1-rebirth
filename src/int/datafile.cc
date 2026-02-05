@@ -171,7 +171,7 @@ unsigned char* datafileLoadBlock(char* path, int* sizePtr)
         return NULL;
     }
 
-    int size = db_filelength(stream);
+    int size = static_cast<int>(db_filelength(stream));
     unsigned char* data = (unsigned char*)mymalloc(size, __FILE__, __LINE__); // "..\\int\\DATAFILE.C", 185
     if (data == NULL) {
         // NOTE: This code is unreachable, mymalloc never fails.

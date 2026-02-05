@@ -1230,7 +1230,7 @@ void windowWrapLineWithSpacing(int win, char* string, int width, int height, int
 
     for (int index = 0; index < substringListLength; index++) {
         int v1 = y + index * (a9 + text_height());
-        windowPrintBuf(win, substringList[index], strlen(substringList[index]), width, height + y, x, v1, flags, textAlignment);
+        windowPrintBuf(win, substringList[index], static_cast<int>(strlen(substringList[index])), width, height + y, x, v1, flags, textAlignment);
     }
 
     windowFreeWordList(substringList, substringListLength);
@@ -1543,9 +1543,9 @@ void initWindow(VideoOptions* video_options, int flags)
     currentHighlightColorB = 0;
     currentTextFlags = 0x2010000;
 
-    // TODO: Review usage.
-    yres = 640;
-    xres = 480;
+    // NOTE: These need to be set correctly for landscape mode (width x height)
+    xres = 640;
+    yres = 480;
 
     for (int i = 0; i < MANAGED_WINDOW_COUNT; i++) {
         windows[i].window = -1;

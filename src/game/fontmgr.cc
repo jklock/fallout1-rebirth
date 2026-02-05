@@ -104,7 +104,7 @@ static int FMLoadFont(int font_index)
         return -1;
     }
 
-    int fileSize = db_filelength(stream);
+    int fileSize = static_cast<int>(db_filelength(stream));
 
     int sig;
     if (db_fread(&sig, 4, 1, stream) != 1) {
@@ -258,7 +258,7 @@ int FMtext_mono_width(const char* str)
         return 0;
     }
 
-    return FMtext_max() * strlen(str);
+    return FMtext_max() * static_cast<int>(strlen(str));
 }
 
 // 0x43AD44
@@ -369,7 +369,7 @@ void FMtext_to_buf(unsigned char* buf, const char* string, int length, int pitch
     }
 
     if ((color & FONT_UNDERLINE) != 0) {
-        int length = ptr - buf;
+        int length = static_cast<int>(ptr - buf);
         unsigned char* underlinePtr = buf + pitch * (gCurrentFont->maxHeight - 1);
         for (int index = 0; index < length; index++) {
             *underlinePtr++ = color & 0xFF;

@@ -71,7 +71,7 @@ int init_message()
             break;
         }
 
-        int len = strlen(word);
+        int len = static_cast<int>(strlen(word));
         if (word[len - 1] == '\n') {
             len--;
             word[len] = '\0';
@@ -521,7 +521,7 @@ bool message_filter(MessageList* messageList)
         return true;
     }
 
-    int replacementsCount = strlen(replacements);
+    int replacementsCount = static_cast<int>(strlen(replacements));
     int replacementsIndex = roll_random(1, replacementsCount) - 1;
 
     for (int index = 0; index < messageList->entries_num; index++) {

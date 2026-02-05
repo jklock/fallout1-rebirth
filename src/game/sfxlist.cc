@@ -75,7 +75,7 @@ int sfxl_init(const char* soundEffectsPath, int compression, int debugLevel)
         return SFXL_ERR;
     }
 
-    sfxl_effect_path_len = strlen(sfxl_effect_path);
+    sfxl_effect_path_len = static_cast<int>(strlen(sfxl_effect_path));
 
     err = sfxl_get_names();
     if (err != SFXL_OK) {
@@ -131,7 +131,7 @@ int sfxl_name_to_tag(char* name, int* tagPtr)
         return SFXL_ERR;
     }
 
-    if (sfxl_index_to_tag(entry - sfxl_list, &tag) != SFXL_OK) {
+    if (sfxl_index_to_tag(static_cast<int>(entry - sfxl_list), &tag) != SFXL_OK) {
         return SFXL_ERR;
     }
 
@@ -411,7 +411,7 @@ static int sfxl_compare_by_name(const void* a1, const void* a2)
 // 0x4980A0
 static unsigned int sfxl_ad_reader(void* stream, void* buf, unsigned int size)
 {
-    return db_fread(buf, 1, size, (DB_FILE*)stream);
+    return static_cast<unsigned int>(db_fread(buf, 1, size, (DB_FILE*)stream));
 }
 
 } // namespace fallout

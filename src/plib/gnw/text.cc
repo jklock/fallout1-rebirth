@@ -362,7 +362,7 @@ void GNW_text_to_buf(unsigned char* buf, const char* str, int swidth, int fullw,
 
     if ((color & FONT_UNDERLINE) != 0) {
         // TODO: Probably additional -1 present, check.
-        int length = ptr - buf;
+        int length = static_cast<int>(ptr - buf);
         unsigned char* underlinePtr = buf + fullw * (curr_font->height - 1);
         for (int pix = 0; pix < length; pix++) {
             *underlinePtr++ = color & 0xFF;
@@ -404,7 +404,7 @@ static int GNW_text_char_width(char c)
 // 0x4C1C78
 static int GNW_text_mono_width(const char* str)
 {
-    return text_max() * strlen(str);
+    return text_max() * static_cast<int>(strlen(str));
 }
 
 // 0x4C1C98

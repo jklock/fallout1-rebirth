@@ -322,7 +322,7 @@ static void printLine(int win, char** strings, int strings_num, int a4, int a5, 
 
     for (i = 0; i < strings_num; i++) {
         v11 = a7 + i * text_height();
-        windowPrintBuf(win, strings[i], strlen(strings[i]), a4, a5 + a7, a6, v11, a8, a9);
+        windowPrintBuf(win, strings[i], static_cast<int>(strlen(strings[i])), a4, a5 + a7, a6, v11, a8, a9);
     }
 }
 

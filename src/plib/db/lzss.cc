@@ -123,7 +123,7 @@ int lzss_decode_to_buf(FILE* in, unsigned char* dest, unsigned int length)
         lzss_decode_chunk_to_buf(byte & 0x80, &curr, &length);
     } while (0);
 
-    return curr - dest;
+    return static_cast<int>(curr - dest);
 }
 
 // 0x4CB570

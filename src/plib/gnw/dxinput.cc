@@ -24,6 +24,9 @@ static bool last_input_was_mouse = false;
 static int last_system_x = -1;
 static int last_system_y = -1;
 static Uint32 last_mouse_buttons = 0;
+// Track button state from events since SDL_GetMouseState doesn't reflect touch-converted clicks
+static bool left_button_down = false;
+static bool right_button_down = false;
 #endif
 
 // 0x4E0400
@@ -132,8 +135,10 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->y = 0;
     }
 
-    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON_LMASK) != 0;
-    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON_RMASK) != 0;
+    // Use tracked button state from events, not SDL_GetMouseState
+    // because SDL3 doesn't update button state for touch-converted clicks
+    mouseState->buttons[0] = left_button_down;
+    mouseState->buttons[1] = right_button_down;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;
@@ -220,6 +225,10 @@ void dxinput_notify_mouse()
 {
 #if defined(__APPLE__) && TARGET_OS_IOS
     last_input_was_mouse = true;
+    static int mouse_event_count = 0;
+    if (mouse_event_count < 5) {
+        debug_printf("iOS: Mouse event received (count=%d)\n", ++mouse_event_count);
+    }
 #endif
 }
 
@@ -227,6 +236,10 @@ void dxinput_notify_touch()
 {
 #if defined(__APPLE__) && TARGET_OS_IOS
     last_input_was_mouse = false;
+    static int touch_event_count = 0;
+    if (touch_event_count < 5) {
+        debug_printf("iOS: Touch event received (count=%d)\n", ++touch_event_count);
+    }
 #endif
 }
 

@@ -4527,9 +4527,9 @@ static void obj_render_outline(Object* object, Rect* rect)
                 }
             }
 
-            int v22 = dest14 - back_buf;
+            int v22 = static_cast<int>(dest14 - back_buf);
             for (int x = 0; x < frameWidth; x++) {
-                v22 = dest14 - back_buf;
+                v22 = static_cast<int>(dest14 - back_buf);
                 if (*src15 != 0 && cycle) {
                     if (x >= v49.ulx && x <= v49.lrx && y >= v49.uly && y <= v49.lry && v22 > 0 && v22 % buf_full != 0) {
                         unsigned char v20;

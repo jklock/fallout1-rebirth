@@ -100,7 +100,7 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
         Touch* touch = &(touches[index]);
         touch->used = true;
         touch->fingerId = event->fingerID;
-        touch->startTimestamp = event->timestamp;
+        touch->startTimestamp = static_cast<Uint32>(event->timestamp);
         touch->startLocation.x = static_cast<int>(event->x * screenGetWidth());
         touch->startLocation.y = static_cast<int>(event->y * screenGetHeight());
         touch->currentTimestamp = touch->startTimestamp;
@@ -114,7 +114,7 @@ void touch_handle_move(SDL_TouchFingerEvent* event)
     int index = find_touch(event->fingerID);
     if (index != -1) {
         Touch* touch = &(touches[index]);
-        touch->currentTimestamp = event->timestamp;
+        touch->currentTimestamp = static_cast<Uint32>(event->timestamp);
         touch->currentLocation.x = static_cast<int>(event->x * screenGetWidth());
         touch->currentLocation.y = static_cast<int>(event->y * screenGetHeight());
         touch->phase = TOUCH_PHASE_MOVED;
@@ -126,7 +126,7 @@ void touch_handle_end(SDL_TouchFingerEvent* event)
     int index = find_touch(event->fingerID);
     if (index != -1) {
         Touch* touch = &(touches[index]);
-        touch->currentTimestamp = event->timestamp;
+        touch->currentTimestamp = static_cast<Uint32>(event->timestamp);
         touch->currentLocation.x = static_cast<int>(event->x * screenGetWidth());
         touch->currentLocation.y = static_cast<int>(event->y * screenGetHeight());
         touch->phase = TOUCH_PHASE_ENDED;
