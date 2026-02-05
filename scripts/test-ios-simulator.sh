@@ -347,6 +347,11 @@ critter_patches=data
 EOF
     fi
     
+    # Copy f1_res.ini (display and input settings)
+    if [[ -f "$GAME_DATA/f1_res.ini" ]]; then
+        cp -v "$GAME_DATA/f1_res.ini" "$target_dir/"
+    fi
+    
     log_ok "Game data copied to Documents folder"
     echo "  Container: $container"
     ls -la "$target_dir/" | head -10

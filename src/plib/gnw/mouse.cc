@@ -132,6 +132,11 @@ static char mouse_trans;
 static int gMouseWheelX = 0;
 static int gMouseWheelY = 0;
 
+// iOS touch click offset correction (configurable via f1_res.ini)
+// These values adjust where clicks register relative to cursor position
+static int gClickOffsetX = 0;
+static int gClickOffsetY = 0;
+
 // 0x4B4780
 int GNW_mouse_init()
 {
@@ -141,6 +146,23 @@ int GNW_mouse_init()
     mouse_is_hidden = true;
 
     mouse_colorize();
+
+    // Load click offset from f1_res.ini (iOS touch calibration)
+    Config resConfig;
+    if (config_init(&resConfig)) {
+        if (config_load(&resConfig, "f1_res.ini", false)) {
+            int offsetX = 0;
+            int offsetY = 0;
+            if (config_get_value(&resConfig, "INPUT", "CLICK_OFFSET_X", &offsetX)) {
+                gClickOffsetX = offsetX;
+            }
+            if (config_get_value(&resConfig, "INPUT", "CLICK_OFFSET_Y", &offsetY)) {
+                gClickOffsetY = offsetY;
+            }
+            SDL_Log("mouse_init: click offset loaded from config: X=%d Y=%d", gClickOffsetX, gClickOffsetY);
+        }
+        config_exit(&resConfig);
+    }
 
     if (mouse_set_shape(NULL, 0, 0, 0, 0, 0, 0) == -1) {
         return -1;
@@ -860,7 +882,13 @@ bool mouse_click_in(int left, int top, int right, int bottom)
         return false;
     }
 
-    return (mouse_hoty + mouse_y >= top - expand) && (mouse_hotx + mouse_x <= right + expand) && (mouse_hotx + mouse_x >= left - expand) && (mouse_hoty + mouse_y <= bottom + expand);
+    // Apply configurable click offset (for iOS touch calibration)
+    // Positive X shifts click right, positive Y shifts click down
+    // Negative values shift the opposite direction
+    int click_x = mouse_hotx + mouse_x + gClickOffsetX;
+    int click_y = mouse_hoty + mouse_y + gClickOffsetY;
+
+    return (click_y >= top - expand) && (click_x <= right + expand) && (click_x >= left - expand) && (click_y <= bottom + expand);
 }
 
 /*
