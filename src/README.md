@@ -31,3 +31,16 @@ All code resides in the `fallout` namespace.
 - File names use lowercase with underscores
 - C++17 standard
 - WebKit-based formatting (see `.clang-format`)
+
+---
+
+## Proof of Work
+
+**Last Verified**: February 5, 2026
+
+**Files read to verify content**:
+- src/ directory listing (all top-level files and subdirectories verified)
+- Confirmed: audio_engine.cc/h, fps_limiter.cc/h, movie_lib.cc/h, platform_compat.cc/h, pointer_registry.cc/h
+- Confirmed subdirectories: game/, int/, plib/, platform/
+
+**Updates made**: No updates needed - content verified accurate. All documented files and directories present.

@@ -8,20 +8,21 @@ Each subdirectory contains a CMakeLists.txt that fetches the dependency from its
 
 | Directory | Library | Version | Description |
 |-----------|---------|---------|-------------|
-| [sdl2/](sdl2/) | SDL2 | 2.30.10 | Cross-platform multimedia library |
+| [sdl3/](sdl3/) | SDL3 | 3.2.4 | Cross-platform multimedia library (upgraded from SDL2) |
 | [adecode/](adecode/) | adecode | 1.0.0 | ACM audio decoder |
 | [fpattern/](fpattern/) | fpattern | 1.9 | Filename pattern matching |
 
-## SDL2
+## SDL3
 
-Simple DirectMedia Layer provides:
+Simple DirectMedia Layer 3 provides:
 - Window creation and management
-- OpenGL/Metal rendering context
+- GPU-accelerated rendering with pixel-perfect scaling
 - Audio output
 - Keyboard, mouse, and touch input
 - Game controller support
+- Improved high-DPI and ProMotion display support
 
-Built as a static library for this project.
+Built as a static library for this project. This fork was the first Fallout CE derivative to upgrade from SDL2 to SDL3.
 
 ## adecode
 
@@ -43,9 +44,9 @@ To update a dependency:
 Example:
 
 ```cmake
-FetchContent_Declare(sdl2
+FetchContent_Declare(sdl3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
-    GIT_TAG "release-2.30.10"  # Update this line
+    GIT_TAG "release-3.2.4"  # Update this line
 )
 ```
 
@@ -55,3 +56,19 @@ During build, dependencies are fetched into `build/_deps/`:
 - `*-src/` - Source code
 - `*-build/` - Build output
 - `*-subbuild/` - FetchContent staging
+
+---
+
+## Proof of Work
+
+**Last Verified**: February 5, 2026
+
+**Files read to verify content**:
+- third_party/ directory listing (sdl3/, adecode/, fpattern/ confirmed)
+- third_party/sdl3/CMakeLists.txt (GIT_TAG "release-3.2.4" confirmed)
+
+**Updates made**:
+- Changed SDL2 references to SDL3 throughout
+- Updated version from 2.30.10 to 3.2.4
+- Updated SDL section to describe SDL3 features
+- Updated CMake example to use sdl3 and release-3.2.4

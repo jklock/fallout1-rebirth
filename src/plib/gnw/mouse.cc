@@ -434,9 +434,20 @@ void mouse_info()
         return;
     }
 
-    // Skip touch gesture processing when using a real mouse
-    // This prevents gestures from interfering with mouse button states
+    // When using a physical mouse, update mouse state from dxinput
+    // This ensures mouse_buttons is kept in sync
     if (dxinput_is_using_mouse()) {
+        // Get the current mouse state from dxinput
+        MouseData mouseData;
+        if (dxinput_get_mouse_state(&mouseData)) {
+            // Convert dxinput button state to game button state
+            int buttons = 0;
+            if (mouseData.buttons[0]) buttons |= MOUSE_STATE_LEFT_BUTTON_DOWN;
+            if (mouseData.buttons[1]) buttons |= MOUSE_STATE_RIGHT_BUTTON_DOWN;
+            
+            // Update position and buttons via simulate_input
+            mouse_simulate_input(mouseData.x, mouseData.y, buttons);
+        }
         return;
     }
 
@@ -444,8 +455,14 @@ void mouse_info()
     // because touch input is the primary input method.
     Gesture gesture;
     if (touch_get_gesture(&gesture)) {
-        SDL_Log("GESTURE RECEIVED: type=%d state=%d fingers=%d x=%d y=%d",
-                gesture.type, gesture.state, gesture.numberOfTouches, gesture.x, gesture.y);
+        int cur_x, cur_y;
+        mouse_get_position(&cur_x, &cur_y);
+        SDL_Log("GESTURE: type=%d(%s) state=%d(%s) fingers=%d pos=(%d,%d) cursor=(%d,%d)",
+                gesture.type,
+                gesture.type == kTap ? "TAP" : gesture.type == kPan ? "PAN" : gesture.type == kLongPress ? "LONGPRESS" : "OTHER",
+                gesture.state,
+                gesture.state == kBegan ? "BEGAN" : gesture.state == kChanged ? "CHANGED" : gesture.state == kEnded ? "ENDED" : "OTHER",
+                gesture.numberOfTouches, gesture.x, gesture.y, cur_x, cur_y);
         
         // If mouse is hidden but we have a gesture, show it so input works
         if (mouse_is_hidden) {
@@ -708,7 +725,11 @@ void mouse_simulate_input(int delta_x, int delta_y, int buttons)
     // 0x671F6C
     static int old;
 
+    SDL_Log("MOUSE_SIMULATE: delta=(%d,%d) buttons=0x%x have=%d hidden=%d",
+            delta_x, delta_y, buttons, have_mouse, mouse_is_hidden);
+
     if (!have_mouse || mouse_is_hidden) {
+        SDL_Log("MOUSE_SIMULATE: SKIPPED (have_mouse=%d, hidden=%d)", have_mouse, mouse_is_hidden);
         return;
     }
 

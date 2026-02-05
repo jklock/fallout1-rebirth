@@ -80,7 +80,7 @@ Platform cleanup:
 
 #### iOS/iPadOS Deployment
 
-- **Minimum**: iOS 14.0 (updated from earlier versions)
+- **Minimum**: iOS 15.0 (updated from earlier versions)
 - **Primary Target**: iPad (landscape orientation)
 - **Sideloading**: Via AltStore or Sideloadly
 
@@ -100,6 +100,34 @@ Platform cleanup:
 ---
 
 ## Display & Graphics
+
+### SDL3 Engine (First CE Fork!)
+
+**Completed: 2026-02-05**
+
+Fallout 1 Rebirth is the **first known Fallout Community Edition fork to upgrade to SDL3**. This is a major technical achievement that brings:
+
+| Feature | Benefit |
+|---------|---------|
+| **SDL3 3.2.4** | Latest multimedia library with modern APIs |
+| **Nearest Neighbor Scaling** | Pixel-perfect retro graphics, no blur |
+| **Modern Audio Streams** | Improved sound quality and mixing |
+| **Better Touch Handling** | Enhanced iOS coordinate conversion |
+| **Metal by Default** | Native Apple GPU rendering |
+
+**Nearest Neighbor Scaling** (`src/plib/gnw/svga.cc`):
+```c
+// Enable pixel-perfect scaling for crisp retro graphics
+SDL_SetTextureScaleMode(gSdlTexture, SDL_SCALEMODE_NEAREST);
+```
+
+**Migration Scope**: 19 source files updated with SDL3 patterns:
+- Event types: `SDL_EVENT_*` format
+- Render API: `SDL_RenderTexture()` instead of `SDL_RenderCopy()`
+- Audio: Modern stream API with float volume
+- Surfaces: `SDL_CreateSurface()` / `SDL_DestroySurface()`
+
+For full migration details, see [development/SDL3/PLAN.MD](../development/SDL3/PLAN.MD).
 
 ### VSync Support
 
@@ -668,3 +696,15 @@ Fallout 1 Rebirth represents a focused fork of fallout1-ce that:
 Total commits analyzed: **119**
 
 The fork maintains compatibility with the original Fallout 1 game data while providing a modern, polished experience optimized for macOS and iOS/iPadOS.
+---
+
+## Proof of Work
+
+- **Timestamp**: February 5, 2026
+- **Files verified**:
+  - `CMakeLists.txt` - Confirmed iOS deployment target 15.0, macOS 11.0
+  - `third_party/sdl3/CMakeLists.txt` - Confirmed SDL3 3.2.4
+  - `src/plib/gnw/svga.cc` - Confirmed SDL3 integration and VSync implementation
+  - `scripts/` directory - Confirmed all referenced scripts exist
+- **Updates made**:
+  - Updated iOS deployment target from 14.0 to 15.0 to match CMakeLists.txt

@@ -38,7 +38,14 @@ All scripts should be run from the repository root directory.
 | `dev-check.sh` | Pre-commit checks (formatting, static analysis, CMake) |
 | `dev-format.sh` | Apply clang-format to all C++ source files |
 | `dev-clean.sh` | Remove all build directories |
-| `journal.sh` | Update JOURNAL.md files with current state |
+
+### Other Utilities
+
+| Script | Description |
+|--------|-------------|
+| `build-releases.sh` | Build release artifacts for all platforms |
+| `install-game-data.sh` | Install game data files to app bundle |
+| `hideall.sh` | Hide all windows (macOS utility) |
 
 ---
 
@@ -132,4 +139,19 @@ CLEAN=1 ./scripts/build-ios.sh
 - **cppcheck** (`brew install cppcheck`)
 - **iOS SDK** (for iOS builds)
 - **Game data files** (master.dat, critter.dat, data/) - not included in repo
+
+---
+
+## Proof of Work
+
+**Last Verified**: February 5, 2026
+
+**Files read to verify content**:
+- scripts/ directory listing (all .sh files verified)
+- Removed reference to journal.sh (does not exist)
+- Added build-releases.sh, install-game-data.sh, hideall.sh (confirmed exist)
+
+**Updates made**:
+- Removed non-existent `journal.sh` from Development Utilities
+- Added "Other Utilities" section with `build-releases.sh`, `install-game-data.sh`, `hideall.sh`
 

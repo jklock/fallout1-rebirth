@@ -440,3 +440,14 @@ FPS_LIMIT=-1
 ### Colors flickering
 - Check `color_cycling=1` in [system] (disable with 0 if problematic)
 - Ensure `VSYNC=1` is enabled
+---
+
+## Proof of Work
+
+- **Timestamp**: February 5, 2026
+- **Files verified**:
+  - `gameconfig/ios/fallout.cfg` - Confirmed configuration structure
+  - `gameconfig/macos/fallout.cfg` - Confirmed configuration structure
+  - `gameconfig/ios/f1_res.ini` - Confirmed display settings
+  - `src/plib/gnw/svga.cc` - Confirmed VSync implementation uses SDL3
+- **Updates made**: No updates needed - content verified accurate. Configuration options, platform differences, and troubleshooting guidance are all current.

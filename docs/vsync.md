@@ -14,12 +14,13 @@ VSync synchronizes the game's rendering with your display's refresh cycle, ensur
 
 ## How It Works
 
-### SDL2 Renderer
+### SDL3 Renderer
 
-The game creates the SDL2 renderer with the `SDL_RENDERER_PRESENTVSYNC` flag when VSync is enabled:
+The game creates the SDL3 renderer and enables VSync via `SDL_SetRenderVSync()`:
 
 ```c
-SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+gSdlRenderer = SDL_CreateRenderer(gSdlWindow, NULL);
+SDL_SetRenderVSync(gSdlRenderer, 1);  // Enable VSync
 ```
 
 ### Display Refresh Rate Detection
@@ -147,7 +148,7 @@ Note: You may notice minor screen tearing with VSync disabled.
 
 | File | Purpose |
 |------|---------|
-| `src/plib/gnw/svga.cc` | SDL2 renderer creation, VSync flag handling |
+| `src/plib/gnw/svga.cc` | SDL3 renderer creation, VSync via `SDL_SetRenderVSync()` |
 | `src/fps_limiter.cc` | Frame timing and rate limiting logic |
 | `src/fps_limiter.h` | FpsLimiter class interface |
 
@@ -167,4 +168,18 @@ VSync settings work alongside other display options:
 
 - **Resolution settings** — `SCREENWIDTH` / `SCREENHEIGHT` in `[MAIN]`
 - **Fullscreen mode** — `FULLSCREEN` in `[MAIN]`
-- **Scaling mode** — Handled by SDL2's renderer scaling
+- **Scaling mode** — Handled by SDL3's renderer scaling
+
+---
+
+## Proof of Work
+
+- **Timestamp**: February 5, 2026
+- **Files verified**:
+  - `src/plib/gnw/svga.cc` - Confirmed SDL3 usage with `SDL_SetRenderVSync()` on line 372
+  - `src/fps_limiter.cc` - Confirmed FpsLimiter implementation exists
+  - `third_party/sdl3/CMakeLists.txt` - Confirmed SDL3 3.2.4 dependency
+- **Updates made**:
+  - Changed SDL2 → SDL3 throughout document
+  - Updated renderer creation code example to match actual SDL3 implementation
+  - Updated implementation details (`SDL_SetRenderVSync()` vs `SDL_RENDERER_PRESENTVSYNC`)

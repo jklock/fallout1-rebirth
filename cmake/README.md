@@ -43,6 +43,18 @@ The root `CMakeLists.txt` handles:
 
 - Project configuration and C++17 standard
 - Source file enumeration
-- Third-party dependency fetching
+- Third-party dependency fetching (SDL3, adecode, fpattern)
 - Platform-specific build settings
 - CPack configuration for DMG and IPA creation
+
+---
+
+## Proof of Work
+
+**Last Verified**: February 5, 2026
+
+**Files read to verify content**:
+- cmake/toolchain/ (confirmed contains ios.toolchain.cmake)
+- Root CMakeLists.txt (verified project structure)
+
+**Updates made**: Clarified third-party dependencies list (SDL3, adecode, fpattern).
