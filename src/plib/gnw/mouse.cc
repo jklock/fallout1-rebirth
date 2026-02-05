@@ -430,16 +430,23 @@ void mouse_info()
         return;
     }
 
-    if (mouse_is_hidden) {
-        return;
-    }
-
     if (mouse_disabled) {
         return;
     }
 
+    // On iOS, we process touch gestures even if the mouse cursor is hidden,
+    // because touch input is the primary input method.
     Gesture gesture;
     if (touch_get_gesture(&gesture)) {
+        SDL_Log("GESTURE RECEIVED: type=%d state=%d fingers=%d x=%d y=%d",
+                gesture.type, gesture.state, gesture.numberOfTouches, gesture.x, gesture.y);
+        
+        // If mouse is hidden but we have a gesture, show it so input works
+        if (mouse_is_hidden) {
+            SDL_Log("GESTURE: mouse was hidden, showing it now");
+            mouse_show();
+        }
+        
         static int prevx;
         static int prevy;
         // Track if current pan/drag started near cursor (for click+drag) vs far (just positioning)
@@ -474,7 +481,9 @@ void mouse_info()
                     }
 
                     // Pencil tap always clicks at the exact tip location.
+                    // Send DOWN then immediately UP to complete the click
                     mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                    mouse_simulate_input(0, 0, 0);  // Button UP
                 } else
 #endif
                 {
@@ -493,20 +502,31 @@ void mouse_info()
                     int radius = (40 * screen_width) / 640;
                     int radius_sq = radius * radius;
 
+                    SDL_Log("TAP CHECK: cursor=(%d,%d) tap=(%d,%d) dx=%d dy=%d dist_sq=%d radius_sq=%d",
+                            cursor_x, cursor_y, gesture.x, gesture.y, dx, dy, distance_sq, radius_sq);
+
                     if (distance_sq < radius_sq) {
                         // Tap NEAR cursor = click at cursor position (no movement needed)
+                        // Send DOWN then immediately UP to complete the click
+                        SDL_Log("TAP CLICK: near cursor, clicking");
                         mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                        mouse_simulate_input(0, 0, 0);  // Button UP
                     } else {
                         // Tap FAR from cursor = move cursor only (no click)
+                        SDL_Log("TAP MOVE: far from cursor, moving only");
                         mouse_simulate_input(dx, dy, 0);
                     }
                 }
             } else if (gesture.numberOfTouches == 2) {
                 // Two-finger tap = right-click at cursor position
+                // Send DOWN then immediately UP to complete the click
                 mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
+                mouse_simulate_input(0, 0, 0);  // Button UP
             } else if (gesture.numberOfTouches == 3) {
                 // Three-finger tap = left-click at cursor position
+                // Send DOWN then immediately UP to complete the click
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                mouse_simulate_input(0, 0, 0);  // Button UP
             }
             break;
         case kLongPress:
@@ -615,6 +635,11 @@ void mouse_info()
             break;
         }
 
+        return;
+    }
+
+    // For mouse-based input (no gesture), skip if cursor is hidden
+    if (mouse_is_hidden) {
         return;
     }
 

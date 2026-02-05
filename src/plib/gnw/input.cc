@@ -1108,6 +1108,7 @@ void GNW95_process_message()
             handleMouseEvent(&e);
             break;
         case SDL_EVENT_FINGER_DOWN:
+            SDL_Log("INPUT: SDL_EVENT_FINGER_DOWN received");
             dxinput_notify_touch();
             touch_handle_start(&(e.tfinger));
             break;
@@ -1116,6 +1117,7 @@ void GNW95_process_message()
             touch_handle_move(&(e.tfinger));
             break;
         case SDL_EVENT_FINGER_UP:
+            SDL_Log("INPUT: SDL_EVENT_FINGER_UP received");
             dxinput_notify_touch();
             touch_handle_end(&(e.tfinger));
             break;
