@@ -434,6 +434,12 @@ void mouse_info()
         return;
     }
 
+    // Skip touch gesture processing when using a real mouse
+    // This prevents gestures from interfering with mouse button states
+    if (dxinput_is_using_mouse()) {
+        return;
+    }
+
     // On iOS, we process touch gestures even if the mouse cursor is hidden,
     // because touch input is the primary input method.
     Gesture gesture;
