@@ -529,62 +529,56 @@ void mouse_info()
             break;
         case kTap:
             if (gesture.numberOfTouches == 1) {
-#if defined(__APPLE__) && TARGET_OS_IOS
-                if (pencil_active) {
-                    int cursor_x, cursor_y;
-                    mouse_get_position(&cursor_x, &cursor_y);
-                    int dx = gesture.x - cursor_x;
-                    int dy = gesture.y - cursor_y;
+                // ALWAYS move cursor to exact tap position first, then click.
+                // This ensures the click happens at the tap location, not wherever
+                // the cursor happened to be due to mouse/trackpad movement.
+                int cursor_x, cursor_y;
+                mouse_get_position(&cursor_x, &cursor_y);
+                int dx = gesture.x - cursor_x;
+                int dy = gesture.y - cursor_y;
 
-                    if (dx != 0 || dy != 0) {
-                        mouse_simulate_input(dx, dy, 0);
-                    }
+                SDL_Log("TAP: cursor=(%d,%d) tap=(%d,%d) delta=(%d,%d)",
+                    cursor_x, cursor_y, gesture.x, gesture.y, dx, dy);
 
-                    // Pencil tap always clicks at the exact tip location.
-                    // Send DOWN then immediately UP to complete the click
-                    mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                    mouse_simulate_input(0, 0, 0); // Button UP
-                } else
-#endif
-                {
-                    // Get current cursor position
-                    int cursor_x, cursor_y;
-                    mouse_get_position(&cursor_x, &cursor_y);
-
-                    // Calculate distance from tap to cursor (for click radius check)
-                    int dx = gesture.x - cursor_x;
-                    int dy = gesture.y - cursor_y;
-                    int distance_sq = dx * dx + dy * dy;
-
-                    // Scale click radius based on screen resolution (base is 640x480)
-                    // Taps within this distance of cursor trigger a click
-                    int screen_width = screenGetWidth();
-                    int radius = (40 * screen_width) / 640;
-                    int radius_sq = radius * radius;
-
-                    SDL_Log("TAP CHECK: cursor=(%d,%d) tap=(%d,%d) dx=%d dy=%d dist_sq=%d radius_sq=%d",
-                        cursor_x, cursor_y, gesture.x, gesture.y, dx, dy, distance_sq, radius_sq);
-
-                    if (distance_sq < radius_sq) {
-                        // Tap NEAR cursor = click at cursor position (no movement needed)
-                        // Send DOWN then immediately UP to complete the click
-                        SDL_Log("TAP CLICK: near cursor, clicking");
-                        mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                        mouse_simulate_input(0, 0, 0); // Button UP
-                    } else {
-                        // Tap FAR from cursor = move cursor only (no click)
-                        SDL_Log("TAP MOVE: far from cursor, moving only");
-                        mouse_simulate_input(dx, dy, 0);
-                    }
+                // Move cursor to tap position
+                if (dx != 0 || dy != 0) {
+                    mouse_simulate_input(dx, dy, 0);
                 }
-            } else if (gesture.numberOfTouches == 2) {
-                // Two-finger tap = right-click at cursor position
+
+                // Then click at that exact position
                 // Send DOWN then immediately UP to complete the click
+                mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+                mouse_simulate_input(0, 0, 0); // Button UP
+
+                SDL_Log("TAP CLICK: moved and clicked at tap position");
+            } else if (gesture.numberOfTouches == 2) {
+                // Two-finger tap = right-click at tap position
+                int cursor_x, cursor_y;
+                mouse_get_position(&cursor_x, &cursor_y);
+                int dx = gesture.x - cursor_x;
+                int dy = gesture.y - cursor_y;
+                
+                // Move cursor to tap position first
+                if (dx != 0 || dy != 0) {
+                    mouse_simulate_input(dx, dy, 0);
+                }
+                
+                // Then right-click at that position
                 mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
                 mouse_simulate_input(0, 0, 0); // Button UP
             } else if (gesture.numberOfTouches == 3) {
-                // Three-finger tap = left-click at cursor position
-                // Send DOWN then immediately UP to complete the click
+                // Three-finger tap = left-click at tap position
+                int cursor_x, cursor_y;
+                mouse_get_position(&cursor_x, &cursor_y);
+                int dx = gesture.x - cursor_x;
+                int dy = gesture.y - cursor_y;
+                
+                // Move cursor to tap position first
+                if (dx != 0 || dy != 0) {
+                    mouse_simulate_input(dx, dy, 0);
+                }
+                
+                // Then left-click at that position
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
                 mouse_simulate_input(0, 0, 0); // Button UP
             }
