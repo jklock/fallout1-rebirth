@@ -97,26 +97,42 @@ static TouchLocation touch_get_current_location_centroid(int* indexes, int lengt
 // logical coordinates that account for the render logical presentation scaling.
 static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, int* out_y)
 {
+    // Get window dimensions in both points and pixels for debugging
+    int window_w, window_h;
+    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+    
     // Get window pixel dimensions to de-normalize touch coordinates
     int window_pw, window_ph;
     SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
     
+    // Calculate and log scale factor
+    float scale_factor = (window_pw > 0 && window_w > 0) ? (float)window_pw / (float)window_w : 1.0f;
+    
+    SDL_Log("TOUCH_CONVERT: window_points=%dx%d window_pixels=%dx%d scale_factor=%.3f",
+            window_w, window_h, window_pw, window_ph, scale_factor);
+    SDL_Log("TOUCH_CONVERT: normalized coords=(%.6f, %.6f)", event->x, event->y);
+    
     // Convert normalized (0...1) to window pixel coordinates
     float pixel_x = event->x * window_pw;
     float pixel_y = event->y * window_ph;
+    
+    SDL_Log("TOUCH_CONVERT: pixel_coords=(%.1f, %.1f)", pixel_x, pixel_y);
     
 #if __APPLE__ && TARGET_OS_IOS
     // On iOS, we use a custom dest rect, so we need to use our own conversion
     // that accounts for the letterbox/pillarbox offset and scaling
     if (iOS_screenToGameCoords(pixel_x, pixel_y, out_x, out_y)) {
         // Successfully converted
+        SDL_Log("TOUCH_CONVERT: iOS result=(%d, %d) [in bounds]", *out_x, *out_y);
         return;
     }
     // Fall through to clamp if outside game area
+    SDL_Log("TOUCH_CONVERT: iOS result=(%d, %d) [OUT OF BOUNDS - clamping]", *out_x, *out_y);
     if (*out_x < 0) *out_x = 0;
     if (*out_y < 0) *out_y = 0;
     if (*out_x >= screenGetWidth()) *out_x = screenGetWidth() - 1;
     if (*out_y >= screenGetHeight()) *out_y = screenGetHeight() - 1;
+    SDL_Log("TOUCH_CONVERT: iOS clamped result=(%d, %d)", *out_x, *out_y);
 #else
     // On non-iOS platforms, use SDL's coordinate conversion
     // Convert window coordinates to render/logical coordinates
