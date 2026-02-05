@@ -77,7 +77,7 @@ static unsigned int GNW95_repeat_delay = 500;
 // A map of DIK_* constants normalized for QWERTY keyboard.
 //
 // 0x6713F0
-static int GNW95_key_map[SDL_NUM_SCANCODES];
+static int GNW95_key_map[SDL_SCANCODE_COUNT];
 
 // Ring buffer of input events.
 //
@@ -88,7 +88,7 @@ static int GNW95_key_map[SDL_NUM_SCANCODES];
 static inputdata input_buffer[40];
 
 // 0x6716D0
-static GNW95RepeatStruct GNW95_key_time_stamps[SDL_NUM_SCANCODES];
+static GNW95RepeatStruct GNW95_key_time_stamps[SDL_SCANCODE_COUNT];
 
 // 0x671ED0
 static int input_mx;
@@ -1100,71 +1100,67 @@ void GNW95_process_message()
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         switch (e.type) {
-        case SDL_MOUSEMOTION:
-        case SDL_MOUSEBUTTONDOWN:
-        case SDL_MOUSEBUTTONUP:
-        case SDL_MOUSEWHEEL:
+        case SDL_EVENT_MOUSE_MOTION:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+        case SDL_EVENT_MOUSE_WHEEL:
             dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
-        case SDL_FINGERDOWN:
+        case SDL_EVENT_FINGER_DOWN:
             dxinput_notify_touch();
             touch_handle_start(&(e.tfinger));
             break;
-        case SDL_FINGERMOTION:
+        case SDL_EVENT_FINGER_MOTION:
             dxinput_notify_touch();
             touch_handle_move(&(e.tfinger));
             break;
-        case SDL_FINGERUP:
+        case SDL_EVENT_FINGER_UP:
             dxinput_notify_touch();
             touch_handle_end(&(e.tfinger));
             break;
-        case SDL_KEYDOWN:
-        case SDL_KEYUP:
+        case SDL_EVENT_KEY_DOWN:
+        case SDL_EVENT_KEY_UP:
             if (!kb_is_disabled()) {
-                keyboardData.key = e.key.keysym.scancode;
-                keyboardData.down = (e.key.state & SDL_PRESSED) != 0;
+                keyboardData.key = e.key.scancode;
+                keyboardData.down = e.key.down;
                 GNW95_process_key(&keyboardData);
             }
             break;
-        case SDL_WINDOWEVENT:
-            switch (e.window.event) {
-            case SDL_WINDOWEVENT_EXPOSED:
-                win_refresh_all(&scr_size);
-                break;
-            case SDL_WINDOWEVENT_SIZE_CHANGED:
-                handleWindowSizeChanged();
-                win_refresh_all(&scr_size);
-                break;
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
-                GNW95_isActive = true;
-                touch_reset();
-                win_refresh_all(&scr_size);
-                audioEngineResume();
-                break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-                GNW95_isActive = false;
-                touch_reset();
-                audioEnginePause();
-                break;
-            }
+        case SDL_EVENT_WINDOW_EXPOSED:
+            win_refresh_all(&scr_size);
             break;
-#if defined(__APPLE__) && TARGET_OS_IOS
-        case SDL_APP_WILLENTERBACKGROUND:
-        case SDL_APP_DIDENTERBACKGROUND:
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+            handleWindowSizeChanged();
+            win_refresh_all(&scr_size);
+            break;
+        case SDL_EVENT_WINDOW_FOCUS_GAINED:
+            GNW95_isActive = true;
+            touch_reset();
+            win_refresh_all(&scr_size);
+            audioEngineResume();
+            break;
+        case SDL_EVENT_WINDOW_FOCUS_LOST:
             GNW95_isActive = false;
             touch_reset();
             audioEnginePause();
             break;
-        case SDL_APP_WILLENTERFOREGROUND:
-        case SDL_APP_DIDENTERFOREGROUND:
+#if defined(__APPLE__) && TARGET_OS_IOS
+        case SDL_EVENT_WILL_ENTER_BACKGROUND:
+        case SDL_EVENT_DID_ENTER_BACKGROUND:
+            GNW95_isActive = false;
+            touch_reset();
+            audioEnginePause();
+            break;
+        case SDL_EVENT_WILL_ENTER_FOREGROUND:
+        case SDL_EVENT_DID_ENTER_FOREGROUND:
             GNW95_isActive = true;
             touch_reset();
             win_refresh_all(&scr_size);
             audioEngineResume();
             break;
 #endif
-        case SDL_QUIT:
+        case SDL_EVENT_QUIT:
             exit(EXIT_SUCCESS);
             break;
         }
@@ -1189,7 +1185,7 @@ void GNW95_process_message()
         // NOTE: Uninline
         unsigned int tick = get_time();
 
-        for (int key = 0; key < SDL_NUM_SCANCODES; key++) {
+        for (int key = 0; key < SDL_SCANCODE_COUNT; key++) {
             GNW95RepeatStruct* ptr = &(GNW95_key_time_stamps[key]);
             if (ptr->time != -1) {
                 unsigned int elapsedTime = ptr->time > tick ? INT_MAX : tick - ptr->time;
@@ -1210,7 +1206,7 @@ void GNW95_process_message()
 // 0x4B4638
 void GNW95_clear_time_stamps()
 {
-    for (int index = 0; index < SDL_NUM_SCANCODES; index++) {
+    for (int index = 0; index < SDL_SCANCODE_COUNT; index++) {
         GNW95_key_time_stamps[index].time = -1;
         GNW95_key_time_stamps[index].count = 0;
     }
@@ -1226,7 +1222,7 @@ static void GNW95_process_key(KeyboardData* data)
 #if defined(__APPLE__) && TARGET_OS_IOS
     // CMD+number combinations on iPadOS for F-key emulation
     SDL_Keymod modState = SDL_GetModState();
-    if ((modState & KMOD_GUI) != 0) {
+    if ((modState & SDL_KMOD_GUI) != 0) {
         switch (data->key) {
         case SDL_SCANCODE_1:
             data->key = SDL_SCANCODE_F1;
@@ -1318,12 +1314,12 @@ static void idleImpl()
 
 void beginTextInput()
 {
-    SDL_StartTextInput();
+    SDL_StartTextInput(gSdlWindow);
 }
 
 void endTextInput()
 {
-    SDL_StopTextInput();
+    SDL_StopTextInput(gSdlWindow);
 }
 
 } // namespace fallout

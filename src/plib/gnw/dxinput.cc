@@ -1,7 +1,7 @@
 #include "plib/gnw/dxinput.h"
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS
@@ -29,7 +29,7 @@ static Uint32 last_mouse_buttons = 0;
 // 0x4E0400
 bool dxinput_init()
 {
-    if (SDL_InitSubSystem(SDL_INIT_EVENTS) != 0) {
+    if (!SDL_InitSubSystem(SDL_INIT_EVENTS)) {
         return false;
     }
 
@@ -80,17 +80,17 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_PumpEvents();
 
 #if defined(__APPLE__) && TARGET_OS_IOS
-    int system_x, system_y;
-    Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
+    float system_x, system_y;
+    SDL_MouseButtonFlags mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
 
     bool mouse_activity = false;
     if (last_system_x == -1 && last_system_y == -1) {
-        last_system_x = system_x;
-        last_system_y = system_y;
+        last_system_x = (int)system_x;
+        last_system_y = (int)system_y;
         last_mouse_buttons = mouse_buttons;
     }
 
-    if (system_x != last_system_x || system_y != last_system_y || mouse_buttons != last_mouse_buttons) {
+    if ((int)system_x != last_system_x || (int)system_y != last_system_y || mouse_buttons != last_mouse_buttons) {
         mouse_activity = true;
     }
 
@@ -98,8 +98,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         last_input_was_mouse = true;
     }
 
-    last_system_x = system_x;
-    last_system_y = system_y;
+    last_system_x = (int)system_x;
+    last_system_y = (int)system_y;
     last_mouse_buttons = mouse_buttons;
 
     if (last_input_was_mouse) {
@@ -107,7 +107,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouse_get_position(&game_x, &game_y);
 
         float logical_x, logical_y;
-        SDL_RenderWindowToLogical(gSdlRenderer, system_x, system_y, &logical_x, &logical_y);
+        SDL_RenderCoordinatesFromWindow(gSdlRenderer, system_x, system_y, &logical_x, &logical_y);
 
         int mapped_x = (int)logical_x;
         int mapped_y = (int)logical_y;
@@ -132,8 +132,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->y = 0;
     }
 
-    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
-    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON_LMASK) != 0;
+    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON_RMASK) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;
@@ -141,9 +141,12 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     return true;
 #endif
 
-    Uint32 buttons = SDL_GetRelativeMouseState(&(mouseState->x), &(mouseState->y));
-    mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
-    mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    float rel_x, rel_y;
+    SDL_MouseButtonFlags buttons = SDL_GetRelativeMouseState(&rel_x, &rel_y);
+    mouseState->x = (int)rel_x;
+    mouseState->y = (int)rel_y;
+    mouseState->buttons[0] = (buttons & SDL_BUTTON_LMASK) != 0;
+    mouseState->buttons[1] = (buttons & SDL_BUTTON_RMASK) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;
@@ -166,7 +169,7 @@ bool dxinput_unacquire_keyboard()
 // 0x4E05FC
 bool dxinput_flush_keyboard_buffer()
 {
-    SDL_FlushEvents(SDL_KEYDOWN, SDL_TEXTINPUT);
+    SDL_FlushEvents(SDL_EVENT_KEY_DOWN, SDL_EVENT_TEXT_INPUT);
     return true;
 }
 
@@ -182,7 +185,7 @@ bool dxinput_mouse_init()
 #if defined(__APPLE__) && TARGET_OS_IOS
     return true;
 #else
-    return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
+    return SDL_SetWindowRelativeMouseMode(gSdlWindow, true);
 #endif
 }
 
@@ -207,9 +210,9 @@ void handleMouseEvent(SDL_Event* event)
     // Mouse movement and buttons are accumulated in SDL itself and will be
     // processed later in `mouseDeviceGetData` via `SDL_GetRelativeMouseState`.
 
-    if (event->type == SDL_MOUSEWHEEL) {
-        gMouseWheelDeltaX += event->wheel.x;
-        gMouseWheelDeltaY += event->wheel.y;
+    if (event->type == SDL_EVENT_MOUSE_WHEEL) {
+        gMouseWheelDeltaX += (int)event->wheel.x;
+        gMouseWheelDeltaY += (int)event->wheel.y;
     }
 }
 

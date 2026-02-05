@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <stack>
 
+#include <SDL3/SDL.h>
+
 #include "plib/gnw/svga.h"
 
 namespace fallout {
@@ -89,7 +91,7 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
     // On iOS `fingerId` is an address of underlying `UITouch` object. When
     // `touchesBegan` is called this object might be reused, but with
     // incresed `tapCount` (which is ignored in this implementation).
-    int index = find_touch(event->fingerId);
+    int index = find_touch(event->fingerID);
     if (index == -1) {
         index = find_unused_touch_index();
     }
@@ -97,7 +99,7 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->used = true;
-        touch->fingerId = event->fingerId;
+        touch->fingerId = event->fingerID;
         touch->startTimestamp = event->timestamp;
         touch->startLocation.x = static_cast<int>(event->x * screenGetWidth());
         touch->startLocation.y = static_cast<int>(event->y * screenGetHeight());
@@ -109,7 +111,7 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
 
 void touch_handle_move(SDL_TouchFingerEvent* event)
 {
-    int index = find_touch(event->fingerId);
+    int index = find_touch(event->fingerID);
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->currentTimestamp = event->timestamp;
@@ -121,7 +123,7 @@ void touch_handle_move(SDL_TouchFingerEvent* event)
 
 void touch_handle_end(SDL_TouchFingerEvent* event)
 {
-    int index = find_touch(event->fingerId);
+    int index = find_touch(event->fingerID);
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->currentTimestamp = event->timestamp;
