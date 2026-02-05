@@ -15,9 +15,15 @@ namespace fallout {
 
 #define MAX_TOUCHES 10
 
+// All time thresholds are in milliseconds
 #define TAP_MAXIMUM_DURATION 75
 #define PAN_MINIMUM_MOVEMENT 4
 #define LONG_PRESS_MINIMUM_DURATION 500
+
+// Helper to convert SDL3 event timestamp (nanoseconds) to milliseconds
+static inline Uint64 timestamp_to_ms(Uint64 timestamp_ns) {
+    return timestamp_ns / 1000000ULL;
+}
 
 struct TouchLocation {
     int x;
@@ -28,9 +34,9 @@ struct Touch {
     bool used;
     SDL_FingerID fingerId;
     TouchLocation startLocation;
-    Uint32 startTimestamp;
+    Uint64 startTimestamp;  // Now in milliseconds (converted from event nanoseconds)
     TouchLocation currentLocation;
-    Uint32 currentTimestamp;
+    Uint64 currentTimestamp;  // Now in milliseconds (converted from event nanoseconds)
     int phase;
 };
 
@@ -86,8 +92,42 @@ static TouchLocation touch_get_current_location_centroid(int* indexes, int lengt
     return centroid;
 }
 
+// Helper to convert touch finger event coordinates to logical (render) coordinates
+// SDL3 touch events have x/y normalized to window dimensions (0...1), but we need
+// logical coordinates that account for the render logical presentation scaling.
+static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, int* out_y)
+{
+    // Get window dimensions to de-normalize touch coordinates
+    int window_w, window_h;
+    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+    
+    // Convert normalized (0...1) to window pixel coordinates
+    float window_x = event->x * window_w;
+    float window_y = event->y * window_h;
+    
+    // Convert window coordinates to render/logical coordinates
+    float logical_x, logical_y;
+    if (SDL_RenderCoordinatesFromWindow(gSdlRenderer, window_x, window_y, &logical_x, &logical_y)) {
+        *out_x = static_cast<int>(logical_x);
+        *out_y = static_cast<int>(logical_y);
+        
+        // Clamp to valid screen bounds
+        if (*out_x < 0) *out_x = 0;
+        if (*out_y < 0) *out_y = 0;
+        if (*out_x >= screenGetWidth()) *out_x = screenGetWidth() - 1;
+        if (*out_y >= screenGetHeight()) *out_y = screenGetHeight() - 1;
+    } else {
+        // Fallback to old method if conversion fails
+        *out_x = static_cast<int>(event->x * screenGetWidth());
+        *out_y = static_cast<int>(event->y * screenGetHeight());
+    }
+}
+
 void touch_handle_start(SDL_TouchFingerEvent* event)
 {
+    SDL_Log("TOUCH START: fingerID=%lld x=%.3f y=%.3f timestamp=%llu", 
+            (long long)event->fingerID, event->x, event->y, (unsigned long long)event->timestamp);
+    
     // On iOS `fingerId` is an address of underlying `UITouch` object. When
     // `touchesBegan` is called this object might be reused, but with
     // incresed `tapCount` (which is ignored in this implementation).
@@ -100,12 +140,18 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
         Touch* touch = &(touches[index]);
         touch->used = true;
         touch->fingerId = event->fingerID;
-        touch->startTimestamp = static_cast<Uint32>(event->timestamp);
-        touch->startLocation.x = static_cast<int>(event->x * screenGetWidth());
-        touch->startLocation.y = static_cast<int>(event->y * screenGetHeight());
+        // Convert SDL3 nanosecond timestamp to milliseconds for consistent time comparisons
+        touch->startTimestamp = timestamp_to_ms(event->timestamp);
+        
+        // Convert touch coordinates from window space to logical/render space
+        convert_touch_to_logical(event, &touch->startLocation.x, &touch->startLocation.y);
+        
         touch->currentTimestamp = touch->startTimestamp;
         touch->currentLocation = touch->startLocation;
         touch->phase = TOUCH_PHASE_BEGAN;
+        
+        SDL_Log("TOUCH START: index=%d logical_x=%d logical_y=%d timestamp_ms=%llu",
+                index, touch->startLocation.x, touch->startLocation.y, (unsigned long long)touch->startTimestamp);
     }
 }
 
@@ -114,28 +160,45 @@ void touch_handle_move(SDL_TouchFingerEvent* event)
     int index = find_touch(event->fingerID);
     if (index != -1) {
         Touch* touch = &(touches[index]);
-        touch->currentTimestamp = static_cast<Uint32>(event->timestamp);
-        touch->currentLocation.x = static_cast<int>(event->x * screenGetWidth());
-        touch->currentLocation.y = static_cast<int>(event->y * screenGetHeight());
+        // Convert SDL3 nanosecond timestamp to milliseconds
+        touch->currentTimestamp = timestamp_to_ms(event->timestamp);
+        
+        // Convert touch coordinates from window space to logical/render space
+        convert_touch_to_logical(event, &touch->currentLocation.x, &touch->currentLocation.y);
+        
         touch->phase = TOUCH_PHASE_MOVED;
     }
 }
 
 void touch_handle_end(SDL_TouchFingerEvent* event)
 {
+    SDL_Log("TOUCH END: fingerID=%lld x=%.3f y=%.3f timestamp=%llu", 
+            (long long)event->fingerID, event->x, event->y, (unsigned long long)event->timestamp);
+            
     int index = find_touch(event->fingerID);
     if (index != -1) {
         Touch* touch = &(touches[index]);
-        touch->currentTimestamp = static_cast<Uint32>(event->timestamp);
-        touch->currentLocation.x = static_cast<int>(event->x * screenGetWidth());
-        touch->currentLocation.y = static_cast<int>(event->y * screenGetHeight());
+        // Convert SDL3 nanosecond timestamp to milliseconds
+        touch->currentTimestamp = timestamp_to_ms(event->timestamp);
+        
+        // Convert touch coordinates from window space to logical/render space
+        convert_touch_to_logical(event, &touch->currentLocation.x, &touch->currentLocation.y);
+        
         touch->phase = TOUCH_PHASE_ENDED;
+        
+        SDL_Log("TOUCH END: index=%d phase=%d start_ts=%llu current_ts=%llu diff=%llu",
+                index, touch->phase, 
+                (unsigned long long)touch->startTimestamp, 
+                (unsigned long long)touch->currentTimestamp,
+                (unsigned long long)(touch->currentTimestamp - touch->startTimestamp));
+    } else {
+        SDL_Log("TOUCH END: fingerID not found!");
     }
 }
 
 void touch_process_gesture()
 {
-    Uint32 sequenceStartTimestamp = -1;
+    Uint64 sequenceStartTimestamp = UINT64_MAX;
     int sequenceStartIndex = -1;
 
     // Find start of sequence (earliest touch).
@@ -152,7 +215,7 @@ void touch_process_gesture()
         return;
     }
 
-    Uint32 sequenceEndTimestamp = -1;
+    Uint64 sequenceEndTimestamp = UINT64_MAX;
     if (touches[sequenceStartIndex].phase == TOUCH_PHASE_ENDED) {
         sequenceEndTimestamp = touches[sequenceStartIndex].currentTimestamp;
 
@@ -170,7 +233,7 @@ void touch_process_gesture()
                     }
                 } else {
                     // Sequence is current.
-                    sequenceEndTimestamp = -1;
+                    sequenceEndTimestamp = UINT64_MAX;
                     break;
                 }
             }
@@ -196,7 +259,7 @@ void touch_process_gesture()
             }
 
             // If this sequence is over, unmark participating finger as used.
-            if (sequenceEndTimestamp != -1) {
+            if (sequenceEndTimestamp != UINT64_MAX) {
                 touches[index].used = false;
             }
         }
@@ -219,17 +282,17 @@ void touch_process_gesture()
         }
 
         // Reset continuous gesture if when current sequence is over.
-        if (currentGesture.state == kEnded && sequenceEndTimestamp != -1) {
+        if (currentGesture.state == kEnded && sequenceEndTimestamp != UINT64_MAX) {
             currentGesture.type = kUnrecognized;
         }
     } else {
         if (activeCount == 0 && endedCount != 0) {
             // For taps we need all participating fingers to be both started
             // and ended simultaneously (within predefined threshold).
-            Uint32 startEarliestTimestamp = -1;
-            Uint32 startLatestTimestamp = 0;
-            Uint32 endEarliestTimestamp = -1;
-            Uint32 endLatestTimestamp = 0;
+            Uint64 startEarliestTimestamp = UINT64_MAX;
+            Uint64 startLatestTimestamp = 0;
+            Uint64 endEarliestTimestamp = UINT64_MAX;
+            Uint64 endLatestTimestamp = 0;
 
             for (int index = 0; index < endedCount; index++) {
                 startEarliestTimestamp = std::min(startEarliestTimestamp, touches[ended[index]].startTimestamp);
@@ -248,6 +311,8 @@ void touch_process_gesture()
                 currentGesture.x = currentCentroid.x;
                 currentGesture.y = currentCentroid.y;
                 gestureEventsQueue.push(currentGesture);
+                
+                SDL_Log("TAP GESTURE: fingers=%d x=%d y=%d", endedCount, currentCentroid.x, currentCentroid.y);
 
                 // Reset tap gesture immediately.
                 currentGesture.type = kUnrecognized;

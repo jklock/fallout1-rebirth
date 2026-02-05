@@ -150,35 +150,16 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
 
 bool svga_init(VideoOptions* video_options)
 {
-#ifdef FALLOUT_IOS_BUILD
-    FILE* logfile = fopen("svga_debug.log", "w");
-    if (logfile) {
-        fprintf(logfile, "iOS: svga_init called with %dx%d (scale=%d)\n", 
-                video_options->width, video_options->height, video_options->scale);
-        fflush(logfile);
-    }
-#endif
+    SDL_Log("svga_init: starting with %dx%d (scale=%d)", 
+        video_options->width, video_options->height, video_options->scale);
 
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
 
-#if defined(__APPLE__) && TARGET_OS_IOS
-    // Force landscape orientation on iOS - the game requires landscape layout
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-#endif
-
     if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
-#ifdef FALLOUT_IOS_BUILD
-        if (logfile) {
-            fprintf(logfile, "iOS ERROR: SDL_InitSubSystem failed: %s\n", SDL_GetError());
-            fclose(logfile);
-        }
-#endif
+        SDL_Log("svga_init: SDL_InitSubSystem failed: %s", SDL_GetError());
         return false;
     }
-
-#ifdef FALLOUT_IOS_BUILD
-    if (logfile) fprintf(logfile, "SDL video subsystem initialized\n"), fflush(logfile);
-#endif
+    SDL_Log("svga_init: SDL video subsystem initialized");
 
     SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
@@ -186,45 +167,43 @@ bool svga_init(VideoOptions* video_options)
 // with the cursor in the top margin of the screen.
 #if __APPLE__ && TARGET_OS_IOS
     windowFlags |= SDL_WINDOW_BORDERLESS;
-    // On iOS, use resizable instead of fullscreen to avoid orientation issues
-    windowFlags |= SDL_WINDOW_RESIZABLE;
+    // On iOS, always use fullscreen to fill the entire screen
+    windowFlags |= SDL_WINDOW_FULLSCREEN;
 #else
     if (video_options->fullscreen) {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
 #endif
 
-#ifdef FALLOUT_IOS_BUILD
-    if (logfile) fprintf(logfile, "Creating window with flags: 0x%x\n", windowFlags), fflush(logfile);
-#endif
+    SDL_Log("svga_init: creating window %dx%d flags=0x%x",
+        video_options->width * video_options->scale,
+        video_options->height * video_options->scale,
+        (unsigned int)windowFlags);
 
+#if __APPLE__ && TARGET_OS_IOS
+    // On iOS, create window with 0x0 dimensions to let fullscreen determine size
+    // This ensures the window fills the entire screen regardless of device
+    gSdlWindow = SDL_CreateWindow(GNW95_title, 0, 0, windowFlags);
+#else
     gSdlWindow = SDL_CreateWindow(GNW95_title,
         video_options->width * video_options->scale,
         video_options->height * video_options->scale,
         windowFlags);
-    if (gSdlWindow == NULL) {
-#ifdef FALLOUT_IOS_BUILD
-        if (logfile) {
-            fprintf(logfile, "iOS ERROR: SDL_CreateWindow failed: %s\n", SDL_GetError());
-            fclose(logfile);
-        }
 #endif
-        debug_printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+    if (gSdlWindow == NULL) {
+        SDL_Log("svga_init: SDL_CreateWindow failed: %s", SDL_GetError());
         return false;
     }
-
-#ifdef FALLOUT_IOS_BUILD
-    if (logfile) fprintf(logfile, "iOS: SDL window created successfully\n"), fflush(logfile);
-#endif
+    
+    // Log actual window dimensions after creation
+    int window_w, window_h;
+    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+    int window_pw, window_ph;
+    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+    SDL_Log("svga_init: window created - size=%dx%d, pixels=%dx%d", window_w, window_h, window_pw, window_ph);
 
     if (!createRenderer(video_options->width, video_options->height)) {
-#ifdef FALLOUT_IOS_BUILD
-        if (logfile) {
-            fprintf(logfile, "iOS ERROR: createRenderer failed\n");
-            fclose(logfile);
-        }
-#endif
-        debug_printf("createRenderer failed\n");
+        SDL_Log("svga_init: createRenderer failed");
         destroyRenderer();
 
         SDL_DestroyWindow(gSdlWindow);
@@ -232,12 +211,14 @@ bool svga_init(VideoOptions* video_options)
 
         return false;
     }
+    SDL_Log("svga_init: renderer created successfully");
 
     gSdlSurface = SDL_CreateSurface(
         video_options->width,
         video_options->height,
         SDL_PIXELFORMAT_INDEX8);
     if (gSdlSurface == NULL) {
+        SDL_Log("svga_init: SDL_CreateSurface failed: %s", SDL_GetError());
         destroyRenderer();
 
         SDL_DestroyWindow(gSdlWindow);
@@ -307,10 +288,14 @@ int screenGetHeight()
 
 static bool createRenderer(int width, int height)
 {
+    SDL_Log("createRenderer: creating renderer for %dx%d", width, height);
+
     gSdlRenderer = SDL_CreateRenderer(gSdlWindow, NULL);
     if (gSdlRenderer == NULL) {
+        SDL_Log("createRenderer: SDL_CreateRenderer failed: %s", SDL_GetError());
         return false;
     }
+    SDL_Log("createRenderer: renderer created");
 
     // Enable VSync
     SDL_SetRenderVSync(gSdlRenderer, 1);
@@ -319,20 +304,24 @@ static bool createRenderer(int width, int height)
     SDL_DisplayID displayID = SDL_GetDisplayForWindow(gSdlWindow);
     const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(displayID);
     if (mode != NULL) {
-        debug_printf("Display refresh rate: %.2f Hz\n", mode->refresh_rate);
-        debug_printf("Display resolution: %dx%d\n", mode->w, mode->h);
+        SDL_Log("Display refresh rate: %.2f Hz", mode->refresh_rate);
+        SDL_Log("Display resolution: %dx%d", mode->w, mode->h);
     } else {
-        debug_printf("Could not query display mode: %s\n", SDL_GetError());
+        SDL_Log("Could not query display mode: %s", SDL_GetError());
     }
 
     if (!SDL_SetRenderLogicalPresentation(gSdlRenderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
+        SDL_Log("createRenderer: SDL_SetRenderLogicalPresentation failed: %s", SDL_GetError());
         return false;
     }
+    SDL_Log("createRenderer: logical presentation set to %dx%d", width, height);
 
     gSdlTexture = SDL_CreateTexture(gSdlRenderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (gSdlTexture == NULL) {
+        SDL_Log("createRenderer: SDL_CreateTexture failed: %s", SDL_GetError());
         return false;
     }
+    SDL_Log("createRenderer: texture created");
 
     // Enable nearest neighbor (pixel-perfect) scaling for crisp retro graphics
     SDL_SetTextureScaleMode(gSdlTexture, SDL_SCALEMODE_NEAREST);
@@ -341,13 +330,16 @@ static bool createRenderer(int width, int height)
     SDL_PropertiesID props = SDL_GetTextureProperties(gSdlTexture);
     SDL_PixelFormat format = (SDL_PixelFormat)SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_FORMAT_NUMBER, SDL_PIXELFORMAT_UNKNOWN);
     if (format == SDL_PIXELFORMAT_UNKNOWN) {
+        SDL_Log("createRenderer: SDL_GetTextureProperties failed - format unknown");
         return false;
     }
 
     gSdlTextureSurface = SDL_CreateSurface(width, height, format);
     if (gSdlTextureSurface == NULL) {
+        SDL_Log("createRenderer: SDL_CreateSurface for texture failed: %s", SDL_GetError());
         return false;
     }
+    SDL_Log("createRenderer: texture surface created - initialization complete");
 
     return true;
 }
