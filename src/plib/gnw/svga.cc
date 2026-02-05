@@ -212,6 +212,14 @@ bool svga_init(VideoOptions* video_options)
     SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
     SDL_Log("svga_init: window created - size=%dx%d, pixels=%dx%d", window_w, window_h, window_pw, window_ph);
 
+    // Log safe area info
+    SDL_Rect safeArea;
+    if (SDL_GetWindowSafeArea(gSdlWindow, &safeArea)) {
+        SDL_Log("svga_init: safe area: x=%d y=%d w=%d h=%d", safeArea.x, safeArea.y, safeArea.w, safeArea.h);
+    } else {
+        SDL_Log("svga_init: no safe area info available");
+    }
+
 #if __APPLE__ && TARGET_OS_IOS
     // On iOS with HIGH_PIXEL_DENSITY, we skip SDL_SetRenderLogicalPresentation
     // and instead manually control the destination rect during rendering.
