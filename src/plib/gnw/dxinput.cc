@@ -28,6 +28,10 @@ static Uint32 last_mouse_buttons = 0;
 // Track button state from events since SDL_GetMouseState doesn't reflect touch-converted clicks
 static bool left_button_down = false;
 static bool right_button_down = false;
+// Capture the position where the click happened (in game coordinates)
+static int click_game_x = -1;
+static int click_game_y = -1;
+static bool have_pending_click = false;
 #endif
 
 // 0x4E0400
@@ -88,8 +92,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     float system_x, system_y;
     SDL_MouseButtonFlags mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
     if (log_count < 20 || (log_count % 100 == 0)) {
-        SDL_Log("DXINPUT: SDL_GetMouseState raw=(%.1f,%.1f) buttons=0x%x",
-            system_x, system_y, mouse_buttons);
+        SDL_Log("DXINPUT: SDL_GetMouseState raw=(%.1f,%.1f) buttons=0x%x pending_click=%d",
+            system_x, system_y, mouse_buttons, have_pending_click);
     }
     log_count++;
 
@@ -124,23 +128,37 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     last_system_y = (int)pixel_y;
     last_mouse_buttons = mouse_buttons;
 
+    // Use tracked button state from events OR SDL button flags
+    bool left_down = left_button_down || (mouse_buttons & SDL_BUTTON_LMASK) != 0;
+    bool right_down = right_button_down || (mouse_buttons & SDL_BUTTON_RMASK) != 0;
+
     if (last_input_was_mouse) {
         int game_x, game_y;
         mouse_get_position(&game_x, &game_y);
 
-        // Use our custom iOS coordinate conversion that accounts for the dest rect
-        int mapped_x, mapped_y;
-        iOS_screenToGameCoords(pixel_x, pixel_y, &mapped_x, &mapped_y);
-
-        int delta_x = mapped_x - game_x;
-        int delta_y = mapped_y - game_y;
-
-        if ((log_count - 1) < 20 || ((log_count - 1) % 100 == 0)) {
-            SDL_Log("DXINPUT: pixel=(%.1f,%.1f) mapped=(%d,%d) cursor=(%d,%d) delta=(%d,%d)",
-                pixel_x, pixel_y, mapped_x, mapped_y, game_x, game_y, delta_x, delta_y);
+        // CRITICAL FIX: When a button is pressed, use the captured click position
+        // instead of the current mouse position. This ensures clicks happen where
+        // the user actually clicked, not where the cursor moved to afterwards.
+        int target_x, target_y;
+        if (have_pending_click && (left_down || right_down) && click_game_x >= 0 && click_game_y >= 0) {
+            target_x = click_game_x;
+            target_y = click_game_y;
+            SDL_Log("DXINPUT: Using captured click position (%d,%d) instead of current (%d,%d)",
+                click_game_x, click_game_y, game_x, game_y);
+        } else {
+            // No pending click, use current mouse position
+            iOS_screenToGameCoords(pixel_x, pixel_y, &target_x, &target_y);
         }
 
-        if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
+        int delta_x = target_x - game_x;
+        int delta_y = target_y - game_y;
+
+        if ((log_count - 1) < 20 || ((log_count - 1) % 100 == 0)) {
+            SDL_Log("DXINPUT: target=(%d,%d) cursor=(%d,%d) delta=(%d,%d) buttons=L%d/R%d",
+                target_x, target_y, game_x, game_y, delta_x, delta_y, left_down, right_down);
+        }
+
+        if (target_x >= 0 && target_x < screenGetWidth() && target_y >= 0 && target_y < screenGetHeight()) {
             mouseState->x = delta_x;
             mouseState->y = delta_y;
         } else {
@@ -152,10 +170,6 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->y = 0;
     }
 
-    // Use tracked button state from events OR SDL button flags
-    // Event tracking catches button presses, SDL flags provide backup
-    bool left_down = left_button_down || (mouse_buttons & SDL_BUTTON_LMASK) != 0;
-    bool right_down = right_button_down || (mouse_buttons & SDL_BUTTON_RMASK) != 0;
     mouseState->buttons[0] = left_down;
     mouseState->buttons[1] = right_down;
     mouseState->wheelX = gMouseWheelDeltaX;
@@ -247,11 +261,36 @@ void handleMouseEvent(SDL_Event* event)
         } else if (event->button.button == SDL_BUTTON_RIGHT) {
             right_button_down = true;
         }
+        
+        // CRITICAL: Capture the click position at the time of the click event!
+        // This ensures we click where the user actually clicked, not where the
+        // cursor moves to by the time we process the click.
+        int window_w, window_h, window_pw, window_ph;
+        SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+        SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+        float scale_x = (float)window_pw / (float)window_w;
+        float scale_y = (float)window_ph / (float)window_h;
+        
+        // event->button.x/y are in points, convert to pixels
+        float pixel_x = event->button.x * scale_x;
+        float pixel_y = event->button.y * scale_y;
+        
+        // Convert to game coordinates
+        iOS_screenToGameCoords(pixel_x, pixel_y, &click_game_x, &click_game_y);
+        have_pending_click = true;
+        
+        SDL_Log("CLICK_CAPTURE: button=%d event_pos=(%.1f,%.1f) pixel=(%.1f,%.1f) game=(%d,%d)",
+            event->button.button, event->button.x, event->button.y,
+            pixel_x, pixel_y, click_game_x, click_game_y);
     } else if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
         if (event->button.button == SDL_BUTTON_LEFT) {
             left_button_down = false;
         } else if (event->button.button == SDL_BUTTON_RIGHT) {
             right_button_down = false;
+        }
+        // Clear pending click when button is released
+        if (!left_button_down && !right_button_down) {
+            have_pending_click = false;
         }
     }
 #endif
