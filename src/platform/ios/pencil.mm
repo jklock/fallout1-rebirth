@@ -193,28 +193,40 @@ bool pencil_init(void* sdl_window) {
 }
 
 void pencil_shutdown(void) {
-    // Remove UIPencilInteraction
-    if (@available(iOS 12.1, *)) {
-        if (g_pencil_interaction && g_tracked_view) {
-            [g_tracked_view removeInteraction:g_pencil_interaction];
+    // UIKit operations must be performed on the main thread
+    // This function may be called from background threads during app termination
+    void (^shutdownBlock)(void) = ^{
+        // Remove UIPencilInteraction
+        if (@available(iOS 12.1, *)) {
+            if (g_pencil_interaction && g_tracked_view) {
+                [g_tracked_view removeInteraction:g_pencil_interaction];
+            }
+            g_pencil_interaction = nil;
+            g_interaction_handler = nil;
         }
-        g_pencil_interaction = nil;
-        g_interaction_handler = nil;
-    }
+        
+        // Remove gesture recognizer
+        if (g_pencil_observer && g_tracked_view) {
+            [g_tracked_view removeGestureRecognizer:g_pencil_observer];
+        }
+        g_pencil_observer = nil;
+        g_tracked_view = nil;
+        
+        // Reset state
+        g_pencil_touching = NO;
+        g_last_touch_was_pencil = NO;
+        g_pencil_position = CGPointZero;
+        g_pencil_pressure = 0.0;
+        g_pending_gesture = PENCIL_GESTURE_NONE;
+    };
     
-    // Remove gesture recognizer
-    if (g_pencil_observer && g_tracked_view) {
-        [g_tracked_view removeGestureRecognizer:g_pencil_observer];
+    if ([NSThread isMainThread]) {
+        shutdownBlock();
+    } else {
+        // During app termination, we can't use dispatch_sync as it may deadlock
+        // Use dispatch_async and don't wait - the app is terminating anyway
+        dispatch_async(dispatch_get_main_queue(), shutdownBlock);
     }
-    g_pencil_observer = nil;
-    g_tracked_view = nil;
-    
-    // Reset state
-    g_pencil_touching = NO;
-    g_last_touch_was_pencil = NO;
-    g_pencil_position = CGPointZero;
-    g_pencil_pressure = 0.0;
-    g_pending_gesture = PENCIL_GESTURE_NONE;
 }
 
 bool pencil_is_active(void) {

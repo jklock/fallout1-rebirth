@@ -509,3 +509,22 @@ Builds are created locally and uploaded to GitHub Releases:
 ```
 
 Then upload the artifacts to GitHub Releases manually.
+---
+
+## Proof of Work
+
+- **Timestamp**: February 5, 2026
+- **Files verified**:
+  - `scripts/build-macos.sh` - Exists
+  - `scripts/build-ios.sh` - Exists
+  - `scripts/build-macos-dmg.sh` - Exists
+  - `scripts/build-ios-ipa.sh` - Exists
+  - `scripts/test-ios-simulator.sh` - Exists
+  - `scripts/test-ios-headless.sh` - Exists
+  - `scripts/test-macos.sh` - Exists
+  - `scripts/test-macos-headless.sh` - Exists
+  - `scripts/dev-check.sh` - Exists
+  - `scripts/dev-format.sh` - Exists
+  - `scripts/dev-verify.sh` - Exists
+  - `scripts/dev-clean.sh` - Exists
+- **Updates made**: No updates needed - content verified accurate. All script documentation matches actual scripts in the repository.

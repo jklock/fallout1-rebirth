@@ -31,7 +31,7 @@ Fallout 1 Rebirth is a C++17 re-implementation of the original Fallout engine. T
 |               Platform Layer                     |
 |   (src/plib/) - Graphics, Input, Audio, DB       |
 +--------------------------------------------------+
-|                     SDL2                         |
+|                     SDL3                         |
 +--------------------------------------------------+
 ```
 
@@ -40,8 +40,8 @@ Fallout 1 Rebirth is a C++17 re-implementation of the original Fallout engine. T
 - **C++17 Standard**: Modern C++ with C-style memory management
 - **Namespace**: All code resides in the `fallout` namespace
 - **Platform**: Apple-only (macOS 11.0+, iOS/iPadOS 15.0+)
-- **Graphics**: SDL2-based rendering with software blitting
-- **Audio**: SDL2 audio with custom ACM decoder
+- **Graphics**: SDL3-based rendering with GPU-accelerated scaling
+- **Audio**: SDL3 audio streams with custom ACM decoder
 
 ---
 
@@ -54,7 +54,7 @@ Fallout 1 Rebirth is a C++17 re-implementation of the original Fallout engine. T
 | `src/` | Main source code |
 | `os/` | Platform-specific resources (Info.plist, icons, storyboards) |
 | `cmake/` | CMake toolchains and configuration |
-| `third_party/` | Bundled dependencies (SDL2, adecode, fpattern) |
+| `third_party/` | Bundled dependencies (SDL3, adecode, fpattern) |
 | `dist/` | Distribution files for packaging |
 | `scripts/` | Build and development automation scripts |
 | `gameconfig/` | Platform-specific configuration templates (iOS and macOS) |
@@ -126,12 +126,13 @@ main_init_system()
 4. **Cursor**: Mouse cursor drawn last
 5. **Present**: Frame presented via SDL
 
-The rendering uses a software blitter with palette-based graphics (256 colors).
+The rendering uses palette-based graphics (256 colors) with GPU-accelerated texture scaling.
 
 **Frame Timing**:
-- VSync is enabled by default via `SDL_RENDERER_PRESENTVSYNC`
+- VSync is enabled by default via `SDL_SetRenderVSync()`
 - `FpsLimiter` class in `fps_limiter.cc` handles frame rate control
 - Display refresh rate is logged at startup
+- SDL3 provides native Metal rendering on Apple platforms
 
 Key files:
 
@@ -175,7 +176,7 @@ See [setup_guide.md](../docs/setup_guide.md) for Apple Pencil configuration opti
 ### Audio System
 
 ```
-Game Sound Calls -> gsound.cc -> audio_engine.cc -> SDL Audio
+Game Sound Calls -> gsound.cc -> audio_engine.cc -> SDL3 Audio Streams
                                    |
                                    v
                               ACM Decoder (for music)
@@ -465,3 +466,19 @@ if (fatal_condition) {
 | `debug_printf()` | Development debug output |
 | `dbg_error()` | Non-fatal errors |
 | `GNWSystemError()` | Fatal errors (terminates) |
+---
+
+## Proof of Work
+
+- **Timestamp**: February 5, 2026
+- **Files verified**:
+  - `CMakeLists.txt` - Confirmed iOS deployment target 15.0, macOS 11.0
+  - `third_party/sdl3/CMakeLists.txt` - Confirmed SDL3 3.2.4
+  - `src/plib/gnw/svga.cc` - Confirmed SDL3 includes and `SDL_SetRenderVSync()` usage
+- **Updates made**:
+  - Changed SDL2 → SDL3 throughout document
+  - Updated iOS deployment target from 14.0 to 15.0
+  - Updated rendering description (GPU-accelerated vs software blitting)
+  - Updated VSync implementation details (`SDL_SetRenderVSync()` vs `SDL_RENDERER_PRESENTVSYNC`)
+  - Updated audio system description (SDL3 Audio Streams)
+  - Added Metal rendering note for Apple platforms

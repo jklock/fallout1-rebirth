@@ -84,8 +84,14 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_PumpEvents();
 
 #if defined(__APPLE__) && TARGET_OS_IOS
+    static int log_count = 0;
     float system_x, system_y;
     SDL_MouseButtonFlags mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
+    if (log_count < 20 || (log_count % 100 == 0)) {
+        SDL_Log("DXINPUT: SDL_GetMouseState raw=(%.1f,%.1f) buttons=0x%x",
+                system_x, system_y, mouse_buttons);
+    }
+    log_count++;
 
     // SDL_GetMouseState returns coordinates in POINTS (logical), but
     // iOS_screenToGameCoords expects PIXELS. Get the scale factor.
@@ -128,6 +134,11 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
 
         int delta_x = mapped_x - game_x;
         int delta_y = mapped_y - game_y;
+        
+        if ((log_count - 1) < 20 || ((log_count - 1) % 100 == 0)) {
+            SDL_Log("DXINPUT: pixel=(%.1f,%.1f) mapped=(%d,%d) cursor=(%d,%d) delta=(%d,%d)",
+                    pixel_x, pixel_y, mapped_x, mapped_y, game_x, game_y, delta_x, delta_y);
+        }
 
         if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
             mouseState->x = delta_x;

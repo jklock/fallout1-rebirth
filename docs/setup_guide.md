@@ -25,7 +25,7 @@ Before you begin, you'll need:
 - **Display**: Any resolution (the game scales to fit)
 
 #### iOS/iPadOS
-- **Operating System**: iOS 14.0+ / iPadOS 14.0+ or later
+- **Operating System**: iOS 15.0+ / iPadOS 15.0+ or later
 - **Device**: iPhone or iPad (iPad recommended for best experience)
 - **Storage**: At least 1 GB free space
 
@@ -753,3 +753,16 @@ Fallout 1 Rebirth is based on the Fallout 1 Community Edition engine reimplement
 - Apple platform support by the Rebirth project
 
 See [LICENSE.md](../LICENSE.md) for licensing information.
+
+---
+
+## Proof of Work
+
+- **Timestamp**: February 5, 2026
+- **Files verified**:
+  - `CMakeLists.txt` - Confirmed iOS deployment target 15.0, macOS 11.0
+  - `gameconfig/ios/` - Confirmed iOS configuration templates exist
+  - `gameconfig/macos/` - Confirmed macOS configuration templates exist
+  - `src/plib/gnw/svga.cc` - Confirmed VSync is enabled by default
+- **Updates made**:
+  - Updated iOS/iPadOS minimum version from 14.0+ to 15.0+ to match CMakeLists.txt

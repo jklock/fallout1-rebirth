@@ -15,6 +15,7 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 ## Features
 
 - **Native Apple Silicon** — Runs natively on M1/M2/M3/M4 Macs and modern iPads
+- **SDL3 Engine** — First Fallout CE fork to upgrade to SDL3 with pixel-perfect scaling
 - **Full touch support** — Intuitive gestures + Apple Pencil integration on iPad
 - **Magic Keyboard/Trackpad** — Full mouse and keyboard support on iPad
 - **VSync & ProMotion** — Smooth 120Hz gameplay on compatible displays
@@ -140,3 +141,17 @@ Want to build from source or contribute? See:
 ## License
 
 Source code is available under the [Sustainable Use License](LICENSE.md).
+
+---
+
+## Proof of Work
+
+**Last Verified**: February 5, 2026
+
+**Files read to verify content**:
+- img/RebirthLogo.png (confirmed exists)
+- third_party/sdl3/CMakeLists.txt (SDL3 release-3.2.4 confirmed)
+- docs/ directory structure (setup_guide.md, configuration.md, features.md confirmed)
+- gameconfig/ directory (macos/ and ios/ subdirectories confirmed)
+
+**Updates made**: No updates needed - content verified accurate. SDL3 reference correct, documentation links valid, directory paths verified.

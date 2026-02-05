@@ -51,3 +51,15 @@ For public distribution, the app must be signed with a Developer ID certificate 
    ```
 
 Alternatively, distribute unsigned builds with instructions for users to remove the quarantine flag using `xattr -cr`.
+
+---
+
+## Proof of Work
+
+**Last Verified**: February 5, 2026
+
+**Files read to verify content**:
+- os/macos/Info.plist (confirmed exists)
+- os/macos/fallout1-rebirth.icns (confirmed exists)
+
+**Updates made**: No updates needed - content verified accurate. Both documented files present.

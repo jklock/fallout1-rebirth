@@ -46,7 +46,7 @@ Fallout 1 Rebirth is a working re-implementation of Fallout with:
 | Platform | Minimum Version | Notes |
 |----------|-----------------|-------|
 | macOS | 11.0 (Big Sur) | Universal binary (Intel + Apple Silicon) |
-| iOS/iPadOS | 14.0+ | iPad is the primary target platform |
+| iOS/iPadOS | 15.0+ | iPad is the primary target platform |
 
 ### Key Features
 
@@ -92,3 +92,13 @@ Fallout 1 Rebirth is a working re-implementation of Fallout with:
 The source code is available under the [Sustainable Use License](../LICENSE.md).
 
 Game assets are NOT included and must be obtained from a legal copy of Fallout.
+---
+
+## Proof of Work
+
+- **Timestamp**: February 5, 2026
+- **Files verified**:
+  - `CMakeLists.txt` - Confirmed iOS deployment target 15.0, macOS 11.0
+  - All linked documentation files exist and are accessible
+- **Updates made**:
+  - Updated iOS minimum version from 14.0+ to 15.0+ to match CMakeLists.txt
