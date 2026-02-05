@@ -2,6 +2,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <algorithm>
+
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -31,6 +33,14 @@ SDL_Surface* gSdlSurface = NULL;
 SDL_Renderer* gSdlRenderer = NULL;
 SDL_Texture* gSdlTexture = NULL;
 SDL_Surface* gSdlTextureSurface = NULL;
+
+#if __APPLE__ && TARGET_OS_IOS
+// iOS-specific: Custom destination rect for fullscreen rendering
+static SDL_FRect g_iOS_destRect = {0, 0, 0, 0};
+static bool g_iOS_useCustomRect = false;
+static int g_iOS_gameWidth = 640;  // Game logical resolution
+static int g_iOS_gameHeight = 480;
+#endif
 
 // TODO: Remove once migration to update-render cycle is completed.
 FpsLimiter sharedFpsLimiter;
@@ -202,6 +212,68 @@ bool svga_init(VideoOptions* video_options)
     SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
     SDL_Log("svga_init: window created - size=%dx%d, pixels=%dx%d", window_w, window_h, window_pw, window_ph);
 
+#if __APPLE__ && TARGET_OS_IOS
+    // On iOS with HIGH_PIXEL_DENSITY, we skip SDL_SetRenderLogicalPresentation
+    // and instead manually control the destination rect during rendering.
+    //
+    // IMPORTANT: SDL3 on iOS reports dimensions and uses coordinates in "native landscape"
+    // orientation, even when the device is in portrait. The iOS display system handles
+    // the rotation automatically when presenting to the screen.
+    //
+    // For a 4:3 landscape game on an iPad in portrait:
+    // - SDL reports: 2752x2064 (landscape, w > h)
+    // - Actual display: 2064x2752 (portrait, h > w)
+    // - We need to render the 4:3 game content letterboxed within SDL's coordinate space
+    //
+    // Since SDL operates in landscape coordinates:
+    // - SDL width (2752) corresponds to the portrait screen's HEIGHT
+    // - SDL height (2064) corresponds to the portrait screen's WIDTH
+    //
+    // For a 4:3 game in a 3:4 portrait view (through SDL's landscape lens):
+    // - The "width" (SDL's coordinate) should be constrained by the narrow dimension
+    // - We want black bars at the "top" and "bottom" of the portrait display
+    // - In SDL's coordinate system, that's the LEFT and RIGHT sides
+    //
+    // Store game resolution for coordinate conversion
+    g_iOS_gameWidth = video_options->width;
+    g_iOS_gameHeight = video_options->height;
+    
+    int sdl_w = window_pw;  // SDL's reported width (larger for portrait device)
+    int sdl_h = window_ph;  // SDL's reported height (smaller for portrait device)
+    
+    SDL_Log("svga_init: iOS - SDL coordinates: %dx%d", sdl_w, sdl_h);
+    
+    // Calculate in SDL's coordinate system
+    // The game needs to maintain 4:3 aspect ratio
+    float game_aspect = (float)g_iOS_gameWidth / (float)g_iOS_gameHeight;  // 4:3 = 1.333
+    float sdl_aspect = (float)sdl_w / (float)sdl_h;
+    
+    SDL_Log("svga_init: iOS - sdl_aspect=%.3f game_aspect=%.3f", sdl_aspect, game_aspect);
+    
+    if (sdl_aspect > game_aspect) {
+        // SDL viewport is wider than game - constrain by height, add bars on sides
+        // This is the normal case for portrait iPad showing 4:3 game
+        int content_w = (int)(sdl_h * game_aspect);
+        g_iOS_destRect.x = (sdl_w - content_w) / 2.0f;
+        g_iOS_destRect.y = 0;
+        g_iOS_destRect.w = (float)content_w;
+        g_iOS_destRect.h = (float)sdl_h;
+        SDL_Log("svga_init: iOS - pillarbox in SDL space (bars on sides)");
+    } else {
+        // SDL viewport is taller than game - constrain by width, add bars top/bottom
+        int content_h = (int)(sdl_w / game_aspect);
+        g_iOS_destRect.x = 0;
+        g_iOS_destRect.y = (sdl_h - content_h) / 2.0f;
+        g_iOS_destRect.w = (float)sdl_w;
+        g_iOS_destRect.h = (float)content_h;
+        SDL_Log("svga_init: iOS - letterbox in SDL space (bars top/bottom)");
+    }
+    g_iOS_useCustomRect = true;
+    
+    SDL_Log("svga_init: iOS - dest rect: (%.0f, %.0f, %.0f, %.0f)", 
+        g_iOS_destRect.x, g_iOS_destRect.y, g_iOS_destRect.w, g_iOS_destRect.h);
+#endif
+
     if (!createRenderer(video_options->width, video_options->height)) {
         SDL_Log("svga_init: createRenderer failed");
         destroyRenderer();
@@ -310,11 +382,17 @@ static bool createRenderer(int width, int height)
         SDL_Log("Could not query display mode: %s", SDL_GetError());
     }
 
+#if !(__APPLE__ && TARGET_OS_IOS)
+    // On iOS, we use custom destination rect instead of logical presentation
+    // to have better control over fullscreen scaling.
     if (!SDL_SetRenderLogicalPresentation(gSdlRenderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
         SDL_Log("createRenderer: SDL_SetRenderLogicalPresentation failed: %s", SDL_GetError());
         return false;
     }
     SDL_Log("createRenderer: logical presentation set to %dx%d", width, height);
+#else
+    SDL_Log("createRenderer: iOS - skipping logical presentation (using custom dest rect)");
+#endif
 
     gSdlTexture = SDL_CreateTexture(gSdlRenderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (gSdlTexture == NULL) {
@@ -372,8 +450,71 @@ void renderPresent()
 {
     SDL_UpdateTexture(gSdlTexture, NULL, gSdlTextureSurface->pixels, gSdlTextureSurface->pitch);
     SDL_RenderClear(gSdlRenderer);
+#if __APPLE__ && TARGET_OS_IOS
+    // On iOS, render to custom destination rect to fill screen with proper aspect ratio
+    if (g_iOS_useCustomRect) {
+        SDL_RenderTexture(gSdlRenderer, gSdlTexture, NULL, &g_iOS_destRect);
+    } else {
+        SDL_RenderTexture(gSdlRenderer, gSdlTexture, NULL, NULL);
+    }
+#else
     SDL_RenderTexture(gSdlRenderer, gSdlTexture, NULL, NULL);
+#endif
     SDL_RenderPresent(gSdlRenderer);
 }
+
+#if __APPLE__ && TARGET_OS_IOS
+// Convert screen pixel coordinates to game logical coordinates
+// This accounts for the custom dest rect used on iOS
+bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* game_y)
+{
+    if (!g_iOS_useCustomRect || g_iOS_destRect.w <= 0 || g_iOS_destRect.h <= 0) {
+        // Fallback: direct mapping
+        *game_x = (int)screen_x;
+        *game_y = (int)screen_y;
+        return false;
+    }
+    
+    // Check if the point is within the dest rect
+    float local_x = screen_x - g_iOS_destRect.x;
+    float local_y = screen_y - g_iOS_destRect.y;
+    
+    // Scale from dest rect size to game resolution
+    float scale_x = (float)g_iOS_gameWidth / g_iOS_destRect.w;
+    float scale_y = (float)g_iOS_gameHeight / g_iOS_destRect.h;
+    
+    int result_x = (int)(local_x * scale_x);
+    int result_y = (int)(local_y * scale_y);
+    
+    // Clamp to game bounds
+    if (result_x < 0) result_x = 0;
+    if (result_x >= g_iOS_gameWidth) result_x = g_iOS_gameWidth - 1;
+    if (result_y < 0) result_y = 0;
+    if (result_y >= g_iOS_gameHeight) result_y = g_iOS_gameHeight - 1;
+    
+    *game_x = result_x;
+    *game_y = result_y;
+    
+    // Return true if the point was within the dest rect
+    return (local_x >= 0 && local_x < g_iOS_destRect.w &&
+            local_y >= 0 && local_y < g_iOS_destRect.h);
+}
+
+// Get the iOS dest rect for external use
+void iOS_getDestRect(float* x, float* y, float* w, float* h)
+{
+    if (g_iOS_useCustomRect) {
+        *x = g_iOS_destRect.x;
+        *y = g_iOS_destRect.y;
+        *w = g_iOS_destRect.w;
+        *h = g_iOS_destRect.h;
+    } else {
+        *x = 0;
+        *y = 0;
+        *w = (float)g_iOS_gameWidth;
+        *h = (float)g_iOS_gameHeight;
+    }
+}
+#endif
 
 } // namespace fallout

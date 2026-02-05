@@ -1,4 +1,5 @@
 #include "plib/gnw/dxinput.h"
+#include "plib/gnw/debug.h"
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
 #include <SDL3/SDL.h>
@@ -86,14 +87,26 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     float system_x, system_y;
     SDL_MouseButtonFlags mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
 
+    // SDL_GetMouseState returns coordinates in POINTS (logical), but
+    // iOS_screenToGameCoords expects PIXELS. Get the scale factor.
+    int window_w, window_h, window_pw, window_ph;
+    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+    float scale_x = (float)window_pw / (float)window_w;
+    float scale_y = (float)window_ph / (float)window_h;
+    
+    // Convert points to pixels
+    float pixel_x = system_x * scale_x;
+    float pixel_y = system_y * scale_y;
+
     bool mouse_activity = false;
     if (last_system_x == -1 && last_system_y == -1) {
-        last_system_x = (int)system_x;
-        last_system_y = (int)system_y;
+        last_system_x = (int)pixel_x;
+        last_system_y = (int)pixel_y;
         last_mouse_buttons = mouse_buttons;
     }
 
-    if ((int)system_x != last_system_x || (int)system_y != last_system_y || mouse_buttons != last_mouse_buttons) {
+    if ((int)pixel_x != last_system_x || (int)pixel_y != last_system_y || mouse_buttons != last_mouse_buttons) {
         mouse_activity = true;
     }
 
@@ -101,24 +114,17 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         last_input_was_mouse = true;
     }
 
-    last_system_x = (int)system_x;
-    last_system_y = (int)system_y;
+    last_system_x = (int)pixel_x;
+    last_system_y = (int)pixel_y;
     last_mouse_buttons = mouse_buttons;
 
     if (last_input_was_mouse) {
         int game_x, game_y;
         mouse_get_position(&game_x, &game_y);
 
-        float logical_x, logical_y;
-        SDL_RenderCoordinatesFromWindow(gSdlRenderer, system_x, system_y, &logical_x, &logical_y);
-
-        int mapped_x = (int)logical_x;
-        int mapped_y = (int)logical_y;
-
-        if (mapped_x < 0) mapped_x = 0;
-        if (mapped_x >= screenGetWidth()) mapped_x = screenGetWidth() - 1;
-        if (mapped_y < 0) mapped_y = 0;
-        if (mapped_y >= screenGetHeight()) mapped_y = screenGetHeight() - 1;
+        // Use our custom iOS coordinate conversion that accounts for the dest rect
+        int mapped_x, mapped_y;
+        iOS_screenToGameCoords(pixel_x, pixel_y, &mapped_x, &mapped_y);
 
         int delta_x = mapped_x - game_x;
         int delta_y = mapped_y - game_y;
@@ -135,10 +141,12 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->y = 0;
     }
 
-    // Use tracked button state from events, not SDL_GetMouseState
-    // because SDL3 doesn't update button state for touch-converted clicks
-    mouseState->buttons[0] = left_button_down;
-    mouseState->buttons[1] = right_button_down;
+    // Use tracked button state from events OR SDL button flags
+    // Event tracking catches button presses, SDL flags provide backup
+    bool left_down = left_button_down || (mouse_buttons & SDL_BUTTON_LMASK) != 0;
+    bool right_down = right_button_down || (mouse_buttons & SDL_BUTTON_RMASK) != 0;
+    mouseState->buttons[0] = left_down;
+    mouseState->buttons[1] = right_down;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;
@@ -219,6 +227,23 @@ void handleMouseEvent(SDL_Event* event)
         gMouseWheelDeltaX += (int)event->wheel.x;
         gMouseWheelDeltaY += (int)event->wheel.y;
     }
+    
+#if defined(__APPLE__) && TARGET_OS_IOS
+    // Track button state from events for iOS
+    if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        if (event->button.button == SDL_BUTTON_LEFT) {
+            left_button_down = true;
+        } else if (event->button.button == SDL_BUTTON_RIGHT) {
+            right_button_down = true;
+        }
+    } else if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+        if (event->button.button == SDL_BUTTON_LEFT) {
+            left_button_down = false;
+        } else if (event->button.button == SDL_BUTTON_RIGHT) {
+            right_button_down = false;
+        }
+    }
+#endif
 }
 
 void dxinput_notify_mouse()
@@ -240,6 +265,15 @@ void dxinput_notify_touch()
     if (touch_event_count < 5) {
         debug_printf("iOS: Touch event received (count=%d)\n", ++touch_event_count);
     }
+#endif
+}
+
+bool dxinput_is_using_mouse()
+{
+#if defined(__APPLE__) && TARGET_OS_IOS
+    return last_input_was_mouse;
+#else
+    return true;  // Non-iOS always uses mouse
 #endif
 }
 

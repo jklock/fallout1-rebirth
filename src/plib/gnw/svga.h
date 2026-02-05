@@ -30,6 +30,15 @@ int screenGetHeight();
 void handleWindowSizeChanged();
 void renderPresent();
 
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#if TARGET_OS_IOS
+// iOS-specific coordinate conversion that accounts for custom dest rect
+bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* game_y);
+void iOS_getDestRect(float* x, float* y, float* w, float* h);
+#endif
+#endif
+
 } // namespace fallout
 
 #endif /* FALLOUT_PLIB_GNW_SVGA_H_ */

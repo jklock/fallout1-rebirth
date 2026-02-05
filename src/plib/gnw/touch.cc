@@ -97,17 +97,31 @@ static TouchLocation touch_get_current_location_centroid(int* indexes, int lengt
 // logical coordinates that account for the render logical presentation scaling.
 static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, int* out_y)
 {
-    // Get window dimensions to de-normalize touch coordinates
-    int window_w, window_h;
-    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+    // Get window pixel dimensions to de-normalize touch coordinates
+    int window_pw, window_ph;
+    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
     
     // Convert normalized (0...1) to window pixel coordinates
-    float window_x = event->x * window_w;
-    float window_y = event->y * window_h;
+    float pixel_x = event->x * window_pw;
+    float pixel_y = event->y * window_ph;
     
+#if __APPLE__ && TARGET_OS_IOS
+    // On iOS, we use a custom dest rect, so we need to use our own conversion
+    // that accounts for the letterbox/pillarbox offset and scaling
+    if (iOS_screenToGameCoords(pixel_x, pixel_y, out_x, out_y)) {
+        // Successfully converted
+        return;
+    }
+    // Fall through to clamp if outside game area
+    if (*out_x < 0) *out_x = 0;
+    if (*out_y < 0) *out_y = 0;
+    if (*out_x >= screenGetWidth()) *out_x = screenGetWidth() - 1;
+    if (*out_y >= screenGetHeight()) *out_y = screenGetHeight() - 1;
+#else
+    // On non-iOS platforms, use SDL's coordinate conversion
     // Convert window coordinates to render/logical coordinates
     float logical_x, logical_y;
-    if (SDL_RenderCoordinatesFromWindow(gSdlRenderer, window_x, window_y, &logical_x, &logical_y)) {
+    if (SDL_RenderCoordinatesFromWindow(gSdlRenderer, pixel_x, pixel_y, &logical_x, &logical_y)) {
         *out_x = static_cast<int>(logical_x);
         *out_y = static_cast<int>(logical_y);
         
@@ -121,6 +135,7 @@ static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
         *out_x = static_cast<int>(event->x * screenGetWidth());
         *out_y = static_cast<int>(event->y * screenGetHeight());
     }
+#endif
 }
 
 void touch_handle_start(SDL_TouchFingerEvent* event)
