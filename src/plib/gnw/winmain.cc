@@ -29,9 +29,9 @@ int main(int argc, char* argv[])
     int rc;
 
 #if __APPLE__ && TARGET_OS_IOS
-    // Enable touch-to-mouse event conversion so iPad touch input works as mouse
+    // Use dedicated touch gesture handling; avoid synthetic touch->mouse events
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
-    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
     chdir(iOSGetDocumentsPath());
 #endif
 

@@ -883,11 +883,9 @@ bool mouse_in(int left, int top, int right, int bottom)
 }
 
 // 0x4B51C0
-// Expanding cursor hot Size for touch devices
+// Click hit-test based on cursor position (with optional offsets)
 bool mouse_click_in(int left, int top, int right, int bottom)
 {
-    int expand = 10; // Extend active area by 10 pixels (set as needed)
-
     if (!have_mouse) {
         return false;
     }
@@ -907,7 +905,10 @@ bool mouse_click_in(int left, int top, int right, int bottom)
     int click_x = mouse_hotx + mouse_x + offset_x;
     int click_y = mouse_hoty + mouse_y + offset_y;
 
-    return (click_y >= top - expand) && (click_x <= right + expand) && (click_x >= left - expand) && (click_y <= bottom + expand);
+    return click_y >= top
+        && click_x <= right
+        && click_x >= left
+        && click_y <= bottom;
 }
 
 /*

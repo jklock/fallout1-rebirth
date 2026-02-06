@@ -1101,24 +1101,44 @@ void GNW95_process_message()
     while (SDL_PollEvent(&e)) {
         switch (e.type) {
         case SDL_EVENT_MOUSE_MOTION:
+#if defined(__APPLE__) && TARGET_OS_IOS
+            if (e.motion.which == SDL_TOUCH_MOUSEID) {
+                break;
+            }
+#endif
             SDL_Log("INPUT: MOUSE_MOTION x=%.1f y=%.1f rel=(%.1f,%.1f)",
                 e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
             dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
+#if defined(__APPLE__) && TARGET_OS_IOS
+            if (e.button.which == SDL_TOUCH_MOUSEID) {
+                break;
+            }
+#endif
             SDL_Log("INPUT: MOUSE_BUTTON_DOWN button=%d x=%.1f y=%.1f",
                 e.button.button, e.button.x, e.button.y);
             dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
+#if defined(__APPLE__) && TARGET_OS_IOS
+            if (e.button.which == SDL_TOUCH_MOUSEID) {
+                break;
+            }
+#endif
             SDL_Log("INPUT: MOUSE_BUTTON_UP button=%d x=%.1f y=%.1f",
                 e.button.button, e.button.x, e.button.y);
             dxinput_notify_mouse();
             handleMouseEvent(&e);
             break;
         case SDL_EVENT_MOUSE_WHEEL:
+#if defined(__APPLE__) && TARGET_OS_IOS
+            if (e.wheel.which == SDL_TOUCH_MOUSEID) {
+                break;
+            }
+#endif
             SDL_Log("INPUT: MOUSE_WHEEL x=%.1f y=%.1f", e.wheel.x, e.wheel.y);
             dxinput_notify_mouse();
             handleMouseEvent(&e);

@@ -284,6 +284,9 @@ void dxinput_notify_touch()
 {
 #if defined(__APPLE__) && TARGET_OS_IOS
     last_input_was_mouse = false;
+    left_button_down = false;
+    right_button_down = false;
+    last_mouse_buttons = 0;
     static int touch_event_count = 0;
     if (touch_event_count < 5) {
         debug_printf("iOS: Touch event received (count=%d)\n", ++touch_event_count);
