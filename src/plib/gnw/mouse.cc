@@ -479,6 +479,13 @@ void mouse_info()
         return;
     }
 
+    static bool pending_tap_release = false;
+    if (pending_tap_release) {
+        // Release tap click on next tick so UI sees a distinct DOWN/UP.
+        mouse_simulate_input(0, 0, 0);
+        pending_tap_release = false;
+    }
+
     // When using a physical mouse, update mouse state from dxinput
     // This ensures mouse_buttons is kept in sync
     if (dxinput_is_using_mouse()) {
@@ -558,9 +565,9 @@ void mouse_info()
                 }
 
                 // Then click at that exact position
-                // Send DOWN then immediately UP to complete the click
+                // Send DOWN now; release next tick so UI can register it
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                mouse_simulate_input(0, 0, 0); // Button UP
+                pending_tap_release = true;
 
                 SDL_Log("TAP CLICK: moved and clicked at tap position");
             } else if (gesture.numberOfTouches == 2) {
@@ -577,7 +584,7 @@ void mouse_info()
 
                 // Then right-click at that position
                 mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
-                mouse_simulate_input(0, 0, 0); // Button UP
+                pending_tap_release = true;
             } else if (gesture.numberOfTouches == 3) {
                 // Three-finger tap = left-click at tap position
                 int cursor_x, cursor_y;
@@ -592,7 +599,7 @@ void mouse_info()
 
                 // Then left-click at that position
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                mouse_simulate_input(0, 0, 0); // Button UP
+                pending_tap_release = true;
             }
             break;
         case kLongPress:
@@ -687,6 +694,11 @@ void mouse_info()
             break;
         }
 
+        return;
+    }
+
+    // For touch/pencil input, do not fall back to mouse state when no gesture.
+    if (!dxinput_is_using_mouse()) {
         return;
     }
 

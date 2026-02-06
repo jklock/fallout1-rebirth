@@ -16,8 +16,10 @@ namespace fallout {
 #define MAX_TOUCHES 10
 
 // All time thresholds are in milliseconds
-#define TAP_MAXIMUM_DURATION 150
-#define PAN_MINIMUM_MOVEMENT 4
+#define TAP_MAXIMUM_DURATION 200
+#define TAP_MAXIMUM_DURATION_MULTI 350
+#define PAN_MINIMUM_MOVEMENT 12
+#define PAN_MINIMUM_MOVEMENT_MULTI 16
 #define LONG_PRESS_MINIMUM_DURATION 500
 
 // Helper to convert SDL3 event timestamp (nanoseconds) to milliseconds
@@ -332,8 +334,9 @@ void touch_process_gesture()
                 endLatestTimestamp = std::max(endLatestTimestamp, touches[ended[index]].currentTimestamp);
             }
 
-            if (startLatestTimestamp - startEarliestTimestamp <= TAP_MAXIMUM_DURATION
-                && endLatestTimestamp - endEarliestTimestamp <= TAP_MAXIMUM_DURATION) {
+            Uint64 tapMaxDuration = endedCount >= 2 ? TAP_MAXIMUM_DURATION_MULTI : TAP_MAXIMUM_DURATION;
+            if (startLatestTimestamp - startEarliestTimestamp <= tapMaxDuration
+                && endLatestTimestamp - endEarliestTimestamp <= tapMaxDuration) {
                 TouchLocation currentCentroid = touch_get_current_location_centroid(ended, endedCount);
 
                 currentGesture.type = kTap;
@@ -353,8 +356,9 @@ void touch_process_gesture()
             TouchLocation currentCentroid = touch_get_current_location_centroid(active, activeCount);
 
             // Disambiguate between pan and long press.
-            if (abs(currentCentroid.x - startCentroid.x) >= PAN_MINIMUM_MOVEMENT
-                || abs(currentCentroid.y - startCentroid.y) >= PAN_MINIMUM_MOVEMENT) {
+            int panThreshold = activeCount >= 2 ? PAN_MINIMUM_MOVEMENT_MULTI : PAN_MINIMUM_MOVEMENT;
+            if (abs(currentCentroid.x - startCentroid.x) >= panThreshold
+                || abs(currentCentroid.y - startCentroid.y) >= panThreshold) {
                 currentGesture.type = kPan;
                 currentGesture.state = kBegan;
                 currentGesture.numberOfTouches = activeCount;
