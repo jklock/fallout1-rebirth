@@ -136,6 +136,9 @@ static int gMouseWheelY = 0;
 // These values adjust where clicks register relative to cursor position
 static int gClickOffsetX = 0;
 static int gClickOffsetY = 0;
+// iOS mouse/trackpad click offset correction (configurable via f1_res.ini)
+static int gClickOffsetMouseX = 0;
+static int gClickOffsetMouseY = 0;
 
 // 0x4B4780
 int GNW_mouse_init()
@@ -159,7 +162,16 @@ int GNW_mouse_init()
             if (config_get_value(&resConfig, "INPUT", "CLICK_OFFSET_Y", &offsetY)) {
                 gClickOffsetY = offsetY;
             }
-            SDL_Log("mouse_init: click offset loaded from config: X=%d Y=%d", gClickOffsetX, gClickOffsetY);
+            int offsetMouseX = 0;
+            int offsetMouseY = 0;
+            if (config_get_value(&resConfig, "INPUT", "CLICK_OFFSET_MOUSE_X", &offsetMouseX)) {
+                gClickOffsetMouseX = offsetMouseX;
+            }
+            if (config_get_value(&resConfig, "INPUT", "CLICK_OFFSET_MOUSE_Y", &offsetMouseY)) {
+                gClickOffsetMouseY = offsetMouseY;
+            }
+            SDL_Log("mouse_init: click offsets loaded from config: touch=(%d,%d) mouse=(%d,%d)",
+                gClickOffsetX, gClickOffsetY, gClickOffsetMouseX, gClickOffsetMouseY);
         }
         config_exit(&resConfig);
     }
@@ -883,8 +895,17 @@ bool mouse_click_in(int left, int top, int right, int bottom)
     // Apply configurable click offset (for iOS touch calibration)
     // Positive X shifts click right, positive Y shifts click down
     // Negative values shift the opposite direction
-    int click_x = mouse_hotx + mouse_x + gClickOffsetX;
-    int click_y = mouse_hoty + mouse_y + gClickOffsetY;
+    int offset_x = gClickOffsetX;
+    int offset_y = gClickOffsetY;
+#if defined(__APPLE__) && TARGET_OS_IOS
+    // Do not apply touch offset when using a real mouse/trackpad.
+    if (dxinput_is_using_mouse()) {
+        offset_x = gClickOffsetMouseX;
+        offset_y = gClickOffsetMouseY;
+    }
+#endif
+    int click_x = mouse_hotx + mouse_x + offset_x;
+    int click_y = mouse_hoty + mouse_y + offset_y;
 
     return (click_y >= top - expand) && (click_x <= right + expand) && (click_x >= left - expand) && (click_y <= bottom + expand);
 }

@@ -93,17 +93,29 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     }
     log_count++;
 
-    // SDL_GetMouseState returns coordinates in POINTS (logical), but
-    // iOS_screenToGameCoords expects PIXELS. Get the scale factor.
-    int window_w, window_h, window_pw, window_ph;
-    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
-    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
-    float scale_x = (float)window_pw / (float)window_w;
-    float scale_y = (float)window_ph / (float)window_h;
+    // Convert window coordinates (points) to render coordinates (pixels)
+    float render_x = system_x;
+    float render_y = system_y;
+    bool converted = false;
+    if (gSdlRenderer != NULL) {
+        converted = SDL_RenderCoordinatesFromWindow(gSdlRenderer, system_x, system_y, &render_x, &render_y);
+    }
 
-    // Convert points to pixels
-    float pixel_x = system_x * scale_x;
-    float pixel_y = system_y * scale_y;
+    if (!converted) {
+        int window_w = 0;
+        int window_h = 0;
+        int window_pw = 0;
+        int window_ph = 0;
+        SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+        SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+        float scale_x = (window_w > 0) ? (float)window_pw / (float)window_w : 1.0f;
+        float scale_y = (window_h > 0) ? (float)window_ph / (float)window_h : 1.0f;
+        render_x = system_x * scale_x;
+        render_y = system_y * scale_y;
+    }
+
+    float pixel_x = render_x;
+    float pixel_y = render_y;
 
     bool mouse_activity = false;
     if (last_system_x == -1 && last_system_y == -1) {
