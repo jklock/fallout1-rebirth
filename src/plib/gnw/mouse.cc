@@ -557,12 +557,12 @@ void mouse_info()
                 mouse_get_position(&cursor_x, &cursor_y);
                 int dx = gesture.x - cursor_x;
                 int dy = gesture.y - cursor_y;
-                
+
                 // Move cursor to tap position first
                 if (dx != 0 || dy != 0) {
                     mouse_simulate_input(dx, dy, 0);
                 }
-                
+
                 // Then right-click at that position
                 mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
                 mouse_simulate_input(0, 0, 0); // Button UP
@@ -572,12 +572,12 @@ void mouse_info()
                 mouse_get_position(&cursor_x, &cursor_y);
                 int dx = gesture.x - cursor_x;
                 int dy = gesture.y - cursor_y;
-                
+
                 // Move cursor to tap position first
                 if (dx != 0 || dy != 0) {
                     mouse_simulate_input(dx, dy, 0);
                 }
-                
+
                 // Then left-click at that position
                 mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
                 mouse_simulate_input(0, 0, 0); // Button UP
