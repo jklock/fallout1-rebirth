@@ -637,26 +637,12 @@ void mouse_info()
 
             if (gesture.type == kLongPress) {
                 if (gesture.numberOfTouches == 1 && gesture.state == kBegan) {
-#if defined(__APPLE__) && TARGET_OS_IOS
-                    if (pencil_precise_mode) {
-                        // Pencil in precise mode: long-press behaves like a left-button drag (no right-click).
-                        int cursor_x, cursor_y;
-                        mouse_get_position(&cursor_x, &cursor_y);
-                        mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                    } else
-#endif
-                    {
-                        // Long-press = RIGHT-click for examine/context menu
-                        int cursor_x, cursor_y;
-                        mouse_get_position(&cursor_x, &cursor_y);
-                        mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_RIGHT_BUTTON_DOWN);
-                    }
+                    // Single-finger long-press = LEFT-click drag (touch and pencil)
+                    int cursor_x, cursor_y;
+                    mouse_get_position(&cursor_x, &cursor_y);
+                    mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_LEFT_BUTTON_DOWN);
                 } else if (gesture.numberOfTouches == 1 && gesture.state == kChanged) {
-#if defined(__APPLE__) && TARGET_OS_IOS
-                    if (pencil_precise_mode) {
-                        mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                    }
-#endif
+                    mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
                 } else if (gesture.numberOfTouches == 2 && (gesture.state == kBegan || gesture.state == kChanged)) {
                     // Two-finger long-press = LEFT-click + drag
                     mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);

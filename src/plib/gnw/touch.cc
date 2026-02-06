@@ -16,7 +16,7 @@ namespace fallout {
 #define MAX_TOUCHES 10
 
 // All time thresholds are in milliseconds
-#define TAP_MAXIMUM_DURATION 75
+#define TAP_MAXIMUM_DURATION 150
 #define PAN_MINIMUM_MOVEMENT 4
 #define LONG_PRESS_MINIMUM_DURATION 500
 
