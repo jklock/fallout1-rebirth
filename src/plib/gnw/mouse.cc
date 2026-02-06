@@ -697,11 +697,6 @@ void mouse_info()
         return;
     }
 
-    // For touch/pencil input, do not fall back to mouse state when no gesture.
-    if (!dxinput_is_using_mouse()) {
-        return;
-    }
-
     // For mouse-based input (no gesture), skip if cursor is hidden
     if (mouse_is_hidden) {
         return;
