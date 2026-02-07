@@ -396,7 +396,7 @@ FodyWeavers.xsd
 /_deps
 
 # Game data (must not be committed - copyrighted)
-GOG/
+game-data/
 master.dat
 critter.dat
 *.sav
@@ -418,3 +418,6 @@ scripts/hideall.sh
 # Distribution builds (generated)
 /dist/*.dmg
 /dist/*.ipa
+
+# Ignore local GOG backups
+GOG/
