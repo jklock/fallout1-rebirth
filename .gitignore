@@ -402,7 +402,7 @@ critter.dat
 *.sav
 
 # Project documentation and research (internal use)
-development/
+development/archive/
 
 # Development files (AI agent notes - toggle with scripts/hideall.sh)
 **/JOURNAL.md
