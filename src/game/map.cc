@@ -38,7 +38,6 @@
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
 #include "plib/gnw/intrface.h"
-#include "plib/gnw/svga.h"
 #include "plib/gnw/memory.h"
 #include "plib/gnw/svga.h"
 

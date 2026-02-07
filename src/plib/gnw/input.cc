@@ -1191,8 +1191,7 @@ void GNW95_process_message()
         case SDL_EVENT_WINDOW_EXPOSED:
             win_refresh_all(&scr_size);
             break;
-        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
-        {
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
             bool size_changed = handleWindowSizeChanged();
             if (size_changed) {
 #if defined(__APPLE__) && TARGET_OS_IOS
