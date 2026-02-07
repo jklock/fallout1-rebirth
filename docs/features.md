@@ -89,7 +89,7 @@ Platform cleanup:
 - Improved App Store compatibility
 
 **Commit `3e5baea`** (2026-01-31): *Add iOS simulator testing script and update deployment targets to 26.0*
-- Added `scripts/test-ios-simulator.sh` for iPad testing
+- Added `scripts/test/test-ios-simulator.sh` for iPad testing
 - Auto-detect bundle ID from Info.plist
 - Robust simulator boot wait with retries
 - Copy game data to Documents container
@@ -285,7 +285,7 @@ Configuration options:
 Major build system change:
 - **Removed CI/CD workflows** (`.github/workflows/ci-build.yml`, `release.yml`)
 - Removed deprecated `package-macos-dmg-with-game-data.sh`
-- Simplified `build-macos-dmg.sh` (removed `--bundle` flag)
+- Simplified `scripts/build/build-macos-dmg.sh` (removed `--bundle` flag)
 - All builds are now local-only
 - Upload to GitHub Releases manually
 
@@ -297,25 +297,25 @@ The following scripts replace CI/CD:
 
 | Script | Purpose | Added In |
 |--------|---------|----------|
-| `build-macos.sh` | Build macOS app | Initial |
-| `build-ios.sh` | Build iOS IPA | Initial |
-| `build-macos-dmg.sh` | Package macOS DMG | `3f9e3ce` |
-| `build-ios-ipa.sh` | Package iOS IPA | `3f9e3ce` |
-| `test-ios-simulator.sh` | iOS Simulator testing | `3e5baea` |
-| `test-macos.sh` | macOS app testing | Initial |
-| `dev-check.sh` | Pre-commit checks | Initial |
-| `dev-verify.sh` | Full build verification | Initial |
-| `dev-format.sh` | Code formatting | Initial |
-| `dev-clean.sh` | Clean build artifacts | Initial |
+| `scripts/build/build-macos.sh` | Build macOS app | Initial |
+| `scripts/build/build-ios.sh` | Build iOS IPA | Initial |
+| `scripts/build/build-macos-dmg.sh` | Package macOS DMG | `3f9e3ce` |
+| `scripts/build/build-ios-ipa.sh` | Package iOS IPA | `3f9e3ce` |
+| `scripts/test/test-ios-simulator.sh` | iOS Simulator testing | `3e5baea` |
+| `scripts/test/test-macos.sh` | macOS app testing | Initial |
+| `scripts/dev/dev-check.sh` | Pre-commit checks | Initial |
+| `scripts/dev/dev-verify.sh` | Full build verification | Initial |
+| `scripts/dev/dev-format.sh` | Code formatting | Initial |
+| `scripts/dev/dev-clean.sh` | Clean build artifacts | Initial |
 
 **Commit `3e5baea`** (2026-01-31): *Add iOS simulator testing script*
 ```bash
 # Usage
-./scripts/test-ios-simulator.sh              # Full flow: build + install + launch
-./scripts/test-ios-simulator.sh --build-only # Just build
-./scripts/test-ios-simulator.sh --launch     # Launch existing install
-./scripts/test-ios-simulator.sh --shutdown   # Shutdown all simulators
-./scripts/test-ios-simulator.sh --list       # Show available iPad sims
+./scripts/test/test-ios-simulator.sh              # Full flow: build + install + launch
+./scripts/test/test-ios-simulator.sh --build-only # Just build
+./scripts/test/test-ios-simulator.sh --launch     # Launch existing install
+./scripts/test/test-ios-simulator.sh --shutdown   # Shutdown all simulators
+./scripts/test/test-ios-simulator.sh --list       # Show available iPad sims
 ```
 
 ### Xcode Integration

@@ -16,17 +16,17 @@ This skill provides guidance for working with the Fallout 1 Rebirth project, an 
 
 | Task | ALWAYS Use | NEVER Do This |
 |------|------------|---------------|
-| iOS Testing | `./scripts/test-ios-simulator.sh` | ❌ `cmake ...` or `xcrun simctl boot` |
-| macOS Testing | `./scripts/test-macos.sh` | ❌ `./build/fallout1-rebirth` directly |
-| iOS Build | `./scripts/build-ios.sh` | ❌ `cmake -B build-ios ...` |
-| macOS Build | `./scripts/build-macos.sh` | ❌ `cmake -B build-macos ...` |
-| Pre-commit | `./scripts/dev-check.sh` | ❌ running `clang-format` manually |
+| iOS Testing | `./scripts/test/test-ios-simulator.sh` | ❌ `cmake ...` or `xcrun simctl boot` |
+| macOS Testing | `./scripts/test/test-macos.sh` | ❌ `./build/fallout1-rebirth` directly |
+| iOS Build | `./scripts/build/build-ios.sh` | ❌ `cmake -B build-ios ...` |
+| macOS Build | `./scripts/build/build-macos.sh` | ❌ `cmake -B build-macos ...` |
+| Pre-commit | `./scripts/dev/dev-check.sh` | ❌ running `clang-format` manually |
 
 ### iOS Simulator Rules (MUST FOLLOW)
-1. **ALWAYS** use `./scripts/test-ios-simulator.sh` for iOS testing
+1. **ALWAYS** use `./scripts/test/test-ios-simulator.sh` for iOS testing
 2. **NEVER** run multiple simulators simultaneously — causes memory pressure
 3. **NEVER** use raw cmake commands for simulator builds
-4. **ALWAYS** run `./scripts/test-ios-simulator.sh --shutdown` before starting a new simulator
+4. **ALWAYS** run `./scripts/test/test-ios-simulator.sh --shutdown` before starting a new simulator
 5. Check running simulators: `xcrun simctl list devices | grep Booted`
 
 The scripts handle proper build configuration, simulator lifecycle management, and cleanup. Ignoring them causes test failures and wastes significant debugging time.
@@ -35,7 +35,7 @@ The scripts handle proper build configuration, simulator lifecycle management, a
 
 ### macOS (fast iteration)
 ```bash
-./scripts/build-macos.sh
+./scripts/build/build-macos.sh
 # or manual:
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build -j $(sysctl -n hw.physicalcpu)
@@ -43,17 +43,17 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 
 ### iOS Device
 ```bash
-./scripts/build-ios.sh
+./scripts/build/build-ios.sh
 ```
 
 ### iOS Simulator Testing (PRIMARY)
 **ALWAYS use this script for simulator testing:**
 ```bash
-./scripts/test-ios-simulator.sh              # Full flow: build + install + launch
-./scripts/test-ios-simulator.sh --build-only # Just build
-./scripts/test-ios-simulator.sh --launch     # Launch existing install
-./scripts/test-ios-simulator.sh --shutdown   # Shutdown all simulators
-./scripts/test-ios-simulator.sh --list       # Show available iPad sims
+./scripts/test/test-ios-simulator.sh              # Full flow: build + install + launch
+./scripts/test/test-ios-simulator.sh --build-only # Just build
+./scripts/test/test-ios-simulator.sh --launch     # Launch existing install
+./scripts/test/test-ios-simulator.sh --shutdown   # Shutdown all simulators
+./scripts/test/test-ios-simulator.sh --list       # Show available iPad sims
 ```
 
 **CRITICAL RULES:**

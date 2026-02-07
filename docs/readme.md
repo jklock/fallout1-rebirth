@@ -4,8 +4,6 @@ Documentation for Fallout 1 Rebirth — an Apple-only fork of Fallout 1 Communit
 
 Last updated: 2026-02-07
 
-> ⚠️ **LOCAL BUILDS ONLY** — This project is built locally. CI/CD workflows have been removed. Use the provided scripts for building and testing. See [scripts.md](scripts.md) for details.
-
 ## Documentation Index
 
 | Document | Description |

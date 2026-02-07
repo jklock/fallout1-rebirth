@@ -55,8 +55,8 @@ cmake -B build-ios-sim \
 ## See Also
 
 - [cmake/README.md](../README.md) - Parent directory documentation
-- [scripts/build-ios.sh](../../scripts/build-ios.sh) - iOS build script
-- [scripts/test-ios-simulator.sh](../../scripts/test-ios-simulator.sh) - Simulator testing script
+- [scripts/build/build-ios.sh](../../scripts/build/build-ios.sh) - iOS build script
+- [scripts/test/test-ios-simulator.sh](../../scripts/test/test-ios-simulator.sh) - Simulator testing script
 
 ---
 
@@ -66,6 +66,6 @@ cmake -B build-ios-sim \
 
 **Files read to verify content**:
 - cmake/toolchain/ios.toolchain.cmake (confirmed exists)
-- scripts/build-ios.sh, scripts/test-ios-simulator.sh (confirmed exist)
+- scripts/build/build-ios.sh, scripts/test/test-ios-simulator.sh (confirmed exist)
 
 **Updates made**: Refreshed deployment target example and verification date.

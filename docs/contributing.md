@@ -67,13 +67,13 @@ git checkout -b feature/your-feature-name
 
 ```bash
 # Build for macOS
-./scripts/build-macos.sh
+./scripts/build/build-macos.sh
 
 # Run pre-commit checks
-./scripts/dev-check.sh
+./scripts/dev/dev-check.sh
 
 # Test on iPad Simulator
-./scripts/test-ios-simulator.sh
+./scripts/test/test-ios-simulator.sh
 ```
 
 ---
@@ -86,10 +86,10 @@ The project uses a WebKit-based style (defined in `.clang-format`). Format all c
 
 ```bash
 # Format all source files
-./scripts/dev-format.sh
+./scripts/dev/dev-format.sh
 
 # Check formatting without modifying
-./scripts/dev-format.sh --check
+./scripts/dev/dev-format.sh --check
 ```
 
 ### Naming Conventions
@@ -182,13 +182,13 @@ Run these before every submission:
 
 ```bash
 # 1. Format code
-./scripts/dev-format.sh
+./scripts/dev/dev-format.sh
 
 # 2. Pre-commit checks (formatting + static analysis)
-./scripts/dev-check.sh
+./scripts/dev/dev-check.sh
 
 # 3. Build verification
-./scripts/dev-verify.sh
+./scripts/dev/dev-verify.sh
 ```
 
 All checks must pass before submitting a pull request.
@@ -197,9 +197,9 @@ All checks must pass before submitting a pull request.
 
 | Change Type | Required Testing |
 |-------------|------------------|
-| Build system | `./scripts/build-macos.sh` + `./scripts/build-ios.sh` |
-| macOS-only code | `./scripts/test-macos.sh` |
-| iOS-only code | `./scripts/test-ios-headless.sh --build` |
+| Build system | `./scripts/build/build-macos.sh` + `./scripts/build/build-ios.sh` |
+| macOS-only code | `./scripts/test/test-macos.sh` |
+| iOS-only code | `./scripts/test/test-ios-headless.sh --build` |
 | Core engine | Both macOS and iOS tests |
 | UI changes | Manual testing on both platforms |
 
@@ -218,7 +218,7 @@ If adding new `.cc` or `.h` files:
 
 2. Verify build:
    ```bash
-   ./scripts/build-macos.sh
+   ./scripts/build/build-macos.sh
    ```
 
 ### Commit Messages
@@ -257,7 +257,7 @@ Your PR should include:
 - **Clear title**: Summarize the change
 - **Description**: What, why, and how
 - **Testing done**: What you tested
-- **Local checks passed**: Confirm you ran `./scripts/dev-check.sh` and `./scripts/dev-verify.sh`
+- **Local checks passed**: Confirm you ran `./scripts/dev/dev-check.sh` and `./scripts/dev/dev-verify.sh`
 - **Related issues**: Link any related issues
 
 > **Important**: No automated CI will run on your PR. Maintainers will verify changes locally before merging.
@@ -270,10 +270,10 @@ Run these scripts before submitting:
 
 ```bash
 # Format + lint checks
-./scripts/dev-check.sh
+./scripts/dev/dev-check.sh
 
 # Full verification (build + static analysis)
-./scripts/dev-verify.sh
+./scripts/dev/dev-verify.sh
 ```
 
 | Check | Requirement |
@@ -305,8 +305,8 @@ All checks must pass locally before submitting a pull request.
 
 Releases are built and distributed locally:
 
-- **macOS**: `./scripts/build-macos-dmg.sh` creates a DMG installer
-- **iOS**: `./scripts/build-ios.sh` followed by `cd build-ios && cpack -C RelWithDebInfo` creates an IPA
+- **macOS**: `./scripts/build/build-macos-dmg.sh` creates a DMG installer
+- **iOS**: `./scripts/build/build-ios.sh` followed by `cd build-ios && cpack -C RelWithDebInfo` creates an IPA
 - Artifacts are uploaded to [GitHub Releases](https://github.com/ORIGINAL_OWNER/fallout1-rebirth/releases)
 
 Contributors do not need to create releases—maintainers handle this for each version.
@@ -357,8 +357,8 @@ Be respectful and constructive in all interactions. We welcome contributors of a
 
 - **Timestamp**: February 5, 2026
 - **Files verified**:
-  - `scripts/dev-check.sh` - Confirmed pre-commit check script exists
-  - `scripts/dev-verify.sh` - Confirmed verification script exists
-  - `scripts/dev-format.sh` - Confirmed formatting script exists
+  - `scripts/dev/dev-check.sh` - Confirmed pre-commit check script exists
+  - `scripts/dev/dev-verify.sh` - Confirmed verification script exists
+  - `scripts/dev/dev-format.sh` - Confirmed formatting script exists
   - `.clang-format` - Confirmed WebKit-based style configuration
 - **Updates made**: No updates needed - content verified accurate. Contribution guidelines, code style requirements, and PR process are all current.

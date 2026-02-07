@@ -12,10 +12,10 @@ Use these scripts instead of CI:
 
 | Task | Command |
 |------|---------|
-| Pre-commit checks | `./scripts/dev-check.sh` |
-| Full verification | `./scripts/dev-verify.sh` |
-| macOS DMG | `./scripts/build-macos-dmg.sh` |
-| iOS IPA | `./scripts/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo` |
+| Pre-commit checks | `./scripts/dev/dev-check.sh` |
+| Full verification | `./scripts/dev/dev-verify.sh` |
+| macOS DMG | `./scripts/build/build-macos-dmg.sh` |
+| iOS IPA | `./scripts/build/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo` |
 
 ## Releasing
 

@@ -10,11 +10,11 @@ Short, actionable instructions to help an AI coding agent get productive quickly
 
 | Task | Script | NOT This |
 |------|--------|----------|
-| Test iOS | `./scripts/test-ios-simulator.sh` | ❌ `cmake ...` or `xcrun simctl` directly |
-| Test macOS | `./scripts/test-macos.sh` | ❌ `./build/fallout1-rebirth` |
-| Build iOS | `./scripts/build-ios.sh` | ❌ `cmake -B build-ios ...` |
-| Build macOS | `./scripts/build-macos.sh` | ❌ `cmake -B build-macos ...` |
-| Pre-commit | `./scripts/dev-check.sh` | ❌ `clang-format` manually |
+| Test iOS | `./scripts/test/test-ios-simulator.sh` | ❌ `cmake ...` or `xcrun simctl` directly |
+| Test macOS | `./scripts/test/test-macos.sh` | ❌ `./build/fallout1-rebirth` |
+| Build iOS | `./scripts/build/build-ios.sh` | ❌ `cmake -B build-ios ...` |
+| Build macOS | `./scripts/build/build-macos.sh` | ❌ `cmake -B build-macos ...` |
+| Pre-commit | `./scripts/dev/dev-check.sh` | ❌ `clang-format` manually |
 
 The scripts handle simulator management, proper build configs, and cleanup. Ignoring them causes test failures and wastes time.
 
@@ -88,24 +88,24 @@ cd build-ios && cpack -C RelWithDebInfo  # creates .ipa
 
 ### Quick Build Scripts
 ```bash
-./scripts/build-macos.sh   # Build for macOS
-./scripts/build-ios.sh     # Build for iOS device
+./scripts/build/build-macos.sh   # Build for macOS
+./scripts/build/build-ios.sh     # Build for iOS device
 ```
 
 ## Available Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `./scripts/build-macos.sh` | Build for macOS |
-| `./scripts/build-ios.sh` | Build for iOS device |
-| `./scripts/test-ios-simulator.sh` | Build and test on iOS Simulator |
-| `./scripts/test-macos.sh` | Build and verify macOS app |
-| `./scripts/test-macos-headless.sh` | Headless macOS app validation |
-| `./scripts/test-ios-headless.sh` | Headless iOS Simulator validation |
-| `./scripts/dev-verify.sh` | Run verification (build + static checks) |
-| `./scripts/dev-check.sh` | Pre-commit checks (format + lint) |
-| `./scripts/dev-format.sh` | Format code with clang-format |
-| `./scripts/dev-clean.sh` | Clean all build artifacts |
+| `./scripts/build/build-macos.sh` | Build for macOS |
+| `./scripts/build/build-ios.sh` | Build for iOS device |
+| `./scripts/test/test-ios-simulator.sh` | Build and test on iOS Simulator |
+| `./scripts/test/test-macos.sh` | Build and verify macOS app |
+| `./scripts/test/test-macos-headless.sh` | Headless macOS app validation |
+| `./scripts/test/test-ios-headless.sh` | Headless iOS Simulator validation |
+| `./scripts/dev/dev-verify.sh` | Run verification (build + static checks) |
+| `./scripts/dev/dev-check.sh` | Pre-commit checks (format + lint) |
+| `./scripts/dev/dev-format.sh` | Format code with clang-format |
+| `./scripts/dev/dev-clean.sh` | Clean all build artifacts |
 
 ## Local Development (No CI)
 
@@ -113,16 +113,16 @@ cd build-ios && cpack -C RelWithDebInfo  # creates .ipa
 
 Run validation before every commit:
 ```bash
-./scripts/dev-check.sh    # Pre-commit format + lint checks
-./scripts/dev-verify.sh   # Full build verification + static analysis
+./scripts/dev/dev-check.sh    # Pre-commit format + lint checks
+./scripts/dev/dev-verify.sh   # Full build verification + static analysis
 ```
 
 ### Releasing
 
 Builds are created locally and uploaded to GitHub Releases:
 ```bash
-./scripts/build-macos-dmg.sh   # Creates macOS DMG
-./scripts/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo  # Creates iOS IPA
+./scripts/build/build-macos-dmg.sh   # Creates macOS DMG
+./scripts/build/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo  # Creates iOS IPA
 ```
 
 Then upload artifacts to GitHub Releases manually.
@@ -184,19 +184,19 @@ All dependencies are pinned via FetchContent GIT_TAG. Update tags when upgrading
 
 ### Automated Testing
 ```bash
-./scripts/dev-verify.sh   # Build verification + static checks
-./scripts/dev-check.sh    # Pre-commit format + lint checks
+./scripts/dev/dev-verify.sh   # Build verification + static checks
+./scripts/dev/dev-check.sh    # Pre-commit format + lint checks
 ```
 
 ### iOS Simulator Testing (Primary Target)
 
 **iPad is the primary use case.** Use the dedicated script:
 ```bash
-./scripts/test-ios-simulator.sh              # Full flow: build + install + launch
-./scripts/test-ios-simulator.sh --build-only # Just build
-./scripts/test-ios-simulator.sh --launch     # Launch existing install
-./scripts/test-ios-simulator.sh --shutdown   # Shutdown all simulators
-./scripts/test-ios-simulator.sh --list       # Show available iPad sims
+./scripts/test/test-ios-simulator.sh              # Full flow: build + install + launch
+./scripts/test/test-ios-simulator.sh --build-only # Just build
+./scripts/test/test-ios-simulator.sh --launch     # Launch existing install
+./scripts/test/test-ios-simulator.sh --shutdown   # Shutdown all simulators
+./scripts/test/test-ios-simulator.sh --list       # Show available iPad sims
 ```
 
 **Critical rules:**
@@ -210,8 +210,8 @@ All dependencies are pinned via FetchContent GIT_TAG. Update tags when upgrading
 
 ## Commit Checklist
 
-- [ ] Run `./scripts/dev-check.sh` (format + lint)
-- [ ] Run `./scripts/dev-verify.sh` (full build verification)
+- [ ] Run `./scripts/dev/dev-check.sh` (format + lint)
+- [ ] Run `./scripts/dev/dev-verify.sh` (full build verification)
 - [ ] Update `CMakeLists.txt` if adding sources
 - [ ] Document manual reproduction steps if assets required
 - [ ] Never include secrets or signing keys

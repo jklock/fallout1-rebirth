@@ -1,7 +1,5 @@
 # Building from Source
 
-> ⚠️ **LOCAL BUILDS ONLY** — This project has no CI/CD pipeline. All builds are performed locally on your machine. See [Distribution Workflow](#distribution-workflow) for how to create and share release artifacts.
-
 Build instructions for Fallout 1 Rebirth on all supported platforms (macOS and iOS/iPadOS).
 
 ## Table of Contents
@@ -58,7 +56,7 @@ clang-format --version
 **Always use the build script for standard builds.** It handles configuration, parallelization, and output paths correctly:
 
 ```bash
-./scripts/build-macos.sh
+./scripts/build/build-macos.sh
 ```
 
 The app bundle will be created at:
@@ -70,19 +68,19 @@ build-macos/RelWithDebInfo/Fallout 1 Rebirth.app
 
 ```bash
 # Debug build
-BUILD_TYPE=Debug ./scripts/build-macos.sh
+BUILD_TYPE=Debug ./scripts/build/build-macos.sh
 
 # Release build
-BUILD_TYPE=Release ./scripts/build-macos.sh
+BUILD_TYPE=Release ./scripts/build/build-macos.sh
 
 # Force clean rebuild
-CLEAN=1 ./scripts/build-macos.sh
+CLEAN=1 ./scripts/build/build-macos.sh
 
 # Custom build directory
-BUILD_DIR=my-build ./scripts/build-macos.sh
+BUILD_DIR=my-build ./scripts/build/build-macos.sh
 
 # Limit parallel jobs
-JOBS=4 ./scripts/build-macos.sh
+JOBS=4 ./scripts/build/build-macos.sh
 ```
 
 ### Method 2: Xcode Generator (GUI Development)
@@ -147,7 +145,7 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 **Always use the build script for standard builds:**
 
 ```bash
-./scripts/build-ios.sh
+./scripts/build/build-ios.sh
 ```
 
 The app bundle will be created at:
@@ -159,13 +157,13 @@ build-ios/RelWithDebInfo/fallout1-rebirth.app
 
 ```bash
 # Debug build
-BUILD_TYPE=Debug ./scripts/build-ios.sh
+BUILD_TYPE=Debug ./scripts/build/build-ios.sh
 
 # Force clean rebuild
-CLEAN=1 ./scripts/build-ios.sh
+CLEAN=1 ./scripts/build/build-ios.sh
 
 # Custom build directory
-BUILD_DIR=my-ios-build ./scripts/build-ios.sh
+BUILD_DIR=my-ios-build ./scripts/build/build-ios.sh
 ```
 
 ### Manual Build Commands
@@ -219,13 +217,13 @@ The simulator test script handles building, installing, and launching:
 
 ```bash
 # Full cycle: build, install, and launch
-./scripts/test-ios-simulator.sh
+./scripts/test/test-ios-simulator.sh
 
 # Build only (no simulator interaction)
-./scripts/test-ios-simulator.sh --build-only
+./scripts/test/test-ios-simulator.sh --build-only
 
 # List available iPad simulators
-./scripts/test-ios-simulator.sh --list
+./scripts/test/test-ios-simulator.sh --list
 ```
 
 See [testing.md](testing.md) for complete simulator testing documentation.
@@ -308,7 +306,7 @@ Note: Sanitizers significantly slow down execution but catch many bugs.
 Use the packaging script to create a distributable disk image:
 
 ```bash
-./scripts/build-macos-dmg.sh
+./scripts/build/build-macos-dmg.sh
 ```
 
 This script:
@@ -340,11 +338,11 @@ Output: `build-macos/fallout1-rebirth.dmg`
 Use the packaging script to create a distributable iOS package:
 
 ```bash
-./scripts/build-ios-ipa.sh
+./scripts/build/build-ios-ipa.sh
 ```
 
 This script:
-- Builds the app using `build-ios.sh`
+- Builds the app using `scripts/build/build-ios.sh`
 - Runs CPack to create the IPA
 - Outputs to `build-outputs/iOS/`
 
@@ -380,10 +378,10 @@ This project uses **local builds only** with manual GitHub Releases uploads. The
 1. **Build the distribution packages locally:**
    ```bash
    # macOS DMG
-   ./scripts/build-macos-dmg.sh
+   ./scripts/build/build-macos-dmg.sh
    
    # iOS IPA
-   ./scripts/build-ios-ipa.sh
+   ./scripts/build/build-ios-ipa.sh
    ```
 
 2. **Verify the outputs:**

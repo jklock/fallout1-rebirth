@@ -12,10 +12,10 @@ All scripts should be run from the repository root directory.
 
 | Script | Description |
 |--------|-------------|
-| `build-macos.sh` | Build for macOS (Xcode generator, creates .app bundle) |
-| `build-macos-dmg.sh` | Build macOS and create DMG installer |
-| `build-ios.sh` | Build for iOS devices (arm64, requires iOS SDK) |
-| `build-ios-ipa.sh` | Build iOS and create IPA package |
+| `scripts/build/build-macos.sh` | Build for macOS (Xcode generator, creates .app bundle) |
+| `scripts/build/build-macos-dmg.sh` | Build macOS and create DMG installer |
+| `scripts/build/build-ios.sh` | Build for iOS devices (arm64, requires iOS SDK) |
+| `scripts/build/build-ios-ipa.sh` | Build iOS and create IPA package |
 
 **Environment Variables** (all build scripts):
 - `BUILD_DIR` - Output directory (default varies by script)
@@ -27,40 +27,48 @@ All scripts should be run from the repository root directory.
 
 | Script | Description |
 |--------|-------------|
-| `test-macos.sh` | Build and verify macOS app bundle structure |
-| `test-macos-headless.sh` | Headless macOS app validation (no GUI) |
-| `test-ios-simulator.sh` | Build, install, and launch on iOS Simulator (iPad) |
-| `test-ios-headless.sh` | Headless iOS Simulator validation (automated) |
+| `scripts/test/test-macos.sh` | Build and verify macOS app bundle structure |
+| `scripts/test/test-macos-headless.sh` | Headless macOS app validation (no GUI) |
+| `scripts/test/test-ios-simulator.sh` | Build, install, and launch on iOS Simulator (iPad) |
+| `scripts/test/test-ios-headless.sh` | Headless iOS Simulator validation (automated) |
 
 ### Development Utilities
 
 | Script | Description |
 |--------|-------------|
-| `dev-verify.sh` | Automated verification suite (build, static analysis, configuration) |
-| `dev-check.sh` | Pre-commit checks (formatting, static analysis, CMake) |
-| `dev-format.sh` | Apply clang-format to all C++ source files |
-| `dev-clean.sh` | Remove all build directories |
+| `scripts/dev/dev-verify.sh` | Automated verification suite (build, static analysis, configuration) |
+| `scripts/dev/dev-check.sh` | Pre-commit checks (formatting, static analysis, CMake) |
+| `scripts/dev/dev-format.sh` | Apply clang-format to all C++ source files |
+| `scripts/dev/dev-clean.sh` | Remove all build directories |
+
+### RME Patch Scripts
+
+| Script | Description |
+|--------|-------------|
+| `scripts/patch/rebirth_patch_data.sh` | Core RME patcher (xdelta + DATA overlay) |
+| `scripts/patch/rebirth_patch_app.sh` | macOS wrapper (produces patched data for .app) |
+| `scripts/patch/rebirth_patch_ipa.sh` | iOS wrapper (produces patched data for .ipa) |
 
 ### Other Utilities
 
 | Script | Description |
 |--------|-------------|
-| `build-releases.sh` | Build release artifacts for all platforms |
-| `install-game-data.sh` | Install game data files to app bundle |
-| `hideall.sh` | Hide all windows (macOS utility) |
+| `scripts/build/build-releases.sh` | Build release artifacts for all platforms |
+| `scripts/test/test-install-game-data.sh` | Install game data files to app bundle |
+| `scripts/hideall.sh` | Hide all windows (macOS utility) |
 
 ---
 
 ## iOS Simulator Testing
 
-The `test-ios-simulator.sh` script is the primary way to test on iPad (the main target platform):
+The `scripts/test/test-ios-simulator.sh` script is the primary way to test on iPad (the main target platform):
 
 ```bash
-./scripts/test-ios-simulator.sh              # Full flow: build + install + launch
-./scripts/test-ios-simulator.sh --build-only # Just build for simulator
-./scripts/test-ios-simulator.sh --launch     # Launch existing installation
-./scripts/test-ios-simulator.sh --shutdown   # Stop all running simulators
-./scripts/test-ios-simulator.sh --list       # List available iPad simulators
+./scripts/test/test-ios-simulator.sh              # Full flow: build + install + launch
+./scripts/test/test-ios-simulator.sh --build-only # Just build for simulator
+./scripts/test/test-ios-simulator.sh --launch     # Launch existing installation
+./scripts/test/test-ios-simulator.sh --shutdown   # Stop all running simulators
+./scripts/test/test-ios-simulator.sh --list       # List available iPad simulators
 ```
 
 **Environment Variables**:
@@ -80,8 +88,8 @@ The `test-ios-simulator.sh` script is the primary way to test on iPad (the main 
 Build and verify the macOS app bundle:
 
 ```bash
-./scripts/test-macos.sh              # Full build + verification
-./scripts/test-macos.sh --verify     # Verify existing build only
+./scripts/test/test-macos.sh              # Full build + verification
+./scripts/test/test-macos.sh --verify     # Verify existing build only
 ```
 
 **Verification Checks**:
@@ -98,14 +106,14 @@ Build and verify the macOS app bundle:
 Before committing changes:
 
 ```bash
-./scripts/dev-format.sh   # Apply clang-format to source files
-./scripts/dev-check.sh    # Verify formatting, static analysis, CMake config
+./scripts/dev/dev-format.sh   # Apply clang-format to source files
+./scripts/dev/dev-check.sh    # Verify formatting, static analysis, CMake config
 ```
 
 Or check formatting only (no modifications):
 
 ```bash
-./scripts/dev-format.sh --check
+./scripts/dev/dev-format.sh --check
 ```
 
 ---
@@ -114,22 +122,22 @@ Or check formatting only (no modifications):
 
 ```bash
 # Full macOS build and test
-./scripts/test-macos.sh
+./scripts/test/test-macos.sh
 
 # Debug build for macOS
-BUILD_TYPE=Debug ./scripts/build-macos.sh
+BUILD_TYPE=Debug ./scripts/build/build-macos.sh
 
 # Full iOS Simulator test cycle
-./scripts/test-ios-simulator.sh
+./scripts/test/test-ios-simulator.sh
 
 # Clean rebuild for iOS device
-CLEAN=1 ./scripts/build-ios.sh
+CLEAN=1 ./scripts/build/build-ios.sh
 
 # Pre-commit verification
-./scripts/dev-verify.sh
+./scripts/dev/dev-verify.sh
 
 # Clean all build artifacts
-./scripts/dev-clean.sh
+./scripts/dev/dev-clean.sh
 ```
 
 ---
@@ -151,7 +159,7 @@ CLEAN=1 ./scripts/build-ios.sh
 **Files read to verify content**:
 - scripts/ directory listing (all .sh files verified)
 - Removed reference to journal.sh (does not exist)
-- Added build-releases.sh, install-game-data.sh, hideall.sh (confirmed exist)
+- Added scripts/build/build-releases.sh, scripts/test/test-install-game-data.sh, scripts/hideall.sh (confirmed exist)
 
 **Updates made**:
 - Refreshed verification date and confirmed current script list

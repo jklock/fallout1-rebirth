@@ -1,7 +1,5 @@
 # Testing
 
-> **⚠️ LOCAL BUILDS ONLY**: This project does not use CI/CD. All testing and verification must be performed locally before submitting pull requests.
-
 Testing procedures for Fallout 1 Rebirth: automated tests, simulator testing, and manual verification.
 
 ## Table of Contents
@@ -27,11 +25,11 @@ Testing procedures for Fallout 1 Rebirth: automated tests, simulator testing, an
 
 | Category | Purpose | Scripts |
 |----------|---------|---------|
-| Build Verification | Ensure code compiles | `dev-verify.sh` |
-| Static Analysis | Catch bugs without running | `dev-check.sh` |
-| Simulator Testing | Run on iPad Simulator | `test-ios-simulator.sh` |
-| Headless Testing | CI-friendly validation | `test-ios-headless.sh` |
-| macOS Testing | Verify macOS app bundle | `test-macos.sh` |
+| Build Verification | Ensure code compiles | `scripts/dev/dev-verify.sh` |
+| Static Analysis | Catch bugs without running | `scripts/dev/dev-check.sh` |
+| Simulator Testing | Run on iPad Simulator | `scripts/test/test-ios-simulator.sh` |
+| Headless Testing | CI-friendly validation | `scripts/test/test-ios-headless.sh` |
+| macOS Testing | Verify macOS app bundle | `scripts/test/test-macos.sh` |
 
 ### Platform Focus
 
@@ -47,16 +45,16 @@ iPad is the **primary target platform** for this project. Testing priorities:
 
 ```bash
 # Pre-commit checks (formatting + static analysis)
-./scripts/dev-check.sh
+./scripts/dev/dev-check.sh
 
 # Full build verification
-./scripts/dev-verify.sh
+./scripts/dev/dev-verify.sh
 
 # Test on iPad Simulator
-./scripts/test-ios-simulator.sh
+./scripts/test/test-ios-simulator.sh
 
 # Test macOS build
-./scripts/test-macos.sh
+./scripts/test/test-macos.sh
 ```
 
 ---
@@ -68,7 +66,7 @@ iPad is the **primary target platform** for this project. Testing priorities:
 Run before every commit:
 
 ```bash
-./scripts/dev-check.sh
+./scripts/dev/dev-check.sh
 ```
 
 **Checks performed**:
@@ -102,7 +100,7 @@ All checks passed!
 Run the full verification suite:
 
 ```bash
-./scripts/dev-verify.sh
+./scripts/dev/dev-verify.sh
 ```
 
 **Tests performed**:
@@ -115,8 +113,8 @@ Run the full verification suite:
 
 **Environment variables**:
 ```bash
-BUILD_DIR=build-test ./scripts/dev-verify.sh
-GAME_DATA=/path/to/fallout ./scripts/dev-verify.sh
+BUILD_DIR=build-test ./scripts/dev/dev-verify.sh
+GAME_DATA=/path/to/fallout ./scripts/dev/dev-verify.sh
 ```
 
 ---
@@ -136,22 +134,22 @@ The iOS Simulator lets you test iPad functionality without a physical device. It
 
 ```bash
 # Full test cycle: build, install, launch
-./scripts/test-ios-simulator.sh
+./scripts/test/test-ios-simulator.sh
 
 # Build only (no simulator)
-./scripts/test-ios-simulator.sh --build-only
+./scripts/test/test-ios-simulator.sh --build-only
 
 # Launch existing installation
-./scripts/test-ios-simulator.sh --launch
+./scripts/test/test-ios-simulator.sh --launch
 
 # Shutdown all simulators
-./scripts/test-ios-simulator.sh --shutdown
+./scripts/test/test-ios-simulator.sh --shutdown
 
 # List available iPad simulators
-./scripts/test-ios-simulator.sh --list
+./scripts/test/test-ios-simulator.sh --list
 
 # Show help
-./scripts/test-ios-simulator.sh --help
+./scripts/test/test-ios-simulator.sh --help
 ```
 
 ### Environment Variables
@@ -168,16 +166,16 @@ The iOS Simulator lets you test iPad functionality without a physical device. It
 
 ```bash
 # 1. First, ensure no simulators are running
-./scripts/test-ios-simulator.sh --shutdown
+./scripts/test/test-ios-simulator.sh --shutdown
 
 # 2. Check available iPad simulators
-./scripts/test-ios-simulator.sh --list
+./scripts/test/test-ios-simulator.sh --list
 
 # 3. Set your preferred simulator (if different from default)
 export SIMULATOR_NAME="iPad Pro 11-inch (M4)"
 
 # 4. Run full test cycle
-./scripts/test-ios-simulator.sh
+./scripts/test/test-ios-simulator.sh
 ```
 
 ### Game Data Setup
@@ -195,7 +193,7 @@ GOG/Fallout1/
     └── music/
 
 # Or specify custom location
-GAME_DATA=/path/to/fallout ./scripts/test-ios-simulator.sh
+GAME_DATA=/path/to/fallout ./scripts/test/test-ios-simulator.sh
 ```
 
 ### Troubleshooting Simulator Issues
@@ -232,13 +230,13 @@ xcrun simctl erase all
 
 ```bash
 # Full build and verification
-./scripts/test-macos.sh
+./scripts/test/test-macos.sh
 
 # Verify existing build only
-./scripts/test-macos.sh --verify
+./scripts/test/test-macos.sh --verify
 
 # Show help
-./scripts/test-macos.sh --help
+./scripts/test/test-macos.sh --help
 ```
 
 ### Verification Checks
@@ -284,16 +282,16 @@ For CI/CD environments without GUI access:
 
 ```bash
 # Full headless test cycle
-./scripts/test-ios-headless.sh
+./scripts/test/test-ios-headless.sh
 
 # Build first, then test
-./scripts/test-ios-headless.sh --build
+./scripts/test/test-ios-headless.sh --build
 
 # Skip simulator tests (bundle validation only)
-./scripts/test-ios-headless.sh --skip-sim
+./scripts/test/test-ios-headless.sh --skip-sim
 
 # Show help
-./scripts/test-ios-headless.sh --help
+./scripts/test/test-ios-headless.sh --help
 ```
 
 **Tests performed**:
@@ -313,10 +311,10 @@ For CI/CD environments without GUI access:
 For CI-friendly macOS verification:
 
 ```bash
-./scripts/test-macos-headless.sh
+./scripts/test/test-macos-headless.sh
 ```
 
-Performs the same checks as `test-macos.sh` but optimized for non-interactive environments.
+Performs the same checks as `scripts/test/test-macos.sh` but optimized for non-interactive environments.
 
 ---
 
@@ -376,13 +374,13 @@ This project uses **local builds exclusively**. CI/CD workflows have been remove
 Before every commit, run:
 
 ```bash
-./scripts/dev-check.sh
+./scripts/dev/dev-check.sh
 ```
 
 Before submitting a PR, run:
 
 ```bash
-./scripts/dev-verify.sh
+./scripts/dev/dev-verify.sh
 ```
 
 ### Running All Checks
@@ -398,13 +396,13 @@ find src -type f -name '*.cc' -o -name '*.h' | \
   xargs clang-format --dry-run --Werror
 
 # Full build verification
-./scripts/dev-verify.sh
+./scripts/dev/dev-verify.sh
 
 # Test on iOS Simulator
-./scripts/test-ios-simulator.sh
+./scripts/test/test-ios-simulator.sh
 
 # Test macOS build
-./scripts/test-macos.sh
+./scripts/test/test-macos.sh
 ```
 
 ### Verification Results
@@ -412,7 +410,7 @@ find src -type f -name '*.cc' -o -name '*.h' | \
 | Check | Pass Criteria | Fix |
 |-------|--------------|-----|
 | Static analysis | No errors | Address cppcheck warnings |
-| Code format | No differences | Run `./scripts/dev-format.sh` |
+| Code format | No differences | Run `./scripts/dev/dev-format.sh` |
 | iOS build | Compiles successfully | Fix build errors |
 | macOS build | Compiles successfully | Fix build errors |
 
@@ -422,10 +420,10 @@ Builds are created locally and uploaded to GitHub Releases:
 
 ```bash
 # Create macOS DMG
-./scripts/build-macos-dmg.sh
+./scripts/build/build-macos-dmg.sh
 
 # Create iOS IPA
-./scripts/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo
+./scripts/build/build-ios.sh && cd build-ios && cpack -C RelWithDebInfo
 ```
 
 Then upload artifacts to GitHub Releases manually.
@@ -435,8 +433,8 @@ Then upload artifacts to GitHub Releases manually.
 Since there's no automated CI, **you are responsible** for ensuring:
 
 1. ✅ Code compiles on both macOS and iOS
-2. ✅ No formatting violations (`dev-check.sh` passes)
-3. ✅ Static analysis clean (`dev-verify.sh` passes)
+2. ✅ No formatting violations (`scripts/dev/dev-check.sh` passes)
+3. ✅ Static analysis clean (`scripts/dev/dev-verify.sh` passes)
 4. ✅ App launches successfully on target platform
 5. ✅ No regressions in existing functionality
 ---
@@ -445,10 +443,10 @@ Since there's no automated CI, **you are responsible** for ensuring:
 
 - **Timestamp**: February 5, 2026
 - **Files verified**:
-  - `scripts/test-ios-simulator.sh` - Confirmed script exists and matches documentation
-  - `scripts/test-macos.sh` - Confirmed script exists
-  - `scripts/test-ios-headless.sh` - Confirmed script exists
-  - `scripts/test-macos-headless.sh` - Confirmed script exists
-  - `scripts/dev-check.sh` - Confirmed script exists
-  - `scripts/dev-verify.sh` - Confirmed script exists
+  - `scripts/test/test-ios-simulator.sh` - Confirmed script exists and matches documentation
+  - `scripts/test/test-macos.sh` - Confirmed script exists
+  - `scripts/test/test-ios-headless.sh` - Confirmed script exists
+  - `scripts/test/test-macos-headless.sh` - Confirmed script exists
+  - `scripts/dev/dev-check.sh` - Confirmed script exists
+  - `scripts/dev/dev-verify.sh` - Confirmed script exists
 - **Updates made**: No updates needed - content verified accurate. Testing procedures, script documentation, and verification requirements are all current.
