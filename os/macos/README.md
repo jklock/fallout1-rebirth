@@ -2,6 +2,8 @@
 
 macOS application bundle resources.
 
+Last updated: 2026-02-07
+
 ## Contents
 
 | File | Description |
@@ -56,10 +58,10 @@ Alternatively, distribute unsigned builds with instructions for users to remove 
 
 ## Proof of Work
 
-**Last Verified**: February 5, 2026
+**Last Verified**: 2026-02-07
 
 **Files read to verify content**:
 - os/macos/Info.plist (confirmed exists)
 - os/macos/fallout1-rebirth.icns (confirmed exists)
 
-**Updates made**: No updates needed - content verified accurate. Both documented files present.
+**Updates made**: Refreshed verification date.

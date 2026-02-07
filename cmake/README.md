@@ -2,6 +2,8 @@
 
 CMake build system support files.
 
+Last updated: 2026-02-07
+
 ## Structure
 
 | Directory | Description |
@@ -17,7 +19,7 @@ CMake toolchain file for iOS and iOS Simulator builds. Based on the popular `ios
 Key variables:
 - `PLATFORM` - Target platform (OS64 for device, SIMULATORARM64 for Apple Silicon simulator)
 - `ENABLE_BITCODE` - Bitcode embedding (set to 0, deprecated by Apple)
-- `DEPLOYMENT_TARGET` - Minimum iOS version
+- `DEPLOYMENT_TARGET` - Minimum iOS version (this repo sets 15.0 in root CMakeLists.txt)
 
 Usage:
 
@@ -51,10 +53,10 @@ The root `CMakeLists.txt` handles:
 
 ## Proof of Work
 
-**Last Verified**: February 5, 2026
+**Last Verified**: 2026-02-07
 
 **Files read to verify content**:
 - cmake/toolchain/ (confirmed contains ios.toolchain.cmake)
-- Root CMakeLists.txt (verified project structure)
+- Root CMakeLists.txt (verified project structure and iOS target 15.0)
 
-**Updates made**: Clarified third-party dependencies list (SDL3, adecode, fpattern).
+**Updates made**: Refreshed deployment target note and verification date.

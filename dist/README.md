@@ -2,6 +2,8 @@
 
 Distribution files and default configurations.
 
+Last updated: 2026-02-07
+
 Contains platform-specific files that are bundled with the distributed application.
 
 ## Structure
@@ -41,8 +43,8 @@ These files are copied into the application bundle during packaging. On iOS, the
 
 ## User Configuration
 
-At runtime, the game looks for configuration files in platform-specific locations:
-- macOS: Application Support directory
-- iOS: App's Documents container
+At runtime, the game reads configuration relative to the working directory:
+- macOS: typically the app bundle (Contents/MacOS or Contents/Resources)
+- iOS: the app's Documents container
 
-The bundled defaults are used when user configs don't exist.
+The bundled defaults are used when user configs don't exist in those locations.

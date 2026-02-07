@@ -2,6 +2,8 @@
 
 Build, test, and development automation scripts for Fallout 1 Rebirth.
 
+Last updated: 2026-02-07
+
 All scripts should be run from the repository root directory.
 
 ## Script Reference
@@ -62,7 +64,7 @@ The `test-ios-simulator.sh` script is the primary way to test on iPad (the main 
 ```
 
 **Environment Variables**:
-- `SIMULATOR_NAME` - Target device (default: "iPad Pro 13-inch (M4)")
+- `SIMULATOR_NAME` - Target device (default: "iPad Pro 13-inch (M5)")
 - `GAME_DATA` - Path to game files (default: "GOG/Fallout1")
 - `BUILD_TYPE` - Build configuration (default: "RelWithDebInfo")
 
@@ -144,7 +146,7 @@ CLEAN=1 ./scripts/build-ios.sh
 
 ## Proof of Work
 
-**Last Verified**: February 5, 2026
+**Last Verified**: 2026-02-07
 
 **Files read to verify content**:
 - scripts/ directory listing (all .sh files verified)
@@ -152,6 +154,4 @@ CLEAN=1 ./scripts/build-ios.sh
 - Added build-releases.sh, install-game-data.sh, hideall.sh (confirmed exist)
 
 **Updates made**:
-- Removed non-existent `journal.sh` from Development Utilities
-- Added "Other Utilities" section with `build-releases.sh`, `install-game-data.sh`, `hideall.sh`
-
+- Refreshed verification date and confirmed current script list

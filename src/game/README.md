@@ -2,6 +2,8 @@
 
 Core game logic and mechanics for Fallout 1.
 
+Last updated: 2026-02-07
+
 ## Entry Points
 
 - `main.cc/h` - Application entry, main game loop

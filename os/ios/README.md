@@ -2,6 +2,8 @@
 
 iOS and iPadOS application bundle resources.
 
+Last updated: 2026-02-07
+
 ## Contents
 
 | File | Description |
@@ -39,11 +41,11 @@ These resources are included in the iOS build via CMake's `MACOSX_BUNDLE` and `R
 
 ## Proof of Work
 
-**Last Verified**: February 5, 2026
+**Last Verified**: 2026-02-07
 
 **Files read to verify content**:
 - os/ios/Info.plist (confirmed exists)
 - os/ios/LaunchScreen.storyboard (confirmed exists)
 - os/ios/AppIcon.xcassets/ (confirmed exists)
 
-**Updates made**: No updates needed - content verified accurate. All documented files present.
+**Updates made**: Refreshed verification date.

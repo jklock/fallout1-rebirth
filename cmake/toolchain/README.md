@@ -2,6 +2,8 @@
 
 CMake toolchain files for cross-compilation to Apple platforms.
 
+Last updated: 2026-02-07
+
 ## Contents
 
 | File | Description |
@@ -18,7 +20,7 @@ A comprehensive CMake toolchain file for building iOS applications. Based on the
 |----------|-------------|----------------|
 | `PLATFORM` | Target platform | `OS64` (device), `SIMULATORARM64` (Apple Silicon sim) |
 | `ENABLE_BITCODE` | Bitcode embedding | `0` (disabled, deprecated by Apple) |
-| `DEPLOYMENT_TARGET` | Minimum iOS version | `14.0` |
+| `DEPLOYMENT_TARGET` | Minimum iOS version | `15.0` |
 
 ### Platform Values
 
@@ -60,10 +62,10 @@ cmake -B build-ios-sim \
 
 ## Proof of Work
 
-**Last Verified**: February 5, 2026
+**Last Verified**: 2026-02-07
 
 **Files read to verify content**:
 - cmake/toolchain/ios.toolchain.cmake (confirmed exists)
 - scripts/build-ios.sh, scripts/test-ios-simulator.sh (confirmed exist)
 
-**Updates made**: No updates needed - content verified accurate. All referenced files exist and documentation matches actual toolchain capabilities.
+**Updates made**: Refreshed deployment target example and verification date.

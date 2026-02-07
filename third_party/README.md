@@ -2,13 +2,15 @@
 
 Third-party dependencies managed via CMake FetchContent.
 
+Last updated: 2026-02-07
+
 Each subdirectory contains a CMakeLists.txt that fetches the dependency from its upstream repository at a pinned commit or tag.
 
 ## Dependencies
 
 | Directory | Library | Version | Description |
 |-----------|---------|---------|-------------|
-| [sdl3/](sdl3/) | SDL3 | 3.2.4 | Cross-platform multimedia library (upgraded from SDL2) |
+| [sdl3/](sdl3/) | SDL3 | 3.4.0 | Cross-platform multimedia library (upgraded from SDL2) |
 | [adecode/](adecode/) | adecode | 1.0.0 | ACM audio decoder |
 | [fpattern/](fpattern/) | fpattern | 1.9 | Filename pattern matching |
 
@@ -46,7 +48,7 @@ Example:
 ```cmake
 FetchContent_Declare(sdl3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
-    GIT_TAG "release-3.2.4"  # Update this line
+    GIT_TAG "release-3.4.0"  # Update this line
 )
 ```
 
@@ -61,14 +63,12 @@ During build, dependencies are fetched into `build/_deps/`:
 
 ## Proof of Work
 
-**Last Verified**: February 5, 2026
+**Last Verified**: 2026-02-07
 
 **Files read to verify content**:
 - third_party/ directory listing (sdl3/, adecode/, fpattern/ confirmed)
-- third_party/sdl3/CMakeLists.txt (GIT_TAG "release-3.2.4" confirmed)
+- third_party/sdl3/CMakeLists.txt (GIT_TAG "release-3.4.0" confirmed)
 
 **Updates made**:
-- Changed SDL2 references to SDL3 throughout
-- Updated version from 2.30.10 to 3.2.4
-- Updated SDL section to describe SDL3 features
-- Updated CMake example to use sdl3 and release-3.2.4
+- Updated SDL3 version references and CMake example to release-3.4.0
+- Refreshed verification date

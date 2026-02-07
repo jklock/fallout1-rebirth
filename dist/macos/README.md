@@ -2,6 +2,8 @@
 
 macOS distribution files bundled with the application.
 
+Last updated: 2026-02-07
+
 ## Contents
 
 | File | Description |

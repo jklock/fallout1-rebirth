@@ -4,6 +4,8 @@
 
 # Fallout 1 Rebirth
 
+Last updated: 2026-02-07
+
 **Play Fallout 1 on your Mac or iPad** — the classic 1997 RPG, rebuilt for Apple platforms.
 
 Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout on macOS and iOS/iPadOS with native performance, bug fixes, and quality-of-life improvements.
@@ -32,7 +34,7 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 | Platform | Download | Requirements |
 |----------|----------|--------------|
 | **macOS** | `Fallout 1 Rebirth.dmg` | macOS 11+ (Big Sur or later) |
-| **iOS/iPadOS** | `fallout1-rebirth.ipa` | iOS 14+ (sideloading required) |
+| **iOS/iPadOS** | `fallout1-rebirth.ipa` | iOS 15+ (sideloading required) |
 
 ---
 
@@ -75,19 +77,22 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 
 | Gesture | Action |
 |---------|--------|
-| Tap | Move cursor + click |
-| Drag | Move cursor |
+| Tap | Move cursor to tap position + left-click |
+| One-finger pan | Move cursor; if started near cursor, drags |
+| Long-press | Left-click drag |
 | Two-finger tap | Right-click (change cursor mode) |
-| Three-finger tap | Click without moving cursor |
+| Three-finger tap | Left-click |
+| Two-finger pan | Scroll |
 
 ### Apple Pencil
 
 | Gesture | Action |
 |---------|--------|
-| Tap near cursor | Left-click |
-| Tap away from cursor | Move cursor only |
-| Long-press | Right-click |
-| Double-tap pencil body | Right-click (2nd gen+) |
+| Tap | Same as touch (move + left-click) |
+| Pan | Always drags (left button held) |
+| Double-tap or squeeze (body) | Right-click (if enabled) |
+
+> Pencil body gestures are controlled by `pencil_right_click` in `fallout.cfg`.
 
 ### Magic Keyboard / Trackpad
 
@@ -114,7 +119,7 @@ Full mouse and keyboard support — works just like on Mac.
 → Make sure `f1_res.ini` is in the same folder as your game data.
 
 **Touch/click doesn't hit the target (iOS)**  
-→ Adjust `CLICK_OFFSET_Y` in `f1_res.ini` `[INPUT]` section. Default is `-12`. See [configuration docs](docs/configuration.md).
+→ Adjust `CLICK_OFFSET_Y` in `f1_res.ini` `[INPUT]` section (default is `0`). See [configuration docs](docs/configuration.md).
 
 **Files have wrong case (MASTER.DAT vs master.dat)**  
 → Filenames must be lowercase. See [setup guide](docs/setup_guide.md#part-2-getting-game-data-files).

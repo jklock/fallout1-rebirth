@@ -2,6 +2,8 @@
 
 Platform-specific code implementations.
 
+Last updated: 2026-02-07
+
 ## Structure
 
 | Directory | Description |
@@ -16,6 +18,8 @@ iOS-specific path handling and system integration:
 |------|-------------|
 | `paths.mm` | Objective-C++ file path resolution for iOS containers |
 | `paths.h` | Path function declarations |
+| `pencil.mm` | Apple Pencil gesture and touch tracking (UIKit bridge) |
+| `pencil.h` | Pencil API used by the input subsystem |
 
 ### iOS Path Resolution
 

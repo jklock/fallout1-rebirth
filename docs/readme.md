@@ -2,6 +2,8 @@
 
 Documentation for Fallout 1 Rebirth — an Apple-only fork of Fallout 1 Community Edition for macOS and iOS/iPadOS.
 
+Last updated: 2026-02-07
+
 > ⚠️ **LOCAL BUILDS ONLY** — This project is built locally. CI/CD workflows have been removed. Use the provided scripts for building and testing. See [scripts.md](scripts.md) for details.
 
 ## Documentation Index
@@ -13,7 +15,9 @@ Documentation for Fallout 1 Rebirth — an Apple-only fork of Fallout 1 Communit
 | [configuration.md](configuration.md) | Config file reference (fallout.cfg, f1_res.ini) |
 | [contributing.md](contributing.md) | How to contribute |
 | [features.md](features.md) | Complete feature history and changelog |
+| [input.md](input.md) | Input system deep dive (mouse, touch, Pencil) |
 | [scripts.md](scripts.md) | Reference for all automation scripts |
+| [sdl3.md](sdl3.md) | SDL3 migration notes and API mapping |
 | [setup_guide.md](setup_guide.md) | Step-by-step setup guide for end users |
 | [testing.md](testing.md) | Testing procedures and scripts |
 | [vsync.md](vsync.md) | VSync and display settings |
@@ -51,7 +55,7 @@ Fallout 1 Rebirth is a working re-implementation of Fallout with:
 ### Key Features
 
 - **VSync enabled by default** for smooth display
-- **Touch input** with proper coordinate handling
+- **Touch input** with gesture recognition and coordinate conversion
 - **Apple Pencil support** with gesture recognition and precise positioning
 - **f1_res.ini configuration system** for display and resolution settings
 - **Local-only builds** (no CI/CD) — use provided scripts
@@ -96,9 +100,9 @@ Game assets are NOT included and must be obtained from a legal copy of Fallout.
 
 ## Proof of Work
 
-- **Timestamp**: February 5, 2026
+- **Timestamp**: 2026-02-07
 - **Files verified**:
   - `CMakeLists.txt` - Confirmed iOS deployment target 15.0, macOS 11.0
   - All linked documentation files exist and are accessible
 - **Updates made**:
-  - Updated iOS minimum version from 14.0+ to 15.0+ to match CMakeLists.txt
+- Added input.md and sdl3.md to the documentation index and refreshed timestamps
