@@ -45,9 +45,10 @@ All scripts should be run from the repository root directory.
 
 | Script | Description |
 |--------|-------------|
-| `scripts/patch/rebirth_patch_data.sh` | Core RME patcher (xdelta + DATA overlay) |
-| `scripts/patch/rebirth_patch_app.sh` | macOS wrapper (produces patched data for .app) |
-| `scripts/patch/rebirth_patch_ipa.sh` | iOS wrapper (produces patched data for .ipa) |
+| `scripts/patch/rebirth-patch-data.sh` | Core RME patcher (xdelta + DATA overlay) |
+| `scripts/patch/rebirth-patch-app.sh` | macOS wrapper (produces patched data for .app) |
+| `scripts/patch/rebirth-patch-ipa.sh` | iOS wrapper (produces patched data for .ipa) |
+| `scripts/patch/rebirth-validate-data.sh` | Validate patched data against RME payload |
 
 ### Other Utilities
 

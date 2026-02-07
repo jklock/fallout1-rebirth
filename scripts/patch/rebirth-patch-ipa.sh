@@ -5,7 +5,7 @@
 # Wrapper for the core patch script with iOS config templates.
 #
 # USAGE:
-#   ./scripts/patch/rebirth_patch_ipa.sh --base <path> --out <path> [--rme <path>] [--skip-checksums] [--force]
+#   ./scripts/patch/rebirth-patch-ipa.sh --base <path> --out <path> [--rme <path>] [--skip-checksums] [--force]
 #
 # OPTIONS:
 #   --base PATH        Base Fallout 1 data folder
@@ -28,7 +28,7 @@ show_help() {
 RME Patch (iOS/iPadOS)
 
 USAGE:
-  ./scripts/patch/rebirth_patch_ipa.sh --base <path> --out <path> [--rme <path>] [--skip-checksums] [--force]
+  ./scripts/patch/rebirth-patch-ipa.sh --base <path> --out <path> [--rme <path>] [--skip-checksums] [--force]
 
 OPTIONS:
   --base PATH        Base Fallout 1 data folder
@@ -63,7 +63,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-./scripts/patch/rebirth_patch_data.sh \
+./scripts/patch/rebirth-patch-data.sh \
     --config-dir gameconfig/ios \
     "${ARGS[@]}"
 

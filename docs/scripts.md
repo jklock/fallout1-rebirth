@@ -29,7 +29,7 @@ cd /path/to/fallout1-rebirth
 | Build | `scripts/build/build-macos.sh`, `scripts/build/build-ios.sh`, `scripts/build/build-macos-dmg.sh`, `scripts/build/build-ios-ipa.sh` | Compile and package |
 | Test | `scripts/test/test-macos.sh`, `scripts/test/test-macos-headless.sh`, `scripts/test/test-ios-simulator.sh`, `scripts/test/test-ios-headless.sh` | Verify builds |
 | Dev | `scripts/dev/dev-check.sh`, `scripts/dev/dev-format.sh`, `scripts/dev/dev-verify.sh`, `scripts/dev/dev-clean.sh` | Development utilities |
-| Patch | `scripts/patch/rebirth_patch_data.sh`, `scripts/patch/rebirth_patch_app.sh`, `scripts/patch/rebirth_patch_ipa.sh` | RME patch automation |
+| Patch | `scripts/patch/rebirth-patch-data.sh`, `scripts/patch/rebirth-patch-app.sh`, `scripts/patch/rebirth-patch-ipa.sh`, `scripts/patch/rebirth-validate-data.sh` | RME patch automation |
 
 ---
 
@@ -351,31 +351,43 @@ Remove all build directories.
 
 ## RME Patch Scripts
 
-### scripts/patch/rebirth_patch_data.sh
+### scripts/patch/rebirth-patch-data.sh
 
-Core patcher that applies RME to base data and outputs a ready-to-copy folder.
+Core patcher that applies RME to base data and outputs a patched folder.
+Pass `--config-dir` only when you want platform config files copied into the output.
 
 **Usage**:
 ```bash
-./scripts/patch/rebirth_patch_data.sh --base /path/to/FalloutData --out /path/to/Fallout1-RME --config-dir gameconfig/macos
+./scripts/patch/rebirth-patch-data.sh --base /path/to/FalloutData --out /path/to/Fallout1-RME
+./scripts/patch/rebirth-patch-data.sh --base /path/to/FalloutData --out /path/to/Fallout1-RME --config-dir gameconfig/macos
 ```
 
-### scripts/patch/rebirth_patch_app.sh
+### scripts/patch/rebirth-patch-app.sh
 
 macOS wrapper that uses `gameconfig/macos` templates.
 
 **Usage**:
 ```bash
-./scripts/patch/rebirth_patch_app.sh --base /path/to/FalloutData --out /path/to/Fallout1-RME
+./scripts/patch/rebirth-patch-app.sh --base /path/to/FalloutData --out /path/to/Fallout1-RME
 ```
 
-### scripts/patch/rebirth_patch_ipa.sh
+### scripts/patch/rebirth-patch-ipa.sh
 
 iOS wrapper that uses `gameconfig/ios` templates.
 
 **Usage**:
 ```bash
-./scripts/patch/rebirth_patch_ipa.sh --base /path/to/FalloutData --out /path/to/Fallout1-RME
+./scripts/patch/rebirth-patch-ipa.sh --base /path/to/FalloutData --out /path/to/Fallout1-RME
+```
+
+### scripts/patch/rebirth-validate-data.sh
+
+Validates that a patched output folder includes the full RME payload. If `--base` is provided, it also validates the xdelta-patched DATs.
+
+**Usage**:
+```bash
+./scripts/patch/rebirth-validate-data.sh --patched /path/to/Fallout1-RME
+./scripts/patch/rebirth-validate-data.sh --patched /path/to/Fallout1-RME --base /path/to/FalloutData
 ```
 ```
 
@@ -528,8 +540,6 @@ cmake --build build-debug -j $(sysctl -n hw.physicalcpu)
 ./scripts/dev/dev-check.sh
 ./scripts/dev/dev-verify.sh
 ```
-
-> **Note**: This project has no CI/CD pipeline. All verification is done locally before pushing.
 
 ---
 

@@ -6,14 +6,14 @@
 # Produces a patched output folder ready to copy into the .app / .ipa.
 #
 # USAGE:
-#   ./scripts/patch/rebirth_patch_data.sh --base <path> --out <path> --config-dir <path> [--rme <path>] [--skip-checksums] [--force]
+#   ./scripts/patch/rebirth-patch-data.sh --base <path> --out <path> [--config-dir <path>] [--rme <path>] [--skip-checksums] [--force]
 #
 # REQUIRED:
 #   --base PATH       Base Fallout 1 data folder (master.dat, critter.dat, data/)
 #   --out PATH        Output folder for patched data
-#   --config-dir PATH Config template directory (gameconfig/macos or gameconfig/ios)
 #
 # OPTIONAL:
+#   --config-dir PATH   Config template directory (gameconfig/macos or gameconfig/ios)
 #   --rme PATH          RME payload directory (default: third_party/rme/source)
 #   --skip-checksums    Skip base DAT checksum validation
 #   --force             Overwrite existing output folder
@@ -25,17 +25,20 @@
 # =============================================================================
 set -euo pipefail
 
+START_DIR="$(pwd)"
 cd "$(dirname "$0")/../.."
+ROOT_DIR="$(pwd)"
 
 # -----------------------------------------------------------------------------
 # Defaults
 # -----------------------------------------------------------------------------
-RME_DIR="third_party/rme/source"
+RME_DIR=""
 OUT_DIR=""
 BASE_DIR=""
 CONFIG_DIR=""
 SKIP_CHECKSUMS=0
 FORCE=0
+RME_FROM_ARG=0
 
 # -----------------------------------------------------------------------------
 # Helpers
@@ -50,14 +53,14 @@ show_help() {
 RME Patch Core
 
 USAGE:
-  ./scripts/patch/rebirth_patch_data.sh --base <path> --out <path> --config-dir <path> [--rme <path>] [--skip-checksums] [--force]
+  ./scripts/patch/rebirth-patch-data.sh --base <path> --out <path> [--config-dir <path>] [--rme <path>] [--skip-checksums] [--force]
 
 REQUIRED:
   --base PATH        Base Fallout 1 data folder (master.dat, critter.dat, data/)
   --out PATH         Output folder for patched data
-  --config-dir PATH  Config template directory (gameconfig/macos or gameconfig/ios)
 
 OPTIONAL:
+  --config-dir PATH   Config template directory (gameconfig/macos or gameconfig/ios)
   --rme PATH          RME payload directory (default: third_party/rme/source)
   --skip-checksums    Skip base DAT checksum validation
   --force             Overwrite existing output folder
@@ -109,6 +112,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --rme)
             RME_DIR="$2"
+            RME_FROM_ARG=1
             shift 2
             ;;
         --skip-checksums)
@@ -129,15 +133,38 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ -z "$BASE_DIR" || -z "$OUT_DIR" || -z "$CONFIG_DIR" ]]; then
+if [[ -z "$BASE_DIR" || -z "$OUT_DIR" ]]; then
     log_error "Missing required arguments."
     show_help
+fi
+
+if [[ "$BASE_DIR" != /* ]]; then
+    BASE_DIR="$START_DIR/$BASE_DIR"
+fi
+if [[ "$OUT_DIR" != /* ]]; then
+    OUT_DIR="$START_DIR/$OUT_DIR"
+fi
+if [[ -z "$RME_DIR" ]]; then
+    RME_DIR="$ROOT_DIR/third_party/rme/source"
+else
+    if [[ "$RME_DIR" != /* ]]; then
+        if [[ "$RME_FROM_ARG" -eq 1 ]]; then
+            RME_DIR="$START_DIR/$RME_DIR"
+        else
+            RME_DIR="$ROOT_DIR/$RME_DIR"
+        fi
+    fi
+fi
+if [[ -n "$CONFIG_DIR" && "$CONFIG_DIR" != /* ]]; then
+    CONFIG_DIR="$START_DIR/$CONFIG_DIR"
 fi
 
 BASE_DIR="$(cd "$BASE_DIR" 2>/dev/null && pwd)" || { log_error "Invalid base path"; exit 1; }
 OUT_DIR="$(mkdir -p "$OUT_DIR" && cd "$OUT_DIR" 2>/dev/null && pwd)" || { log_error "Invalid out path"; exit 1; }
 RME_DIR="$(cd "$RME_DIR" 2>/dev/null && pwd)" || { log_error "Invalid RME path"; exit 1; }
-CONFIG_DIR="$(cd "$CONFIG_DIR" 2>/dev/null && pwd)" || { log_error "Invalid config dir"; exit 1; }
+if [[ -n "$CONFIG_DIR" ]]; then
+    CONFIG_DIR="$(cd "$CONFIG_DIR" 2>/dev/null && pwd)" || { log_error "Invalid config dir"; exit 1; }
+fi
 
 # -----------------------------------------------------------------------------
 # Preconditions
@@ -158,9 +185,11 @@ if [[ ! -f "$RME_DIR/master.xdelta" || ! -f "$RME_DIR/critter.xdelta" || ! -d "$
     exit 1
 fi
 
-if [[ ! -f "$CONFIG_DIR/fallout.cfg" || ! -f "$CONFIG_DIR/f1_res.ini" ]]; then
-    log_error "Config dir must contain fallout.cfg and f1_res.ini"
-    exit 1
+if [[ -n "$CONFIG_DIR" ]]; then
+    if [[ ! -f "$CONFIG_DIR/fallout.cfg" || ! -f "$CONFIG_DIR/f1_res.ini" ]]; then
+        log_error "Config dir must contain fallout.cfg and f1_res.ini"
+        exit 1
+    fi
 fi
 
 if [[ -e "$OUT_DIR/master.dat" || -e "$OUT_DIR/critter.dat" || -d "$OUT_DIR/data" ]]; then
@@ -274,9 +303,13 @@ PYCODE
 # -----------------------------------------------------------------------------
 # Copy configs
 # -----------------------------------------------------------------------------
-log_info "Copying config templates..."
-cp "$CONFIG_DIR/fallout.cfg" "$OUT_DIR/fallout.cfg"
-cp "$CONFIG_DIR/f1_res.ini" "$OUT_DIR/f1_res.ini"
+if [[ -n "$CONFIG_DIR" ]]; then
+    log_info "Copying config templates..."
+    cp "$CONFIG_DIR/fallout.cfg" "$OUT_DIR/fallout.cfg"
+    cp "$CONFIG_DIR/f1_res.ini" "$OUT_DIR/f1_res.ini"
+else
+    log_info "Skipping config templates (no --config-dir provided)"
+fi
 
 # -----------------------------------------------------------------------------
 # Summary

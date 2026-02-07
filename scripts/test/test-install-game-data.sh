@@ -87,7 +87,7 @@ EXAMPLES:
 
 NOTES:
     - Game data files are NOT included with Fallout 1 Rebirth
-    - Patch data first with scripts/patch/rebirth_patch_app.sh if you need RME content
+    - Patch data first with scripts/patch/rebirth-patch-app.sh if you need RME content
     - Set GAME_DATA to supply --source non-interactively
     - Files are copied, not moved (originals remain intact)
 EOF
