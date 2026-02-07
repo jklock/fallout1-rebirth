@@ -480,10 +480,12 @@ void mouse_info()
     }
 
     static bool pending_tap_release = false;
+    bool released_this_frame = false;
     if (pending_tap_release) {
         // Release tap click on next tick so UI sees a distinct DOWN/UP.
         mouse_simulate_input(0, 0, 0);
         pending_tap_release = false;
+        released_this_frame = true;
     }
 
     // When using a physical mouse, update mouse state from dxinput
@@ -697,11 +699,6 @@ void mouse_info()
         return;
     }
 
-    // For mouse-based input (no gesture), skip if cursor is hidden
-    if (mouse_is_hidden) {
-        return;
-    }
-
     int x;
     int y;
     int buttons = 0;
@@ -721,6 +718,12 @@ void mouse_info()
     } else {
         x = 0;
         y = 0;
+    }
+
+    // Avoid clobbering the touch tap release event on frames with no gesture.
+    // Still allow mouse activation in the same frame if it happened.
+    if (released_this_frame && !dxinput_is_using_mouse()) {
+        return;
     }
 
     x = (int)(x * mouse_sensitivity);
@@ -764,8 +767,8 @@ void mouse_simulate_input(int delta_x, int delta_y, int buttons)
     SDL_Log("MOUSE_SIMULATE: delta=(%d,%d) buttons=0x%x have=%d hidden=%d",
         delta_x, delta_y, buttons, have_mouse, mouse_is_hidden);
 
-    if (!have_mouse || mouse_is_hidden) {
-        SDL_Log("MOUSE_SIMULATE: SKIPPED (have_mouse=%d, hidden=%d)", have_mouse, mouse_is_hidden);
+    if (!have_mouse) {
+        SDL_Log("MOUSE_SIMULATE: SKIPPED (have_mouse=%d)", have_mouse);
         return;
     }
 
@@ -853,9 +856,10 @@ void mouse_simulate_input(int delta_x, int delta_y, int buttons)
         mouse_y += delta_y;
         mouse_clip();
 
-        win_refresh_all(&mouseRect);
-
-        mouse_show();
+        if (!mouse_is_hidden) {
+            win_refresh_all(&mouseRect);
+            mouse_show();
+        }
 
         raw_x = mouse_x;
         raw_y = mouse_y;
