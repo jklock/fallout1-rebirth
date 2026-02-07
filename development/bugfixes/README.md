@@ -15,11 +15,16 @@ All artifacts for the items below should live here.
    - See: bug-3-sporadic-click-offset.md
 4) Vault 15 (and other ladder transitions) self-attack combat bug
    - See: bug-4-vault15-self-attack.md
+5) iPad dock reveal stutter (bottom edge) in fullscreen
+   - See: bug-5-ios-dock-bottom-edge.md
+6) iOS on-screen keyboard stutter (text input)
+   - See: bug-6-ios-keyboard-stutter.md
 
 ## Research and Cross-Refs
 
 - Upstream issue scan: upstream-issues.md
 - Work plan: PLAN.md
+- Full audit: RESEARCH.md
 
 ## Docs reviewed for input context
 
@@ -27,4 +32,3 @@ All artifacts for the items below should live here.
 - docs/pencil.md
 - docs/mouse.md
 - docs/input.md
-

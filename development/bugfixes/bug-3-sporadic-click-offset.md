@@ -23,16 +23,19 @@ still occur sporadically. Right/left/drag work but land slightly off at times.
 2) Tap near edges and in letterboxed regions
 3) Observe sporadic offsets in click hit-testing
 
-## Instrumentation Ideas
-- Log in-bounds vs clamped conversions in convert_touch_to_logical().
-- Track last_input_was_mouse transitions around touch events.
-- Log dest rect values on each window-size change to confirm stability.
-
-## Candidate Fixes
-- Treat touches outside the dest rect as no-op (do not clamp to edge),
-  or provide visual feedback that tap was out-of-bounds.
-- Harden last_input_was_mouse transitions: avoid switching to mouse path
-  mid-gesture.
-- Verify any remaining click offsets (CLICK_OFFSET_X/Y, CLICK_OFFSET_MOUSE_X/Y)
-  are applied only once per path.
-
+## Actionable Fix Direction (No Simulator-Only Logging)
+1) Ignore out-of-bounds touch starts instead of clamping:
+   - In `src/plib/gnw/touch.cc`, have `convert_touch_to_logical()` return
+     an `in_bounds` flag from `iOS_windowToGameCoords()`.
+   - If a touch starts out-of-bounds, mark it as invalid and skip gesture
+     processing for that finger. This prevents taps in letterbox bars from
+     snapping to the nearest edge (sporadic offset).
+2) Keep drags stable when leaving the dest rect:
+   - If a touch starts in-bounds but moves out, clamp *movement* to last
+     in-bounds position rather than snapping to the edge.
+3) Unify mapping for touch + mouse:
+   - Consider a shared helper (window→render→game) that both `touch.cc` and
+     `dxinput.cc` use so rounding is consistent across input types.
+4) Ensure dest rect stays current:
+   - With the iOS window-size fix from Bug 1, keep `iOS_updateDestRect()`
+     running on actual size changes so coordinate transforms stay accurate.
