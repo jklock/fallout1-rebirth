@@ -27,7 +27,7 @@ bool svga_init(VideoOptions* video_options);
 void svga_exit();
 int screenGetWidth();
 int screenGetHeight();
-void handleWindowSizeChanged();
+bool handleWindowSizeChanged();
 void renderPresent();
 
 #if defined(__APPLE__)

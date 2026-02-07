@@ -132,6 +132,11 @@ static bool bk_disabled;
 // 0x671F08
 static unsigned int bk_process_time;
 
+#if defined(__APPLE__) && TARGET_OS_IOS
+static bool g_iOS_keyboard_visible = false;
+static unsigned int g_iOS_keyboard_toggle_time = 0;
+#endif
+
 // 0x4B32C0
 int GNW_input_init(int use_msec_timer)
 {
@@ -1171,13 +1176,34 @@ void GNW95_process_message()
                 GNW95_process_key(&keyboardData);
             }
             break;
+        case SDL_EVENT_SCREEN_KEYBOARD_SHOWN:
+#if defined(__APPLE__) && TARGET_OS_IOS
+            g_iOS_keyboard_visible = true;
+            g_iOS_keyboard_toggle_time = get_time();
+#endif
+            break;
+        case SDL_EVENT_SCREEN_KEYBOARD_HIDDEN:
+#if defined(__APPLE__) && TARGET_OS_IOS
+            g_iOS_keyboard_visible = false;
+            g_iOS_keyboard_toggle_time = get_time();
+#endif
+            break;
         case SDL_EVENT_WINDOW_EXPOSED:
             win_refresh_all(&scr_size);
             break;
         case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
-            handleWindowSizeChanged();
-            win_refresh_all(&scr_size);
+        {
+            bool size_changed = handleWindowSizeChanged();
+            if (size_changed) {
+#if defined(__APPLE__) && TARGET_OS_IOS
+                if (g_iOS_keyboard_visible && elapsed_time(g_iOS_keyboard_toggle_time) < 500) {
+                    break;
+                }
+#endif
+                win_refresh_all(&scr_size);
+            }
             break;
+        }
         case SDL_EVENT_WINDOW_FOCUS_GAINED:
             GNW95_isActive = true;
             touch_reset();
@@ -1358,6 +1384,9 @@ static void idleImpl()
 
 void beginTextInput()
 {
+#if defined(__APPLE__) && TARGET_OS_IOS
+    SDL_SetHint(SDL_HINT_ENABLE_SCREEN_KEYBOARD, "auto");
+#endif
     SDL_StartTextInput(gSdlWindow);
 }
 

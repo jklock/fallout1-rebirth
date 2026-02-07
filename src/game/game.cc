@@ -881,16 +881,32 @@ int game_handle_input(int eventCode, bool isInCombatMode)
         }
         break;
     case KEY_ARROW_LEFT:
+#if defined(__APPLE__) && TARGET_OS_IOS
+        map_scroll_and_full_refresh(-2, 0);
+#else
         map_scroll(-2, 0);
+#endif
         break;
     case KEY_ARROW_RIGHT:
+#if defined(__APPLE__) && TARGET_OS_IOS
+        map_scroll_and_full_refresh(2, 0);
+#else
         map_scroll(2, 0);
+#endif
         break;
     case KEY_ARROW_UP:
+#if defined(__APPLE__) && TARGET_OS_IOS
+        map_scroll_and_full_refresh(0, -2);
+#else
         map_scroll(0, -2);
+#endif
         break;
     case KEY_ARROW_DOWN:
+#if defined(__APPLE__) && TARGET_OS_IOS
+        map_scroll_and_full_refresh(0, 2);
+#else
         map_scroll(0, 2);
+#endif
         break;
     }
 

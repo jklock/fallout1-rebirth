@@ -41,6 +41,8 @@ struct Touch {
     TouchLocation currentLocation;
     Uint64 currentTimestamp; // Now in milliseconds (converted from event nanoseconds)
     int phase;
+    bool started_in_bounds;
+    TouchLocation lastInBounds;
 };
 
 static Touch touches[MAX_TOUCHES];
@@ -98,7 +100,7 @@ static TouchLocation touch_get_current_location_centroid(int* indexes, int lengt
 // Helper to convert touch finger event coordinates to logical (render) coordinates
 // SDL3 touch events have x/y normalized to window dimensions (0...1), but we need
 // logical coordinates that account for the render logical presentation scaling.
-static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, int* out_y)
+static bool convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, int* out_y)
 {
     // Get window dimensions in points and pixels for debugging
     int window_w, window_h;
@@ -126,15 +128,10 @@ static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
     if (iOS_windowToGameCoords(window_x, window_y, out_x, out_y)) {
         // Successfully converted
         SDL_Log("TOUCH_CONVERT: iOS result=(%d, %d) [in bounds]", *out_x, *out_y);
-        return;
+        return true;
     }
-    // Fall through to clamp if outside game area
-    SDL_Log("TOUCH_CONVERT: iOS result=(%d, %d) [OUT OF BOUNDS - clamping]", *out_x, *out_y);
-    if (*out_x < 0) *out_x = 0;
-    if (*out_y < 0) *out_y = 0;
-    if (*out_x >= screenGetWidth()) *out_x = screenGetWidth() - 1;
-    if (*out_y >= screenGetHeight()) *out_y = screenGetHeight() - 1;
-    SDL_Log("TOUCH_CONVERT: iOS clamped result=(%d, %d)", *out_x, *out_y);
+    SDL_Log("TOUCH_CONVERT: iOS result=(%d, %d) [OUT OF BOUNDS]", *out_x, *out_y);
+    return false;
 #else
     // On non-iOS platforms, use SDL's coordinate conversion
     // Convert window coordinates to render/logical coordinates
@@ -154,6 +151,7 @@ static void convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
         *out_y = static_cast<int>(event->y * screenGetHeight());
     }
 #endif
+    return true;
 }
 
 void touch_handle_start(SDL_TouchFingerEvent* event)
@@ -171,17 +169,24 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
 
     if (index != -1) {
         Touch* touch = &(touches[index]);
+        int logical_x = 0;
+        int logical_y = 0;
+        if (!convert_touch_to_logical(event, &logical_x, &logical_y)) {
+            return;
+        }
+
         touch->used = true;
         touch->fingerId = event->fingerID;
         // Convert SDL3 nanosecond timestamp to milliseconds for consistent time comparisons
         touch->startTimestamp = timestamp_to_ms(event->timestamp);
 
-        // Convert touch coordinates from window space to logical/render space
-        convert_touch_to_logical(event, &touch->startLocation.x, &touch->startLocation.y);
-
+        touch->startLocation.x = logical_x;
+        touch->startLocation.y = logical_y;
         touch->currentTimestamp = touch->startTimestamp;
         touch->currentLocation = touch->startLocation;
         touch->phase = TOUCH_PHASE_BEGAN;
+        touch->started_in_bounds = true;
+        touch->lastInBounds = touch->startLocation;
 
         SDL_Log("TOUCH START: index=%d logical_x=%d logical_y=%d timestamp_ms=%llu",
             index, touch->startLocation.x, touch->startLocation.y, (unsigned long long)touch->startTimestamp);
@@ -196,8 +201,16 @@ void touch_handle_move(SDL_TouchFingerEvent* event)
         // Convert SDL3 nanosecond timestamp to milliseconds
         touch->currentTimestamp = timestamp_to_ms(event->timestamp);
 
-        // Convert touch coordinates from window space to logical/render space
-        convert_touch_to_logical(event, &touch->currentLocation.x, &touch->currentLocation.y);
+        int logical_x = 0;
+        int logical_y = 0;
+        bool in_bounds = convert_touch_to_logical(event, &logical_x, &logical_y);
+        if (in_bounds) {
+            touch->currentLocation.x = logical_x;
+            touch->currentLocation.y = logical_y;
+            touch->lastInBounds = touch->currentLocation;
+        } else if (touch->started_in_bounds) {
+            touch->currentLocation = touch->lastInBounds;
+        }
 
         touch->phase = TOUCH_PHASE_MOVED;
     }
@@ -214,8 +227,16 @@ void touch_handle_end(SDL_TouchFingerEvent* event)
         // Convert SDL3 nanosecond timestamp to milliseconds
         touch->currentTimestamp = timestamp_to_ms(event->timestamp);
 
-        // Convert touch coordinates from window space to logical/render space
-        convert_touch_to_logical(event, &touch->currentLocation.x, &touch->currentLocation.y);
+        int logical_x = 0;
+        int logical_y = 0;
+        bool in_bounds = convert_touch_to_logical(event, &logical_x, &logical_y);
+        if (in_bounds) {
+            touch->currentLocation.x = logical_x;
+            touch->currentLocation.y = logical_y;
+            touch->lastInBounds = touch->currentLocation;
+        } else if (touch->started_in_bounds) {
+            touch->currentLocation = touch->lastInBounds;
+        }
 
         touch->phase = TOUCH_PHASE_ENDED;
 
@@ -401,6 +422,9 @@ void touch_reset()
         touches[index].currentLocation.x = 0;
         touches[index].currentLocation.y = 0;
         touches[index].phase = TOUCH_PHASE_ENDED;
+        touches[index].started_in_bounds = false;
+        touches[index].lastInBounds.x = 0;
+        touches[index].lastInBounds.y = 0;
     }
 
     currentGesture.type = kUnrecognized;

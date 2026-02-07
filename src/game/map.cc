@@ -38,6 +38,7 @@
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
 #include "plib/gnw/intrface.h"
+#include "plib/gnw/svga.h"
 #include "plib/gnw/memory.h"
 #include "plib/gnw/svga.h"
 
@@ -814,6 +815,20 @@ int map_scroll(int dx, int dy)
     return 0;
 }
 
+// 0x474284 (iOS helper)
+int map_scroll_and_full_refresh(int dx, int dy)
+{
+    int rc = map_scroll(dx, dy);
+    if (rc == 0) {
+        tile_refresh_display();
+        win_draw(display_win);
+#if defined(__APPLE__) && TARGET_OS_IOS
+        renderPresent();
+#endif
+    }
+    return rc;
+}
+
 // 0x4744C0
 char* map_file_path(char* name)
 {
@@ -892,7 +907,7 @@ int map_load(char* file_name)
 
         if (rc == 0) {
             strcpy(map_data.name, file_name);
-            obj_dude->data.critter.combat.whoHitMe = NULL;
+            critter_set_who_hit_me(obj_dude, NULL);
         }
     }
 

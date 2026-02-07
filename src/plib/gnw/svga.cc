@@ -40,6 +40,8 @@ static SDL_FRect g_iOS_destRect = { 0, 0, 0, 0 };
 static bool g_iOS_useCustomRect = false;
 static int g_iOS_gameWidth = 640; // Game logical resolution
 static int g_iOS_gameHeight = 480;
+static int g_iOS_last_window_pw = 0;
+static int g_iOS_last_window_ph = 0;
 
 static void iOS_updateDestRect()
 {
@@ -216,6 +218,9 @@ bool svga_init(VideoOptions* video_options)
         video_options->width, video_options->height, video_options->scale);
 
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
+#if __APPLE__ && TARGET_OS_IOS
+    SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
+#endif
 
     if (!SDL_InitSubSystem(SDL_INIT_VIDEO)) {
         SDL_Log("svga_init: SDL_InitSubSystem failed: %s", SDL_GetError());
@@ -298,6 +303,7 @@ bool svga_init(VideoOptions* video_options)
     g_iOS_gameWidth = video_options->width;
     g_iOS_gameHeight = video_options->height;
     iOS_updateDestRect();
+    SDL_GetWindowSizeInPixels(gSdlWindow, &g_iOS_last_window_pw, &g_iOS_last_window_ph);
 #endif
 
     if (!createRenderer(video_options->width, video_options->height)) {
@@ -466,12 +472,32 @@ static void destroyRenderer()
     }
 }
 
-void handleWindowSizeChanged()
+bool handleWindowSizeChanged()
 {
+#if __APPLE__ && TARGET_OS_IOS
+    if (gSdlWindow == NULL) {
+        return false;
+    }
+
+    int window_pw = 0;
+    int window_ph = 0;
+    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+    if (window_pw <= 0 || window_ph <= 0) {
+        return false;
+    }
+
+    if (window_pw == g_iOS_last_window_pw && window_ph == g_iOS_last_window_ph) {
+        return false;
+    }
+
+    g_iOS_last_window_pw = window_pw;
+    g_iOS_last_window_ph = window_ph;
+    iOS_updateDestRect();
+    return true;
+#else
     destroyRenderer();
     createRenderer(screenGetWidth(), screenGetHeight());
-#if __APPLE__ && TARGET_OS_IOS
-    iOS_updateDestRect();
+    return true;
 #endif
 }
 
