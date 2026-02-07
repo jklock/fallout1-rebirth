@@ -63,7 +63,7 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 
 1. Download `fallout1-rebirth.ipa`
 2. Sideload using [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/)
-3. Run the app once (it will show a "missing datafile" error — that's normal)
+3. Run the app once (on iOS you may just see a black screen if data files are missing — that's normal)
 4. Use Finder to copy game files + config files into the app's Documents folder
 5. Relaunch and play!
 

@@ -31,6 +31,7 @@ cd "$(dirname "$0")/.."
 # -----------------------------------------------------------------------------
 DEFAULT_TARGET="/Applications/Fallout 1 Rebirth.app"
 DEFAULT_SOURCES=(
+    "GOG"
     "."
     "$HOME/Games/Fallout1"
     "$HOME/GOG Games/Fallout"
@@ -62,7 +63,7 @@ USAGE:
 
 OPTIONS:
     --source PATH   Path to directory containing game data files
-                    Default: current directory or ~/Games/Fallout1
+                    Default: ./GOG, current directory, or ~/Games/Fallout1
     
     --target PATH   Path to the .app bundle to install into
                     Default: /Applications/Fallout 1 Rebirth.app
