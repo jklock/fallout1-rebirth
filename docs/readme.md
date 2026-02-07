@@ -83,11 +83,11 @@ Fallout 1 Rebirth is a working re-implementation of Fallout with:
 
 ### Runtime Requirements
 
-- Original Fallout game data files:
+- Original Fallout game data files (from your own copy):
   - `master.dat`
   - `critter.dat`
   - `data/` folder
-- Purchase from [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400)
+- Obtain from your preferred storefront or installer
 
 ## License
 

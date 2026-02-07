@@ -13,6 +13,7 @@ Each subdirectory contains a CMakeLists.txt that fetches the dependency from its
 | [sdl3/](sdl3/) | SDL3 | 3.4.0 | Cross-platform multimedia library (upgraded from SDL2) |
 | [adecode/](adecode/) | adecode | 1.0.0 | ACM audio decoder |
 | [fpattern/](fpattern/) | fpattern | 1.9 | Filename pattern matching |
+| [rme/](rme/) | RME | 1.1e | Restoration Mod Enhanced data payload |
 
 ## SDL3
 

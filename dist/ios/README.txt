@@ -24,7 +24,7 @@ iOS/iPad Installation Instructions
 
 2. INSTALL GAME FILES
 
-   You need the original Fallout 1 data files from GOG or Steam:
+   You need the original Fallout 1 data files from your own copy:
    - master.dat
    - critter.dat
    - data/ folder

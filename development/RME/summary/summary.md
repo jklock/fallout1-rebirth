@@ -8,7 +8,7 @@
 
 ## Implementation Completed
 - Added RME payload storage:
-  - `third_party/rme/source/` (copied from `GOG/rme_1`, without .DS_Store)
+  - `third_party/rme/source/` (copied from `rme_1`, without .DS_Store)
   - `third_party/rme/manifest.json`
   - `third_party/rme/checksums.txt`
   - `third_party/rme/README.md`

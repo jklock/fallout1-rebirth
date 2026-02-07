@@ -178,7 +178,7 @@ All dependencies are pinned via FetchContent GIT_TAG. Update tags when upgrading
 - See `README.md` and `LICENSE.md` (Sustainable Use License)
 - Asset filename case matters on case-sensitive file systems
 - Config keys in `fallout.cfg`: `master_dat`, `critter_dat`
-- Obtain game data from GOG or Steam
+- Obtain game data from your Fallout 1 copy
 
 ## Testing
 

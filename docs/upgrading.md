@@ -14,8 +14,8 @@ This guide explains how to update Fallout 1 Rebirth to a new version **without l
 | `fallout.cfg` | Game configuration | ✅ Yes |
 | `f1_res.ini` | Resolution/display settings | ✅ Yes |
 | `data/PREMADE/` | Exported characters | ✅ Yes (if you have exports) |
-| `master.dat` | Original game data | ❌ No (can re-copy from GOG/Steam) |
-| `critter.dat` | Original game data | ❌ No (can re-copy from GOG/Steam) |
+| `master.dat` | Original game data | ❌ No (can re-copy from your original install) |
+| `critter.dat` | Original game data | ❌ No (can re-copy from your original install) |
 
 ---
 
@@ -185,7 +185,7 @@ App Container/
 ### "master.dat not found" error
 
 1. The original game data files need to be in the game folder
-2. Copy `master.dat` and `critter.dat` from your GOG/Steam installation
+2. Copy `master.dat` and `critter.dat` from your original installation
 3. On iOS, use Finder/iTunes to copy these files to the app container
 
 ---
@@ -194,7 +194,7 @@ App Container/
 
 ### Original Game Data
 - `master.dat` and `critter.dat` are from the original Fallout game
-- These files are **always safe to re-copy** from your GOG or Steam installation
+- These files are **always safe to re-copy** from your original installation
 - They are not modified by the game and contain no user data
 
 ### Mods and Custom Patches

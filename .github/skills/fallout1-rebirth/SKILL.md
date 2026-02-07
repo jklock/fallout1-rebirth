@@ -107,7 +107,7 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 
 ## Game Data
 - Files `master.dat`, `critter.dat`, `data/` are **NOT included** in repo
-- Obtain from GOG or Steam
+- Obtain from your Fallout 1 copy
 - For simulator: game data goes in app's **data container**, not app bundle
 
 ## Project Documentation

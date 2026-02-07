@@ -44,52 +44,34 @@ Before you begin, you'll need:
 
 ### Game Data Files (Required)
 
-You need a legitimate copy of Fallout 1 to get the required game data files. Fallout 1 Rebirth is an engine reimplementation and doesn't include any copyrighted game assets.
+You need a legitimate copy of Fallout 1 to get the required game data files. Fallout 1 Rebirth is an engine reimplementation and doesn't include any game assets.
 
-**Where to purchase Fallout 1:**
-- [GOG.com](https://www.gog.com/game/fallout) - DRM-free, recommended
-- [Steam](https://store.steampowered.com/app/38400/Fallout_A_Post_Nuclear_Role_Playing_Game/)
+**Where to obtain Fallout 1:**
+- Your preferred storefront or original media
+- Any installer or local installation that provides the game data files
 
 ---
 
 ## Part 2: Getting Game Data Files
 
-### Option A: From GOG (Recommended)
+### Option A: From a macOS app bundle
 
-GOG provides DRM-free installers that are easy to extract.
+1. Install Fallout 1 on macOS (via your storefront or installer).
+2. Right-click the Fallout app and select **Show Package Contents**.
+3. Navigate to `Contents/Resources/game/` (or a similar folder).
+4. Copy the game data files.
 
-#### On macOS:
+### Option B: From a Windows installation (for iOS users)
 
-1. Buy and download Fallout 1 from GOG.com
-2. Download the macOS installer (`.pkg` file)
-3. Double-click the installer to mount it
-4. Navigate to the installed game location (typically in Applications or where you chose to install)
-5. Locate the game data files inside the application bundle:
-   - Right-click the Fallout app and select "Show Package Contents"
-   - Navigate to `Contents/Resources/game/`
+1. Install Fallout 1 on Windows.
+2. Locate the installation folder (varies by storefront and install path).
+3. Copy the game data files.
 
-#### On Windows (for iOS users):
+### Option C: From a DRM-free installer
 
-1. Purchase and download Fallout 1 from GOG.com
-2. Run the installer and install the game
-3. Navigate to the installation folder (typically `C:\GOG Games\Fallout\`)
-4. The game data files are in this folder
-
-### Option B: From Steam
-
-#### On macOS:
-
-1. Install Steam and purchase Fallout 1
-2. Download and install the game through Steam
-3. Right-click Fallout in your library and select "Manage" then "Browse Local Files"
-4. The game data files are in this folder
-
-#### On Windows (for iOS users):
-
-1. Install Steam and purchase Fallout 1
-2. Download and install the game through Steam
-3. Right-click Fallout in your library and select "Manage" then "Browse Local Files"
-4. Navigate to the Fallout folder (typically `C:\Program Files (x86)\Steam\steamapps\common\Fallout\`)
+1. Extract the installer using your preferred extraction tool.
+2. Locate the extracted game folder.
+3. Copy the game data files.
 
 ### Required Files List
 

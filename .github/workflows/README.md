@@ -2,6 +2,8 @@
 
 This directory previously contained GitHub Actions CI/CD workflows.
 
+Last updated: 2026-02-07
+
 ## Current Status
 
 **CI/CD workflows have been removed.** This project is now built locally only.

@@ -10,7 +10,7 @@ Last updated: 2026-02-07
 
 Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout on macOS and iOS/iPadOS with native performance, bug fixes, and quality-of-life improvements.
 
-> **You must own the game** — This is an engine only. Game data files from [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400) are required.
+> **You must own the game** — This is an engine only. Game data files from your own Fallout 1 copy are required.
 
 ---
 
@@ -43,7 +43,7 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 ### What You Need
 
 1. **The app** — Download from [Releases](https://github.com/jklock/fallout1-rebirth/releases)
-2. **Game data** — From your GOG or Steam copy of Fallout 1:
+2. **Game data** — From your Fallout 1 copy:
    - `master.dat` (~300 MB)
    - `critter.dat` (~25 MB)
    - `data/` folder

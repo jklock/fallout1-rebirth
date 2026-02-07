@@ -419,5 +419,6 @@ scripts/hideall.sh
 /dist/*.dmg
 /dist/*.ipa
 
-# Ignore local GOG backups
+# Ignore local game data backups
+game-data/
 GOG/

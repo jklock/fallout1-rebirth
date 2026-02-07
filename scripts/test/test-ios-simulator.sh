@@ -23,7 +23,7 @@
 #
 # CONFIGURATION (environment variables):
 #   SIMULATOR_NAME  - Device name (default: "iPad Pro 13-inch (M5)")
-#   GAME_DATA       - Path to game files (default: "GOG/Fallout1")
+#   GAME_DATA       - Path to game files (master.dat, critter.dat, data/)
 #   BUILD_DIR       - Build output dir (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
 #   CLEAN           - Set to "1" to force reconfigure
@@ -38,7 +38,7 @@ cd "$(dirname "$0")/../.."
 # Preferred iPad simulator — change this to match your installed runtimes
 SIMULATOR_NAME="${SIMULATOR_NAME:-iPad Pro 13-inch (M5)}"
 
-GAME_DATA="${GAME_DATA:-GOG/Fallout1}"
+GAME_DATA="${GAME_DATA:-}"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
@@ -276,10 +276,16 @@ copy_game_data() {
     fi
     
     # Check game data exists
+    if [[ -z "$GAME_DATA" ]]; then
+        log_error "GAME_DATA is not set"
+        echo "  Set GAME_DATA=/path/to/FalloutData (master.dat, critter.dat, data/)"
+        exit 1
+    fi
+
     if [[ ! -f "$GAME_DATA/master.dat" ]]; then
         log_error "Game data not found at: $GAME_DATA"
         echo "  Expected files: master.dat, critter.dat, data/"
-        echo "  Set GAME_DATA=/path/to/game or place files in GOG/Fallout1"
+        echo "  Set GAME_DATA=/path/to/FalloutData"
         exit 1
     fi
     

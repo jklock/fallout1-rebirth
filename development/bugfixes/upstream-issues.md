@@ -15,7 +15,7 @@ Source: https://github.com/alexbatalov/fallout1-ce/issues (open issues list)
   - Overlaps with our configuration access/documentation on iOS.
 
 - #239 "cannot load iface textures nor high res main menu (macOS)"
-  - High-res interface/menu issues with f1_res.ini and GOG data.
+  - High-res interface/menu issues with f1_res.ini and retail data.
   - Related to resolution/scaling concerns (not directly to our input bugs).
 
 - #245 "Character shows up on map when playing in high resolutions"
@@ -32,4 +32,3 @@ Source: https://github.com/alexbatalov/fallout1-ce/issues (open issues list)
 Note: This scan only covered the open issues list visible without filters.
 If we need a wider historical search, we should query closed issues and
 perform a keyword search (stutter, tearing, ladder, vault 15, self-attack).
-

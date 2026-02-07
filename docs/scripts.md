@@ -316,7 +316,14 @@ Full verification suite: build, analysis, and configuration.
 ./scripts/dev/dev-verify.sh
 ```
 
-**Options** (via environment variables):
+**Options**:
+```bash
+./scripts/dev/dev-verify.sh --build-dir build-test
+./scripts/dev/dev-verify.sh --game-data /path/to/FalloutData
+```
+Relative `--game-data` paths are resolved from the invoking directory.
+
+**Environment variables** (optional):
 ```bash
 BUILD_DIR=build-test ./scripts/dev/dev-verify.sh
 GAME_DATA=/path/to/fallout ./scripts/dev/dev-verify.sh
@@ -417,7 +424,7 @@ These variables are recognized by multiple scripts:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `SIMULATOR_NAME` | `iPad Pro 13-inch (M4)` | Target simulator device |
-| `GAME_DATA` | `GOG/Fallout1` | Path to game data files |
+| `GAME_DATA` | (not set) | Path to game data files (master.dat, critter.dat, data/) |
 
 ### Examples
 
@@ -429,7 +436,7 @@ BUILD_TYPE=Debug JOBS=4 ./scripts/build/build-macos.sh
 SIMULATOR_NAME="iPad mini (6th generation)" ./scripts/test/test-ios-simulator.sh
 
 # Clean rebuild with custom game data
-CLEAN=1 GAME_DATA=/Users/me/fallout ./scripts/test/test-ios-simulator.sh
+CLEAN=1 GAME_DATA=/path/to/FalloutData ./scripts/test/test-ios-simulator.sh
 ```
 
 ---

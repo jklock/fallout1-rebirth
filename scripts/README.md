@@ -55,7 +55,7 @@ All scripts should be run from the repository root directory.
 |--------|-------------|
 | `scripts/build/build-releases.sh` | Build release artifacts for all platforms |
 | `scripts/test/test-install-game-data.sh` | Install game data files to app bundle |
-| `scripts/hideall.sh` | Hide all windows (macOS utility) |
+
 
 ---
 
@@ -73,13 +73,14 @@ The `scripts/test/test-ios-simulator.sh` script is the primary way to test on iP
 
 **Environment Variables**:
 - `SIMULATOR_NAME` - Target device (default: "iPad Pro 13-inch (M5)")
-- `GAME_DATA` - Path to game files (default: "GOG/Fallout1")
+- `GAME_DATA` - Path to game files (master.dat, critter.dat, data/)
 - `BUILD_TYPE` - Build configuration (default: "RelWithDebInfo")
 
 **Critical Rules**:
 - ONE SIMULATOR AT A TIME - multiple simulators cause severe memory pressure
 - Always run `--shutdown` before starting a new simulator
 - Game data is copied to the app's Documents container (not the bundle)
+- Set `GAME_DATA` to the folder that contains `master.dat`, `critter.dat`, and `data/`
 
 ---
 
@@ -135,6 +136,7 @@ CLEAN=1 ./scripts/build/build-ios.sh
 
 # Pre-commit verification
 ./scripts/dev/dev-verify.sh
+./scripts/dev/dev-verify.sh --game-data /path/to/FalloutData
 
 # Clean all build artifacts
 ./scripts/dev/dev-clean.sh

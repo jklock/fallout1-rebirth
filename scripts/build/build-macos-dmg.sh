@@ -102,7 +102,7 @@ INSTALLATION:
 3) Launch the app!
 
 GETTING GAME DATA:
-- Purchase Fallout 1 from GOG.com or Steam
+- Obtain Fallout 1 from your preferred storefront
 - See README.md in the repository for detailed instructions
 
 Need help? https://github.com/fallout1-rebirth/fallout1-rebirth

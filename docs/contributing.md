@@ -46,8 +46,8 @@ Fallout 1 Rebirth is an **Apple-only fork**. Contributions should focus on:
    - cppcheck (`brew install cppcheck`)
 
 2. **Game Assets** (for testing):
-   - Purchase Fallout from [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400)
-   - Extract game data to `GOG/Fallout1/` or set `GAME_DATA` environment variable
+   - Obtain Fallout from your preferred storefront or installer
+   - Extract game data to your local game-data directory or set the `GAME_DATA` environment variable
 
 ### Fork and Clone
 

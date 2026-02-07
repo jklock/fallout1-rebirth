@@ -111,7 +111,14 @@ Run the full verification suite:
 5. Source file inventory
 6. iOS CMake configuration validation
 
-**Environment variables**:
+**Options**:
+```bash
+./scripts/dev/dev-verify.sh --build-dir build-test
+./scripts/dev/dev-verify.sh --game-data /path/to/FalloutData
+```
+Relative `--game-data` paths are resolved from the invoking directory.
+
+**Environment variables** (optional):
 ```bash
 BUILD_DIR=build-test ./scripts/dev/dev-verify.sh
 GAME_DATA=/path/to/fallout ./scripts/dev/dev-verify.sh
@@ -157,7 +164,7 @@ The iOS Simulator lets you test iPad functionality without a physical device. It
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `SIMULATOR_NAME` | "iPad Pro 13-inch (M4)" | Target device name |
-| `GAME_DATA` | "GOG/Fallout1" | Path to game data |
+| `GAME_DATA` | (not set) | Path to game data (master.dat, critter.dat, data/) |
 | `BUILD_DIR` | "build-ios-sim" | Build output directory |
 | `BUILD_TYPE` | "RelWithDebInfo" | Build configuration |
 | `CLEAN` | "0" | Set to "1" to force rebuild |
@@ -183,8 +190,8 @@ export SIMULATOR_NAME="iPad Pro 11-inch (M4)"
 The simulator test script copies game data to the app's Documents container. Make sure your game data is accessible:
 
 ```bash
-# Default location
-GOG/Fallout1/
+# Example layout
+/path/to/FalloutData/
 ├── master.dat
 ├── critter.dat
 ├── data/
@@ -192,8 +199,8 @@ GOG/Fallout1/
 └── sound/
     └── music/
 
-# Or specify custom location
-GAME_DATA=/path/to/fallout ./scripts/test/test-ios-simulator.sh
+# Specify custom location
+GAME_DATA=/path/to/FalloutData ./scripts/test/test-ios-simulator.sh
 ```
 
 ### Troubleshooting Simulator Issues

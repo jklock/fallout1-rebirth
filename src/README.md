@@ -17,7 +17,7 @@ Last updated: 2026-02-07
 
 | File | Description |
 |------|-------------|
-| `audio_engine.cc/h` | SDL-based audio engine wrapper |
+| `audio_engine.cc/h` | SDL3-based audio engine wrapper |
 | `fps_limiter.cc/h` | Frame rate limiting and timing |
 | `movie_lib.cc/h` | MVE video playback library |
 | `platform_compat.cc/h` | Cross-platform compatibility utilities |

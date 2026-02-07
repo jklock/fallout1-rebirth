@@ -18,8 +18,8 @@ iOS-specific path handling and system integration:
 |------|-------------|
 | `paths.mm` | Objective-C++ file path resolution for iOS containers |
 | `paths.h` | Path function declarations |
-| `pencil.mm` | Apple Pencil gesture and touch tracking (UIKit bridge) |
-| `pencil.h` | Pencil API used by the input subsystem |
+| `pencil.mm` | Apple Pencil support with pressure sensitivity (UIKit bridge) |
+| `pencil.h` | Pencil API for input subsystem, window-to-game coordinate mapping |
 
 ### iOS Path Resolution
 

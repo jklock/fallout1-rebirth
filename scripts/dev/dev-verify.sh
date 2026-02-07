@@ -6,8 +6,9 @@
 # Does NOT include manual gameplay testing.
 #
 # USAGE:
-#   ./scripts/dev/dev-verify.sh                  # Run all tests
-#   BUILD_DIR=build-alt ./scripts/dev/dev-verify.sh  # Use alternate build dir
+#   ./scripts/dev/dev-verify.sh                           # Run all tests
+#   ./scripts/dev/dev-verify.sh --build-dir build-alt     # Use alternate build dir
+#   ./scripts/dev/dev-verify.sh --game-data /path/to/data # Use custom game data path
 #
 # TESTS PERFORMED:
 #   1. Build verification (CMake + compile)
@@ -19,30 +20,98 @@
 #
 # CONFIGURATION:
 #   BUILD_DIR  - Build output directory (default: "build")
-#   GAME_DATA  - Path to game files (default: "GOG/Fallout1")
+#   GAME_DATA  - Path to game files (optional; can also be set via --game-data)
 # =============================================================================
 set -euo pipefail
 
+START_DIR="$(pwd)"
 cd "$(dirname "$0")/../.."
 
 ERRORS=0
 BUILD_DIR="${BUILD_DIR:-build}"
-GAME_DATA="${GAME_DATA:-GOG/Fallout1}"
+GAME_DATA="${GAME_DATA:-}"
+GAME_DATA_INVALID=0
+
+show_help() {
+    cat << 'EOF'
+Fallout 1 Rebirth — Automated Test Suite
+
+USAGE:
+    ./scripts/dev/dev-verify.sh [OPTIONS]
+
+OPTIONS:
+    --build-dir PATH   Build output directory (default: build)
+    --game-data PATH   Path to game data (master.dat/critter.dat/data/)
+    --help             Show this help message and exit
+
+NOTES:
+    - Game data is optional for this script.
+    - Provide --game-data or set GAME_DATA to validate data availability.
+    - Relative --game-data paths are resolved from the invoking directory.
+EOF
+    exit 0
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --build-dir)
+            BUILD_DIR="$2"
+            shift 2
+            ;;
+        --game-data)
+            GAME_DATA="$2"
+            shift 2
+            ;;
+        --help|-h)
+            show_help
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_help
+            ;;
+    esac
+done
+
+GAME_DATA_RAW="$GAME_DATA"
+if [[ -n "$GAME_DATA" ]]; then
+    if [[ "$GAME_DATA" != /* ]]; then
+        GAME_DATA="$START_DIR/$GAME_DATA"
+    fi
+    if ! GAME_DATA_RESOLVED="$(cd "$GAME_DATA" 2>/dev/null && pwd)"; then
+        GAME_DATA_INVALID=1
+    else
+        GAME_DATA="$GAME_DATA_RESOLVED"
+    fi
+fi
 
 echo ""
 echo "=== Fallout 1 Rebirth Test Suite ==="
 echo "Build directory: $BUILD_DIR"
-echo "Game data:       $GAME_DATA"
+if [[ -n "$GAME_DATA" ]]; then
+    echo "Game data:       $GAME_DATA"
+else
+    echo "Game data:       (not set)"
+fi
 echo ""
 
 # Check game data
-if [[ ! -f "$GAME_DATA/master.dat" ]]; then
-    echo "⚠️  Game data not found at $GAME_DATA"
-    echo "   Set GAME_DATA env var or place game files in GOG/Fallout1"
+if [[ "$GAME_DATA_INVALID" -eq 1 ]]; then
+    echo "⚠️  Game data path not found: $GAME_DATA"
+    if [[ -n "$GAME_DATA_RAW" ]]; then
+        echo "   (from input: $GAME_DATA_RAW)"
+    fi
+    echo "   Provide --game-data PATH or set GAME_DATA to a valid folder"
     HAS_GAME_DATA=false
-else
+elif [[ -n "$GAME_DATA" && -f "$GAME_DATA/master.dat" ]]; then
     echo "✅ Game data found"
     HAS_GAME_DATA=true
+elif [[ -n "$GAME_DATA" ]]; then
+    echo "⚠️  Game data not found at $GAME_DATA"
+    echo "   Provide --game-data PATH or set GAME_DATA to a valid folder"
+    HAS_GAME_DATA=false
+else
+    echo "ℹ️  Game data not provided (skipping data validation)"
+    HAS_GAME_DATA=false
 fi
 echo ""
 
@@ -158,10 +227,10 @@ echo ""
 
 if [[ $ERRORS -eq 0 ]]; then
     echo "✅ All automated tests passed!"
-    if [[ "$HAS_GAME_DATA" == "true" ]]; then
+    if [[ "$HAS_GAME_DATA" == "true" && -n "$BINARY" ]]; then
         echo ""
         echo "Run game manually for gameplay testing:"
-        echo "  cd $GAME_DATA && ../build/fallout1-rebirth"
+        echo "  cd \"$GAME_DATA\" && \"$BINARY\""
     fi
     echo ""
     echo "See: FCE/TODO/PHASE_4_TESTING_POLISH.md for full test matrix"

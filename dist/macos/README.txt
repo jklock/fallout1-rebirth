@@ -5,7 +5,7 @@ macOS Installation Instructions
 -------------------------------
 
 1. REQUIRED FILES
-   You need the original Fallout 1 data files from GOG or Steam:
+   You need the original Fallout 1 data files from your own copy:
    - master.dat
    - critter.dat
    - data/ folder

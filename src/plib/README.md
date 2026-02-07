@@ -27,7 +27,7 @@ Core windowing and input system:
 | `input.cc/h` | Input event queue |
 | `kb.cc/h` | Keyboard handling |
 | `mouse.cc/h` | Mouse handling |
-| `touch.cc/h` | Touch input (iOS/iPadOS) |
+| `touch.cc/h` | Touch input with tap/pan gestures, long-press drag, mouse fallback (iOS/iPadOS) |
 | `button.cc/h` | UI button system |
 | `text.cc/h` | Text rendering |
 | `rect.cc/h` | Rectangle operations |
