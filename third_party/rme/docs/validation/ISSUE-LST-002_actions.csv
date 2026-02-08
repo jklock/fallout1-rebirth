@@ -1,0 +1,118 @@
+lst_file,missing_token,rme_present,rme_line,present_in_dat,dat_name,loose_candidates,csv_candidate_path,recommended_action
+ART\INTRFACE\INTRFACE.LST,actionh.frm,yes,actionh.frm    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,actionm.frm,yes,actionm.frm    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,AMAPHV.FRM,yes,AMAPHV.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,MAPMK.FRM,yes,MAPMK.FRM      ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,ENDTDN.FRM,yes,ENDTDN.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,ENDTUP.FRM,yes,ENDTUP.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,TMAPDN.FRM,yes,TMAPDN.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,TMAPHV.FRM,yes,TMAPHV.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,TMAPUP.FRM,yes,TMAPUP.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,WMAPDN.FRM,yes,WMAPDN.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,WMAPHV.FRM,yes,WMAPHV.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,WMAPUP.FRM,yes,WMAPUP.FRM     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATTKBDN.FRM,yes,LATTKBDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATTKBDS.FRM,yes,LATTKBDS.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATTKBUP.FRM,yes,LATTKBUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATTKSDN.FRM,yes,LATTKSDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATTKSDS.FRM,yes,LATTKSDS.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATTKSUP.FRM,yes,LATTKSUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,SATTKSUP.FRM,yes,SATTKSUP.FRM   ; single attack small up,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,UATTKBDN.FRM,yes,UATTKBDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,UATTKBUP.FRM,yes,UATTKBUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,UATTKSDN.FRM,yes,UATTKSDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,UATTKSUP.FRM,yes,UATTKSUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,TWOHAND.FRM,yes,TWOHAND.FRM    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,autodim.frm,yes,autodim.frm    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,autohi.frm,yes,autohi.frm     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,towndim.frm,yes,towndim.frm    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,townhi.frm,yes,townhi.frm     ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,worlddim.frm,yes,worlddim.frm   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,worldhi.frm,yes,worldhi.frm    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATURBDN.FRM,yes,LATURBDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATURBDS.FRM,yes,LATURBDS.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATURBUP.FRM,yes,LATURBUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATURSDN.FRM,yes,LATURSDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATURSDS.FRM,yes,LATURSDS.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,LATURSUP.FRM,yes,LATURSUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,UATURBDN.FRM,yes,UATURBDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,UATURBUP.FRM,yes,UATURBUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,UATURSDN.FRM,yes,UATURSDN.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,UATURSUP.FRM,yes,UATURSUP.FRM   ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,ACTIONT.FRM,yes,ACTIONT.FRM    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,ACTIONI.FRM,yes,ACTIONI.FRM    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,upsell03.frm,yes,upsell03.frm   ; Upsell screen for interactive demo,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,upsell04.frm,yes,upsell04.frm   ; Upsell screen for interactive demo,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,upsell05.frm,yes,upsell05.frm   ; Upsell screen for interactive demo,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,upsell06.frm,yes,upsell06.frm   ; Upsell screen for interactive demo,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,upsell07.frm,yes,upsell07.frm   ; Upsell screen for interactive demo,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,upsell08.frm,yes,upsell08.frm   ; Upsell screen for interactive demo,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,upsell09.frm,yes,upsell09.frm   ; Upsell screen for interactive demo,no,,,,MISSING_NEED_UPSTREAM
+ART\INTRFACE\INTRFACE.LST,SHABAD3.FRM,yes,SHABAD3.FRM    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+ART\INTRFACE\INTRFACE.LST,SHAGOD2.FRM,yes,SHAGOD2.FRM    ; *** NO LONGER USED ***,no,,,,REVIEW_REMOVE_OR_COMMENT
+SCRIPTS\SCRIPTS.LST,1dedgul1.int,yes,1dedgul1.int   ; Dead ghouls (?)                                                              # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,1manhol1.int,yes,1manhol1.int   ; Manhole to get to the Sewers in Necropolis (?)                               # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,1ladder1.int,yes,1ladder1.int   ; Ladder for the Manhole in Necropolis (?)                                     # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,1MoleRat.int,yes,1MoleRat.int    ; Mole Rat Boss (nasty guy)                                                   # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,JunkDemo.int,yes,JunkDemo.int    ; Map Script for Junkdemo.Map (for demo)                                      # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,LowJack.int,yes,LowJack.int     ; low stakes Blackjack                             # map_init                 # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,HighJack.int,yes,HighJack.int    ; high stakes Blackjack.                           # map_init                 # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,DemoComp.int,yes,DemoComp.int    ; Computer for the demo                                                       # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,DemoDoor.int,yes,DemoDoor.int    ; locked freezer in the demo                                                  # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Phrax.int,yes,"Phrax.int       ; From the Demo, guard for the Crypts.                                        # local_vars=4",no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,DemoGen.int,yes,DemoGen.int     ; Generator for the demo                                                      # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,DemoCryp.int,yes,DemoCryp.int    ; generic Crypt ganger member for the demo                                    # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,DemoFool.int,yes,DemoFool.int    ; generic Fool ganger memeber for the demo                                    # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Lenny.int,yes,Lenny.int       ; the Bhrama master for the demo                                              # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Icepick.int,yes,Icepick.int     ; Leader of the Fools.                                                        # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Skizzer.int,yes,Skizzer.int     ; gate guard for the demo                                                     # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Pez.int,yes,Pez.int         ; generic peasant for the demo                                                # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Rock.int,yes,Rock.int        ; another guard for the demo                                                  # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Lex.int,yes,Lex.int         ; Leader of Scrapheap for the demo                                            # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Rayze.int,yes,Rayze.int       ; leader of the Crypts for the demo                                           # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Skippy.int,yes,Skippy.int      ; Lead wirecutter boy                                                         # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Baka.int,yes,Baka.int        ; Leader of the Fools                                                         # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,ScoutC.int,yes,ScoutC.int      ; has the player scouted the Crypts?                                          # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,ScoutF.int,yes,ScoutF.int      ; has the player scouted the Fools?                                           # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,MVAirloc.ssl,yes,MVAirloc.ssl    ;  Master's Vault: Airlock door   # map_init                                  # local_vars=3,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,MVBShelf.ssl,yes,MVBShelf.ssl    ;  Master's Vault: Bookshelf                                                  # local_vars=2,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,MVSctShf.ssl,yes,MVSctShf.ssl    ;  Master's Vault: Bookshelf with secret door                                 # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,LgFtPrnt.int,yes,LgFtPrnt.int    ; Map Script for Large Foot Print special encounter                           # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,VTeam5.int,yes,VTeam5.int      ; Mutant team num 5 in Vats                                                   # local_vars=6,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,VTeam6.int,yes,VTeam6.int      ; Mutant team num 6 in Vats                                                   # local_vars=6,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,bill.int,yes,bill.int        ; guard for Lorenzo in the Hub                                                # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,bob.int,yes,JtBob.int       ; Bob from Junktown. Pretty much a dead beat                                  # local_vars=11,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,bobsign.int,yes,bobsign.int     ; Sign outside Bob's Iguana Bits                                              # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,cally.int,yes,cally.int       ; Another bodyguard for Lorenzo                                               # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,crvndrvr.int,yes,crvndrvr.int    ; Generic Caravan Driver in the Hub                                           # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,elecdoor.int,yes,elecdoor.int    ; Electronic lock on a door in the Hub                                        # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,electrap.int,yes,electrap.int    ; Electronic Trap in the Thieves' Circle                                      # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,gunlock.int,yes,gunlock.int     ; Lock on the gun storage                                                     # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,hgengrd.int,yes,hgengrd.int     ; Generic Guard in the hub                                                    # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,hubber.int,yes,hubber.int      ; Generic Hubber (Hub Dweller)                                                # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,hubcarvn.int,yes,hubcarvn.int    ; Hub Caravan (generic)                          # map_init                   # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,hubcop.int,yes,hubcop.int      ; Generic Hub Cop                                                             # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,jobpost.int,yes,jobpost.int     ; Job Post where all the jobs in the Hub are posted                           # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,rufus.int,yes,"rufus.int       ; Rufus, cyber hack in the Hub                                                # local_vars=4",no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,wtrMGrd.int,yes,wtrMGrd.int     ; Water Merchant Guards                                                       # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,VLocker.int,yes,VLocker.int     ; Trapped locker in the Vats.                                                 # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,WhoMap.int,yes,DrWhoMap.int    ; Map Script for Dr. Who special encounter                                    # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,TalkCow.int,yes,TalkCow.int     ; Script for the talking Brahmin.                                             # local_vars=3,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,TCowMap.int,yes,TCowMap.int     ; Map script for the talking cows.                                            # local_vars=3,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Alan.int,yes,Alan.int        ; Recent enthusiastic Follower convert.                                       # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Enemy.int,yes,Enemy.int       ; Responses from people who don't want to talk to the dude.                   # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Merch1.int,yes,Merch1.int      ; Merchant from the Hub                                                       # local_vars=5,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,RndMerch.int,yes,RndMerch.int    ; Random Hub merchants.                                                       # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,PalScout.int,yes,PalScout.int    ; Random Paladin scouts.                                                      # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,GenMercC.int,yes,GenMercC.int    ; Generic merchant for random encounter                                       # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,GenPalC.int,yes,GenPalC.int     ; Generic paladin for random encounter                                        # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,GenChat.int,yes,GenChat.int     ; generic messagage file                                                      # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,FGTRtnVn.int,yes,FGTRtnVn.int    ; Far Go Traders Return to the Hub                                            # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,CCRtnVn.int,yes,CCRtnVn.int     ; Crimson Caravans Return to the Hub                                          # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,WMRtnVn.int,yes,WMRtnVn.int     ; Water Merchants Return to the Hub                                           # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Armory.int,yes,Armory.int      ; merchant for the Armory Store                                               # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Rope.int,yes,Rope.int        ; for message file                                                            # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Bethgrd.int,yes,Bethgrd.int     ; guys outside the weapons shop                                               # local_vars=6,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,Rndecspl.int,yes,Rndecspl.int    ; Another random encounter script                                             # local_vars=4,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,chitem.int,yes,chitem.int      ; cheater                                                                     # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
+SCRIPTS\SCRIPTS.LST,invaded.int,yes,invaded.int     ; msg file for random encounter                                               # local_vars=0,no,,,,MISSING_NEED_UPSTREAM
