@@ -8,24 +8,32 @@ Provide a one-command patch flow for macOS and iOS users that produces patched d
    - `scripts/patch/rebirth-patch-data.sh`
    - Inputs: `--base`, `--rme`, `--out`
    - Steps: validate -> copy -> xdelta -> overlay -> lowercase -> configs -> summary
-2. Implement macOS wrapper:
+2. Add cross-reference generator:
+   - `scripts/patch/rme-crossref.py`
+   - Output: `development/RME/summary/rme-crossref.csv`
+   - Output: `development/RME/summary/rme-crossref.md`
+3. Implement macOS wrapper:
    - `scripts/patch/rebirth-patch-app.sh`
    - Uses `gameconfig/macos` templates
    - Prints exact copy destination:
      - `/Applications/Fallout 1 Rebirth.app/Contents/Resources/`
-3. Implement iOS wrapper:
+4. Implement iOS wrapper:
    - `scripts/patch/rebirth-patch-ipa.sh`
    - Uses `gameconfig/ios` templates
    - Prints Finder destination:
      - `Files > Fallout 1 Rebirth > Documents/`
-4. Add dependency checks:
+5. Add dependency checks:
    - `xdelta3`, `python3`, `rsync` (or `cp` fallback)
-5. Add verification output:
-   - Checksums
-   - File counts
-   - Output size
-6. Update docs to reference the new scripts.
-
+6. Add verification output:
+    - Checksums
+    - File counts
+    - Output size
+    - MAP header sanity check (warn or fail if unexpected)
+    - CRLF normalization for .lst/.msg/.txt
+7. Add validation reports:
+   - `scripts/patch/rebirth-validate-data.sh` should surface crossref warnings
+   - LST heuristic report as a non-failing warning
+8. Update docs to reference the new scripts.
 ## Done Criteria
 - All three scripts exist and run on macOS.
 - Output is a ready-to-copy folder containing patched data + configs.

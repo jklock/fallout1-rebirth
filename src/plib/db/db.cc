@@ -11,6 +11,7 @@
 #include "platform_compat.h"
 #include "plib/assoc/assoc.h"
 #include "plib/db/lzss.h"
+#include "plib/db/patchlog.h"
 
 namespace fallout {
 
@@ -134,18 +135,39 @@ DB_DATABASE* db_init(const char* datafile, const char* datafile_path, const char
 {
     DB_DATABASE* database;
 
+    patchlog_context(patches_path, datafile_path);
+
     if (db_create_database(&database) != 0) {
+        if (patchlog_enabled()) {
+            patchlog_write("DB_INIT_FAIL", "stage=create_database");
+        }
         return INVALID_DATABASE_HANDLE;
     }
 
     if (db_init_database(database, datafile, datafile_path) != 0) {
+        if (patchlog_enabled()) {
+            const char* datafile_name = datafile != NULL ? datafile : "(null)";
+            patchlog_write("DB_INIT_FAIL", "stage=init_database datafile=\"%s\"", datafile_name);
+        }
         db_close(database);
         return INVALID_DATABASE_HANDLE;
     }
 
     if (db_init_patches(database, patches_path) != 0) {
+        if (patchlog_enabled()) {
+            const char* patches = patches_path != NULL ? patches_path : "(null)";
+            patchlog_write("DB_INIT_FAIL", "stage=init_patches patches_path=\"%s\"", patches);
+        }
         db_close(database);
         return INVALID_DATABASE_HANDLE;
+    }
+
+    patchlog_context(database->patches_path, database->datafile_path);
+    if (patchlog_enabled()) {
+        const char* datafile = database->datafile != NULL ? database->datafile : "(null)";
+        const char* datafile_path = database->datafile_path != NULL ? database->datafile_path : "(null)";
+        const char* patches_path = database->patches_path != NULL ? database->patches_path : "(null)";
+        patchlog_write("DB_INIT", "datafile=\"%s\" datafile_path=\"%s\" patches_path=\"%s\"", datafile, datafile_path, patches_path);
     }
 
     if (current_database == NULL) {
@@ -534,6 +556,8 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
         return NULL;
     }
 
+    patchlog_context(current_database->patches_path, current_database->datafile_path);
+
     mode_value = -1;
     mode_is_text = true;
     for (k = 0; mode[k] != '\0'; k++) {
@@ -591,7 +615,12 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
         }
 
         if (stream != NULL) {
+            if (patchlog_verbose()) {
+                patchlog_write("DB_OPEN_OK", "source=patches path=\"%s\" mode=\"%s\"", path, mode);
+            }
             return db_add_fp_rec(stream, NULL, 0, flags | 0x4);
+        } else if (patchlog_verbose()) {
+            patchlog_write("DB_OPEN_MISS", "source=patches path=\"%s\" mode=\"%s\"", path, mode);
         }
     }
 
@@ -600,6 +629,7 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
     }
 
     if (current_database->datafile == NULL) {
+        patchlog_write("DB_OPEN_FAIL", "source=datafile reason=no_dat request=\"%s\" mode=\"%s\"", filename, mode);
         return NULL;
     }
 
@@ -610,19 +640,26 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
     compat_strupr(path);
 
     if (db_find_dir_entry(path, &de) == -1) {
+        patchlog_write("DB_OPEN_FAIL", "source=datafile reason=missing request=\"%s\" path=\"%s\" mode=\"%s\"", filename, path, mode);
         return NULL;
     }
 
     if (current_database->stream == NULL) {
+        patchlog_write("DB_OPEN_FAIL", "source=datafile reason=no_stream request=\"%s\" path=\"%s\" mode=\"%s\"", filename, path, mode);
         return NULL;
     }
 
     if (fseek(current_database->stream, de.offset, SEEK_SET) != 0) {
+        patchlog_write("DB_OPEN_FAIL", "source=datafile reason=seek request=\"%s\" path=\"%s\" mode=\"%s\"", filename, path, mode);
         return NULL;
     }
 
     if (de.flags == 0) {
         de.flags = 16;
+    }
+
+    if (patchlog_verbose()) {
+        patchlog_write("DB_OPEN_OK", "source=datafile path=\"%s\" mode=\"%s\" flags=%d", path, mode, de.flags);
     }
 
     switch (de.flags & 0xF0) {

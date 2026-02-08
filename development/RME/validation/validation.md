@@ -1,7 +1,7 @@
 # RME Execution Validation
 
 ## Validation Scope
-Confirm all tasks in the plan and todo documents were implemented and verified.
+Confirm tasks in the plan/todo documents are implemented and verify the current patch pipeline produces a macOS-ready bundle with normalized text files.
 
 ## Plan References
 - `development/RME/plan/engineplan.md`
@@ -13,31 +13,35 @@ Confirm all tasks in the plan and todo documents were implemented and verified.
 - `development/RME/todo/game_data_todo.md`
 - `development/RME/todo/scripts_todo.md`
 
-## Checks Performed
-1. Engine plan alignment:
-   - Verified macOS working directory search order and iOS Documents chdir in `src/plib/gnw/winmain.cc`.
-   - Verified config defaults in `src/game/gconfig.cc`.
-   - Verified config templates in `gameconfig/macos/fallout.cfg` and `gameconfig/ios/fallout.cfg`.
-   - Verified exact install paths are documented in plan docs.
-2. Game data plan alignment:
-   - RME payload stored at `third_party/rme/source/`.
-   - `third_party/rme/manifest.json` and `third_party/rme/checksums.txt` created.
-   - `third_party/rme/README.md` created with version context and expectations.
-3. Script plan alignment:
-   - `scripts/patch/rebirth-patch-data.sh` implemented with validation, xdelta patching, overlay, lowercase normalization, and config copy.
-   - `scripts/patch/rebirth-patch-app.sh` and `scripts/patch/rebirth-patch-ipa.sh` implemented with exact copy destinations.
-   - Dependency checks and summary output included.
-4. Script relocation updates:
-   - Script paths updated across docs to reflect `scripts/build`, `scripts/dev`, `scripts/test`.
-   - Updated internal script root resolution to account for new subfolders.
-5. Risks:
-   - `development/RME/plan/RISKS.md` includes per-mod risk entries and fresh-install assumptions.
+## Checks Performed (Current)
+1. **Cross-reference mapping generated**:
+   - `development/RME/summary/rme-crossref.csv`
+   - `development/RME/summary/rme-crossref.md`
+   - `development/RME/summary/rme-lst-report.md`
+2. **CRLF normalization added**:
+   - `scripts/patch/rebirth-patch-data.sh` normalizes `.lst/.msg/.txt` to LF.
+3. **Validation updated for text files**:
+   - `scripts/patch/rebirth-validate-data.sh` normalizes text hashes and asserts no CRLF remains.
+4. **Patch pipeline exercised**:
+   - Patched output produced at `GOG/patchedfiles`.
+5. **macOS build and app install tested**:
+   - Build succeeded.
+   - Patched data installed into `build-macos/RelWithDebInfo/Fallout 1 Rebirth.app`.
 
 ## Tests Run
-- `bash -n scripts/patch/rebirth-patch-data.sh scripts/patch/rebirth-patch-app.sh scripts/patch/rebirth-patch-ipa.sh`
-- `./scripts/patch/rebirth-patch-data.sh --help`
-- `./scripts/patch/rebirth-patch-app.sh --help`
-- `./scripts/patch/rebirth-patch-ipa.sh --help`
+- `./scripts/patch/rebirth-patch-data.sh --base GOG/unpatchedfiles --out GOG/patchedfiles --config-dir gameconfig/macos --rme third_party/rme/source --force`
+- `./scripts/patch/rebirth-validate-data.sh --patched GOG/patchedfiles --base GOG/unpatchedfiles --rme third_party/rme/source`
+- `./scripts/build/build-macos.sh`
+- `./scripts/test/test-install-game-data.sh --source GOG/patchedfiles --target "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app"`
+- `./scripts/test/test-macos-headless.sh`
+- `./scripts/test/test-macos.sh --verify`
+- `F1R_PATCHLOG=1 F1R_PATCHLOG_VERBOSE=1 F1R_PATCHLOG_PATH=/tmp/f1r-patchlog.txt .../Contents/MacOS/fallout1-rebirth`
 
 ## Results
-All plan and todo items were implemented, documented, and validated against the updated plan files. No engine code changes were required for the patch-in-place flow, and the patch scripts now produce a ready-to-copy output folder with configs included.
+Data-level validation and macOS bundle tests pass. Headless and verify tests pass. In-game visual verification remains pending (headed run).
+
+## Outstanding Validation (Planned)
+1. **In-game visual confirmation** (map/world render).
+2. **Patch logging diagnostics** (only if visual issues persist):
+   - Enable `F1R_PATCHLOG=1` for a run.
+   - Review `patchlog.txt` for missing assets or failed opens.

@@ -5,12 +5,15 @@
 #include <string>
 #include <unistd.h>
 
+#include <limits.h>
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
 #include "game/main.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/svga.h"
+#include "plib/db/patchlog.h"
 
 #if __APPLE__ && TARGET_OS_IOS
 #include "platform/ios/paths.h"
@@ -28,6 +31,61 @@ int main(int argc, char* argv[])
 {
     int rc;
 
+#if __APPLE__ && TARGET_OS_OSX
+    auto resolve_base_path = [argv]() -> std::string {
+        std::string sdlBasePath;
+        const char* sdlBase = SDL_GetBasePath();
+        if (sdlBase != NULL) {
+            sdlBasePath.assign(sdlBase);
+            SDL_free((void*)sdlBase);
+        }
+
+        std::string argvBasePath;
+        if (argv != nullptr && argv[0] != nullptr) {
+            char resolved[PATH_MAX];
+            if (realpath(argv[0], resolved) != NULL) {
+                std::string path(resolved);
+                size_t sep = path.find_last_of('/');
+                if (sep != std::string::npos) {
+                    argvBasePath = path.substr(0, sep + 1);
+                }
+            }
+        }
+
+        auto looks_like_bundle = [](const std::string& path) {
+            return path.find("/Contents/MacOS/") != std::string::npos
+                || path.find("/Contents/Resources/") != std::string::npos;
+        };
+
+        if (looks_like_bundle(sdlBasePath)) {
+            return sdlBasePath;
+        }
+
+        if (looks_like_bundle(argvBasePath)) {
+            return argvBasePath;
+        }
+
+        if (!sdlBasePath.empty()) {
+            return sdlBasePath;
+        }
+
+        if (!argvBasePath.empty()) {
+            return argvBasePath;
+        }
+
+        char cwd[PATH_MAX];
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            std::string path(cwd);
+            if (!path.empty() && path.back() != '/') {
+                path.push_back('/');
+            }
+            return path;
+        }
+
+        return std::string();
+    };
+#endif
+
 #if __APPLE__ && TARGET_OS_IOS
     // Use dedicated touch gesture handling; avoid synthetic touch->mouse events
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
@@ -36,8 +94,8 @@ int main(int argc, char* argv[])
 #endif
 
 #if __APPLE__ && TARGET_OS_OSX
-    const char* basePath = SDL_GetBasePath();
-    if (basePath != NULL) {
+    std::string basePath = resolve_base_path();
+    if (!basePath.empty()) {
         std::string workingDir(basePath);
 
         auto hasGameFiles = [](const std::string& dir) {
@@ -50,16 +108,16 @@ int main(int argc, char* argv[])
 
         const char resourcesMarker[] = "/Contents/Resources/";
         const char macosMarker[] = "/Contents/MacOS/";
-        const char* resources = strstr(basePath, resourcesMarker);
-        const char* macos = strstr(basePath, macosMarker);
+        const char* resources = strstr(basePath.c_str(), resourcesMarker);
+        const char* macos = strstr(basePath.c_str(), macosMarker);
 
         if (resources != NULL || macos != NULL) {
             std::string appRoot;
 
             if (resources != NULL) {
-                appRoot.assign(basePath, resources - basePath);
+                appRoot.assign(basePath.c_str(), resources - basePath.c_str());
             } else {
-                appRoot.assign(basePath, macos - basePath);
+                appRoot.assign(basePath.c_str(), macos - basePath.c_str());
             }
 
             std::string macosPath = appRoot + "/Contents/MacOS/";
@@ -80,9 +138,13 @@ int main(int argc, char* argv[])
             }
         }
 
+        if (patchlog_enabled()) {
+            patchlog_write("BOOT_PATH", "base=\"%s\" working=\"%s\"",
+                basePath.c_str(),
+                workingDir.c_str());
+        }
+
         chdir(workingDir.c_str());
-        // SDL3 returns const char* but it's still allocated memory that needs freeing
-        SDL_free((void*)basePath);
     }
 #endif
 

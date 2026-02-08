@@ -1,38 +1,70 @@
 # RME Execution Summary
 
-## Plan Updates
-- Updated plan documents in `development/RME/plan/` with concrete install paths:
-  - macOS: `/Applications/Fallout 1 Rebirth.app/Contents/Resources/`
-  - iOS: `Files > Fallout 1 Rebirth > Documents/`
-- Confirmed patch-in-place strategy (no runtime patch directory, no save-path changes).
+## Current Status (2026-02-08)
+Patch pipeline is implemented and verified at the data/script level. A cross-reference mapping has been generated and line-ending normalization has been added to avoid macOS proto lookup failures. Headless and verify tests pass on the macOS build. In-game visual verification remains pending on your machine after re-installing patched data.
 
-## Implementation Completed
-- Added RME payload storage:
-  - `third_party/rme/source/` (copied from `rme_1`, without .DS_Store)
-  - `third_party/rme/manifest.json`
-  - `third_party/rme/checksums.txt`
-  - `third_party/rme/README.md`
-- Added patch scripts:
-  - `scripts/patch/rebirth-patch-data.sh`
-  - `scripts/patch/rebirth-patch-app.sh`
-  - `scripts/patch/rebirth-patch-ipa.sh`
-- Standardized patch script log markers to ASCII for portability.
-- Removed Windows-only executables from the RME payload (`falloutw.exe`, `TOOLS/*.exe`) and updated the manifest/checksums.
-- Updated script path references across docs and scripts to match new structure:
-  - `scripts/build/`, `scripts/dev/`, `scripts/test/`
-- Fixed moved script working directories and root resolution.
-- Updated `docs/scripts.md` and `scripts/README.md` to document new paths and RME patch scripts.
-- Normalized script headers for patch/build tooling and clarified usage.
-- Updated `scripts/test/test-install-game-data.sh` to remove hardcoded source paths and prompt for input (supports `GAME_DATA`).
+## Fixes Applied (Tracked in Repo)
+1. **CRLF normalization for `.lst/.msg/.txt`** (patch step):
+   - Reason: `proto_list_str` strips `\n` but not `\r`, causing proto filenames to include `\r` on macOS and break map/object loads (black world).
+   - Change: `scripts/patch/rebirth-patch-data.sh` now replaces CRLF with LF after overlay.
+2. **Validation hardened for text files**:
+   - Change: `scripts/patch/rebirth-validate-data.sh` hashes text files with normalized line endings and asserts no CRLF remains.
+3. **Full RME mapping generation**:
+   - New script: `scripts/patch/rme-crossref.py`
+   - Outputs:
+     - `development/RME/summary/rme-crossref.csv`
+     - `development/RME/summary/rme-crossref.md`
+     - `development/RME/summary/rme-lst-report.md`
+   - Purpose: show overrides vs new files, and LST-reference heuristics.
 
-## Todo Execution Status
-- Engine todo: verified no engine changes required and documented exact install paths.
-- Game data todo: third_party payload + checksums + manifest created.
-- Scripts todo: patch scripts implemented and documented.
+4. **Patch logging + boot-path diagnostics**:
+   - Added `src/plib/db/patchlog.{h,cc}` and instrumentation in `db_fopen` + `db_init`.
+   - Added boot path logging in `src/plib/gnw/winmain.cc` to show base/working directory.
+   - Added fallback base-path resolution using `argv[0]` if SDL base path is outside the app bundle.
+5. **Config copy in test installer**:
+   - `scripts/test/test-install-game-data.sh` now copies `fallout.cfg` and `f1_res.ini` when present.
 
-## Tests Run
-- `bash -n scripts/patch/rebirth-patch-data.sh scripts/patch/rebirth-patch-app.sh scripts/patch/rebirth-patch-ipa.sh scripts/test/test-install-game-data.sh scripts/build/build-ios-ipa.sh`
-- `./scripts/patch/rebirth-patch-data.sh --help`
-- `./scripts/patch/rebirth-patch-app.sh --help`
-- `./scripts/patch/rebirth-patch-ipa.sh --help`
-- `./scripts/test/test-install-game-data.sh --help`
+## What Was Done (End-to-End Execution)
+- Patched data output created in `GOG/patchedfiles` using:
+  - `./scripts/patch/rebirth-patch-data.sh --base GOG/unpatchedfiles --out GOG/patchedfiles --config-dir gameconfig/macos --rme third_party/rme/source --force`
+- Validation run:
+  - `./scripts/patch/rebirth-validate-data.sh --patched GOG/patchedfiles --base GOG/unpatchedfiles --rme third_party/rme/source`
+- macOS build:
+  - `./scripts/build/build-macos.sh`
+- Installed patched data into app bundle:
+  - `./scripts/test/test-install-game-data.sh --source GOG/patchedfiles --target "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app"`
+- Tests:
+  - `./scripts/test/test-macos-headless.sh` (pass)
+  - `./scripts/test/test-macos.sh --verify` (pass)
+  - Runtime diagnostics with `F1R_PATCHLOG=1` (log written to `/tmp/f1r-patchlog.txt`)
+
+## Open Work (Remaining)
+1. **In-game visual verification** (headed run on your machine):
+   - Install patched data into `/Applications/Fallout 1 Rebirth.app`.
+   - Launch and confirm world renders correctly (no black map).
+2. **Crossref triage**:
+   - Review `development/RME/summary/rme-lst-report.md` for missing references.
+   - Confirm missing assets are expected or add them to the pipeline if required.
+
+## Notes on Patch Coverage
+We currently apply:
+- `xdelta` patches for DATs
+- RME `DATA` overlay
+- Case normalization + CRLF normalization
+
+## Patch Logging (Runtime Diagnostics)
+Patch logging can be enabled for runs where missing assets or black screens appear.
+- Enable: `F1R_PATCHLOG=1`
+- Verbose (log successful opens): `F1R_PATCHLOG_VERBOSE=1`
+- Log path override: `F1R_PATCHLOG_PATH=/absolute/path/to/patchlog.txt`
+Categories:
+- `DB_CONTEXT` (patch/data paths)
+- `DB_OPEN_OK` (successful file opens)
+- `DB_OPEN_MISS` (patch folder miss in verbose mode)
+- `DB_OPEN_FAIL` (missing file, seek failure, etc.)
+- `DB_INIT` / `DB_INIT_FAIL` (database init success/failure)
+- `BOOT_PATH` (base path + selected working directory)
+Removal:
+- Delete `src/plib/db/patchlog.cc` and `src/plib/db/patchlog.h`
+- Remove the include + calls in `src/plib/db/db.cc`
+- Remove the two entries from `CMakeLists.txt`

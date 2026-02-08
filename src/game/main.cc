@@ -13,6 +13,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
@@ -39,6 +40,7 @@
 #include "game/scripts.h"
 #include "game/select.h"
 #include "game/selfrun.h"
+#include "game/tile.h"
 #include "game/wordwrap.h"
 #include "game/worldmap.h"
 #include "plib/color/color.h"
@@ -99,6 +101,20 @@ int gnw_main(int argc, char** argv)
 
     if (!main_init_system(argc, argv)) {
         return 1;
+    }
+
+    const char* autorun_map = getenv("F1R_AUTORUN_MAP");
+    if (autorun_map != NULL && autorun_map[0] != '\0') {
+        const char* map_name = autorun_map;
+        if (strcmp(autorun_map, "1") == 0) {
+            map_name = mainMap;
+        }
+        roll_set_seed(-1);
+        main_load_new(const_cast<char*>(map_name));
+        main_unload_new();
+        main_exit_system();
+        autorun_mutex_destroy();
+        return 0;
     }
 
     gmovie_play(MOVIE_IPLOGO, GAME_MOVIE_FADE_IN);
@@ -287,6 +303,11 @@ static int main_load_new(char* mapFileName)
     win_delete(win);
     loadColorTable("color.pal");
     palette_fade_to(cmap);
+    tile_refresh_display();
+    const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");
+    if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {
+        dump_screen();
+    }
     return 0;
 }
 
