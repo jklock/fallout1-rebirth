@@ -1,0 +1,46 @@
+{
+  "repo": "alexbatalov/fallout1-ce",
+  "branch": "patchfix",
+  "created": "2026-02-08",
+  "top_issues": [
+    {
+      "id": "ISSUE-LST-002",
+      "title": "Missing LST references",
+      "priority": "High",
+      "symptom": "117 LST entries reference assets not found in overlay or DATs",
+      "evidence_files": [
+        "GOG/rme_xref_patched/rme-lst-report.md",
+        "GOG/validation/raw/lst_candidates.csv"
+      ],
+      "recommended_action": "Find candidate assets or add overlay copies; update LSTs only when confident",
+      "verify_cmd": "python3 scripts/patch/rme-crossref.py --rme third_party/rme/source --base-dir GOG/patchedfiles --out-dir GOG/rme_xref_patched",
+      "scripts": ["GOG/validation/scripts_archive/find_lst_candidates.py"]
+    },
+    {
+      "id": "ISSUE-CASE-001",
+      "title": "Case-only renames",
+      "priority": "High",
+      "symptom": "20 pairs with case-only naming differences (e.g., MAINMENU.FRM vs mainmenu.frm)",
+      "evidence_files": ["GOG/case_renames.txt","GOG/validation/case_test_results.txt"],
+      "recommended_action": "Create overlay copies for missing case variants or normalize to canonical case after LST/code analysis",
+      "verify_cmd": "python3 GOG/validation/scripts_archive/run_case_test.py && ls -la /Volumes/cs_test/case_test",
+      "scripts": ["GOG/validation/scripts_archive/propose_case_fixes.sh","GOG/validation/scripts_archive/find_lst_candidates.py"]
+    },
+    {
+      "id": "ISSUE-DAT-005",
+      "title": "DAT promotions vs data-only packaging",
+      "priority": "High",
+      "symptom": "Patched master.dat and critter.dat include many RME files (114 & 289 promoted files)",
+      "evidence_files": ["GOG/master_added_files.txt","GOG/critter_added_files.txt","GOG/validation/raw/master_added_rows.csv"],
+      "recommended_action": "Decide DAT replacement vs data-only overlay and implement extraction if overlay is preferred",
+      "verify_cmd": "./scripts/patch/rebirth-validate-data.sh --patched GOG/validation/overlay_data --base GOG/unpatchedfiles --rme third_party/rme/source",
+      "scripts": ["GOG/validation/scripts_archive/generate_overlay_from_rows.sh"]
+    }
+  ],
+  "artifacts": {
+    "diff": "GOG/unpatched_vs_patched.diff",
+    "mapping_csv": "GOG/validation/patch_mapping.csv",
+    "lst_candidates": "GOG/validation/raw/lst_candidates.csv",
+    "validation_logs": "GOG/validation/rebirth_validate.log"
+  }
+}
