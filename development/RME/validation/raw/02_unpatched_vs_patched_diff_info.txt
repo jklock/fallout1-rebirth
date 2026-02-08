@@ -1,0 +1,2 @@
+2) Copy existing unified diff (already generated)
+-rw-r--r--@ 1 klock  staff    16M Feb  8 12:14 GOG/unpatched_vs_patched.diff

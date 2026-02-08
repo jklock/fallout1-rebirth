@@ -1,0 +1,5 @@
+6) RME crossref counts
+unpatched: new files (base empty)= 0
+patched: new files (base empty)= 0
+patched: master.dat override count= 750
+patched: critter.dat override count= 376
