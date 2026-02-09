@@ -6,9 +6,11 @@
 #include <TargetConditionals.h>
 #endif
 
+#include "game/map.h"
 #include "game/palette.h"
 #include "plib/color/color.h"
 #include "plib/db/db.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/button.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/grbuf.h"
@@ -16,11 +18,9 @@
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/memory.h"
 #include "plib/gnw/svga.h"
-#include "game/map.h"
 #include "plib/gnw/text.h"
 #include "plib/gnw/vcr.h"
 #include "plib/gnw/winmain.h"
-#include "plib/db/patchlog.h"
 
 namespace fallout {
 

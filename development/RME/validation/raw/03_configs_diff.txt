@@ -1,6 +1,6 @@
 3) Config diffs
---- GOG/unpatchedfiles/f1_res.ini	2026-02-04 17:55:45
-+++ GOG/patchedfiles/f1_res.ini	2026-02-08 21:47:23
+--- /Volumes/Storage/GitHub/fallout1-rebirth/GOG/unpatchedfiles/f1_res.ini	2026-02-04 17:55:45
++++ /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/f1_res.ini	2026-02-09 10:19:22
 @@ -1,19 +1,26 @@
  [MAIN]
  ; ================================================================
@@ -73,8 +73,8 @@
 +; Usually 0 on macOS; adjust if needed for specific display configurations.
 +CLICK_OFFSET_Y=0
 
---- GOG/unpatchedfiles/fallout.cfg	2026-02-02 17:52:59
-+++ GOG/patchedfiles/fallout.cfg	2026-02-08 21:47:23
+--- /Volumes/Storage/GitHub/fallout1-rebirth/GOG/unpatchedfiles/fallout.cfg	2026-02-02 17:52:59
++++ /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/fallout.cfg	2026-02-09 10:19:22
 @@ -1,65 +1,11 @@
 -[debug]
 -mode=environment

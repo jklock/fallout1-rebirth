@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "plib/color/color.h"
+#include "plib/db/patchlog.h"
+#include <stdlib.h>
 
 namespace fallout {
 
@@ -346,16 +348,57 @@ void transSrcCopy(unsigned char* dest, int destPitch, unsigned char* src, int sr
     int destSkip = destPitch - width;
     int srcSkip = srcPitch - width;
 
+    long pre_non_zero = 0;
+    long writes = 0;
+    long post_non_zero = 0;
+
+    bool do_log = false;
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            do_log = true;
+        }
+    }
+
+    unsigned char* destBase = dest;
+
+    if (do_log) {
+        for (int yy = 0; yy < height; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < width; xx++) {
+                if (row[xx] != 0) {
+                    pre_non_zero++;
+                }
+            }
+        }
+    }
+
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             unsigned char c = *src++;
             if (c != 0) {
                 *dest = c;
+                if (do_log) {
+                    writes++;
+                }
             }
             dest++;
         }
         src += srcSkip;
         dest += destSkip;
+    }
+
+    if (do_log) {
+        for (int yy = 0; yy < height; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < width; xx++) {
+                if (row[xx] != 0) {
+                    post_non_zero++;
+                }
+            }
+        }
+
+        patchlog_write("TRANS_SRC_COPY", "rect=%dx%d pre=%ld writes=%ld post=%ld", width, height, pre_non_zero, writes, post_non_zero);
     }
 }
 
