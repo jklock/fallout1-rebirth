@@ -9,7 +9,11 @@
 - Implemented missing tooling:
   - `scripts/patch/rme-crossref.py` (was referenced by docs but missing from the repo)
   - `scripts/patch/rme-find-lst-candidates.py` (keeps `development/RME/validation/raw/lst_candidates.csv` current)
-- Current LST missing count: **74** (INTRFACE: 8, SCRIPTS: 66) per `development/RME/validation/raw/08_lst_missing.md`.
+- Implemented script-reference auditing:
+  - `scripts/patch/rme-audit-script-refs.py` (produces `development/RME/validation/raw/12_script_refs.*`)
+- Fixed validator noise for `SCRIPTS\\SCRIPTS.LST` `.ssl` entries:
+  - Runtime always resolves scripts.lst entries to `<base>.int` (see `scr_index_to_name`), so the LST validator now checks `.int` for `.ssl`.
+- Current LST missing count: **71** (INTRFACE: 8, SCRIPTS: 63) per `development/RME/validation/raw/08_lst_missing.md`.
 
 ## Build Outputs Generated (Scripts Only)
 - macOS `.app`: `build-macos/RelWithDebInfo/Fallout 1 Rebirth.app`
@@ -60,11 +64,16 @@ Evidence:
 
 Observed patterns:
 - `ART\\INTRFACE\\INTRFACE.LST` missing tokens (now reduced after commenting out the "*** NO LONGER USED ***" entries and fixing the validator to ignore comment lines).
-- `SCRIPTS\\SCRIPTS.LST` missing tokens including `.int` and `.ssl`.
+- `SCRIPTS\\SCRIPTS.LST` missing tokens (`.int`).
 
 This is not automatically fatal, but it is the kind of issue that becomes intermittent and platform-dependent:
 - If missing tokens are truly unused, no symptoms.
 - If any missing token is referenced by a proto, map, or UI path in actual play, you get missing art/scripts at runtime.
+
+Script usage audit evidence:
+- `development/RME/validation/raw/12_script_refs.md`
+
+Current finding: the only map referencing missing scripts is `MAPS\\JUNKDEMO.MAP` (17 missing scripts referenced there). If `JUNKDEMO.MAP` is not part of shipped gameplay, this is likely non-impacting; if it is reachable, those scripts need to be supplied or the map removed/updated.
 
 The `INTRFACE.LST` backup in this directory shows those "NO LONGER USED" entries were historically still active lines:
 - `development/RME/validation/raw/INTRFACE.LST.bak`
@@ -85,6 +94,8 @@ Those specific entries have since been commented out in the source `INTRFACE.LST
 ### Raw Folder
 - `development/RME/validation/raw/rme-crossref-*.csv`
   - Canonical mapping of file -> base source (`master.dat`, `critter.dat`, `none`) plus hashes and sizes.
+- `development/RME/validation/raw/12_script_refs.md`, `development/RME/validation/raw/12_script_refs.csv`
+  - Which missing scripts are actually referenced by shipped MAP/PRO content.
 - `development/RME/validation/raw/07_map_endian.txt`
   - Lists `map_endian=big` rows extracted from the patched crossref.
   - `scripts/patch/rme-crossref.py` validates MAP header version (expects big-endian `19`) and annotates these rows.
@@ -100,6 +111,7 @@ Evidence:
 
 The archived scripts were useful to generate artifacts, but some had Windows-path handling bugs on macOS (backslashes treated as normal characters by POSIX basename/pathlib).
 - These path normalization bugs have been fixed in the archived scripts so they can be re-run reliably if needed.
+- After re-running `generate_overlay_from_rows.sh` with the fixed path handling, the overlay-generation log contains **no** `MISSING:` entries (it successfully locates and copies all promoted files from `GOG/patchedfiles` into the overlay staging directory).
 
 ## Where Next Steps Live
 - Actionable follow-ups are recorded in: `development/RME/todo/validation_todo.md`
