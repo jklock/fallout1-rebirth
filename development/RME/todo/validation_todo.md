@@ -25,7 +25,8 @@
   - Implemented in `scripts/patch/rebirth-patch-data.sh` (strict normalization + collision handling).
 - [x] Decide the supported stance explicitly.
 - [x] Option A: enforce all-lowercase output and fail the build if any mixed-case path remains.
-- [ ] Option B: implement case-insensitive lookup fallback in the loader for macOS/Linux case-sensitive volumes (optional defense in depth).
+- [x] Option B: implement case-insensitive lookup fallback in the loader for macOS/Linux case-sensitive volumes (defense in depth).
+  - Already implemented by `compat_resolve_path` (used by `compat_fopen`), which resolves each path component case-insensitively on non-Windows platforms.
 
 ## Archived Script Reliability
 - [x] If we intend to rely on anything in `development/RME/validation/scripts_archive/`, fix path handling first.
