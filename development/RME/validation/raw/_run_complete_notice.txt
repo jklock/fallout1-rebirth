@@ -1,1 +1,1 @@
-Full audit run complete. Raw logs are in GOG/validation/raw.
+Full audit run complete. Raw logs are in development/RME/validation/raw.

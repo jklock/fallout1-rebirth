@@ -1,1 +1,3 @@
-5) Copy rme-crossref CSVs (patched/unpatched)
+5) Copied rme-crossref CSVs (patched/unpatched)
+  - rme-crossref-unpatched.csv
+  - rme-crossref-patched.csv
