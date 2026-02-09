@@ -26,7 +26,9 @@
 ## Executive Summary
 - The validation set is a useful evidence bundle and is now refreshed to match current patch outputs (`GOG/patchedfiles`) and config templates.
 - The "hard" validation (`rebirth_validate.log`) passed, including overlay integrity, CRLF normalization, and DAT patch verification.
-- The biggest remaining risk is platform correctness (case-sensitivity and lookup behavior). The validation now shows **0** missing LST references, so the "missing files from LST" risk is eliminated for shipped data.
+- Platform correctness is addressed by strict lowercasing + collision detection in `scripts/patch/rebirth-patch-data.sh`.
+- Platform correctness is also protected by case-insensitive path resolution on non-Windows via `compat_resolve_path` (used by `compat_fopen`).
+- The validation now shows **0** missing LST references, so the "missing files from LST" risk is eliminated for shipped data.
 
 If we want to treat this directory as the canonical validation record going forward, keep regenerating it after any data/template changes with `./scripts/patch/rebirth-refresh-validation.sh`.
 
