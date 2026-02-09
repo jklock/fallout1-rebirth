@@ -4,6 +4,7 @@ Produces: third_party/rme/docs/validation/ISSUE-LST-002_actions.csv
 """
 import csv
 import os
+import ntpath
 from pathlib import Path
 
 base = Path('GOG')
@@ -27,7 +28,8 @@ if crossref.exists():
         reader = csv.DictReader(cf)
         for r in reader:
             path = r.get('path', '')
-            bn = Path(path).name.lower()
+            # Crossref paths are Windows-style (backslashes). Use ntpath for basename.
+            bn = ntpath.basename(path).lower()
             dat_map.setdefault(bn, []).append(r.get('base_source', ''))
 
 # Function to check RME LST for comment

@@ -10,7 +10,8 @@ CSV_CRITTER=GOG/validation/raw/critter_added_rows.csv
 
 action_copy() {
   local original_path="$1" # e.g., ART\INTRFACE\BOSHARRY.FRM
-  local src_basename=$(basename "$original_path" )
+  # On POSIX, backslashes are not path separators. Treat input as Windows-style.
+  local src_basename="${original_path##*\\}"
   # Find case-insensitive candidate in patchedfiles
   local found=$(find GOG/patchedfiles -type f -iname "$src_basename" -print -quit || true)
   if [ -n "$found" ]; then
