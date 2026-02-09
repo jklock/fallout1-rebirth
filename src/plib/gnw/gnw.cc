@@ -18,9 +18,11 @@
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/memory.h"
 #include "plib/gnw/svga.h"
+#include "game/map.h"
 #include "plib/gnw/text.h"
 #include "plib/gnw/vcr.h"
 #include "plib/gnw/winmain.h"
+#include "plib/db/patchlog.h"
 
 namespace fallout {
 
@@ -46,10 +48,6 @@ int GNW_wcolor[6] = {
     0,
     0,
     0,
-    0,
-};
-
-// 0x53A250
 static unsigned char* screen_buffer = NULL;
 
 // 0x6AC120
