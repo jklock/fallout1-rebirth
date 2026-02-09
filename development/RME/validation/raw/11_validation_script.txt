@@ -1,1 +1,2 @@
-11) Validation script log (already run)
+11) Validation script log
+See: rebirth_validate.log

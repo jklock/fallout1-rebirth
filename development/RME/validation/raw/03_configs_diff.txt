@@ -1,7 +1,7 @@
 3) Config diffs
 --- GOG/unpatchedfiles/f1_res.ini	2026-02-04 17:55:45
-+++ GOG/patchedfiles/f1_res.ini	2026-02-08 07:58:12
-@@ -1,18 +1,25 @@
++++ GOG/patchedfiles/f1_res.ini	2026-02-08 18:35:43
+@@ -1,19 +1,26 @@
  [MAIN]
  ; ================================================================
 -; iPad Resolution Settings
@@ -30,12 +30,14 @@
 -SCR_WIDTH=2732
 -SCR_HEIGHT=2048
 -WINDOWED=0
+-SCALE_2X=0
 +SCR_WIDTH=1280
 +SCR_HEIGHT=960
 +WINDOWED=1
- SCALE_2X=0
++SCALE_2X=1
  
  [DISPLAY]
+ ; VSync eliminates screen tearing. Recommended ON.
 @@ -22,15 +29,24 @@
  VSYNC=1
  
@@ -70,8 +72,9 @@
 +; Positive values shift clicks DOWN, negative shifts UP.
 +; Usually 0 on macOS; adjust if needed for specific display configurations.
 +CLICK_OFFSET_Y=0
+
 --- GOG/unpatchedfiles/fallout.cfg	2026-02-02 17:52:59
-+++ GOG/patchedfiles/fallout.cfg	2026-02-08 07:58:12
++++ GOG/patchedfiles/fallout.cfg	2026-02-08 18:35:43
 @@ -1,65 +1,11 @@
 -[debug]
 -mode=environment
