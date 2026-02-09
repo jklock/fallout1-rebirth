@@ -1,6 +1,6 @@
 3) Config diffs
 --- GOG/unpatchedfiles/f1_res.ini	2026-02-04 17:55:45
-+++ GOG/patchedfiles/f1_res.ini	2026-02-08 18:35:43
++++ GOG/patchedfiles/f1_res.ini	2026-02-08 21:47:23
 @@ -1,19 +1,26 @@
  [MAIN]
  ; ================================================================
@@ -74,7 +74,7 @@
 +CLICK_OFFSET_Y=0
 
 --- GOG/unpatchedfiles/fallout.cfg	2026-02-02 17:52:59
-+++ GOG/patchedfiles/fallout.cfg	2026-02-08 18:35:43
++++ GOG/patchedfiles/fallout.cfg	2026-02-08 21:47:23
 @@ -1,65 +1,11 @@
 -[debug]
 -mode=environment
