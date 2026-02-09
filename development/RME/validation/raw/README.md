@@ -6,6 +6,7 @@ Key files:
 - `rme-crossref-patched.csv`, `rme-crossref-unpatched.csv` — full RME cross-reference CSVs (patched vs unpatched)
 - `master_added_rows.csv`, `critter_added_rows.csv` — rows for promoted files (used by overlay generation)
 - `lst_candidates.csv` — candidate matches for missing LST references
+- `12_script_refs.md`, `12_script_refs.csv` — audit of missing scripts (scripts.lst) and whether any are referenced by MAP/PRO content
 - `generate_patch_mapping.log` — output of `generate_patch_mapping.py`
 - `generate_overlay_from_rows.log` — overlay generation log (shows missing items)
 - `run_full_audit.log` — when the full audit script is executed

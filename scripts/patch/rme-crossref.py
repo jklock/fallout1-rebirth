@@ -271,7 +271,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         lst_rel = lst_path.relative_to(rme_data)
         lst_win = _rel_to_win(lst_rel)
         for token in _iter_lst_tokens(lst_path):
-            ref_win = _make_ref_path(lst_rel, token)
+            # SCRIPTS.LST can contain `.ssl` source names, but runtime always
+            # resolves to `<base>.int` (see scr_index_to_name).
+            ref_token = token
+            if lst_win.upper() == r"SCRIPTS\SCRIPTS.LST" and token.lower().endswith(".ssl"):
+                ref_token = token[:-4] + ".int"
+
+            ref_win = _make_ref_path(lst_rel, ref_token)
             ref_key = ref_win.upper()
             if ref_key in rme_paths or ref_key in dat_paths:
                 continue
@@ -347,4 +353,3 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

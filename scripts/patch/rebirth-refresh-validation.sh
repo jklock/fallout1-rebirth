@@ -239,5 +239,11 @@ fi
   echo "See: rebirth_validate.log"
 } > "$RAW_DIR/11_validation_script.txt"
 
+log_info "12) Script reference audit (scripts.lst vs MAP/PRO)"
+python3 scripts/patch/rme-audit-script-refs.py \
+  --patched-dir "$PATCHED_DIR" \
+  --out-dir "$RAW_DIR" \
+  > "$RAW_DIR/12_script_refs_run.log" 2>&1
+
 echo "Full audit run complete. Raw logs are in $RAW_DIR." > "$RAW_DIR/_run_complete_notice.txt"
 log_ok "Validation refreshed at: $OUT_DIR"

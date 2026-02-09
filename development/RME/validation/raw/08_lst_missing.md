@@ -39,9 +39,6 @@ formats encode non-file data and will not be validated here.
 - SCRIPTS\SCRIPTS.LST -> Baka.int
 - SCRIPTS\SCRIPTS.LST -> ScoutC.int
 - SCRIPTS\SCRIPTS.LST -> ScoutF.int
-- SCRIPTS\SCRIPTS.LST -> MVAirloc.ssl
-- SCRIPTS\SCRIPTS.LST -> MVBShelf.ssl
-- SCRIPTS\SCRIPTS.LST -> MVSctShf.ssl
 - SCRIPTS\SCRIPTS.LST -> LgFtPrnt.int
 - SCRIPTS\SCRIPTS.LST -> VTeam5.int
 - SCRIPTS\SCRIPTS.LST -> VTeam6.int
