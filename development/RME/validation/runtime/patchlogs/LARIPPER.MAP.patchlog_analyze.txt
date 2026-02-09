@@ -1,0 +1,2 @@
+Analyzing /tmp/f1r-patchlog_LARIPPER.txt
+No suspicious GNW_SHOW_RECT surf_pre>0 && surf_post==0 found
