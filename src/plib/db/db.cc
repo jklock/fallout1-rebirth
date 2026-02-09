@@ -6,11 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if !defined(_WIN32)
+
+/* Apple-only fork: use POSIX headers (no windows direct.h handling). */
 #include <unistd.h>
-#else
-#include <direct.h>
-#endif
 
 #include <fpattern/fpattern.h>
 
@@ -2034,19 +2032,11 @@ static int db_init_database(DB_DATABASE* database, const char* datafile, const c
 
     if (patchlog_enabled()) {
         char cwd[COMPAT_MAX_PATH] = "";
-#if defined(_WIN32)
-        if (_getcwd(cwd, sizeof(cwd)) != NULL) {
-            patchlog_write("DB_INIT", "cwd=\"%s\"", cwd);
-        } else {
-            patchlog_write("DB_INIT", "cwd=\"(unknown)\"");
-        }
-#else
         if (getcwd(cwd, sizeof(cwd)) != NULL) {
             patchlog_write("DB_INIT", "cwd=\"%s\"", cwd);
         } else {
             patchlog_write("DB_INIT", "cwd=\"(unknown)\"");
         }
-#endif
     }
 
     database->datafile = internal_strdup(datafile);

@@ -93,11 +93,8 @@ static void patchlog_write_prefix(const char* category)
 
     time_t now = time(NULL);
     struct tm tm_info = { 0 };
-#if defined(_WIN32)
-    localtime_s(&tm_info, &now);
-#else
+    /* Apple-only fork: prefer POSIX `localtime_r`. */
     localtime_r(&now, &tm_info);
-#endif
 
     char ts[32];
     strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &tm_info);
