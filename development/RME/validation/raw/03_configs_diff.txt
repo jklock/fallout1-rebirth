@@ -1,6 +1,6 @@
 3) Config diffs
 --- /Volumes/Storage/GitHub/fallout1-rebirth/GOG/unpatchedfiles/f1_res.ini	2026-02-04 17:55:45
-+++ /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/f1_res.ini	2026-02-09 15:31:59
++++ /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/f1_res.ini	2026-02-09 16:51:06
 @@ -1,19 +1,26 @@
  [MAIN]
  ; ================================================================
@@ -74,7 +74,7 @@
 +CLICK_OFFSET_Y=0
 
 --- /Volumes/Storage/GitHub/fallout1-rebirth/GOG/unpatchedfiles/fallout.cfg	2026-02-02 17:52:59
-+++ /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/fallout.cfg	2026-02-09 15:31:59
++++ /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/fallout.cfg	2026-02-09 16:51:06
 @@ -1,65 +1,11 @@
 -[debug]
 -mode=environment

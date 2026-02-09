@@ -1,0 +1,2 @@
+Analyzing development/RME/validation/runtime/patchlogs/CARAVAN.MAP.patchlog.txt
+No suspicious GNW_SHOW_RECT surf_pre>0 && surf_post==0 found
