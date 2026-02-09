@@ -15,6 +15,7 @@
 #include "game/object.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
@@ -452,6 +453,44 @@ void tile_set_border(int windowWidth, int windowHeight, int hexGridWidth, int he
     borderInitialized = true;
 }
 
+// Logs non-zero pixel counts in the top area of the display buffer.
+// Only writes to patchlog when patch logging is enabled.
+static void tile_log_stage_top_pixels(const char* stage)
+{
+    if (!patchlog_enabled()) {
+        return;
+    }
+
+    int window_h = buf_length;
+    int ui_h = 120;
+    int top_h = window_h - ui_h;
+    if (top_h < 0) {
+        top_h = 0;
+    }
+
+    long total = (long)buf_width * top_h;
+    long non_zero = 0;
+
+    for (int row = 0; row < top_h; row++) {
+        unsigned char* p = buf + buf_full * row;
+        for (int col = 0; col < buf_width; col++) {
+            if (p[col] != 0) {
+                non_zero++;
+            }
+        }
+    }
+
+    int non_zero_pct = total ? (int)((non_zero * 100 + total / 2) / total) : 0;
+
+    patchlog_write("DISPLAY_STAGE_TOP_PIXELS", "stage=\"%s\" top_pixels=%ld non_zero=%ld non_zero_pct=%d", stage, total, non_zero, non_zero_pct);
+}
+
+// Public wrapper for map-level sampling of top display pixels during map scrolling.
+void tile_log_stage_top_pixels_public(const char* stage)
+{
+    tile_log_stage_top_pixels(stage);
+}
+
 // 0x49DE80
 void tile_reset()
 {
@@ -488,6 +527,9 @@ void tile_refresh_rect(Rect* rect, int elevation)
 void tile_refresh_display()
 {
     if (refresh_enabled) {
+        if (patchlog_enabled()) {
+            patchlog_write("TILE_REFRESH_DISPLAY", "called");
+        }
         tile_refresh(&buf_rect, map_elevation);
     }
 }
@@ -584,11 +626,23 @@ static void refresh_mapper(Rect* rect, int elevation)
         buf_full,
         0);
 
+    // Diagnostic sampling for autorun/patchlog runs.
+    tile_log_stage_top_pixels("BEFORE_DRAW");
+
     square_render_floor(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_FLOOR");
+
     grid_render(&rectToUpdate, elevation);
+
     obj_render_pre_roof(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_PRE_ROOF");
+
     square_render_roof(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_ROOF");
+
     obj_render_post_roof(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_POST_ROOF");
+
     blit(&rectToUpdate);
 }
 
@@ -601,17 +655,33 @@ static void refresh_game(Rect* rect, int elevation)
         return;
     }
 
+    if (patchlog_enabled()) {
+        patchlog_write("REFRESH_GAME", "rect=%d,%d,%d,%d", rectToUpdate.ulx, rectToUpdate.uly, rectToUpdate.lrx, rectToUpdate.lry);
+    }
+
     buf_fill(buf + buf_full * rectToUpdate.uly + rectToUpdate.ulx,
         rectGetWidth(&rectToUpdate),
         rectGetHeight(&rectToUpdate),
         buf_full,
         0);
 
+    // Diagnostic sampling for autorun/patchlog runs.
+    tile_log_stage_top_pixels("BEFORE_DRAW");
+
     square_render_floor(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_FLOOR");
+
     obj_render_pre_roof(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_PRE_ROOF");
+
     square_render_roof(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_ROOF");
+
     bounds_render(&rectToUpdate, elevation);
+
     obj_render_post_roof(&rectToUpdate, elevation);
+    tile_log_stage_top_pixels("AFTER_POST_ROOF");
+
     blit(&rectToUpdate);
 }
 
@@ -1420,6 +1490,11 @@ void square_render_floor(Rect* rect, int elevation)
 
     int baseSquareTile = square_width * minY;
 
+    long drawn_tiles = 0;
+    long drawn_top_tiles = 0;
+    int window_h = buf_length;
+    int ui_h = 120;
+    int top_h = window_h - ui_h;
     for (int y = minY; y <= maxY; y++) {
         for (int x = minX; x <= maxX; x++) {
             int squareTile = baseSquareTile + x;
@@ -1430,9 +1505,20 @@ void square_render_floor(Rect* rect, int elevation)
                 square_coord(squareTile, &tileScreenX, &tileScreenY, elevation);
                 int fid = art_id(OBJ_TYPE_TILE, frmId & 0xFFF, 0, 0, 0);
                 floor_draw(fid, tileScreenX, tileScreenY, &constrainedRect);
+                drawn_tiles++;
+                if (tileScreenY < top_h) {
+                    drawn_top_tiles++;
+                }
             }
         }
         baseSquareTile += square_width;
+    }
+
+    if (patchlog_enabled()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            patchlog_write("SQUARE_RENDER_FLOOR_DRAWN", "minX=%d maxX=%d minY=%d maxY=%d drawn=%ld drawn_top=%ld", minX, maxX, minY, maxY, drawn_tiles, drawn_top_tiles);
+        }
     }
 }
 
@@ -1614,6 +1700,11 @@ void floor_draw(int fid, int x, int y, Rect* rect)
     int savedX = x;
     int savedY = y;
 
+    // Diagnostics for autorun/patchlog: pre/post non-zero pixel counts.
+    long pre_non_zero = 0;
+    bool tile_log_enabled = false;
+    bool tile_is_top = false;
+
     if (left < 0) {
         left = 0;
     }
@@ -1662,6 +1753,34 @@ void floor_draw(int fid, int x, int y, Rect* rect)
     }
 
     if (v77 <= 0 || v76 <= 0) goto out;
+
+    // Collect pre-draw non-zero counts for tiles in the top area when patch logging
+    // is enabled. Use broader gating (patchlog_enabled) so we capture diagnostics
+    // even if verbose logging variable is not toggled in some runs.
+    if (patchlog_enabled()) {
+        tile_log_enabled = true;
+        int window_h = buf_length;
+        int ui_h = 120;
+        int top_h = window_h - ui_h;
+        if (top_h < 0) {
+            top_h = 0;
+        }
+        if (savedY < top_h) {
+            tile_is_top = true;
+            for (int yy = y; yy < y + v76; yy++) {
+                if (yy < 0 || yy >= buf_length) {
+                    continue;
+                }
+                unsigned char* row = buf + buf_full * yy;
+                for (int xx = x; xx < x + v77; xx++) {
+                    if (xx < 0 || xx >= buf_width) {
+                        continue;
+                    }
+                    pre_non_zero += (row[xx] != 0);
+                }
+            }
+        }
+    }
 
     tile = tile_num(savedX, savedY + 13, map_elevation);
     if (tile != -1) {
@@ -1823,6 +1942,23 @@ void floor_draw(int fid, int x, int y, Rect* rect)
     }
 
 out:
+
+    if (tile_log_enabled && tile_is_top) {
+        long post_non_zero = 0;
+        for (int yy = y; yy < y + v76; yy++) {
+            if (yy < 0 || yy >= buf_length) {
+                continue;
+            }
+            unsigned char* row = buf + buf_full * yy;
+            for (int xx = x; xx < x + v77; xx++) {
+                if (xx < 0 || xx >= buf_width) {
+                    continue;
+                }
+                post_non_zero += (row[xx] != 0);
+            }
+        }
+        patchlog_write("TILE_DRAW", "tile=%d fid=%d savedX=%d savedY=%d x=%d y=%d pre=%ld post=%ld", tile, fid, savedX, savedY, x, y, pre_non_zero, post_non_zero);
+    }
 
     art_ptr_unlock(cacheEntry);
 }
@@ -2021,6 +2157,16 @@ void tile_update_bounds_base()
     // to screen center tile) to offsets from reference tile (geometric center
     // of the map).
 
+    // If no scroll-blocking objects were found, min/max bounds will be left
+    // at sentinels (INT_MAX/INT_MIN). In that case, use a very wide default
+    // bounding box so tiles are considered inside bounds (i.e., no blockers).
+    if (min_x == INT_MAX || min_y == INT_MAX || max_x == INT_MIN || max_y == INT_MIN) {
+        min_x = -1000000;
+        min_y = -1000000;
+        max_x = 1000000;
+        max_y = 1000000;
+    }
+
     int geometric_center_x;
     int geometric_center_y;
     tile_coord(20100, &geometric_center_x, &geometric_center_y, map_elevation);
@@ -2091,7 +2237,14 @@ void tile_update_bounds_rect()
 
 int tile_inside_bound(Rect* rect)
 {
-    return rect_inside_bound(rect, &tile_bounds_rect, rect);
+    int rc = rect_inside_bound(rect, &tile_bounds_rect, rect);
+    if (patchlog_enabled()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            patchlog_write("TILE_INSIDE_BOUND", "rect=%d,%d,%d,%d bound=%d,%d,%d,%d rc=%d", rect->ulx, rect->uly, rect->lrx, rect->lry, tile_bounds_rect.ulx, tile_bounds_rect.uly, tile_bounds_rect.lrx, tile_bounds_rect.lry, rc);
+        }
+    }
+    return rc;
 }
 
 bool tile_point_inside_bound(int x, int y)

@@ -18,11 +18,9 @@
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/memory.h"
 #include "plib/gnw/svga.h"
-#include "game/map.h"
 #include "plib/gnw/text.h"
 #include "plib/gnw/vcr.h"
 #include "plib/gnw/winmain.h"
-#include "plib/db/patchlog.h"
 
 namespace fallout {
 

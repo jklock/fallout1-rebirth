@@ -334,7 +334,18 @@ static int main_load_new(char* mapFileName)
     win_delete(win);
     loadColorTable("color.pal");
     palette_fade_to(cmap);
+
+    // Ensure render refresh is enabled for autorun/patchlog runs so that
+    // tile rendering (and our stage-level diagnostics) are executed.
+    if (patchlog_enabled()) {
+        tile_enable_refresh();
+    }
+
     tile_refresh_display();
+
+    if (patchlog_enabled()) {
+        map_log_display_pixel_stats_public(map_elevation);
+    }
 
     const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");
     if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {

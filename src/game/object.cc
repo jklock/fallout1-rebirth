@@ -1,6 +1,7 @@
 #include "game/object.h"
 
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <algorithm>
@@ -23,6 +24,7 @@
 #include "game/tile.h"
 #include "game/worldmap.h"
 #include "plib/color/color.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
@@ -2496,25 +2498,70 @@ void obj_delete_list(Object** objectList)
 // 0x47D634
 void translucent_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int srcPitch, unsigned char* dest, int destX, int destY, int destPitch, unsigned char* a9, unsigned char* a10)
 {
-    dest += destPitch * destY + destX;
+    unsigned char* sp = src;
+    unsigned char* dp = dest + destPitch * destY + destX;
     int srcStep = srcPitch - srcWidth;
     int destStep = destPitch - srcWidth;
+
+    long pre_non_zero = 0;
+    long writes = 0;
+    long post_non_zero = 0;
+
+    bool do_log = false;
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            do_log = true;
+        }
+    }
+
+    unsigned char* destBase = dp;
+
+    if (do_log) {
+        for (int yy = 0; yy < srcHeight; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < srcWidth; xx++) {
+                if (row[xx] != 0) {
+                    pre_non_zero++;
+                }
+            }
+        }
+    }
 
     for (int y = 0; y < srcHeight; y++) {
         for (int x = 0; x < srcWidth; x++) {
             // TODO: Probably wrong.
-            unsigned char v1 = a10[*src];
+            unsigned char v1 = a10[*sp];
             unsigned char* v2 = a9 + (v1 << 8);
-            unsigned char v3 = *dest;
+            unsigned char v3 = *dp;
 
-            *dest = v2[v3];
+            unsigned char newVal = v2[v3];
+            *dp = newVal;
+            if (do_log) {
+                if (newVal != 0) {
+                    writes++;
+                }
+            }
 
-            src++;
-            dest++;
+            sp++;
+            dp++;
         }
 
-        src += srcStep;
-        dest += destStep;
+        sp += srcStep;
+        dp += destStep;
+    }
+
+    if (do_log) {
+        for (int yy = 0; yy < srcHeight; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < srcWidth; xx++) {
+                if (row[xx] != 0) {
+                    post_non_zero++;
+                }
+            }
+        }
+
+        patchlog_write("TRANSLUCENT_TRANS", "src=%dx%d dest=%dx%d pre=%ld writes=%ld post=%ld", srcWidth, srcHeight, destX, destY, pre_non_zero, writes, post_non_zero);
     }
 }
 
@@ -2529,6 +2576,31 @@ void dark_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int 
     // TODO: Name might be confusing.
     int lightModifier = light >> 9;
 
+    long pre_non_zero = 0;
+    long writes = 0;
+    long post_non_zero = 0;
+
+    bool do_log = false;
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            do_log = true;
+        }
+    }
+
+    unsigned char* destBase = dp;
+
+    if (do_log) {
+        for (int yy = 0; yy < srcHeight; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < srcWidth; xx++) {
+                if (row[xx] != 0) {
+                    pre_non_zero++;
+                }
+            }
+        }
+    }
+
     for (int y = 0; y < srcHeight; y++) {
         for (int x = 0; x < srcWidth; x++) {
             unsigned char b = *sp;
@@ -2538,6 +2610,9 @@ void dark_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int 
                 }
 
                 *dp = b;
+                if (do_log) {
+                    writes += (b != 0);
+                }
             }
 
             sp++;
@@ -2546,6 +2621,19 @@ void dark_trans_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, int 
 
         sp += srcStep;
         dp += destStep;
+    }
+
+    if (do_log) {
+        for (int yy = 0; yy < srcHeight; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < srcWidth; xx++) {
+                if (row[xx] != 0) {
+                    post_non_zero++;
+                }
+            }
+        }
+
+        patchlog_write("DARK_TRANS", "src=%dx%d dest=%dx%d pre=%ld writes=%ld post=%ld", srcWidth, srcHeight, destX, destY, pre_non_zero, writes, post_non_zero);
     }
 }
 
@@ -2556,24 +2644,66 @@ void dark_translucent_trans_buf_to_buf(unsigned char* src, int srcWidth, int src
     int destStep = destPitch - srcWidth;
     int lightModifier = light >> 9;
 
-    dest += destPitch * destY + destX;
+    unsigned char* sp = src;
+    unsigned char* dp = dest + destPitch * destY + destX;
+
+    long pre_non_zero = 0;
+    long writes = 0;
+    long post_non_zero = 0;
+
+    bool do_log = false;
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            do_log = true;
+        }
+    }
+
+    unsigned char* destBase = dp;
+
+    if (do_log) {
+        for (int yy = 0; yy < srcHeight; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < srcWidth; xx++) {
+                if (row[xx] != 0) {
+                    pre_non_zero++;
+                }
+            }
+        }
+    }
 
     for (int y = 0; y < srcHeight; y++) {
         for (int x = 0; x < srcWidth; x++) {
-            unsigned char srcByte = *src;
+            unsigned char srcByte = *sp;
             if (srcByte != 0) {
-                unsigned char destByte = *dest;
+                unsigned char destByte = *dp;
                 unsigned int index = a11[srcByte] << 8;
                 index = a10[index + destByte];
-                *dest = intensityColorTable[index][lightModifier];
+                *dp = intensityColorTable[index][lightModifier];
+                if (do_log) {
+                    writes++;
+                }
             }
 
-            src++;
-            dest++;
+            sp++;
+            dp++;
         }
 
-        src += srcStep;
-        dest += destStep;
+        sp += srcStep;
+        dp += destStep;
+    }
+
+    if (do_log) {
+        for (int yy = 0; yy < srcHeight; yy++) {
+            unsigned char* row = destBase + (long)yy * destPitch;
+            for (int xx = 0; xx < srcWidth; xx++) {
+                if (row[xx] != 0) {
+                    post_non_zero++;
+                }
+            }
+        }
+
+        patchlog_write("DARK_TRANS_L", "src=%dx%d dest=%dx%d pre=%ld writes=%ld post=%ld", srcWidth, srcHeight, destX, destY, pre_non_zero, writes, post_non_zero);
     }
 }
 
