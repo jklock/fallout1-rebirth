@@ -31,6 +31,16 @@ This skill provides guidance for working with the Fallout 1 Rebirth project, an 
 
 The scripts handle proper build configuration, simulator lifecycle management, and cleanup. Ignoring them causes test failures and wastes significant debugging time.
 
+## ⚠️ CRITICAL: Git Safety (NO Rebases / NO PRs Unless Explicitly Asked)
+
+**NEVER** run `git rebase` (including interactive rebases) or create/open Pull Requests unless the user explicitly tells you to.
+
+Also forbidden unless explicitly instructed:
+- History-rewriting operations: `git reset --hard`, `git commit --amend`, `git filter-branch`/`filter-repo`
+- Force pushes: `git push --force` / `--force-with-lease`
+
+Default to read-only git inspection (`git status/log/diff/reflog`) and ask before taking any destructive git action.
+
 ## Build Commands
 
 ### macOS (fast iteration)
