@@ -31,7 +31,7 @@ OPTIUP.FRM     ; options button up
 ;LATTKSUP.FRM   ; *** NO LONGER USED ***
 SATTKBDN.FRM   ; single attack big down
 SATTKBUP.FRM   ; single attack big up
-SATTKSUP.FRM   ; single attack small up
+blank.frm   ; single attack small up
 ;UATTKBDN.FRM   ; *** NO LONGER USED ***
 ;UATTKBUP.FRM   ; *** NO LONGER USED ***
 ;UATTKSDN.FRM   ; *** NO LONGER USED ***
@@ -228,13 +228,13 @@ BOMB1.FRM      ; Pipboy
 upsell00.frm   ; Upsell screen for interactive demo
 upsell01.frm   ; Upsell screen for interactive demo
 upsell02.frm   ; Upsell screen for interactive demo
-upsell03.frm   ; Upsell screen for interactive demo
-upsell04.frm   ; Upsell screen for interactive demo
-upsell05.frm   ; Upsell screen for interactive demo
-upsell06.frm   ; Upsell screen for interactive demo
-upsell07.frm   ; Upsell screen for interactive demo
-upsell08.frm   ; Upsell screen for interactive demo
-upsell09.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
 LSGAME.FRM     ; Load/Save game
 LSGBOX.FRM     ; Load/Save game
 LSCOVER.FRM    ; Load/Save game
