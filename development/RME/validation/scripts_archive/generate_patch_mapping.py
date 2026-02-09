@@ -4,7 +4,7 @@
 Create GOG/validation/patch_mapping.csv from the patched rme-crossref CSV.
 Fields: path,ext,size,sha256,base_source,patched_found,patched_path,recommended_action,priority
 """
-import csv, os, subprocess
+import csv, os, subprocess, ntpath
 INCSV='GOG/validation/raw/rme-crossref-patched.csv'
 OUT='GOG/validation/patch_mapping.csv'
 
@@ -26,7 +26,8 @@ with open(INCSV,'r',encoding='utf-8') as f:
         sha256=parts[3]
         base_source=parts[4]
         # locate candidate in patchedfiles (case-insensitive)
-        basename=os.path.basename(path)
+        # Crossref paths are Windows-style (backslashes). Use ntpath for basename.
+        basename=ntpath.basename(path)
         try:
             proc=subprocess.run(['bash','-lc', f"find GOG/patchedfiles -type f -iname '{basename}' -print -quit"], capture_output=True, text=True)
             found=proc.stdout.strip()

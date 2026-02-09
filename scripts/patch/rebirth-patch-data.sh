@@ -277,27 +277,149 @@ fi
 # -----------------------------------------------------------------------------
 log_info "Normalizing case to lowercase in out/data/..."
 python3 - "$OUT_DIR/data" <<'PYCODE'
+import hashlib
 import os
 import sys
+
 root = os.path.abspath(sys.argv[1])
 
-for dirpath, dirnames, filenames in os.walk(root, topdown=False):
-    for name in filenames:
-        src = os.path.join(dirpath, name)
-        dst = os.path.join(dirpath, name.lower())
-        if src != dst:
-            try:
+
+def sha256(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def has_upper(s: str) -> bool:
+    return any("A" <= ch <= "Z" for ch in s)
+
+
+def safe_dedupe_or_fail(src: str, dst: str) -> None:
+    def rename_case(src_path: str, dst_path: str) -> None:
+        # On case-insensitive, case-preserving filesystems, case-only renames
+        # often require a two-step rename via a temporary name.
+        tmp = dst_path + f".__case_tmp__.{os.getpid()}"
+        i = 0
+        while os.path.exists(tmp):
+            i += 1
+            tmp = dst_path + f".__case_tmp__.{os.getpid()}.{i}"
+        os.rename(src_path, tmp)
+        os.rename(tmp, dst_path)
+
+    if not os.path.exists(dst):
+        os.rename(src, dst)
+        return
+
+    # If src/dst refer to the same entry (case-insensitive FS), force a case rename.
+    try:
+        if os.path.samefile(src, dst):
+            rename_case(src, dst)
+            return
+    except OSError:
+        pass
+
+    # Collision: both exist.
+    if os.path.isdir(src) or os.path.isdir(dst):
+        raise RuntimeError(f"case collision between file and directory: {src} vs {dst}")
+
+    if sha256(src) == sha256(dst):
+        os.remove(src)
+        return
+
+    raise RuntimeError(f"case-insensitive collision with different content: {src} vs {dst}")
+
+
+def merge_dir(src_dir: str, dst_dir: str) -> None:
+    # Move entries from src_dir into dst_dir, lowercasing names as we go.
+    for name in os.listdir(src_dir):
+        src = os.path.join(src_dir, name)
+        dst = os.path.join(dst_dir, name.lower())
+
+        if os.path.isdir(src):
+            if os.path.exists(dst):
+                if not os.path.isdir(dst):
+                    raise RuntimeError(f"case collision between dir and file: {src} vs {dst}")
+                merge_dir(src, dst)
+                try:
+                    os.rmdir(src)
+                except OSError:
+                    pass
+            else:
                 os.rename(src, dst)
-            except OSError:
-                pass
-    for name in dirnames:
-        src = os.path.join(dirpath, name)
-        dst = os.path.join(dirpath, name.lower())
-        if src != dst:
-            try:
-                os.rename(src, dst)
-            except OSError:
-                pass
+        else:
+            safe_dedupe_or_fail(src, dst)
+
+    # src_dir should now be empty.
+    try:
+        os.rmdir(src_dir)
+    except OSError:
+        pass
+
+
+try:
+    # Pass 1: normalize files (bottom-up). This resolves same-dir collisions early.
+    for dirpath, dirnames, filenames in os.walk(root, topdown=False):
+        for name in filenames:
+            lower = name.lower()
+            if name == lower:
+                continue
+            src = os.path.join(dirpath, name)
+            dst = os.path.join(dirpath, lower)
+            safe_dedupe_or_fail(src, dst)
+
+    # Pass 2: normalize/merge directories (bottom-up) so children are already normalized.
+    for dirpath, dirnames, filenames in os.walk(root, topdown=False):
+        for name in dirnames:
+            lower = name.lower()
+            if name == lower:
+                continue
+            src_dir = os.path.join(dirpath, name)
+            dst_dir = os.path.join(dirpath, lower)
+            if not os.path.exists(src_dir):
+                continue
+            if os.path.exists(dst_dir):
+                # On case-insensitive FS this might be the same directory.
+                try:
+                    if os.path.samefile(src_dir, dst_dir):
+                        tmp = dst_dir + f".__case_tmp__.{os.getpid()}"
+                        i = 0
+                        while os.path.exists(tmp):
+                            i += 1
+                            tmp = dst_dir + f".__case_tmp__.{os.getpid()}.{i}"
+                        os.rename(src_dir, tmp)
+                        os.rename(tmp, dst_dir)
+                        continue
+                except OSError:
+                    pass
+
+                if not os.path.isdir(dst_dir):
+                    raise RuntimeError(f"case collision between dir and file: {src_dir} vs {dst_dir}")
+                merge_dir(src_dir, dst_dir)
+            else:
+                os.rename(src_dir, dst_dir)
+
+    # Final check: enforce all-lowercase names in the produced data tree.
+    bad = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        for name in list(dirnames) + list(filenames):
+            if has_upper(name):
+                bad.append(os.path.join(dirpath, name))
+                if len(bad) >= 50:
+                    break
+        if len(bad) >= 50:
+            break
+
+    if bad:
+        sys.stderr.write("ERROR: non-lowercase entries remain after normalization (showing up to 50):\n")
+        for p in bad:
+            sys.stderr.write(f"  - {p}\n")
+        raise SystemExit(1)
+
+except Exception as e:
+    sys.stderr.write(f"ERROR: failed to normalize case: {e}\n")
+    raise SystemExit(1)
 PYCODE
 
 # -----------------------------------------------------------------------------
