@@ -1,6 +1,8 @@
 #include "game/map.h"
 
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <vector>
@@ -40,6 +42,7 @@
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/memory.h"
 #include "plib/gnw/svga.h"
+#include "plib/db/patchlog.h"
 
 namespace fallout {
 
@@ -58,8 +61,57 @@ static void map_place_dude_and_mouse();
 static void square_init();
 static void square_reset();
 static int square_load(DB_FILE* stream, int a2);
+static void map_log_square_stats(int elevation);
 static int map_write_MapData(MapHeader* ptr, DB_FILE* stream);
 static int map_read_MapData(MapHeader* ptr, DB_FILE* stream);
+
+static void map_log_square_stats(int elevation)
+{
+    if (!patchlog_enabled()) {
+        return;
+    }
+
+    if (elevation < 0 || elevation >= ELEVATION_COUNT) {
+        return;
+    }
+
+    int* arr = square[elevation]->field_0;
+    int floor_count = 0;
+    int roof_count = 0;
+    int zero_id = 0;
+    int min_id = INT_MAX;
+    int max_id = INT_MIN;
+
+    for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
+        int upper = (arr[tile] >> 16) & 0xFFFF;
+        int tile_id = upper & 0x0FFF;
+        int flags = (upper & 0xF000) >> 12;
+        if ((flags & 0x01) == 0) {
+            floor_count++;
+        } else {
+            roof_count++;
+        }
+        if (tile_id == 0) {
+            zero_id++;
+        }
+        if (tile_id < min_id) {
+            min_id = tile_id;
+        }
+        if (tile_id > max_id) {
+            max_id = tile_id;
+        }
+    }
+
+    patchlog_write("SQUARE_STATS",
+        "elevation=%d tiles=%d floor=%d roof=%d zero_id=%d min_id=%d max_id=%d",
+        elevation,
+        SQUARE_GRID_SIZE,
+        floor_count,
+        roof_count,
+        zero_id,
+        min_id == INT_MAX ? -1 : min_id,
+        max_id == INT_MIN ? -1 : max_id);
+}
 
 // 0x4735CE
 static const short city_vs_city_idx_table[MAP_COUNT][5] = {
@@ -937,6 +989,12 @@ int map_load_file(DB_FILE* stream)
 {
     int rc = 0;
     const char* error;
+    bool autorun_active = false;
+
+    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+    if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+        autorun_active = true;
+    }
 
     map_save_in_game(true);
     gsound_background_play("wind2", 12, 13, 16);
@@ -987,6 +1045,7 @@ int map_load_file(DB_FILE* stream)
         if (map_load_local_vars(stream) != 0) break;
 
         if (square_load(stream, map_data.flags) != 0) break;
+        map_log_square_stats(map_data.enteringElevation);
 
         error = "Error reading scripts";
         if (scr_load(stream) != 0) break;
@@ -1048,9 +1107,11 @@ int map_load_file(DB_FILE* stream)
             object->id = new_obj_id();
             script->scr_oid = object->id;
             script->owner = object;
-            scr_spatials_disable();
-            exec_script_proc(map_script_id, SCRIPT_PROC_MAP_ENTER);
-            scr_spatials_enable();
+            if (!autorun_active) {
+                scr_spatials_disable();
+                exec_script_proc(map_script_id, SCRIPT_PROC_MAP_ENTER);
+                scr_spatials_enable();
+            }
         }
 
         error = NULL;
@@ -1073,12 +1134,14 @@ int map_load_file(DB_FILE* stream)
     gmouse_disable_scrolling();
     gmouse_set_cursor(MOUSE_CURSOR_WAIT_PLANET);
 
-    if (scr_load_all_scripts() == -1) {
-        debug_printf("\n   Error: scr_load_all_scripts failed!");
-    }
+    if (!autorun_active) {
+        if (scr_load_all_scripts() == -1) {
+            debug_printf("\n   Error: scr_load_all_scripts failed!");
+        }
 
-    scr_exec_map_enter_scripts();
-    scr_exec_map_update_scripts();
+        scr_exec_map_enter_scripts();
+        scr_exec_map_update_scripts();
+    }
     tile_enable_refresh();
 
     if (map_state.map > 0) {
@@ -1871,6 +1934,23 @@ static int map_read_MapData(MapHeader* ptr, DB_FILE* stream)
     if (db_freadInt32(stream, &(ptr->field_34)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->lastVisitTime)) == -1) return -1;
     if (db_freadInt32List(stream, ptr->field_3C, 44) == -1) return -1;
+
+    if (patchlog_enabled()) {
+        patchlog_write("MAP_HEADER",
+            "version=%d name=\"%s\" tile=%d elev=%d rot=%d locals=%d script=%d flags=0x%08X dark=%d globals=%d field_34=%d last=%d",
+            ptr->version,
+            ptr->name,
+            ptr->enteringTile,
+            ptr->enteringElevation,
+            ptr->enteringRotation,
+            ptr->localVariablesCount,
+            ptr->scriptIndex,
+            ptr->flags,
+            ptr->darkness,
+            ptr->globalVariablesCount,
+            ptr->field_34,
+            ptr->lastVisitTime);
+    }
 
     return 0;
 }

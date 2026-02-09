@@ -36,53 +36,67 @@ int main(int argc, char* argv[])
 #endif
 
 #if __APPLE__ && TARGET_OS_OSX
-    const char* basePath = SDL_GetBasePath();
-    if (basePath != NULL) {
-        std::string workingDir(basePath);
+    auto hasGameFiles = [](const std::string& dir) {
+        std::string cfg = dir + "fallout.cfg";
+        std::string master = dir + "master.dat";
+        std::string critter = dir + "critter.dat";
+        return access(cfg.c_str(), R_OK) == 0
+            || (access(master.c_str(), R_OK) == 0 && access(critter.c_str(), R_OK) == 0);
+    };
 
-        auto hasGameFiles = [](const std::string& dir) {
-            std::string cfg = dir + "fallout.cfg";
-            std::string master = dir + "master.dat";
-            std::string critter = dir + "critter.dat";
-            return access(cfg.c_str(), R_OK) == 0
-                || (access(master.c_str(), R_OK) == 0 && access(critter.c_str(), R_OK) == 0);
-        };
+    bool keepCwd = false;
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        std::string cwdDir(cwd);
+        if (!cwdDir.empty() && cwdDir.back() != '/') {
+            cwdDir.push_back('/');
+        }
+        if (hasGameFiles(cwdDir)) {
+            keepCwd = true;
+        }
+    }
 
-        const char resourcesMarker[] = "/Contents/Resources/";
-        const char macosMarker[] = "/Contents/MacOS/";
-        const char* resources = strstr(basePath, resourcesMarker);
-        const char* macos = strstr(basePath, macosMarker);
+    if (!keepCwd) {
+        const char* basePath = SDL_GetBasePath();
+        if (basePath != NULL) {
+            std::string workingDir(basePath);
 
-        if (resources != NULL || macos != NULL) {
-            std::string appRoot;
+            const char resourcesMarker[] = "/Contents/Resources/";
+            const char macosMarker[] = "/Contents/MacOS/";
+            const char* resources = strstr(basePath, resourcesMarker);
+            const char* macos = strstr(basePath, macosMarker);
 
-            if (resources != NULL) {
-                appRoot.assign(basePath, resources - basePath);
-            } else {
-                appRoot.assign(basePath, macos - basePath);
-            }
+            if (resources != NULL || macos != NULL) {
+                std::string appRoot;
 
-            std::string macosPath = appRoot + "/Contents/MacOS/";
-            std::string resourcesPath = appRoot + "/Contents/Resources/";
+                if (resources != NULL) {
+                    appRoot.assign(basePath, resources - basePath);
+                } else {
+                    appRoot.assign(basePath, macos - basePath);
+                }
 
-            std::string parentDir;
-            size_t sep = appRoot.find_last_of('/');
-            if (sep != std::string::npos) {
-                parentDir = appRoot.substr(0, sep + 1);
-            }
+                std::string macosPath = appRoot + "/Contents/MacOS/";
+                std::string resourcesPath = appRoot + "/Contents/Resources/";
 
-            const std::string candidates[] = { macosPath, resourcesPath, parentDir };
-            for (const auto& candidate : candidates) {
-                if (!candidate.empty() && hasGameFiles(candidate)) {
-                    workingDir = candidate;
-                    break;
+                std::string parentDir;
+                size_t sep = appRoot.find_last_of('/');
+                if (sep != std::string::npos) {
+                    parentDir = appRoot.substr(0, sep + 1);
+                }
+
+                const std::string candidates[] = { macosPath, resourcesPath, parentDir };
+                for (const auto& candidate : candidates) {
+                    if (!candidate.empty() && hasGameFiles(candidate)) {
+                        workingDir = candidate;
+                        break;
+                    }
                 }
             }
-        }
 
-        chdir(workingDir.c_str());
-        // SDL3 returns const char* but it's still allocated memory that needs freeing
-        SDL_free((void*)basePath);
+            chdir(workingDir.c_str());
+            // SDL3 returns const char* but it's still allocated memory that needs freeing
+            SDL_free((void*)basePath);
+        }
     }
 #endif
 

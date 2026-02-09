@@ -34,6 +34,11 @@ SDL_Renderer* gSdlRenderer = NULL;
 SDL_Texture* gSdlTexture = NULL;
 SDL_Surface* gSdlTextureSurface = NULL;
 
+// When running under a non-Cocoa SDL video driver (dummy/offscreen), we treat
+// rendering as "headless". Some renderer features (like logical presentation)
+// are optional in that mode and should not hard-fail initialization.
+static bool gHeadlessVideo = false;
+
 #if __APPLE__ && TARGET_OS_IOS
 // iOS-specific: Custom destination rect for fullscreen rendering
 static SDL_FRect g_iOS_destRect = { 0, 0, 0, 0 };
@@ -217,7 +222,6 @@ bool svga_init(VideoOptions* video_options)
     SDL_Log("svga_init: starting with %dx%d (scale=%d)",
         video_options->width, video_options->height, video_options->scale);
 
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
 #if __APPLE__ && TARGET_OS_IOS
     SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
 #endif
@@ -227,6 +231,24 @@ bool svga_init(VideoOptions* video_options)
         return false;
     }
     SDL_Log("svga_init: SDL video subsystem initialized");
+
+    const char* video_driver = SDL_GetCurrentVideoDriver();
+    if (video_driver != NULL) {
+        SDL_Log("svga_init: video driver=%s", video_driver);
+    } else {
+        SDL_Log("svga_init: video driver unavailable");
+    }
+
+    gHeadlessVideo = video_driver != NULL
+        && (SDL_strcasecmp(video_driver, "dummy") == 0
+            || SDL_strcasecmp(video_driver, "offscreen") == 0);
+    if (gHeadlessVideo) {
+        SDL_Log("svga_init: headless video driver detected");
+    }
+
+    if (!gHeadlessVideo) {
+        SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
+    }
 
     SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
@@ -419,9 +441,13 @@ static bool createRenderer(int width, int height)
     // to have better control over fullscreen scaling.
     if (!SDL_SetRenderLogicalPresentation(gSdlRenderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
         SDL_Log("createRenderer: SDL_SetRenderLogicalPresentation failed: %s", SDL_GetError());
-        return false;
+        if (!gHeadlessVideo) {
+            return false;
+        }
+        SDL_Log("createRenderer: headless video - continuing without logical presentation");
+    } else {
+        SDL_Log("createRenderer: logical presentation set to %dx%d", width, height);
     }
-    SDL_Log("createRenderer: logical presentation set to %dx%d", width, height);
 #else
     SDL_Log("createRenderer: iOS - skipping logical presentation (using custom dest rect)");
 #endif

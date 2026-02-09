@@ -13,6 +13,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
@@ -39,9 +40,13 @@
 #include "game/scripts.h"
 #include "game/select.h"
 #include "game/selfrun.h"
+#include "game/tile.h"
 #include "game/wordwrap.h"
 #include "game/worldmap.h"
+#include "platform_compat.h"
 #include "plib/color/color.h"
+#include "plib/db/db.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -99,6 +104,36 @@ int gnw_main(int argc, char** argv)
 
     if (!main_init_system(argc, argv)) {
         return 1;
+    }
+
+    const char* autorun_map = getenv("F1R_AUTORUN_MAP");
+    if (autorun_map != NULL && autorun_map[0] != '\0' && autorun_map[0] != '0') {
+        const char* map_name = autorun_map;
+        if (strcmp(autorun_map, "1") == 0) {
+            map_name = mainMap;
+        }
+
+        char map_buf[COMPAT_MAX_PATH];
+        strncpy(map_buf, map_name, sizeof(map_buf) - 1);
+        map_buf[sizeof(map_buf) - 1] = '\0';
+
+        roll_set_seed(-1);
+
+        int load_rc = main_load_new(map_buf);
+        int open_failures = db_diag_open_fail_count();
+        if (open_failures != 0) {
+            debug_printf("\n[autorun] DB open failures during map load: %d\n", open_failures);
+        }
+
+        main_unload_new();
+        main_exit_system();
+        autorun_mutex_destroy();
+
+        if (open_failures != 0) {
+            return 2;
+        }
+
+        return load_rc == 0 ? 0 : 3;
     }
 
     gmovie_play(MOVIE_IPLOGO, GAME_MOVIE_FADE_IN);
@@ -281,13 +316,31 @@ static int main_load_new(char* mapFileName)
     map_init();
     gmouse_set_cursor(MOUSE_CURSOR_NONE);
     mouse_show();
-    map_load(mapFileName);
+    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+    if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+        // Count only map-load phase failures; game init often probes optional files.
+        db_diag_reset_open_fail_count();
+        if (patchlog_enabled()) {
+            patchlog_write("AUTORUN_MAP", "load_start map=\"%s\"", mapFileName);
+        }
+    }
+    int rc = map_load(mapFileName);
+    if (patchlog_enabled()) {
+        patchlog_write("AUTORUN_MAP", "load_end map=\"%s\" rc=%d", mapFileName, rc);
+    }
     PlayCityMapMusic();
     palette_fade_to(white_palette);
     win_delete(win);
     loadColorTable("color.pal");
     palette_fade_to(cmap);
-    return 0;
+    tile_refresh_display();
+
+    const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");
+    if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {
+        dump_screen();
+    }
+
+    return rc;
 }
 
 // 0x472A04
