@@ -298,6 +298,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     out_dir = Path(args.out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "screenshots").mkdir(parents=True, exist_ok=True)
+    # Directory for per-map patchlogs (created if F1R_PATCHLOG is enabled)
+    patchlogs_dir = out_dir / "patchlogs"
+    patchlogs_dir.mkdir(parents=True, exist_ok=True)
 
     maps = _iter_all_map_names(data_root)
     if args.limit and args.limit > 0:
@@ -337,6 +340,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             env = os.environ.copy()
             env["F1R_AUTORUN_MAP"] = map_name
             env["F1R_AUTOSCREENSHOT"] = "1"
+            # If patchlog capture is enabled in the outer environment, set a unique per-map patchlog path
+            if os.environ.get("F1R_PATCHLOG") and os.environ.get("F1R_PATCHLOG") != "0":
+                env["F1R_PATCHLOG"] = "1"
+                env["F1R_PATCHLOG_PATH"] = str(patchlogs_dir / f"{map_name}.patchlog.txt")
+                if os.environ.get("F1R_PATCHLOG_VERBOSE") and os.environ.get("F1R_PATCHLOG_VERBOSE") != "0":
+                    env["F1R_PATCHLOG_VERBOSE"] = os.environ.get("F1R_PATCHLOG_VERBOSE")
 
             t0 = time.time()
             try:
@@ -418,7 +427,45 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 ]
             )
             f_csv.flush()
-
+    # If patchlogs were created (F1R_PATCHLOG enabled), run analyzer on each and write a summary
+    try:
+        patchlog_dir = out_dir / "patchlogs"
+        patchlog_files = sorted(patchlog_dir.glob("*.patchlog.txt")) if patchlog_dir.exists() else []
+        if patchlog_files:
+            with run_log.open("a", encoding="utf-8") as f_log:
+                f_log.write(f"[INFO] Running patchlog analyzer on {len(patchlog_files)} patchlogs\n")
+                f_log.flush()
+            analyzer = Path(__file__).resolve().parents[1] / "dev" / "patchlog_analyze.py"
+            if not analyzer.exists():
+                analyzer = Path("scripts/dev/patchlog_analyze.py")
+            summary_rows = []
+            for pl in patchlog_files:
+                env2 = os.environ.copy()
+                env2.pop("PYTHONSTARTUP", None)
+                res = subprocess.run([sys.executable, str(analyzer), str(pl)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env2, text=True)
+                outtxt = res.stdout or ""
+                out_file = pl.with_suffix(".patchlog_analyze.txt")
+                out_file.write_text(outtxt, encoding="utf-8")
+                suspicious_flag = "No suspicious GNW_SHOW_RECT surf_pre>0 && surf_post==0 found" not in outtxt
+                summary_rows.append((pl.name, suspicious_flag, str(out_file)))
+                with run_log.open("a", encoding="utf-8") as f_log:
+                    f_log.write(f"[ANALYZE] {pl.name}: {'SUSPICIOUS' if suspicious_flag else 'OK'}\n")
+                    f_log.flush()
+            # write CSV and MD summary
+            patchlog_summary_csv = patchlog_dir / "patchlog_summary.csv"
+            with patchlog_summary_csv.open("w", newline="") as f_ps:
+                w_ps = csv.writer(f_ps)
+                w_ps.writerow(["map", "suspicious", "analyze_output"])
+                for name, sflag, path in summary_rows:
+                    w_ps.writerow([name, "1" if sflag else "0", path])
+            patchlog_summary_md = patchlog_dir / "patchlog_summary.md"
+            md_lines_pl = ["# Patchlog analysis summary", "", f"- Patchlogs dir: `{patchlog_dir}`", "", "## Results", ""]
+            for name, sflag, path in summary_rows:
+                md_lines_pl.append(f"- `{name}`: {'**SUSPICIOUS**' if sflag else 'OK'} (analyze: `{path}`)")
+            patchlog_summary_md.write_text("\n".join(md_lines_pl) + "\n", encoding="utf-8")
+    except Exception as e:
+        with run_log.open("a", encoding="utf-8") as f_log:
+            f_log.write(f"[WARN] patchlog analysis failed: {e}\n")
     md_lines: List[str] = []
     md_lines.append("# Runtime Map Sweep")
     md_lines.append("")
