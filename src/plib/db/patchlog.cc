@@ -92,8 +92,12 @@ static void patchlog_write_prefix(const char* category)
     }
 
     time_t now = time(NULL);
-    struct tm tm_info = { 0 };
+    struct tm tm_info;
+#if defined(_WIN32)
+    localtime_s(&tm_info, &now);
+#else
     localtime_r(&now, &tm_info);
+#endif
 
     char ts[32];
     strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &tm_info);
@@ -143,4 +147,5 @@ void patchlog_context(const char* patches_path, const char* datafile_path)
     patchlog_write("DB_CONTEXT", "patches_path=\"%s\" datafile_path=\"%s\"", patches, datafile);
 }
 
+} // namespace fallout
 } // namespace fallout

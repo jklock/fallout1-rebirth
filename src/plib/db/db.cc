@@ -8,6 +8,12 @@
 #include <string.h>
 #include <string>
 #include <strings.h>
+#include <errno.h>
+#if !defined(_WIN32)
+#include <unistd.h>
+#else
+#include <direct.h>
+#endif
 
 #include <fpattern/fpattern.h>
 
@@ -134,7 +140,6 @@ static db_read_callback* read_callback = NULL;
 
 // Diagnostics: count DB opens that fail to resolve in both patches and DAT.
 static int db_diag_open_fail_count_value = 0;
-
 void db_diag_reset_open_fail_count()
 {
     db_diag_open_fail_count_value = 0;
@@ -179,15 +184,69 @@ static void db_diag_note_open_fail(const char* request, const char* resolved_pat
 
     db_diag_open_fail_count_value++;
 }
-
 // 0x6713C8
 static DB_DATABASE* database_list[DB_DATABASE_LIST_CAPACITY];
+
+void db_diag_reset_open_fail_count()
+{
+    db_diag_open_fail_count_value = 0;
+}
+
+int db_diag_open_fail_count()
+{
+    return db_diag_open_fail_count_value;
+}
+
+static bool db_diag_is_soft_open_fail(const char* request, const char* resolved_path)
+{
+    const char* s = resolved_path != NULL ? resolved_path : request;
+    if (s == NULL) {
+        return false;
+    }
+
+    const char* ext = strrchr(s, '.');
+    if (ext == NULL) {
+        return false;
+    }
+
+    // map_load() probes for MAPS\\*.SAV to detect "saved map" variants.
+    // A miss here is expected and should not trip diagnostics.
+    if (ext[0] == '.'
+        && (ext[1] == 'S' || ext[1] == 's')
+        && (ext[2] == 'A' || ext[2] == 'a')
+        && (ext[3] == 'V' || ext[3] == 'v')
+        && ext[4] == '\0') {
+        return true;
+    }
+
+    // Map globals (.GAM) are optional for many maps; map_load ignores missing.
+    if (ext[0] == '.'
+        && (ext[1] == 'G' || ext[1] == 'g')
+        && (ext[2] == 'A' || ext[2] == 'a')
+        && (ext[3] == 'M' || ext[3] == 'm')
+        && ext[4] == '\0') {
+        return true;
+    }
+
+    return false;
+}
+
+static void db_diag_note_open_fail(const char* request, const char* resolved_path)
+{
+    if (db_diag_is_soft_open_fail(request, resolved_path)) {
+        return;
+    }
+
+    db_diag_open_fail_count_value++;
+}
 
 // 0x4AEE90
 DB_DATABASE* db_init(const char* datafile, const char* datafile_path, const char* patches_path, int show_cursor)
 {
     DB_DATABASE* database;
     std::string datafile_dir;
+
+    patchlog_context(patches_path, datafile_path);
 
     patchlog_context(patches_path, datafile_path);
 
@@ -227,6 +286,17 @@ DB_DATABASE* db_init(const char* datafile, const char* datafile_path, const char
         }
         db_close(database);
         return INVALID_DATABASE_HANDLE;
+    }
+
+    patchlog_context(database->patches_path, database->datafile_path);
+    if (patchlog_enabled()) {
+        const char* datafile_name = database->datafile != NULL ? database->datafile : "(null)";
+        const char* datafile_dir = database->datafile_path != NULL ? database->datafile_path : "(null)";
+        const char* patches = database->patches_path != NULL ? database->patches_path : "(null)";
+        patchlog_write("DB_INIT", "datafile=\"%s\" datafile_path=\"%s\" patches_path=\"%s\"",
+            datafile_name,
+            datafile_dir,
+            patches);
     }
 
     if (current_database == NULL) {
@@ -773,6 +843,10 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
 
     if (de.flags == 0) {
         de.flags = 16;
+    }
+
+    if (patchlog_verbose()) {
+        patchlog_write("DB_OPEN_OK", "source=datafile path=\"%s\" mode=\"%s\" flags=%d", path, mode, de.flags);
     }
 
     switch (de.flags & 0xF0) {
@@ -2096,19 +2170,46 @@ static int db_init_database(DB_DATABASE* database, const char* datafile, const c
         return 0;
     }
 
+    if (patchlog_enabled()) {
+        char cwd[COMPAT_MAX_PATH] = "";
+#if defined(_WIN32)
+        if (_getcwd(cwd, sizeof(cwd)) != NULL) {
+            patchlog_write("DB_INIT", "cwd=\"%s\"", cwd);
+        } else {
+            patchlog_write("DB_INIT", "cwd=\"(unknown)\"");
+        }
+#else
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            patchlog_write("DB_INIT", "cwd=\"%s\"", cwd);
+        } else {
+            patchlog_write("DB_INIT", "cwd=\"(unknown)\"");
+        }
+#endif
+    }
+
     database->datafile = internal_strdup(datafile);
     if (database->datafile == NULL) {
+        if (patchlog_enabled()) {
+            patchlog_write("DB_INIT_FAIL", "stage=dup datafile=\"%s\"", datafile);
+        }
         return -1;
     }
 
     database->stream = compat_fopen(database->datafile, "rb");
     if (database->stream == NULL) {
+        if (patchlog_enabled()) {
+            int err = errno;
+            patchlog_write("DB_INIT_FAIL", "stage=open datafile=\"%s\" errno=%d err=\"%s\"", datafile, err, strerror(err));
+        }
         internal_free(database->datafile);
         database->datafile = NULL;
         return -1;
     }
 
     if (assoc_init(&(database->root), 0, sizeof(*database->entries), NULL) != 0) {
+        if (patchlog_enabled()) {
+            patchlog_write("DB_INIT_FAIL", "stage=assoc_init datafile=\"%s\"", datafile);
+        }
         fclose(database->stream);
         internal_free(database->datafile);
         database->datafile = NULL;
@@ -2116,6 +2217,9 @@ static int db_init_database(DB_DATABASE* database, const char* datafile, const c
     }
 
     if (assoc_load(database->stream, &(database->root), 0) != 0) {
+        if (patchlog_enabled()) {
+            patchlog_write("DB_INIT_FAIL", "stage=assoc_load datafile=\"%s\"", datafile);
+        }
         fclose(database->stream);
         internal_free(database->datafile);
         database->datafile = NULL;
@@ -2124,6 +2228,9 @@ static int db_init_database(DB_DATABASE* database, const char* datafile, const c
 
     database->entries = (assoc_array*)internal_malloc(sizeof(*database->entries) * database->root.size);
     if (database->entries == NULL) {
+        if (patchlog_enabled()) {
+            patchlog_write("DB_INIT_FAIL", "stage=alloc_entries datafile=\"%s\"", datafile);
+        }
         assoc_free(&(database->root));
         fclose(database->stream);
         internal_free(database->datafile);
@@ -3188,50 +3295,59 @@ int db_fwriteInt32(DB_FILE* stream, int value)
 int db_fwriteUInt8List(DB_FILE* stream, unsigned char* arr, int count)
 {
     for (int index = 0; index < count; index++) {
-        if (db_fwriteUInt8(stream, arr[index]) == -1) {
-            return -1;
-        }
-    }
+        if (db_find_dir_entry(path, &de) == -1) {
+                patchlog_write("DB_OPEN_FAIL", "source=datafile reason=missing request=\"%s\" path=\"%s\" mode=\"%s\"", filename, path, mode);
+                db_diag_note_open_fail(filename, path);
+                return NULL;
+            }
 
-    return 0;
-}
+            if (current_database->stream == NULL) {
+                patchlog_write("DB_OPEN_FAIL", "source=datafile reason=no_stream request=\"%s\" path=\"%s\" mode=\"%s\"", filename, path, mode);
+                db_diag_note_open_fail(filename, path);
+                if (rme_log_topic_enabled("db")) {
+                    rme_logf("db", "db_fopen dat miss stream path=%s", path);
+                }
+                return NULL;
+            }
 
-int db_fwriteInt8List(DB_FILE* stream, char* arr, int count)
-{
-    for (int index = 0; index < count; index++) {
-        if (db_fwriteInt8(stream, arr[index]) == -1) {
-            return -1;
-        }
-    }
+            if (fseek(current_database->stream, de.offset, SEEK_SET) != 0) {
+                patchlog_write("DB_OPEN_FAIL", "source=datafile reason=seek request=\"%s\" path=\"%s\" mode=\"%s\"", filename, path, mode);
+                db_diag_note_open_fail(filename, path);
+                return NULL;
+            }
 
-    return 0;
-}
+            if (patchlog_verbose()) {
+                patchlog_write("DB_OPEN_OK", "source=datafile path=\"%s\" mode=\"%s\" flags=%d", path, mode, de.flags);
+            }
+            if (rme_log_topic_enabled("db")) {
+                rme_logf("db", "db_fopen dat hit path=%s flags=%d length=%d field_C=%d", path, de.flags, de.length, de.field_C);
+            }
 
-int db_fwriteInt16List(DB_FILE* stream, short* arr, int count)
-{
-    for (int index = 0; index < count; index++) {
-        if (db_fwriteInt16(stream, arr[index]) == -1) {
-            return -1;
-        }
-    }
+            if (de.flags == 0) {
+                de.flags = 16;
+            }
 
-    return 0;
-}
+            if (patchlog_verbose()) {
+                patchlog_write("DB_OPEN_OK", "source=datafile path=\"%s\" mode=\"%s\" flags=%d", path, mode, de.flags);
+            }
 
-int db_fwriteInt32List(DB_FILE* stream, int* arr, int count)
-{
-    for (int index = 0; index < count; index++) {
-        if (db_fwriteInt32(stream, arr[index]) == -1) {
-            return -1;
-        }
-    }
+            switch (de.flags & 0xF0) {
+            case 16:
+                buf = (unsigned char*)internal_malloc(de.length);
+                if (buf != NULL) {
+                    lzss_decode_to_buf(current_database->stream, buf, de.field_C);
+                    return db_add_fp_rec(NULL, buf, de.length, flags | 0x10 | 0x8);
+                }
+                break;
+            case 32:
+                return db_add_fp_rec(current_database->stream, NULL, de.length, flags | 0x20 | 0x8);
+            case 64:
+                buf = (unsigned char*)internal_malloc(0x4000);
+                if (buf != NULL) {
+                    return db_add_fp_rec(current_database->stream, buf, de.length, flags | 0x40 | 0x8);
+                }
+                break;
+            }
 
-    return 0;
-}
-
-int db_fwriteBool(DB_FILE* stream, bool value)
-{
-    return db_fwriteInt32(stream, value ? 1 : 0);
-}
-
-} // namespace fallout
+            patchlog_write("DB_OPEN_FAIL", "source=datafile reason=alloc request=\"%s\" path=\"%s\" mode=\"%s\" flags=%d", filename, path, mode, de.flags);
+            db_diag_note_open_fail(filename, path);

@@ -77,182 +77,182 @@ static void map_log_square_stats(int elevation)
     int* arr = square[elevation]->field_0;
     int floor_count = 0;
     int roof_count = 0;
-    int zero_id = 0;
-    int min_id = INT_MAX;
-    int max_id = INT_MIN;
-
-    for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
-        int upper = (arr[tile] >> 16) & 0xFFFF;
-        int tile_id = upper & 0x0FFF;
-        int flags = (upper & 0xF000) >> 12;
-        if ((flags & 0x01) == 0) {
-            floor_count++;
-        } else {
-            roof_count++;
+    static void map_log_square_stats(int elevation)
+    {
+        if (!patchlog_enabled()) {
+            return;
         }
-        if (tile_id == 0) {
-            zero_id++;
+
+        if (elevation < 0 || elevation >= ELEVATION_COUNT) {
+            return;
         }
-        if (tile_id < min_id) {
-            min_id = tile_id;
-        }
-        if (tile_id > max_id) {
-            max_id = tile_id;
-        }
-    }
 
-    patchlog_write("SQUARE_STATS",
-        "elevation=%d tiles=%d floor=%d roof=%d zero_id=%d min_id=%d max_id=%d",
-        elevation,
-        SQUARE_GRID_SIZE,
-        floor_count,
-        roof_count,
-        zero_id,
-        min_id == INT_MAX ? -1 : min_id,
-        max_id == INT_MIN ? -1 : max_id);
-}
+        int* arr = square[elevation]->field_0;
+        int floor_count = 0;
+        int roof_count = 0;
+        int zero_id = 0;
+        int min_id = INT_MAX;
+        int max_id = INT_MIN;
 
-static void map_log_floor_art_stats(int elevation)
-{
-    if (!patchlog_enabled()) {
-        return;
-    }
-
-    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
-    if (autorun_env == NULL || autorun_env[0] == '\0' || autorun_env[0] == '0') {
-        return;
-    }
-
-    if (elevation < 0 || elevation >= ELEVATION_COUNT) {
-        return;
-    }
-
-    TileData* td = square[elevation];
-    if (td == NULL) {
-        return;
-    }
-
-    int* arr = td->field_0;
-    int floor_tiles = 0;
-    int floor_drawable = 0;
-    int floor_missing = 0;
-    int floor_blank = 0;
-
-    std::map<int, int> missing_by_tid;
-    std::map<int, int> blank_by_tid;
-    std::map<int, int> drawable_by_tid;
-    std::map<int, int> fid_status;
-
-    for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
-        int upper = (arr[tile] >> 16) & 0xFFFF;
-        int tile_id = upper & 0x0FFF;
-        int flags = (upper & 0xF000) >> 12;
-        if ((flags & 0x01) != 0) {
-            continue;
-        }
-        floor_tiles++;
-        int fid = art_id(OBJ_TYPE_TILE, tile_id, 0, 0, 0);
-
-        auto it = fid_status.find(fid);
-        int status = 0;
-        if (it != fid_status.end()) {
-            status = it->second;
-        } else {
-            CacheEntry* handle = NULL;
-            Art* art = art_ptr_lock(fid, &handle);
-            if (art == NULL) {
-                fid_status[fid] = 1;
-                status = 1;
+        for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
+            int upper = (arr[tile] >> 16) & 0xFFFF;
+            int tile_id = upper & 0x0FFF;
+            int flags = (upper & 0xF000) >> 12;
+            if ((flags & 0x01) == 0) {
+                floor_count++;
             } else {
-                unsigned char* frame = art_frame_data(art, 0, 0);
-                if (frame == NULL) {
-                    fid_status[fid] = 2;
-                    status = 2;
-                } else {
-                    int w = art_frame_width(art, 0, 0);
-                    int h = art_frame_length(art, 0, 0);
-                    long total = (long)w * (long)h;
-                    long non_zero = 0;
-                    for (int i = 0; i < total; i++) {
-                        if (frame[i] != 0) {
-                            non_zero++;
-                        }
-                    }
-
-                    if (non_zero == 0) {
-                        fid_status[fid] = 3;
-                        status = 3;
-                    } else {
-                        fid_status[fid] = 4;
-                        status = 4;
-                    }
-                }
-                art_ptr_unlock(handle);
+                roof_count++;
+            }
+            if (tile_id == 0) {
+                zero_id++;
+            }
+            if (tile_id < min_id) {
+                min_id = tile_id;
+            }
+            if (tile_id > max_id) {
+                max_id = tile_id;
             }
         }
 
-        switch (status) {
-        case 1:
-            floor_missing++;
-            missing_by_tid[tile_id]++;
-            break;
-        case 2:
-        case 3:
-            floor_blank++;
-            blank_by_tid[tile_id]++;
-            break;
-        case 4:
-            floor_drawable++;
-            drawable_by_tid[tile_id]++;
-            break;
-        default:
-            break;
+        patchlog_write("SQUARE_STATS",
+            "elevation=%d tiles=%d floor=%d roof=%d zero_id=%d min_id=%d max_id=%d",
+            elevation,
+            SQUARE_GRID_SIZE,
+            floor_count,
+            roof_count,
+            zero_id,
+            min_id == INT_MAX ? -1 : min_id,
+            max_id == INT_MIN ? -1 : max_id);
+    }
+
+    static void map_log_floor_art_stats(int elevation)
+    {
+        if (!patchlog_enabled()) {
+            return;
         }
-    }
 
-    patchlog_write("FLOOR_ART",
-        "elevation=%d tiles=%d drawable=%d missing=%d blank=%d",
-        elevation,
-        floor_tiles,
-        floor_drawable,
-        floor_missing,
-        floor_blank);
-
-    auto log_map_counts = [](const char* category, const std::map<int, int>& counts) {
-        for (const auto& pair : counts) {
-            patchlog_write(category, "tile_id=%d count=%d", pair.first, pair.second);
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env == NULL || autorun_env[0] == '\0' || autorun_env[0] == '0') {
+            return;
         }
-    };
 
-    log_map_counts("FLOOR_ART_DRAWABLE", drawable_by_tid);
-    log_map_counts("FLOOR_ART_MISSING", missing_by_tid);
-    log_map_counts("FLOOR_ART_BLANK", blank_by_tid);
-}
+        if (elevation < 0 || elevation >= ELEVATION_COUNT) {
+            return;
+        }
 
-static void map_log_display_pixel_stats(int elevation)
-{
-    if (!patchlog_enabled()) {
-        return;
+        TileData* td = square[elevation];
+        if (td == NULL) {
+            return;
+        }
+
+        int* arr = td->field_0;
+        int floor_tiles = 0;
+        int floor_drawable = 0;
+        int floor_missing = 0;
+        int floor_blank = 0;
+
+        std::map<int, int> missing_by_tid;
+        std::map<int, int> blank_by_tid;
+        std::map<int, int> drawable_by_tid;
+        std::map<int, int> fid_status;
+
+        for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
+            int upper = (arr[tile] >> 16) & 0xFFFF;
+            int tile_id = upper & 0x0FFF;
+            int flags = (upper & 0xF000) >> 12;
+            if ((flags & 0x01) != 0) {
+                continue;
+            }
+            floor_tiles++;
+            int fid = art_id(OBJ_TYPE_TILE, tile_id, 0, 0, 0);
+
+            auto it = fid_status.find(fid);
+            int status = 0;
+            if (it != fid_status.end()) {
+                status = it->second;
+            } else {
+                CacheEntry* handle = NULL;
+                Art* art = art_ptr_lock(fid, &handle);
+                if (art == NULL) {
+                    fid_status[fid] = 1;
+                    status = 1;
+                } else {
+                    unsigned char* frame = art_frame_data(art, 0, 0);
+                    if (frame == NULL) {
+                        fid_status[fid] = 2;
+                        status = 2;
+                    } else {
+                        int w = art_frame_width(art, 0, 0);
+                        int h = art_frame_length(art, 0, 0);
+                        long total = (long)w * (long)h;
+                        long non_zero = 0;
+                        for (int i = 0; i < total; i++) {
+                            if (frame[i] != 0) {
+                                non_zero++;
+                            }
+                        }
+
+                        if (non_zero == 0) {
+                            fid_status[fid] = 3;
+                            status = 3;
+                        } else {
+                            fid_status[fid] = 4;
+                            status = 4;
+                        }
+                    }
+                    art_ptr_unlock(handle);
+                }
+            }
+
+            switch (status) {
+            case 1:
+                floor_missing++;
+                missing_by_tid[tile_id]++;
+                break;
+            case 2:
+                floor_blank++;
+                blank_by_tid[tile_id]++;
+                break;
+            case 3:
+                floor_blank++;
+                blank_by_tid[tile_id]++;
+                break;
+            case 4:
+                floor_drawable++;
+                drawable_by_tid[tile_id]++;
+                break;
+            default:
+                break;
+            }
+        }
+
+        patchlog_write("MAP_FLOOR_ART_STATS",
+            "elevation=%d floor_tiles=%d drawable=%d missing=%d blank=%d",
+            elevation,
+            floor_tiles,
+            floor_drawable,
+            floor_missing,
+            floor_blank);
+
+        auto dump_counts = [](const char* category, const std::map<int, int>& counts) {
+            if (counts.empty()) {
+                return;
+            }
+            std::string buf;
+            for (const auto& kv : counts) {
+                char entry[32];
+                snprintf(entry, sizeof(entry), "%d:%d ", kv.first, kv.second);
+                buf.append(entry);
+            }
+            patchlog_write(category, "%s", buf.c_str());
+        };
+
+        dump_counts("MAP_FLOOR_MISSING", missing_by_tid);
+        dump_counts("MAP_FLOOR_BLANK", blank_by_tid);
+        dump_counts("MAP_FLOOR_DRAWABLE", drawable_by_tid);
     }
 
-    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
-    if (autorun_env == NULL || autorun_env[0] == '\0' || autorun_env[0] == '0') {
-        return;
-    }
-
-    if (display_buf == NULL) {
-        return;
-    }
-
-    int width = scr_size.lrx - scr_size.ulx + 1;
-    int height = scr_size.lry - scr_size.uly - 99;
-    int ui_h = 120;
-    int top_h = height - ui_h;
-    if (top_h < 1) {
-        top_h = 1;
-    }
-
-    long total = (long)width * (long)top_h;
+    static unsigned char* display_buf = NULL;
     if (total <= 0) {
         return;
     }
@@ -287,145 +287,184 @@ long map_count_display_non_zero(int x, int y, int w, int h)
     int height = scr_size.lry - scr_size.uly - 99;
 
     if (x < 0) {
-        w += x;
-        x = 0;
-    }
-    if (y < 0) {
-        h += y;
-        y = 0;
-    }
-    if (x + w > width) {
-        w = width - x;
-    }
-    if (y + h > height) {
-        h = height - y;
-    }
+    static unsigned char* display_buf = NULL;
 
-    if (w <= 0 || h <= 0) {
-        return 0;
-    }
+    static void map_log_square_stats(int elevation)
+    {
+        if (!patchlog_enabled()) {
+            return;
+        }
 
-    long non_zero = 0;
-    for (int row = 0; row < h; row++) {
-        unsigned char* r = display_buf + (long)(y + row) * width + x;
-        for (int col = 0; col < w; col++) {
-            if (r[col] != 0) {
-                non_zero++;
+        if (elevation < 0 || elevation >= ELEVATION_COUNT) {
+            return;
+        }
+
+        int* arr = square[elevation]->field_0;
+        int floor_count = 0;
+        int roof_count = 0;
+        int zero_id = 0;
+        int min_id = INT_MAX;
+        int max_id = INT_MIN;
+
+        for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
+            int upper = (arr[tile] >> 16) & 0xFFFF;
+            int tile_id = upper & 0x0FFF;
+            int flags = (upper & 0xF000) >> 12;
+            if ((flags & 0x01) == 0) {
+                floor_count++;
+            } else {
+                roof_count++;
+            }
+            if (tile_id == 0) {
+                zero_id++;
+            }
+            if (tile_id < min_id) {
+                min_id = tile_id;
+            }
+            if (tile_id > max_id) {
+                max_id = tile_id;
             }
         }
+
+        patchlog_write("SQUARE_STATS",
+            "elevation=%d tiles=%d floor=%d roof=%d zero_id=%d min_id=%d max_id=%d",
+            elevation,
+            SQUARE_GRID_SIZE,
+            floor_count,
+            roof_count,
+            zero_id,
+            min_id == INT_MAX ? -1 : min_id,
+            max_id == INT_MIN ? -1 : max_id);
     }
 
-    return non_zero;
-}
-static void map_log_square_stats(int elevation);
-static void map_log_floor_art_stats(int elevation);
-static void map_log_display_pixel_stats(int elevation);
-long map_count_display_non_zero(int x, int y, int w, int h);
-void map_log_display_pixel_stats_public(int elevation);
-static int map_write_MapData(MapHeader* ptr, DB_FILE* stream);
-static int map_read_MapData(MapHeader* ptr, DB_FILE* stream);
+    static void map_log_floor_art_stats(int elevation)
+    {
+        if (!patchlog_enabled()) {
+            return;
+        }
 
-// 0x4735CE
-static const short city_vs_city_idx_table[MAP_COUNT][5] = {
-    /*  DESERT1 */ { -1, -1, -1, -1, -1 },
-    /*  DESERT2 */ { -1, -1, -1, -1, -1 },
-    /*  DESERT3 */ { -1, -1, -1, -1, -1 },
-    /*  HALLDED */ { MAP_VAULTNEC, MAP_HOTEL, MAP_WATRSHD, -1, -1 },
-    /*    HOTEL */ { MAP_HALLDED, MAP_VAULTNEC, MAP_WATRSHD, -1, -1 },
-    /*  WATRSHD */ { MAP_HALLDED, MAP_HOTEL, MAP_VAULTNEC, -1, -1 },
-    /*  VAULT13 */ { MAP_V13ENT, -1, -1, -1, -1 },
-    /* VAULTENT */ { MAP_VAULTBUR, -1, -1, -1, -1 },
-    /* VAULTBUR */ { MAP_VAULTENT, -1, -1, -1, -1 },
-    /* VAULTNEC */ { MAP_HALLDED, MAP_HOTEL, MAP_WATRSHD, -1, -1 },
-    /*  JUNKENT */ { MAP_JUNKCSNO, MAP_JUNKKILL, -1, -1, -1 },
-    /* JUNKCSNO */ { MAP_JUNKENT, MAP_JUNKKILL, -1, -1, -1 },
-    /* JUNKKILL */ { MAP_JUNKENT, MAP_JUNKCSNO, -1, -1, -1 },
-    /* BROHDENT */ { MAP_BROHD12, MAP_BROHD34, MAP_BRODEAD, -1, -1 },
-    /*  BROHD12 */ { MAP_BROHDENT, MAP_BROHD34, MAP_BRODEAD, -1, -1 },
-    /*  BROHD34 */ { MAP_BROHDENT, MAP_BROHD12, MAP_BRODEAD, -1, -1 },
-    /*    CAVES */ { MAP_SHADYE, MAP_SHADYW, -1, -1, -1 },
-    /* CHILDRN1 */ { MAP_CHILDRN2, MAP_CHILDEAD, MAP_MSTRLR12, MAP_MSTRLR34, -1 },
-    /* CHILDRN2 */ { MAP_CHILDRN1, MAP_CHILDEAD, MAP_MSTRLR12, MAP_MSTRLR34, -1 },
-    /*    CITY1 */ { -1, -1, -1, -1, -1 },
-    /*   COAST1 */ { -1, -1, -1, -1, -1 },
-    /*   COAST2 */ { -1, -1, -1, -1, -1 },
-    /* COLATRUK */ { -1, -1, -1, -1, -1 },
-    /*  FSAUSER */ { -1, -1, -1, -1, -1 },
-    /*  RAIDERS */ { -1, -1, -1, -1, -1 },
-    /*   SHADYE */ { MAP_CAVES, MAP_SHADYW, -1, -1, -1 },
-    /*   SHADYW */ { MAP_CAVES, MAP_SHADYE, -1, -1, -1 },
-    /*  GLOWENT */ { MAP_GLOW1, MAP_GLOW2, -1, -1, -1 },
-    /* LAADYTUM */ { MAP_LAFOLLWR, MAP_LABLADES, MAP_LARIPPER, MAP_LAGUNRUN, -1 },
-    /* LAFOLLWR */ { MAP_LAADYTUM, MAP_LABLADES, MAP_LARIPPER, MAP_LAGUNRUN, -1 },
-    /*    MBENT */ { MAP_MBSTRG12, MAP_MBVATS12, MAP_MBDEAD, -1, -1 },
-    /* MBSTRG12 */ { MAP_MBENT, MAP_MBVATS12, MAP_MBDEAD, -1, -1 },
-    /* MBVATS12 */ { MAP_MBENT, MAP_MBSTRG12, MAP_MBDEAD, -1, -1 },
-    /* MSTRLR12 */ { MAP_MSTRLR34, MAP_CHILDEAD, MAP_CHILDRN1, MAP_CHILDRN2, -1 },
-    /* MSTRLR34 */ { MAP_MSTRLR12, MAP_CHILDEAD, MAP_CHILDRN1, MAP_CHILDRN2, -1 },
-    /*   V13ENT */ { MAP_VAULT13, -1, -1, -1, -1 },
-    /*   HUBENT */ { MAP_DETHCLAW, MAP_HUBDWNTN, MAP_HUBHEIGT, MAP_HUBOLDTN, MAP_HUBWATER },
-    /* DETHCLAW */ { MAP_HUBENT, MAP_HUBDWNTN, MAP_HUBHEIGT, MAP_HUBOLDTN, MAP_HUBWATER },
-    /* HUBDWNTN */ { MAP_HUBENT, MAP_DETHCLAW, MAP_HUBHEIGT, MAP_HUBOLDTN, MAP_HUBWATER },
-    /* HUBHEIGT */ { MAP_HUBENT, MAP_DETHCLAW, MAP_HUBDWNTN, MAP_HUBOLDTN, MAP_HUBWATER },
-    /* HUBOLDTN */ { MAP_HUBENT, MAP_DETHCLAW, MAP_HUBDWNTN, MAP_HUBHEIGT, MAP_HUBWATER },
-    /* HUBWATER */ { MAP_HUBENT, MAP_DETHCLAW, MAP_HUBDWNTN, MAP_HUBHEIGT, MAP_HUBOLDTN },
-    /*    GLOW1 */ { MAP_GLOWENT, MAP_GLOW2, -1, -1, -1 },
-    /*    GLOW2 */ { MAP_GLOWENT, MAP_GLOW1, -1, -1, -1 },
-    /* LABLADES */ { MAP_LAADYTUM, MAP_LAFOLLWR, MAP_LARIPPER, MAP_LAGUNRUN, -1 },
-    /* LARIPPER */ { MAP_LAADYTUM, MAP_LAFOLLWR, MAP_LABLADES, MAP_LAGUNRUN, -1 },
-    /* LAGUNRUN */ { MAP_LAADYTUM, MAP_LAFOLLWR, MAP_LABLADES, MAP_LARIPPER, -1 },
-    /* CHILDEAD */ { MAP_CHILDRN1, MAP_CHILDRN2, MAP_MSTRLR12, MAP_MSTRLR34, -1 },
-    /*   MBDEAD */ { MAP_MBENT, MAP_MBSTRG12, MAP_MBVATS12, -1, -1 },
-    /*  MOUNTN1 */ { -1, -1, -1, -1, -1 },
-    /*  MOUNTN2 */ { -1, -1, -1, -1, -1 },
-    /*     FOOT */ { -1, -1, -1, -1, -1 },
-    /*   TARDIS */ { -1, -1, -1, -1, -1 },
-    /*  TALKCOW */ { -1, -1, -1, -1, -1 },
-    /*  USEDCAR */ { -1, -1, -1, -1, -1 },
-    /*  BRODEAD */ { MAP_BROHDENT, MAP_BROHD12, MAP_BROHD34, -1, -1 },
-    /* DESCRVN1 */ { -1, -1, -1, -1, -1 },
-    /* DESCRVN2 */ { -1, -1, -1, -1, -1 },
-    /* MNTCRVN1 */ { -1, -1, -1, -1, -1 },
-    /* MNTCRVN2 */ { -1, -1, -1, -1, -1 },
-    /*   VIPERS */ { -1, -1, -1, -1, -1 },
-    /* DESCRVN3 */ { -1, -1, -1, -1, -1 },
-    /* MNTCRVN3 */ { -1, -1, -1, -1, -1 },
-    /* DESCRVN4 */ { -1, -1, -1, -1, -1 },
-    /* MNTCRVN4 */ { -1, -1, -1, -1, -1 },
-    /*  HUBMIS1 */ { -1, -1, -1, -1, -1 },
-};
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env == NULL || autorun_env[0] == '\0' || autorun_env[0] == '0') {
+            return;
+        }
 
-// 0x473864
-static const short shrtnames[MAP_COUNT] = {
-    /*  DESERT1 */ 100,
-    /*  DESERT2 */ 100,
-    /*  DESERT3 */ 100,
-    /*  HALLDED */ 505,
-    /*    HOTEL */ 505,
-    /*  WATRSHD */ 505,
-    /*  VAULT13 */ 500,
-    /* VAULTENT */ 501,
-    /* VAULTBUR */ 501,
-    /* VAULTNEC */ 505,
-    /*  JUNKENT */ 503,
-    /* JUNKCSNO */ 503,
-    /* JUNKKILL */ 503,
-    /* BROHDENT */ 507,
-    /*  BROHD12 */ 507,
-    /*  BROHD34 */ 507,
-    /*    CAVES */ 116,
-    /* CHILDRN1 */ 511,
-    /* CHILDRN2 */ 511,
-    /*    CITY1 */ 119,
-    /*   COAST1 */ 120,
-    /*   COAST2 */ 120,
-    /* COLATRUK */ 100,
-    /*  FSAUSER */ 100,
-    /*  RAIDERS */ 504,
-    /*   SHADYE */ 502,
-    /*   SHADYW */ 502,
-    /*  GLOWENT */ 509,
-    /* LAADYTUM */ 510,
+        if (elevation < 0 || elevation >= ELEVATION_COUNT) {
+            return;
+        }
+
+        TileData* td = square[elevation];
+        if (td == NULL) {
+            return;
+        }
+
+        int* arr = td->field_0;
+        int floor_tiles = 0;
+        int floor_drawable = 0;
+        int floor_missing = 0;
+        int floor_blank = 0;
+
+        std::map<int, int> missing_by_tid;
+        std::map<int, int> blank_by_tid;
+        std::map<int, int> drawable_by_tid;
+        std::map<int, int> fid_status;
+
+        for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
+            int upper = (arr[tile] >> 16) & 0xFFFF;
+            int tile_id = upper & 0x0FFF;
+            int flags = (upper & 0xF000) >> 12;
+            if ((flags & 0x01) != 0) {
+                continue;
+            }
+            floor_tiles++;
+            int fid = art_id(OBJ_TYPE_TILE, tile_id, 0, 0, 0);
+
+            auto it = fid_status.find(fid);
+            int status = 0;
+            if (it != fid_status.end()) {
+                status = it->second;
+            } else {
+                CacheEntry* handle = NULL;
+                Art* art = art_ptr_lock(fid, &handle);
+                if (art == NULL) {
+                    fid_status[fid] = 1;
+                    status = 1;
+                } else {
+                    unsigned char* frame = art_frame_data(art, 0, 0);
+                    if (frame == NULL) {
+                        fid_status[fid] = 2;
+                        status = 2;
+                    } else {
+                        int w = art_frame_width(art, 0, 0);
+                        int h = art_frame_length(art, 0, 0);
+                        long total = (long)w * (long)h;
+                        long non_zero = 0;
+                        for (int i = 0; i < total; i++) {
+                            if (frame[i] != 0) {
+                                non_zero++;
+                            }
+                        }
+
+                        if (non_zero == 0) {
+                            fid_status[fid] = 3;
+                            status = 3;
+                        } else {
+                            fid_status[fid] = 4;
+                            status = 4;
+                        }
+                    }
+                    art_ptr_unlock(handle);
+                }
+            }
+
+            switch (status) {
+            case 1:
+                floor_missing++;
+                missing_by_tid[tile_id]++;
+                break;
+            case 2:
+                floor_blank++;
+                blank_by_tid[tile_id]++;
+                break;
+            case 3:
+                floor_blank++;
+                blank_by_tid[tile_id]++;
+                break;
+            case 4:
+                floor_drawable++;
+                drawable_by_tid[tile_id]++;
+                break;
+            default:
+                break;
+            }
+        }
+
+        patchlog_write("MAP_FLOOR_ART_STATS",
+            "elevation=%d floor_tiles=%d drawable=%d missing=%d blank=%d",
+            elevation,
+            floor_tiles,
+            floor_drawable,
+            floor_missing,
+            floor_blank);
+
+        auto dump_counts = [](const char* category, const std::map<int, int>& counts) {
+            if (counts.empty()) {
+                return;
+            }
+            std::string buf;
+            for (const auto& kv : counts) {
+                char entry[32];
+                snprintf(entry, sizeof(entry), "%d:%d ", kv.first, kv.second);
+                buf.append(entry);
+            }
+            patchlog_write(category, "%s", buf.c_str());
+        };
+
+        dump_counts("MAP_FLOOR_MISSING", missing_by_tid);
+        dump_counts("MAP_FLOOR_BLANK", blank_by_tid);
+        dump_counts("MAP_FLOOR_DRAWABLE", drawable_by_tid);
+    }
+
+    static unsigned char* display_buf = NULL;
     /* LAFOLLWR */ 510,
     /*    MBENT */ 508,
     /* MBSTRG12 */ 508,
@@ -2216,6 +2255,23 @@ static int map_read_MapData(MapHeader* ptr, DB_FILE* stream)
     if (db_freadInt32(stream, &(ptr->field_34)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->lastVisitTime)) == -1) return -1;
     if (db_freadInt32List(stream, ptr->field_3C, 44) == -1) return -1;
+
+    if (patchlog_enabled()) {
+        patchlog_write("MAP_HEADER",
+            "version=%d name=\"%s\" tile=%d elev=%d rot=%d locals=%d script=%d flags=0x%08X dark=%d globals=%d field_34=%d last=%d",
+            ptr->version,
+            ptr->name,
+            ptr->enteringTile,
+            ptr->enteringElevation,
+            ptr->enteringRotation,
+            ptr->localVariablesCount,
+            ptr->scriptIndex,
+            ptr->flags,
+            ptr->darkness,
+            ptr->globalVariablesCount,
+            ptr->field_34,
+            ptr->lastVisitTime);
+    }
 
     return 0;
 }
