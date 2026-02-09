@@ -56,6 +56,10 @@ This is the exhaustive handoff for the full-coverage test runner script:
   - Screenshots for failures/suspicious cases: `development/RME/validation/runtime/screenshots/*.bmp`
 - Why: loads every map and captures a screenshot to detect missing assets or black-map regressions.
 
+### Step 9 — Patchlog analysis
+- Command: `python3 scripts/dev/patchlog_analyze.py <patchlog.txt>`
+- Why: Scans patchlogs for `GNW_SHOW_RECT` events where `surf_pre>0 && surf_post==0`, correlates with `WIN_FILL_RECT` and `MAP_SCROLL_MEMMOVE`, and prints context for nearest prior source & fill operations. Use `F1R_PATCHLOG=1` and `F1R_PATCHLOG_VERBOSE=1` during autorun to capture the required logs.
+
 ### Optional Steps — iOS
 - If `RUN_IPA_PATCH=1`: `./scripts/patch/rebirth-patch-ipa.sh` (IPA payload patch)
 - If `RUN_IOS=1`:

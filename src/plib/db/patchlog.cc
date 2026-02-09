@@ -92,7 +92,7 @@ static void patchlog_write_prefix(const char* category)
     }
 
     time_t now = time(NULL);
-    struct tm tm_info;
+    struct tm tm_info = { 0 };
 #if defined(_WIN32)
     localtime_s(&tm_info, &now);
 #else
@@ -147,5 +147,4 @@ void patchlog_context(const char* patches_path, const char* datafile_path)
     patchlog_write("DB_CONTEXT", "patches_path=\"%s\" datafile_path=\"%s\"", patches, datafile);
 }
 
-} // namespace fallout
 } // namespace fallout
