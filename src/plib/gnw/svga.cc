@@ -4,7 +4,9 @@
 
 #include "plib/db/patchlog.h"
 #include <algorithm>
+#include <limits.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "game/map.h"
 #include "plib/gnw/debug.h"
@@ -266,6 +268,62 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
         srcPitch,
         surfacePtr,
         gSdlSurface->pitch);
+
+    long postSurfaceNonZero = 0;
+    // Defensive check: avoid copying an all-zero source over an existing non-zero
+    // surface for small regions since that leads to transient zeroing anomalies.
+    // Limit to small areas to avoid scan overhead.
+    int area = copyW * copyH;
+    bool src_all_zero = false;
+    if (area <= 4096) {
+        src_all_zero = true;
+        for (int r = 0; r < copyH && src_all_zero; r++) {
+            unsigned char* p = srcPtr + r * srcPitch;
+            for (int c = 0; c < copyW; c++) {
+                if (p[c] != 0) {
+                    src_all_zero = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (src_all_zero) {
+        // If src is all zero and destination has non-zero data, skip the copy to
+        // avoid clearing existing content (this prevents surf_pre>0 && surf_post==0).
+        long dest_non_zero = 0;
+        for (int r = 0; r < copyH; r++) {
+            unsigned char* p = surfacePtr + r * gSdlSurface->pitch;
+            for (int c = 0; c < copyW; c++) {
+                if (p[c] != 0) {
+                    dest_non_zero++;
+                    break;
+                }
+            }
+            if (dest_non_zero) {
+                break;
+            }
+        }
+
+        if (dest_non_zero) {
+            // Log the skipped copy for triage.
+            patchlog_write("GNW_SHOW_RECT_SKIP_ZERO", "dest=(%d,%d) copy=%dx%d area=%d srcPtr=%p preSurfaceNonZero=%ld", copyX, copyY, copyW, copyH, area, srcPtr, dest_non_zero);
+        } else {
+            buf_to_buf(srcPtr,
+                copyW,
+                copyH,
+                srcPitch,
+                surfacePtr,
+                gSdlSurface->pitch);
+        }
+    } else {
+        buf_to_buf(srcPtr,
+            copyW,
+            copyH,
+            srcPitch,
+            surfacePtr,
+            gSdlSurface->pitch);
+    }
 
     long postSurfaceNonZero = 0;
     if (do_log) {
@@ -785,13 +843,23 @@ void renderPresent()
                         }
                     }
 
-                    // Save presented pixels as a BMP for offline inspection (if we could
-                    // read the surface). Save before destroying.
-                    char path[256];
-                    snprintf(path, sizeof(path), "/tmp/f1r-present-anom-%llu.bmp", anomaly_seq);
-                    if (surf != NULL) {
-                        SDL_SaveBMP(surf, path);
-                        patchlog_write("RENDER_PRESENT_ANOMALY", "screenshot=%s", path);
+                    // Save presented pixels as a BMP for offline inspection if configured.
+                    const char* anom_dir = getenv("F1R_PRESENT_ANOM_DIR");
+                    if (anom_dir != NULL && anom_dir[0] != '\0') {
+                        char path[PATH_MAX];
+                        snprintf(path, sizeof(path), "%s/f1r-present-anom-%llu.bmp", anom_dir, anomaly_seq);
+                        if (surf != NULL) {
+                            // Best-effort: create the directory if it doesn't exist (ignore failures)
+                            struct stat st;
+                            if (stat(anom_dir, &st) != 0) {
+                                mkdir(anom_dir, 0755);
+                            }
+                            SDL_SaveBMP(surf, path);
+                            patchlog_write("RENDER_PRESENT_ANOMALY", "screenshot=%s", path);
+                        }
+                    } else {
+                        // Not configured; do not write present anomaly files by default.
+                        patchlog_write("RENDER_PRESENT_ANOMALY", "screenshot=(not-saved - F1R_PRESENT_ANOM_DIR not set)");
                     }
                 }
 
