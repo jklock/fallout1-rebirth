@@ -100,6 +100,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-1-timeout180.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-caravan-rerun-summary.md`
   - Commit: 45ec8e4
 
+- 2026-02-10T23:18:55Z — Executor — Re-ran M-5 CARAVAN (10 repeats) (FAIL; stopped on run 1).
+  - Commands: `OUT_DIR="$(pwd)/development/RME/ARTIFACTS/evidence/gate-2/runtime" PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" ./scripts/patch/rme-repeat-map.sh CARAVAN 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/CARAVAN.iter01.bmp`
+  - Commit: 1661bd5
+
 ---
 
 ## Phase 2 Task Checklist (follow `TODO.maps.md`)
