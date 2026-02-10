@@ -1,0 +1,747 @@
+[2026-02-10 16:07:34] [DB_CONTEXT] patches_path="data" datafile_path="(null)"
+[2026-02-10 16:07:34] [DB_INIT] cwd="/Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources"
+[2026-02-10 16:07:34] [DB_CONTEXT] patches_path="data/" datafile_path=".\"
+[2026-02-10 16:07:34] [DB_INIT] datafile="master.dat" datafile_path=".\" patches_path="data/"
+[2026-02-10 16:07:34] [DB_CONTEXT] patches_path="data" datafile_path="(null)"
+[2026-02-10 16:07:34] [DB_INIT] cwd="/Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources"
+[2026-02-10 16:07:34] [DB_CONTEXT] patches_path="data/" datafile_path=".\"
+[2026-02-10 16:07:34] [DB_INIT] datafile="critter.dat" datafile_path=".\" patches_path="data/"
+[2026-02-10 16:07:34] [DB_OPEN_FAIL] source=datafile reason=missing request="font4.fon" path=".\FONT4.FON" mode="rb"
+[2026-02-10 16:07:34] [DB_OPEN_FAIL] source=datafile reason=missing request="font6.fon" path=".\FONT6.FON" mode="rb"
+[2026-02-10 16:07:34] [DB_OPEN_FAIL] source=datafile reason=missing request="font7.fon" path=".\FONT7.FON" mode="rb"
+[2026-02-10 16:07:34] [DB_OPEN_FAIL] source=datafile reason=missing request="font8.fon" path=".\FONT8.FON" mode="rb"
+[2026-02-10 16:07:34] [DB_OPEN_FAIL] source=datafile reason=missing request="font9.fon" path=".\FONT9.FON" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font5.aaf" path=".\FONT5.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font6.aaf" path=".\FONT6.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font7.aaf" path=".\FONT7.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font8.aaf" path=".\FONT8.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font9.aaf" path=".\FONT9.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font10.aaf" path=".\FONT10.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font11.aaf" path=".\FONT11.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font12.aaf" path=".\FONT12.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font13.aaf" path=".\FONT13.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font14.aaf" path=".\FONT14.AAF" mode="rb"
+[2026-02-10 16:07:36] [DB_OPEN_FAIL] source=datafile reason=missing request="font15.aaf" path=".\FONT15.AAF" mode="rb"
+[2026-02-10 16:07:37] [DISPLAY_BUF_PTR] display_buf=0xb0394c010 width=640 height=380
+[2026-02-10 16:07:37] [AUTORUN_MAP] load_start map="V13ENT.MAP"
+[2026-02-10 16:07:37] [DB_OPEN_FAIL] source=datafile reason=missing request="MAPS\V13ENT.SAV" path=".\MAPS\V13ENT.SAV" mode="rb"
+[2026-02-10 16:07:37] [MAP_HEADER] version=19 name="V13ENT.MAP" tile=20100 elev=0 rot=0 locals=0 script=430 flags=0x0000000C dark=1 globals=1 field_34=35 last=0
+[2026-02-10 16:07:38] [SQUARE_STATS] elevation=0 tiles=10000 floor=10000 roof=0 zero_id=0 min_id=1 max_id=1
+[2026-02-10 16:07:38] [FLOOR_DRAW_STATS] elevation=0 tiles=10000 floor_drawable=10000 floor_missing_art=0 floor_blank=0 unique_missing=0
+[2026-02-10 16:07:38] [FLOOR_DRAW_TOP] top_tiles=5400 top_drawable=5400 top_missing=0 top_blank=0
+[2026-02-10 16:07:41] [TILE_REFRESH_DISPLAY] called
+[2026-02-10 16:07:41] [REFRESH_GAME] rect=0,0,639,379
+[2026-02-10 16:07:41] [DISPLAY_STAGE_TOP_PIXELS] stage="BEFORE_DRAW" top_pixels=166400 non_zero=0 non_zero_pct=0
+[2026-02-10 16:07:41] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:41] [TILE_DRAW] tile=16700 fid=67108933 savedX=48 savedY=-24 x=48 y=0 pre=0 post=384
+[2026-02-10 16:07:41] [TILE_DRAW] tile=16702 fid=67108933 savedX=0 savedY=-12 x=0 y=0 pre=90 post=1240
+[2026-02-10 16:07:41] [TILE_DRAW] tile=16704 fid=67108934 savedX=-48 savedY=0 x=0 y=0 pre=370 post=900
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17096 fid=67108921 savedX=176 savedY=-24 x=176 y=0 pre=0 post=384
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17098 fid=67108933 savedX=128 savedY=-12 x=128 y=0 pre=90 post=1240
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17100 fid=67108933 savedX=80 savedY=0 x=80 y=0 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17102 fid=67108933 savedX=32 savedY=12 x=32 y=12 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17104 fid=67108933 savedX=-16 savedY=24 x=0 y=24 pre=502 post=1920
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17106 fid=67108933 savedX=-64 savedY=36 x=0 y=36 pre=282 post=420
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17492 fid=67108901 savedX=304 savedY=-24 x=304 y=0 pre=0 post=384
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17494 fid=67108919 savedX=256 savedY=-12 x=256 y=0 pre=90 post=1240
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17496 fid=67108927 savedX=208 savedY=0 x=208 y=0 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17498 fid=67108933 savedX=160 savedY=12 x=160 y=12 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17500 fid=67108933 savedX=112 savedY=24 x=112 y=24 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17502 fid=67108921 savedX=64 savedY=36 x=64 y=36 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17504 fid=67108921 savedX=16 savedY=48 x=16 y=48 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17506 fid=67108921 savedX=-32 savedY=60 x=0 y=60 pre=406 post=1446
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17888 fid=67108887 savedX=432 savedY=-24 x=432 y=0 pre=0 post=384
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17890 fid=67108907 savedX=384 savedY=-12 x=384 y=0 pre=90 post=1240
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17892 fid=67108905 savedX=336 savedY=0 x=336 y=0 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17894 fid=67108917 savedX=288 savedY=12 x=288 y=12 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17896 fid=67108921 savedX=240 savedY=24 x=240 y=24 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17898 fid=67108933 savedX=192 savedY=36 x=192 y=36 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17900 fid=67108933 savedX=144 savedY=48 x=144 y=48 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17902 fid=67108885 savedX=96 savedY=60 x=96 y=60 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17904 fid=67108913 savedX=48 savedY=72 x=48 y=72 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17906 fid=67108915 savedX=0 savedY=84 x=0 y=84 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=17908 fid=67108913 savedX=-48 savedY=96 x=0 y=96 pre=370 post=900
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18284 fid=67108885 savedX=560 savedY=-24 x=560 y=0 pre=0 post=384
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18286 fid=67108886 savedX=512 savedY=-12 x=512 y=0 pre=90 post=1240
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18288 fid=67108885 savedX=464 savedY=0 x=464 y=0 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18290 fid=67108888 savedX=416 savedY=12 x=416 y=12 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18292 fid=67108885 savedX=368 savedY=24 x=368 y=24 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18294 fid=67108919 savedX=320 savedY=36 x=320 y=36 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18296 fid=67108927 savedX=272 savedY=48 x=272 y=48 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18298 fid=67108921 savedX=224 savedY=60 x=224 y=60 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18300 fid=67108921 savedX=176 savedY=72 x=176 y=72 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18302 fid=67108911 savedX=128 savedY=84 x=128 y=84 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18304 fid=67108885 savedX=80 savedY=96 x=80 y=96 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18306 fid=67108888 savedX=32 savedY=108 x=32 y=108 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18308 fid=67108885 savedX=-16 savedY=120 x=0 y=120 pre=502 post=1920
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18310 fid=67108886 savedX=-64 savedY=132 x=0 y=132 pre=282 post=420
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18684 fid=67108909 savedX=592 savedY=0 x=592 y=0 pre=294 post=1300
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18686 fid=67108885 savedX=544 savedY=12 x=544 y=12 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18688 fid=67108923 savedX=496 savedY=24 x=496 y=24 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18690 fid=67108929 savedX=448 savedY=36 x=448 y=36 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18692 fid=67108886 savedX=400 savedY=48 x=400 y=48 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18694 fid=67108917 savedX=352 savedY=60 x=352 y=60 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18696 fid=67108921 savedX=304 savedY=72 x=304 y=72 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18698 fid=67108921 savedX=256 savedY=84 x=256 y=84 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18700 fid=67108921 savedX=208 savedY=96 x=208 y=96 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18702 fid=67108909 savedX=160 savedY=108 x=160 y=108 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18704 fid=67108887 savedX=112 savedY=120 x=112 y=120 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18706 fid=67108891 savedX=64 savedY=132 x=64 y=132 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18708 fid=67108889 savedX=16 savedY=144 x=16 y=144 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=18710 fid=67108885 savedX=-32 savedY=156 x=0 y=156 pre=406 post=1446
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19084 fid=67108909 savedX=624 savedY=24 x=624 y=24 pre=162 post=280
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19086 fid=67108886 savedX=576 savedY=36 x=576 y=36 pre=382 post=1780
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19088 fid=67108915 savedX=528 savedY=48 x=528 y=48 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19090 fid=67108931 savedX=480 savedY=60 x=480 y=60 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19092 fid=67108885 savedX=432 savedY=72 x=432 y=72 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19094 fid=67108930 savedX=384 savedY=84 x=384 y=84 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19096 fid=67108915 savedX=336 savedY=96 x=336 y=96 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19098 fid=67108913 savedX=288 savedY=108 x=288 y=108 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19100 fid=67108915 savedX=240 savedY=120 x=240 y=120 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19102 fid=67108931 savedX=192 savedY=132 x=192 y=132 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19104 fid=67108885 savedX=144 savedY=144 x=144 y=144 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19106 fid=67108895 savedX=96 savedY=156 x=96 y=156 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19108 fid=67108885 savedX=48 savedY=168 x=48 y=168 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19110 fid=67108886 savedX=0 savedY=180 x=0 y=180 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19112 fid=67108885 savedX=-48 savedY=192 x=0 y=192 pre=370 post=900
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19486 fid=67108885 savedX=608 savedY=60 x=608 y=60 pre=258 post=754
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19488 fid=67108887 savedX=560 savedY=72 x=560 y=72 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19490 fid=67108885 savedX=512 savedY=84 x=512 y=84 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19492 fid=67108886 savedX=464 savedY=96 x=464 y=96 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19494 fid=67108885 savedX=416 savedY=108 x=416 y=108 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19496 fid=67108887 savedX=368 savedY=120 x=368 y=120 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19498 fid=67108885 savedX=320 savedY=132 x=320 y=132 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19500 fid=67108886 savedX=272 savedY=144 x=272 y=144 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19502 fid=67108885 savedX=224 savedY=156 x=224 y=156 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19504 fid=67108887 savedX=176 savedY=168 x=176 y=168 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19506 fid=67108885 savedX=128 savedY=180 x=128 y=180 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19508 fid=67108886 savedX=80 savedY=192 x=80 y=192 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19510 fid=67108885 savedX=32 savedY=204 x=32 y=204 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19512 fid=67108887 savedX=-16 savedY=216 x=0 y=216 pre=502 post=1920
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19514 fid=67108885 savedX=-64 savedY=228 x=0 y=228 pre=282 post=420
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19888 fid=67108923 savedX=592 savedY=96 x=592 y=96 pre=294 post=1300
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19890 fid=67108929 savedX=544 savedY=108 x=544 y=108 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19892 fid=67108885 savedX=496 savedY=120 x=496 y=120 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19894 fid=67108886 savedX=448 savedY=132 x=448 y=132 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19896 fid=67108923 savedX=400 savedY=144 x=400 y=144 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19898 fid=67108925 savedX=352 savedY=156 x=352 y=156 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19900 fid=67108923 savedX=304 savedY=168 x=304 y=168 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19902 fid=67108925 savedX=256 savedY=180 x=256 y=180 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19904 fid=67108923 savedX=208 savedY=192 x=208 y=192 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19906 fid=67108925 savedX=160 savedY=204 x=160 y=204 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19908 fid=67108923 savedX=112 savedY=216 x=112 y=216 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19910 fid=67108929 savedX=64 savedY=228 x=64 y=228 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19912 fid=67108885 savedX=16 savedY=240 x=16 y=240 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=19914 fid=67108888 savedX=-32 savedY=252 x=0 y=252 pre=406 post=1446
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20288 fid=67108887 savedX=624 savedY=120 x=624 y=120 pre=162 post=280
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20290 fid=67108909 savedX=576 savedY=132 x=576 y=132 pre=382 post=1780
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20292 fid=67108886 savedX=528 savedY=144 x=528 y=144 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20294 fid=67108919 savedX=480 savedY=156 x=480 y=156 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20296 fid=67108921 savedX=432 savedY=168 x=432 y=168 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20298 fid=67108927 savedX=384 savedY=180 x=384 y=180 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20300 fid=67108935 savedX=336 savedY=192 x=336 y=192 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20302 fid=67108934 savedX=288 savedY=204 x=288 y=204 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20304 fid=67108935 savedX=240 savedY=216 x=240 y=216 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20306 fid=67108921 savedX=192 savedY=228 x=192 y=228 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20308 fid=67108927 savedX=144 savedY=240 x=144 y=240 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20310 fid=67108911 savedX=96 savedY=252 x=96 y=252 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20690 fid=67108909 savedX=608 savedY=156 x=608 y=156 pre=258 post=754
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20692 fid=67108885 savedX=560 savedY=168 x=560 y=168 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20694 fid=67108917 savedX=512 savedY=180 x=512 y=180 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20696 fid=67108927 savedX=464 savedY=192 x=464 y=192 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20698 fid=67108921 savedX=416 savedY=204 x=416 y=204 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20700 fid=67108934 savedX=368 savedY=216 x=368 y=216 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20702 fid=67108934 savedX=320 savedY=228 x=320 y=228 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20704 fid=67108934 savedX=272 savedY=240 x=272 y=240 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=20706 fid=67108934 savedX=224 savedY=252 x=224 y=252 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21092 fid=67108886 savedX=592 savedY=192 x=592 y=192 pre=294 post=1300
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21094 fid=67108919 savedX=544 savedY=204 x=544 y=204 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21096 fid=67108921 savedX=496 savedY=216 x=496 y=216 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21098 fid=67108927 savedX=448 savedY=228 x=448 y=228 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21100 fid=67108935 savedX=400 savedY=240 x=400 y=240 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21102 fid=67108934 savedX=352 savedY=252 x=352 y=252 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21492 fid=67108886 savedX=624 savedY=216 x=624 y=216 pre=162 post=280
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21494 fid=67108917 savedX=576 savedY=228 x=576 y=228 pre=382 post=1780
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21496 fid=67108927 savedX=528 savedY=240 x=528 y=240 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21498 fid=67108921 savedX=480 savedY=252 x=480 y=252 pre=664 post=2200
+[2026-02-10 16:07:41] [TILE_DRAW] tile=21894 fid=67108930 savedX=608 savedY=252 x=608 y=252 pre=258 post=754
+[2026-02-10 16:07:41] [SQUARE_RENDER_FLOOR_DRAWN] minX=41 maxX=58 minY=42 maxY=58 drawn=306 drawn_top=216
+[2026-02-10 16:07:41] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_FLOOR" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:41] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:41] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_PRE_ROOF" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:41] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:41] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_ROOF" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:41] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:41] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_POST_ROOF" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:41] [DISPLAY_TOP_PIXELS] top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:41] [AUTORUN_MAP] load_end map="V13ENT.MAP" rc=0
+[2026-02-10 16:07:42] [TILE_REFRESH_DISPLAY] called
+[2026-02-10 16:07:42] [REFRESH_GAME] rect=0,0,639,379
+[2026-02-10 16:07:42] [DISPLAY_STAGE_TOP_PIXELS] stage="BEFORE_DRAW" top_pixels=166400 non_zero=0 non_zero_pct=0
+[2026-02-10 16:07:42] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:42] [TILE_DRAW] tile=16700 fid=67108933 savedX=48 savedY=-24 x=48 y=0 pre=0 post=384
+[2026-02-10 16:07:42] [TILE_DRAW] tile=16702 fid=67108933 savedX=0 savedY=-12 x=0 y=0 pre=90 post=1240
+[2026-02-10 16:07:42] [TILE_DRAW] tile=16704 fid=67108934 savedX=-48 savedY=0 x=0 y=0 pre=370 post=900
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17096 fid=67108921 savedX=176 savedY=-24 x=176 y=0 pre=0 post=384
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17098 fid=67108933 savedX=128 savedY=-12 x=128 y=0 pre=90 post=1240
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17100 fid=67108933 savedX=80 savedY=0 x=80 y=0 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17102 fid=67108933 savedX=32 savedY=12 x=32 y=12 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17104 fid=67108933 savedX=-16 savedY=24 x=0 y=24 pre=502 post=1920
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17106 fid=67108933 savedX=-64 savedY=36 x=0 y=36 pre=282 post=420
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17492 fid=67108901 savedX=304 savedY=-24 x=304 y=0 pre=0 post=384
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17494 fid=67108919 savedX=256 savedY=-12 x=256 y=0 pre=90 post=1240
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17496 fid=67108927 savedX=208 savedY=0 x=208 y=0 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17498 fid=67108933 savedX=160 savedY=12 x=160 y=12 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17500 fid=67108933 savedX=112 savedY=24 x=112 y=24 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17502 fid=67108921 savedX=64 savedY=36 x=64 y=36 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17504 fid=67108921 savedX=16 savedY=48 x=16 y=48 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17506 fid=67108921 savedX=-32 savedY=60 x=0 y=60 pre=406 post=1446
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17888 fid=67108887 savedX=432 savedY=-24 x=432 y=0 pre=0 post=384
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17890 fid=67108907 savedX=384 savedY=-12 x=384 y=0 pre=90 post=1240
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17892 fid=67108905 savedX=336 savedY=0 x=336 y=0 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17894 fid=67108917 savedX=288 savedY=12 x=288 y=12 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17896 fid=67108921 savedX=240 savedY=24 x=240 y=24 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17898 fid=67108933 savedX=192 savedY=36 x=192 y=36 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17900 fid=67108933 savedX=144 savedY=48 x=144 y=48 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17902 fid=67108885 savedX=96 savedY=60 x=96 y=60 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17904 fid=67108913 savedX=48 savedY=72 x=48 y=72 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17906 fid=67108915 savedX=0 savedY=84 x=0 y=84 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=17908 fid=67108913 savedX=-48 savedY=96 x=0 y=96 pre=370 post=900
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18284 fid=67108885 savedX=560 savedY=-24 x=560 y=0 pre=0 post=384
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18286 fid=67108886 savedX=512 savedY=-12 x=512 y=0 pre=90 post=1240
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18288 fid=67108885 savedX=464 savedY=0 x=464 y=0 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18290 fid=67108888 savedX=416 savedY=12 x=416 y=12 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18292 fid=67108885 savedX=368 savedY=24 x=368 y=24 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18294 fid=67108919 savedX=320 savedY=36 x=320 y=36 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18296 fid=67108927 savedX=272 savedY=48 x=272 y=48 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18298 fid=67108921 savedX=224 savedY=60 x=224 y=60 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18300 fid=67108921 savedX=176 savedY=72 x=176 y=72 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18302 fid=67108911 savedX=128 savedY=84 x=128 y=84 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18304 fid=67108885 savedX=80 savedY=96 x=80 y=96 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18306 fid=67108888 savedX=32 savedY=108 x=32 y=108 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18308 fid=67108885 savedX=-16 savedY=120 x=0 y=120 pre=502 post=1920
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18310 fid=67108886 savedX=-64 savedY=132 x=0 y=132 pre=282 post=420
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18684 fid=67108909 savedX=592 savedY=0 x=592 y=0 pre=294 post=1300
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18686 fid=67108885 savedX=544 savedY=12 x=544 y=12 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18688 fid=67108923 savedX=496 savedY=24 x=496 y=24 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18690 fid=67108929 savedX=448 savedY=36 x=448 y=36 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18692 fid=67108886 savedX=400 savedY=48 x=400 y=48 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18694 fid=67108917 savedX=352 savedY=60 x=352 y=60 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18696 fid=67108921 savedX=304 savedY=72 x=304 y=72 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18698 fid=67108921 savedX=256 savedY=84 x=256 y=84 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18700 fid=67108921 savedX=208 savedY=96 x=208 y=96 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18702 fid=67108909 savedX=160 savedY=108 x=160 y=108 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18704 fid=67108887 savedX=112 savedY=120 x=112 y=120 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18706 fid=67108891 savedX=64 savedY=132 x=64 y=132 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18708 fid=67108889 savedX=16 savedY=144 x=16 y=144 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=18710 fid=67108885 savedX=-32 savedY=156 x=0 y=156 pre=406 post=1446
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19084 fid=67108909 savedX=624 savedY=24 x=624 y=24 pre=162 post=280
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19086 fid=67108886 savedX=576 savedY=36 x=576 y=36 pre=382 post=1780
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19088 fid=67108915 savedX=528 savedY=48 x=528 y=48 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19090 fid=67108931 savedX=480 savedY=60 x=480 y=60 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19092 fid=67108885 savedX=432 savedY=72 x=432 y=72 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19094 fid=67108930 savedX=384 savedY=84 x=384 y=84 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19096 fid=67108915 savedX=336 savedY=96 x=336 y=96 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19098 fid=67108913 savedX=288 savedY=108 x=288 y=108 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19100 fid=67108915 savedX=240 savedY=120 x=240 y=120 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19102 fid=67108931 savedX=192 savedY=132 x=192 y=132 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19104 fid=67108885 savedX=144 savedY=144 x=144 y=144 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19106 fid=67108895 savedX=96 savedY=156 x=96 y=156 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19108 fid=67108885 savedX=48 savedY=168 x=48 y=168 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19110 fid=67108886 savedX=0 savedY=180 x=0 y=180 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19112 fid=67108885 savedX=-48 savedY=192 x=0 y=192 pre=370 post=900
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19486 fid=67108885 savedX=608 savedY=60 x=608 y=60 pre=258 post=754
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19488 fid=67108887 savedX=560 savedY=72 x=560 y=72 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19490 fid=67108885 savedX=512 savedY=84 x=512 y=84 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19492 fid=67108886 savedX=464 savedY=96 x=464 y=96 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19494 fid=67108885 savedX=416 savedY=108 x=416 y=108 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19496 fid=67108887 savedX=368 savedY=120 x=368 y=120 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19498 fid=67108885 savedX=320 savedY=132 x=320 y=132 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19500 fid=67108886 savedX=272 savedY=144 x=272 y=144 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19502 fid=67108885 savedX=224 savedY=156 x=224 y=156 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19504 fid=67108887 savedX=176 savedY=168 x=176 y=168 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19506 fid=67108885 savedX=128 savedY=180 x=128 y=180 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19508 fid=67108886 savedX=80 savedY=192 x=80 y=192 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19510 fid=67108885 savedX=32 savedY=204 x=32 y=204 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19512 fid=67108887 savedX=-16 savedY=216 x=0 y=216 pre=502 post=1920
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19514 fid=67108885 savedX=-64 savedY=228 x=0 y=228 pre=282 post=420
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19888 fid=67108923 savedX=592 savedY=96 x=592 y=96 pre=294 post=1300
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19890 fid=67108929 savedX=544 savedY=108 x=544 y=108 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19892 fid=67108885 savedX=496 savedY=120 x=496 y=120 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19894 fid=67108886 savedX=448 savedY=132 x=448 y=132 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19896 fid=67108923 savedX=400 savedY=144 x=400 y=144 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19898 fid=67108925 savedX=352 savedY=156 x=352 y=156 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19900 fid=67108923 savedX=304 savedY=168 x=304 y=168 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19902 fid=67108925 savedX=256 savedY=180 x=256 y=180 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19904 fid=67108923 savedX=208 savedY=192 x=208 y=192 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19906 fid=67108925 savedX=160 savedY=204 x=160 y=204 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19908 fid=67108923 savedX=112 savedY=216 x=112 y=216 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19910 fid=67108929 savedX=64 savedY=228 x=64 y=228 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19912 fid=67108885 savedX=16 savedY=240 x=16 y=240 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=19914 fid=67108888 savedX=-32 savedY=252 x=0 y=252 pre=406 post=1446
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20288 fid=67108887 savedX=624 savedY=120 x=624 y=120 pre=162 post=280
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20290 fid=67108909 savedX=576 savedY=132 x=576 y=132 pre=382 post=1780
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20292 fid=67108886 savedX=528 savedY=144 x=528 y=144 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20294 fid=67108919 savedX=480 savedY=156 x=480 y=156 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20296 fid=67108921 savedX=432 savedY=168 x=432 y=168 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20298 fid=67108927 savedX=384 savedY=180 x=384 y=180 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20300 fid=67108935 savedX=336 savedY=192 x=336 y=192 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20302 fid=67108934 savedX=288 savedY=204 x=288 y=204 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20304 fid=67108935 savedX=240 savedY=216 x=240 y=216 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20306 fid=67108921 savedX=192 savedY=228 x=192 y=228 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20308 fid=67108927 savedX=144 savedY=240 x=144 y=240 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20310 fid=67108911 savedX=96 savedY=252 x=96 y=252 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20690 fid=67108909 savedX=608 savedY=156 x=608 y=156 pre=258 post=754
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20692 fid=67108885 savedX=560 savedY=168 x=560 y=168 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20694 fid=67108917 savedX=512 savedY=180 x=512 y=180 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20696 fid=67108927 savedX=464 savedY=192 x=464 y=192 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20698 fid=67108921 savedX=416 savedY=204 x=416 y=204 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20700 fid=67108934 savedX=368 savedY=216 x=368 y=216 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20702 fid=67108934 savedX=320 savedY=228 x=320 y=228 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20704 fid=67108934 savedX=272 savedY=240 x=272 y=240 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=20706 fid=67108934 savedX=224 savedY=252 x=224 y=252 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21092 fid=67108886 savedX=592 savedY=192 x=592 y=192 pre=294 post=1300
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21094 fid=67108919 savedX=544 savedY=204 x=544 y=204 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21096 fid=67108921 savedX=496 savedY=216 x=496 y=216 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21098 fid=67108927 savedX=448 savedY=228 x=448 y=228 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21100 fid=67108935 savedX=400 savedY=240 x=400 y=240 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21102 fid=67108934 savedX=352 savedY=252 x=352 y=252 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21492 fid=67108886 savedX=624 savedY=216 x=624 y=216 pre=162 post=280
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21494 fid=67108917 savedX=576 savedY=228 x=576 y=228 pre=382 post=1780
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21496 fid=67108927 savedX=528 savedY=240 x=528 y=240 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21498 fid=67108921 savedX=480 savedY=252 x=480 y=252 pre=664 post=2200
+[2026-02-10 16:07:42] [TILE_DRAW] tile=21894 fid=67108930 savedX=608 savedY=252 x=608 y=252 pre=258 post=754
+[2026-02-10 16:07:42] [SQUARE_RENDER_FLOOR_DRAWN] minX=41 maxX=58 minY=42 maxY=58 drawn=306 drawn_top=216
+[2026-02-10 16:07:42] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_FLOOR" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:42] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:42] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_PRE_ROOF" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:42] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:42] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_ROOF" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:42] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-704,-264,2271,1507 rc=0
+[2026-02-10 16:07:42] [DISPLAY_STAGE_TOP_PIXELS] stage="AFTER_POST_ROOF" top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:42] [DISPLAY_TOP_PIXELS] top_pixels=166400 non_zero=166400 non_zero_pct=100
+[2026-02-10 16:07:42] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(0,0,639,239) inter=(0,0,639,239) compW=640 compH=240 src=0xb0394c010 comp=0xb039b0010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=0 srcRow=0xb0394c010 dstRow=0xb039b0010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=1 srcRow=0xb0394c290 dstRow=0xb039b0290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=2 srcRow=0xb0394c510 dstRow=0xb039b0510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=3 srcRow=0xb0394c790 dstRow=0xb039b0790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=4 srcRow=0xb0394ca10 dstRow=0xb039b0a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=5 srcRow=0xb0394cc90 dstRow=0xb039b0c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=6 srcRow=0xb0394cf10 dstRow=0xb039b0f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=7 srcRow=0xb0394d190 dstRow=0xb039b1190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=8 srcRow=0xb0394d410 dstRow=0xb039b1410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=9 srcRow=0xb0394d690 dstRow=0xb039b1690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=10 srcRow=0xb0394d910 dstRow=0xb039b1910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=11 srcRow=0xb0394db90 dstRow=0xb039b1b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=12 srcRow=0xb0394de10 dstRow=0xb039b1e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=13 srcRow=0xb0394e090 dstRow=0xb039b2090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=14 srcRow=0xb0394e310 dstRow=0xb039b2310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=15 srcRow=0xb0394e590 dstRow=0xb039b2590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=16 srcRow=0xb0394e810 dstRow=0xb039b2810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=17 srcRow=0xb0394ea90 dstRow=0xb039b2a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=18 srcRow=0xb0394ed10 dstRow=0xb039b2d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=19 srcRow=0xb0394ef90 dstRow=0xb039b2f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=20 srcRow=0xb0394f210 dstRow=0xb039b3210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=21 srcRow=0xb0394f490 dstRow=0xb039b3490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=22 srcRow=0xb0394f710 dstRow=0xb039b3710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=23 srcRow=0xb0394f990 dstRow=0xb039b3990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=24 srcRow=0xb0394fc10 dstRow=0xb039b3c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=25 srcRow=0xb0394fe90 dstRow=0xb039b3e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=26 srcRow=0xb03950110 dstRow=0xb039b4110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=27 srcRow=0xb03950390 dstRow=0xb039b4390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=28 srcRow=0xb03950610 dstRow=0xb039b4610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=29 srcRow=0xb03950890 dstRow=0xb039b4890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=30 srcRow=0xb03950b10 dstRow=0xb039b4b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=31 srcRow=0xb03950d90 dstRow=0xb039b4d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=32 srcRow=0xb03951010 dstRow=0xb039b5010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=33 srcRow=0xb03951290 dstRow=0xb039b5290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=34 srcRow=0xb03951510 dstRow=0xb039b5510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=35 srcRow=0xb03951790 dstRow=0xb039b5790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=36 srcRow=0xb03951a10 dstRow=0xb039b5a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=37 srcRow=0xb03951c90 dstRow=0xb039b5c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=38 srcRow=0xb03951f10 dstRow=0xb039b5f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=39 srcRow=0xb03952190 dstRow=0xb039b6190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=40 srcRow=0xb03952410 dstRow=0xb039b6410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=41 srcRow=0xb03952690 dstRow=0xb039b6690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=42 srcRow=0xb03952910 dstRow=0xb039b6910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=43 srcRow=0xb03952b90 dstRow=0xb039b6b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=44 srcRow=0xb03952e10 dstRow=0xb039b6e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=45 srcRow=0xb03953090 dstRow=0xb039b7090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=46 srcRow=0xb03953310 dstRow=0xb039b7310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=47 srcRow=0xb03953590 dstRow=0xb039b7590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=48 srcRow=0xb03953810 dstRow=0xb039b7810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=49 srcRow=0xb03953a90 dstRow=0xb039b7a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=50 srcRow=0xb03953d10 dstRow=0xb039b7d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=51 srcRow=0xb03953f90 dstRow=0xb039b7f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=52 srcRow=0xb03954210 dstRow=0xb039b8210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=53 srcRow=0xb03954490 dstRow=0xb039b8490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=54 srcRow=0xb03954710 dstRow=0xb039b8710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=55 srcRow=0xb03954990 dstRow=0xb039b8990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=56 srcRow=0xb03954c10 dstRow=0xb039b8c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=57 srcRow=0xb03954e90 dstRow=0xb039b8e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=58 srcRow=0xb03955110 dstRow=0xb039b9110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=59 srcRow=0xb03955390 dstRow=0xb039b9390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=60 srcRow=0xb03955610 dstRow=0xb039b9610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=61 srcRow=0xb03955890 dstRow=0xb039b9890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=62 srcRow=0xb03955b10 dstRow=0xb039b9b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=63 srcRow=0xb03955d90 dstRow=0xb039b9d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=64 srcRow=0xb03956010 dstRow=0xb039ba010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=65 srcRow=0xb03956290 dstRow=0xb039ba290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=66 srcRow=0xb03956510 dstRow=0xb039ba510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=67 srcRow=0xb03956790 dstRow=0xb039ba790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=68 srcRow=0xb03956a10 dstRow=0xb039baa10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=69 srcRow=0xb03956c90 dstRow=0xb039bac90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=70 srcRow=0xb03956f10 dstRow=0xb039baf10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=71 srcRow=0xb03957190 dstRow=0xb039bb190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=72 srcRow=0xb03957410 dstRow=0xb039bb410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=73 srcRow=0xb03957690 dstRow=0xb039bb690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=74 srcRow=0xb03957910 dstRow=0xb039bb910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=75 srcRow=0xb03957b90 dstRow=0xb039bbb90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=76 srcRow=0xb03957e10 dstRow=0xb039bbe10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=77 srcRow=0xb03958090 dstRow=0xb039bc090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=78 srcRow=0xb03958310 dstRow=0xb039bc310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=79 srcRow=0xb03958590 dstRow=0xb039bc590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=80 srcRow=0xb03958810 dstRow=0xb039bc810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=81 srcRow=0xb03958a90 dstRow=0xb039bca90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=82 srcRow=0xb03958d10 dstRow=0xb039bcd10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=83 srcRow=0xb03958f90 dstRow=0xb039bcf90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=84 srcRow=0xb03959210 dstRow=0xb039bd210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=85 srcRow=0xb03959490 dstRow=0xb039bd490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=86 srcRow=0xb03959710 dstRow=0xb039bd710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=87 srcRow=0xb03959990 dstRow=0xb039bd990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=88 srcRow=0xb03959c10 dstRow=0xb039bdc10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=89 srcRow=0xb03959e90 dstRow=0xb039bde90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=90 srcRow=0xb0395a110 dstRow=0xb039be110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=91 srcRow=0xb0395a390 dstRow=0xb039be390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=92 srcRow=0xb0395a610 dstRow=0xb039be610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=93 srcRow=0xb0395a890 dstRow=0xb039be890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=94 srcRow=0xb0395ab10 dstRow=0xb039beb10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=95 srcRow=0xb0395ad90 dstRow=0xb039bed90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=96 srcRow=0xb0395b010 dstRow=0xb039bf010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=97 srcRow=0xb0395b290 dstRow=0xb039bf290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=98 srcRow=0xb0395b510 dstRow=0xb039bf510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=99 srcRow=0xb0395b790 dstRow=0xb039bf790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=100 srcRow=0xb0395ba10 dstRow=0xb039bfa10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=101 srcRow=0xb0395bc90 dstRow=0xb039bfc90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=102 srcRow=0xb0395bf10 dstRow=0xb039bff10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=103 srcRow=0xb0395c190 dstRow=0xb039c0190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=104 srcRow=0xb0395c410 dstRow=0xb039c0410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=105 srcRow=0xb0395c690 dstRow=0xb039c0690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=106 srcRow=0xb0395c910 dstRow=0xb039c0910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=107 srcRow=0xb0395cb90 dstRow=0xb039c0b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=108 srcRow=0xb0395ce10 dstRow=0xb039c0e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=109 srcRow=0xb0395d090 dstRow=0xb039c1090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=110 srcRow=0xb0395d310 dstRow=0xb039c1310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=111 srcRow=0xb0395d590 dstRow=0xb039c1590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=112 srcRow=0xb0395d810 dstRow=0xb039c1810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=113 srcRow=0xb0395da90 dstRow=0xb039c1a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=114 srcRow=0xb0395dd10 dstRow=0xb039c1d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=115 srcRow=0xb0395df90 dstRow=0xb039c1f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=116 srcRow=0xb0395e210 dstRow=0xb039c2210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=117 srcRow=0xb0395e490 dstRow=0xb039c2490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=118 srcRow=0xb0395e710 dstRow=0xb039c2710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=119 srcRow=0xb0395e990 dstRow=0xb039c2990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=120 srcRow=0xb0395ec10 dstRow=0xb039c2c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=121 srcRow=0xb0395ee90 dstRow=0xb039c2e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=122 srcRow=0xb0395f110 dstRow=0xb039c3110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=123 srcRow=0xb0395f390 dstRow=0xb039c3390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=124 srcRow=0xb0395f610 dstRow=0xb039c3610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=125 srcRow=0xb0395f890 dstRow=0xb039c3890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=126 srcRow=0xb0395fb10 dstRow=0xb039c3b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=127 srcRow=0xb0395fd90 dstRow=0xb039c3d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=128 srcRow=0xb03960010 dstRow=0xb039c4010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=129 srcRow=0xb03960290 dstRow=0xb039c4290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=130 srcRow=0xb03960510 dstRow=0xb039c4510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=131 srcRow=0xb03960790 dstRow=0xb039c4790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=132 srcRow=0xb03960a10 dstRow=0xb039c4a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=133 srcRow=0xb03960c90 dstRow=0xb039c4c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=134 srcRow=0xb03960f10 dstRow=0xb039c4f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=135 srcRow=0xb03961190 dstRow=0xb039c5190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=136 srcRow=0xb03961410 dstRow=0xb039c5410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=137 srcRow=0xb03961690 dstRow=0xb039c5690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=138 srcRow=0xb03961910 dstRow=0xb039c5910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=139 srcRow=0xb03961b90 dstRow=0xb039c5b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=140 srcRow=0xb03961e10 dstRow=0xb039c5e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=141 srcRow=0xb03962090 dstRow=0xb039c6090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=142 srcRow=0xb03962310 dstRow=0xb039c6310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=143 srcRow=0xb03962590 dstRow=0xb039c6590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=144 srcRow=0xb03962810 dstRow=0xb039c6810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=145 srcRow=0xb03962a90 dstRow=0xb039c6a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=146 srcRow=0xb03962d10 dstRow=0xb039c6d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=147 srcRow=0xb03962f90 dstRow=0xb039c6f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=148 srcRow=0xb03963210 dstRow=0xb039c7210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=149 srcRow=0xb03963490 dstRow=0xb039c7490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=150 srcRow=0xb03963710 dstRow=0xb039c7710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=151 srcRow=0xb03963990 dstRow=0xb039c7990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=152 srcRow=0xb03963c10 dstRow=0xb039c7c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=153 srcRow=0xb03963e90 dstRow=0xb039c7e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=154 srcRow=0xb03964110 dstRow=0xb039c8110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=155 srcRow=0xb03964390 dstRow=0xb039c8390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=156 srcRow=0xb03964610 dstRow=0xb039c8610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=157 srcRow=0xb03964890 dstRow=0xb039c8890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=158 srcRow=0xb03964b10 dstRow=0xb039c8b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=159 srcRow=0xb03964d90 dstRow=0xb039c8d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=160 srcRow=0xb03965010 dstRow=0xb039c9010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=161 srcRow=0xb03965290 dstRow=0xb039c9290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=162 srcRow=0xb03965510 dstRow=0xb039c9510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=163 srcRow=0xb03965790 dstRow=0xb039c9790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=164 srcRow=0xb03965a10 dstRow=0xb039c9a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=165 srcRow=0xb03965c90 dstRow=0xb039c9c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=166 srcRow=0xb03965f10 dstRow=0xb039c9f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=167 srcRow=0xb03966190 dstRow=0xb039ca190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=168 srcRow=0xb03966410 dstRow=0xb039ca410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=169 srcRow=0xb03966690 dstRow=0xb039ca690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=170 srcRow=0xb03966910 dstRow=0xb039ca910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=171 srcRow=0xb03966b90 dstRow=0xb039cab90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=172 srcRow=0xb03966e10 dstRow=0xb039cae10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=173 srcRow=0xb03967090 dstRow=0xb039cb090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=174 srcRow=0xb03967310 dstRow=0xb039cb310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=175 srcRow=0xb03967590 dstRow=0xb039cb590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=176 srcRow=0xb03967810 dstRow=0xb039cb810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=177 srcRow=0xb03967a90 dstRow=0xb039cba90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=178 srcRow=0xb03967d10 dstRow=0xb039cbd10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=179 srcRow=0xb03967f90 dstRow=0xb039cbf90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=180 srcRow=0xb03968210 dstRow=0xb039cc210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=181 srcRow=0xb03968490 dstRow=0xb039cc490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=182 srcRow=0xb03968710 dstRow=0xb039cc710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=183 srcRow=0xb03968990 dstRow=0xb039cc990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=184 srcRow=0xb03968c10 dstRow=0xb039ccc10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=185 srcRow=0xb03968e90 dstRow=0xb039cce90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=186 srcRow=0xb03969110 dstRow=0xb039cd110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=187 srcRow=0xb03969390 dstRow=0xb039cd390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=188 srcRow=0xb03969610 dstRow=0xb039cd610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=189 srcRow=0xb03969890 dstRow=0xb039cd890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=190 srcRow=0xb03969b10 dstRow=0xb039cdb10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=191 srcRow=0xb03969d90 dstRow=0xb039cdd90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=192 srcRow=0xb0396a010 dstRow=0xb039ce010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=193 srcRow=0xb0396a290 dstRow=0xb039ce290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=194 srcRow=0xb0396a510 dstRow=0xb039ce510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=195 srcRow=0xb0396a790 dstRow=0xb039ce790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=196 srcRow=0xb0396aa10 dstRow=0xb039cea10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=197 srcRow=0xb0396ac90 dstRow=0xb039cec90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=198 srcRow=0xb0396af10 dstRow=0xb039cef10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=199 srcRow=0xb0396b190 dstRow=0xb039cf190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=200 srcRow=0xb0396b410 dstRow=0xb039cf410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=201 srcRow=0xb0396b690 dstRow=0xb039cf690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=202 srcRow=0xb0396b910 dstRow=0xb039cf910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=203 srcRow=0xb0396bb90 dstRow=0xb039cfb90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=204 srcRow=0xb0396be10 dstRow=0xb039cfe10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=205 srcRow=0xb0396c090 dstRow=0xb039d0090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=206 srcRow=0xb0396c310 dstRow=0xb039d0310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=207 srcRow=0xb0396c590 dstRow=0xb039d0590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=208 srcRow=0xb0396c810 dstRow=0xb039d0810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=209 srcRow=0xb0396ca90 dstRow=0xb039d0a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=210 srcRow=0xb0396cd10 dstRow=0xb039d0d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=211 srcRow=0xb0396cf90 dstRow=0xb039d0f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=212 srcRow=0xb0396d210 dstRow=0xb039d1210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=213 srcRow=0xb0396d490 dstRow=0xb039d1490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=214 srcRow=0xb0396d710 dstRow=0xb039d1710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=215 srcRow=0xb0396d990 dstRow=0xb039d1990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=216 srcRow=0xb0396dc10 dstRow=0xb039d1c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=217 srcRow=0xb0396de90 dstRow=0xb039d1e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=218 srcRow=0xb0396e110 dstRow=0xb039d2110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=219 srcRow=0xb0396e390 dstRow=0xb039d2390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=220 srcRow=0xb0396e610 dstRow=0xb039d2610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=221 srcRow=0xb0396e890 dstRow=0xb039d2890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=222 srcRow=0xb0396eb10 dstRow=0xb039d2b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=223 srcRow=0xb0396ed90 dstRow=0xb039d2d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=224 srcRow=0xb0396f010 dstRow=0xb039d3010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=225 srcRow=0xb0396f290 dstRow=0xb039d3290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=226 srcRow=0xb0396f510 dstRow=0xb039d3510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=227 srcRow=0xb0396f790 dstRow=0xb039d3790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=228 srcRow=0xb0396fa10 dstRow=0xb039d3a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=229 srcRow=0xb0396fc90 dstRow=0xb039d3c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=230 srcRow=0xb0396ff10 dstRow=0xb039d3f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=231 srcRow=0xb03970190 dstRow=0xb039d4190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=232 srcRow=0xb03970410 dstRow=0xb039d4410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=233 srcRow=0xb03970690 dstRow=0xb039d4690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=234 srcRow=0xb03970910 dstRow=0xb039d4910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=235 srcRow=0xb03970b90 dstRow=0xb039d4b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=236 srcRow=0xb03970e10 dstRow=0xb039d4e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=237 srcRow=0xb03971090 dstRow=0xb039d5090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=238 srcRow=0xb03971310 dstRow=0xb039d5310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=239 srcRow=0xb03971590 dstRow=0xb039d5590
+[2026-02-10 16:07:42] [DEBUG_MEM] compBuf=0xb039b0010 compW=640 compH=240 buf=0xb03988010
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb03988010
+[2026-02-10 16:07:42] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(0,241,639,379) inter=(0,241,639,379) compW=640 compH=139 src=0xb0394c010 comp=0xb039a0010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=0 srcRow=0xb03971a90 dstRow=0xb039a0010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=1 srcRow=0xb03971d10 dstRow=0xb039a0290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=2 srcRow=0xb03971f90 dstRow=0xb039a0510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=3 srcRow=0xb03972210 dstRow=0xb039a0790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=4 srcRow=0xb03972490 dstRow=0xb039a0a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=5 srcRow=0xb03972710 dstRow=0xb039a0c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=6 srcRow=0xb03972990 dstRow=0xb039a0f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=7 srcRow=0xb03972c10 dstRow=0xb039a1190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=8 srcRow=0xb03972e90 dstRow=0xb039a1410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=9 srcRow=0xb03973110 dstRow=0xb039a1690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=10 srcRow=0xb03973390 dstRow=0xb039a1910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=11 srcRow=0xb03973610 dstRow=0xb039a1b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=12 srcRow=0xb03973890 dstRow=0xb039a1e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=13 srcRow=0xb03973b10 dstRow=0xb039a2090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=14 srcRow=0xb03973d90 dstRow=0xb039a2310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=15 srcRow=0xb03974010 dstRow=0xb039a2590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=16 srcRow=0xb03974290 dstRow=0xb039a2810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=17 srcRow=0xb03974510 dstRow=0xb039a2a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=18 srcRow=0xb03974790 dstRow=0xb039a2d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=19 srcRow=0xb03974a10 dstRow=0xb039a2f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=20 srcRow=0xb03974c90 dstRow=0xb039a3210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=21 srcRow=0xb03974f10 dstRow=0xb039a3490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=22 srcRow=0xb03975190 dstRow=0xb039a3710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=23 srcRow=0xb03975410 dstRow=0xb039a3990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=24 srcRow=0xb03975690 dstRow=0xb039a3c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=25 srcRow=0xb03975910 dstRow=0xb039a3e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=26 srcRow=0xb03975b90 dstRow=0xb039a4110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=27 srcRow=0xb03975e10 dstRow=0xb039a4390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=28 srcRow=0xb03976090 dstRow=0xb039a4610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=29 srcRow=0xb03976310 dstRow=0xb039a4890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=30 srcRow=0xb03976590 dstRow=0xb039a4b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=31 srcRow=0xb03976810 dstRow=0xb039a4d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=32 srcRow=0xb03976a90 dstRow=0xb039a5010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=33 srcRow=0xb03976d10 dstRow=0xb039a5290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=34 srcRow=0xb03976f90 dstRow=0xb039a5510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=35 srcRow=0xb03977210 dstRow=0xb039a5790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=36 srcRow=0xb03977490 dstRow=0xb039a5a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=37 srcRow=0xb03977710 dstRow=0xb039a5c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=38 srcRow=0xb03977990 dstRow=0xb039a5f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=39 srcRow=0xb03977c10 dstRow=0xb039a6190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=40 srcRow=0xb03977e90 dstRow=0xb039a6410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=41 srcRow=0xb03978110 dstRow=0xb039a6690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=42 srcRow=0xb03978390 dstRow=0xb039a6910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=43 srcRow=0xb03978610 dstRow=0xb039a6b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=44 srcRow=0xb03978890 dstRow=0xb039a6e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=45 srcRow=0xb03978b10 dstRow=0xb039a7090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=46 srcRow=0xb03978d90 dstRow=0xb039a7310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=47 srcRow=0xb03979010 dstRow=0xb039a7590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=48 srcRow=0xb03979290 dstRow=0xb039a7810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=49 srcRow=0xb03979510 dstRow=0xb039a7a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=50 srcRow=0xb03979790 dstRow=0xb039a7d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=51 srcRow=0xb03979a10 dstRow=0xb039a7f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=52 srcRow=0xb03979c90 dstRow=0xb039a8210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=53 srcRow=0xb03979f10 dstRow=0xb039a8490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=54 srcRow=0xb0397a190 dstRow=0xb039a8710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=55 srcRow=0xb0397a410 dstRow=0xb039a8990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=56 srcRow=0xb0397a690 dstRow=0xb039a8c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=57 srcRow=0xb0397a910 dstRow=0xb039a8e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=58 srcRow=0xb0397ab90 dstRow=0xb039a9110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=59 srcRow=0xb0397ae10 dstRow=0xb039a9390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=60 srcRow=0xb0397b090 dstRow=0xb039a9610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=61 srcRow=0xb0397b310 dstRow=0xb039a9890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=62 srcRow=0xb0397b590 dstRow=0xb039a9b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=63 srcRow=0xb0397b810 dstRow=0xb039a9d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=64 srcRow=0xb0397ba90 dstRow=0xb039aa010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=65 srcRow=0xb0397bd10 dstRow=0xb039aa290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=66 srcRow=0xb0397bf90 dstRow=0xb039aa510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=67 srcRow=0xb0397c210 dstRow=0xb039aa790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=68 srcRow=0xb0397c490 dstRow=0xb039aaa10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=69 srcRow=0xb0397c710 dstRow=0xb039aac90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=70 srcRow=0xb0397c990 dstRow=0xb039aaf10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=71 srcRow=0xb0397cc10 dstRow=0xb039ab190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=72 srcRow=0xb0397ce90 dstRow=0xb039ab410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=73 srcRow=0xb0397d110 dstRow=0xb039ab690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=74 srcRow=0xb0397d390 dstRow=0xb039ab910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=75 srcRow=0xb0397d610 dstRow=0xb039abb90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=76 srcRow=0xb0397d890 dstRow=0xb039abe10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=77 srcRow=0xb0397db10 dstRow=0xb039ac090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=78 srcRow=0xb0397dd90 dstRow=0xb039ac310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=79 srcRow=0xb0397e010 dstRow=0xb039ac590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=80 srcRow=0xb0397e290 dstRow=0xb039ac810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=81 srcRow=0xb0397e510 dstRow=0xb039aca90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=82 srcRow=0xb0397e790 dstRow=0xb039acd10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=83 srcRow=0xb0397ea10 dstRow=0xb039acf90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=84 srcRow=0xb0397ec90 dstRow=0xb039ad210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=85 srcRow=0xb0397ef10 dstRow=0xb039ad490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=86 srcRow=0xb0397f190 dstRow=0xb039ad710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=87 srcRow=0xb0397f410 dstRow=0xb039ad990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=88 srcRow=0xb0397f690 dstRow=0xb039adc10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=89 srcRow=0xb0397f910 dstRow=0xb039ade90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=90 srcRow=0xb0397fb90 dstRow=0xb039ae110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=91 srcRow=0xb0397fe10 dstRow=0xb039ae390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=92 srcRow=0xb03980090 dstRow=0xb039ae610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=93 srcRow=0xb03980310 dstRow=0xb039ae890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=94 srcRow=0xb03980590 dstRow=0xb039aeb10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=95 srcRow=0xb03980810 dstRow=0xb039aed90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=96 srcRow=0xb03980a90 dstRow=0xb039af010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=97 srcRow=0xb03980d10 dstRow=0xb039af290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=98 srcRow=0xb03980f90 dstRow=0xb039af510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=99 srcRow=0xb03981210 dstRow=0xb039af790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=100 srcRow=0xb03981490 dstRow=0xb039afa10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=101 srcRow=0xb03981710 dstRow=0xb039afc90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=102 srcRow=0xb03981990 dstRow=0xb039aff10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=103 srcRow=0xb03981c10 dstRow=0xb039b0190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=104 srcRow=0xb03981e90 dstRow=0xb039b0410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=105 srcRow=0xb03982110 dstRow=0xb039b0690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=106 srcRow=0xb03982390 dstRow=0xb039b0910
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=107 srcRow=0xb03982610 dstRow=0xb039b0b90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=108 srcRow=0xb03982890 dstRow=0xb039b0e10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=109 srcRow=0xb03982b10 dstRow=0xb039b1090
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=110 srcRow=0xb03982d90 dstRow=0xb039b1310
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=111 srcRow=0xb03983010 dstRow=0xb039b1590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=112 srcRow=0xb03983290 dstRow=0xb039b1810
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=113 srcRow=0xb03983510 dstRow=0xb039b1a90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=114 srcRow=0xb03983790 dstRow=0xb039b1d10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=115 srcRow=0xb03983a10 dstRow=0xb039b1f90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=116 srcRow=0xb03983c90 dstRow=0xb039b2210
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=117 srcRow=0xb03983f10 dstRow=0xb039b2490
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=118 srcRow=0xb03984190 dstRow=0xb039b2710
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=119 srcRow=0xb03984410 dstRow=0xb039b2990
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=120 srcRow=0xb03984690 dstRow=0xb039b2c10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=121 srcRow=0xb03984910 dstRow=0xb039b2e90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=122 srcRow=0xb03984b90 dstRow=0xb039b3110
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=123 srcRow=0xb03984e10 dstRow=0xb039b3390
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=124 srcRow=0xb03985090 dstRow=0xb039b3610
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=125 srcRow=0xb03985310 dstRow=0xb039b3890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=126 srcRow=0xb03985590 dstRow=0xb039b3b10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=127 srcRow=0xb03985810 dstRow=0xb039b3d90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=128 srcRow=0xb03985a90 dstRow=0xb039b4010
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=129 srcRow=0xb03985d10 dstRow=0xb039b4290
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=130 srcRow=0xb03985f90 dstRow=0xb039b4510
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=131 srcRow=0xb03986210 dstRow=0xb039b4790
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=132 srcRow=0xb03986490 dstRow=0xb039b4a10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=133 srcRow=0xb03986710 dstRow=0xb039b4c90
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=134 srcRow=0xb03986990 dstRow=0xb039b4f10
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=135 srcRow=0xb03986c10 dstRow=0xb039b5190
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=136 srcRow=0xb03986e90 dstRow=0xb039b5410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=137 srcRow=0xb03987110 dstRow=0xb039b5690
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=138 srcRow=0xb03987390 dstRow=0xb039b5910
+[2026-02-10 16:07:42] [DEBUG_MEM] compBuf=0xb039a0010 compW=640 compH=139 buf=0xb03988010
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb03988010
+[2026-02-10 16:07:42] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(0,240,319,240) inter=(0,240,319,240) compW=320 compH=1 src=0xb0394c010 comp=0xb0582e410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=0 srcRow=0xb03971810 dstRow=0xb0582e410
+[2026-02-10 16:07:42] [DEBUG_MEM] compBuf=0xb0582e410 compW=320 compH=1 buf=0xb0582e290
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb0582e290
+[2026-02-10 16:07:42] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(321,240,639,240) inter=(321,240,639,240) compW=319 compH=1 src=0xb0394c010 comp=0xb0582e410
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=0 srcRow=0xb03971951 dstRow=0xb0582e410
+[2026-02-10 16:07:42] [DEBUG_MEM] compBuf=0xb0582e410 compW=319 compH=1 buf=0xb0582e290
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb0582e290
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb05b9d8b0
+[2026-02-10 16:07:42] [GNW_SHOW_RECT_SKIP_ZERO] dest=(320,240) copy=1x1 area=1 srcPtr=0xb05464690 preSurfaceNonZero=1
+[2026-02-10 16:07:42] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(320,240,320,240) inter=(320,240,320,240) compW=1 compH=1 src=0xb0394c010 comp=0xb05b9d890
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=0 srcRow=0xb03971950 dstRow=0xb05b9d890
+[2026-02-10 16:07:42] [DEBUG_MEM] compBuf=0xb05b9d890 compW=1 compH=1 buf=0xb05b9d8b0
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb05b9d8b0
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb0582e410
+[2026-02-10 16:07:42] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(320,240,337,257) inter=(320,240,337,257) compW=18 compH=18 src=0xb0394c010 comp=0xb0582e590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=0 srcRow=0xb03971950 dstRow=0xb0582e590
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=1 srcRow=0xb03971bd0 dstRow=0xb0582e5a2
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=2 srcRow=0xb03971e50 dstRow=0xb0582e5b4
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=3 srcRow=0xb039720d0 dstRow=0xb0582e5c6
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=4 srcRow=0xb03972350 dstRow=0xb0582e5d8
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=5 srcRow=0xb039725d0 dstRow=0xb0582e5ea
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=6 srcRow=0xb03972850 dstRow=0xb0582e5fc
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=7 srcRow=0xb03972ad0 dstRow=0xb0582e60e
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=8 srcRow=0xb03972d50 dstRow=0xb0582e620
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=9 srcRow=0xb03972fd0 dstRow=0xb0582e632
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=10 srcRow=0xb03973250 dstRow=0xb0582e644
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=11 srcRow=0xb039734d0 dstRow=0xb0582e656
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=12 srcRow=0xb03973750 dstRow=0xb0582e668
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=13 srcRow=0xb039739d0 dstRow=0xb0582e67a
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=14 srcRow=0xb03973c50 dstRow=0xb0582e68c
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=15 srcRow=0xb03973ed0 dstRow=0xb0582e69e
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=16 srcRow=0xb03974150 dstRow=0xb0582e6b0
+[2026-02-10 16:07:42] [DEBUG_COPY_ROW] r=17 srcRow=0xb039743d0 dstRow=0xb0582e6c2
+[2026-02-10 16:07:42] [DEBUG_MEM] compBuf=0xb0582e590 compW=18 compH=18 buf=0xb0582e410
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb0582e410
+[2026-02-10 16:07:42] [DEBUG_MEM] no-overlap buf=0xb04be0010 width=640 height=100
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb04be0010
+[2026-02-10 16:07:42] [DEBUG_MEM] no-map-rect buf=0xb0394c010 width=640 height=380
+[2026-02-10 16:07:42] [DEBUG_MEM] freeing buf=0xb0394c010

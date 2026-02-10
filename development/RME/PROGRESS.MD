@@ -80,6 +80,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep.csv`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep_run.log`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep.md`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots/`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-sweep-check.txt`
   - Commit: e3f2321
 
+- 2026-02-10T22:09:46Z — Executor — Completed M-2 patchlog sweep (PASS).
+  - Commands: `F1R_PATCHLOG=1 PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --timeout 90 --out-dir development/RME/ARTIFACTS/evidence/gate-2/runtime > development/RME/ARTIFACTS/evidence/gate-2/sweep-patchlog-log.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/` (72 patchlogs), `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-count.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-warnings.txt`, `development/RME/ARTIFACTS/evidence/gate-2/sweep-patchlog-log.txt`
+  - Commit: TBD
+
 ---
 
 ## Phase 2 Task Checklist (follow `TODO.maps.md`)
@@ -88,8 +93,11 @@
   - Subagent: Executor
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/` (`runtime_map_sweep.csv`, `runtime_map_sweep_run.log`, `runtime_map_sweep.md`, `screenshots/`)
 
-- [ ] M-2 — Patchlog sweep
-  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/`
+- [x] M-2 — Patchlog sweep (PASS)
+  - Date: 2026-02-10T22:09:46Z
+  - Subagent: Executor
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/` (72 patchlogs), `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-count.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-warnings.txt`, `development/RME/ARTIFACTS/evidence/gate-2/sweep-patchlog-log.txt`
+  - Commit: TBD
 
 - [ ] M-3 — Analyze patchlogs
 - [ ] M-4 — Review present-anomaly screenshots
