@@ -33,10 +33,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-log.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-log-20260210T205645Z.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-manifest.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-manifest-20260210T205717Z.txt`
   - Commit: d4bb39d87814548e81808bd2f773248ac3dcca2b
 
-- [ ] I-2 — Fresh patched data generated
-  - Date: 
-  - Subagent: 
-  - Evidence: `GOG/patchedfiles/` listing, `development/RME/ARTIFACTS/evidence/gate-1/patch-log.txt`
+- [x] I-2 — Fresh patched data generated
+  - Date: 2026-02-10T20:59:48Z
+  - Subagent: Executor
+  - Evidence: `GOG/patchedfiles/` listing, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-patch-log.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-patch-log-20260210T205948Z.txt`
+  - Commit: 306383b1e3fbc76280142800738ad53e637786ab
 
 - [ ] I-3 — Static validation passed
   - Date: 
