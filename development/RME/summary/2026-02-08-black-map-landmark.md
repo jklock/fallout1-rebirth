@@ -29,7 +29,7 @@ We removed debug frame dumps (`present_*.bmp`, `scr*.bmp`) from the build bundle
 
 ## Debug Hooks Used
 The build includes env-var hooks used during this investigation:
-- `F1R_PATCHLOG=1` and `F1R_PATCHLOG_PATH=...` (example output: `/tmp/f1r-patchlog-scale2x1.txt`)
+- `F1R_PATCHLOG=1` and `F1R_PATCHLOG_PATH=...` (example output: `development/RME/validation/runtime/patchlogs/f1r-patchlog-scale2x1.txt`)
 - `F1R_PRESENT_DUMP(_FRAMES)=...`
 - `F1R_AUTORUN_*` (map-load automation)
 

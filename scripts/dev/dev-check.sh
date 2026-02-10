@@ -61,9 +61,10 @@ fi
 # 3. Check CMakeLists.txt syntax
 echo ""
 echo ">>> Checking CMake configuration..."
-if cmake -B /tmp/fallout1-rebirth-check -D CMAKE_BUILD_TYPE=Debug > /dev/null 2>&1; then
+TMP_CHECK_DIR="$PWD/tmp/fallout1-rebirth-check"
+if cmake -B "$TMP_CHECK_DIR" -D CMAKE_BUILD_TYPE=Debug > /dev/null 2>&1; then
     echo "✅ CMake configuration OK"
-    rm -rf /tmp/fallout1-rebirth-check
+    rm -rf "$TMP_CHECK_DIR"
 else
     echo "❌ CMake configuration failed"
     ERRORS=$((ERRORS + 1))

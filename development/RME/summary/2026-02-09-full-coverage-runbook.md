@@ -170,7 +170,7 @@ The map sweep uses runtime hooks added to the engine:
      F1R_AUTORUN_MAP=MAPNAME.MAP F1R_AUTOSCREENSHOT=1 \
        build-macos/RelWithDebInfo/Fallout\ 1\ Rebirth.app/Contents/MacOS/fallout1-rebirth
      ```
-  4. Use `F1R_PATCHLOG=1` and `F1R_PATCHLOG_PATH=/tmp/f1r-patchlog.txt` for deeper insight.
+  4. Use `F1R_PATCHLOG=1` and `F1R_PATCHLOG_PATH=development/RME/validation/runtime/patchlogs/<map>.patchlog.txt` for deeper insight. To capture engine-presented anomaly BMPs, set `F1R_PRESENT_ANOM_DIR=development/RME/validation/runtime/present-anomalies`. **Do not use `/tmp` for large artifacts.**
 
 ### H) Black-map or suspicious screenshots
 - Symptom: `runtime_map_sweep.csv` top_mean≈0, top_black≈100%, UI bottom still bright.

@@ -9,7 +9,7 @@
 ## Key files changed
 
 - `src/plib/gnw/svga.cc`
-  - New patchlog tags and telemetry: `GNW_SHOW_RECT_SRC`, enhanced `GNW_SHOW_RECT` (pre/post counts), `GNW_SURF_SUSPECT` ring buffer, present sampling + `RENDER_PRESENT_ANOMALY` (saves `/tmp/f1r-present-anom-*.bmp`).
+  - New patchlog tags and telemetry: `GNW_SHOW_RECT_SRC`, enhanced `GNW_SHOW_RECT` (pre/post counts), `GNW_SURF_SUSPECT` ring buffer, present sampling + `RENDER_PRESENT_ANOMALY` (saves `development/RME/validation/runtime/present-anomalies/f1r-present-anom-*.bmp`).
 - `src/plib/gnw/gnw.cc`
   - `WIN_FILL_RECT` instrumentation; implemented composite-fill atomic blit (create `compBuf`, overlay map pixels, single `scr_blit`). Added `DEBUG_MEM`, `DEBUG_COPY`, `DEBUG_COPY_ROW` messages for tracing. Fixed double-free (commit: `gnw: avoid double-free in WIN_FILL_RECT composite path`).
 - `scripts/dev/patchlog_analyze.py`
@@ -40,7 +40,7 @@ F1R_AUTORUN_MAP=CARAVAN.MAP \
 python3 scripts/dev/patchlog_analyze.py /tmp/f1r-patchlog-CARAVAN.txt
 ```
 
-4. If a `RENDER_PRESENT_ANOMALY` was recorded, check `/tmp/f1r-present-anom-*.bmp` for the presented frame and use the patchlog analyzer output to correlate.
+4. If a `RENDER_PRESENT_ANOMALY` was recorded, check `development/RME/validation/runtime/present-anomalies/f1r-present-anom-*.bmp` for the presented frame and use the patchlog analyzer output to correlate.
 
 ## Current status
 
@@ -62,7 +62,7 @@ cmake --build build-macos-asan --config RelWithDebInfo -j $(sysctl -n hw.physica
 ## Where to look for artifacts
 
 - Patchlogs: captured when autorun: `F1R_PATCHLOG_PATH` (e.g., `/tmp/f1r-patchlog-CARAVAN.txt`).
-- Anomaly screenshots: `/tmp/f1r-present-anom-*.bmp`.
+- Anomaly screenshots: `development/RME/validation/runtime/present-anomalies/f1r-present-anom-*.bmp`.
 - Runtime sweep outputs: `development/RME/validation/runtime/*`.
 
 ---

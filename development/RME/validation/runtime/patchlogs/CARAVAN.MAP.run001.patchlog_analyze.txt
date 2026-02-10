@@ -1,0 +1,8 @@
+Analyzing development/RME/validation/runtime/patchlogs/CARAVAN.MAP.run001.patchlog.txt
+Traceback (most recent call last):
+  File "/Volumes/Storage/GitHub/fallout1-rebirth/scripts/dev/patchlog_analyze.py", line 120, in <module>
+    res = analyze(path)
+  File "/Volumes/Storage/GitHub/fallout1-rebirth/scripts/dev/patchlog_analyze.py", line 46, in analyze
+    with open(path, 'r', encoding='utf-8', errors='replace') as f:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'development/RME/validation/runtime/patchlogs/CARAVAN.MAP.run001.patchlog.txt'

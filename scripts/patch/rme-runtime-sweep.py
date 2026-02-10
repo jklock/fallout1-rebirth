@@ -301,6 +301,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     # Directory for per-map patchlogs (created if F1R_PATCHLOG is enabled)
     patchlogs_dir = out_dir / "patchlogs"
     patchlogs_dir.mkdir(parents=True, exist_ok=True)
+    # Directory for present-anomaly BMPs captured by the engine (if enabled)
+    present_anom_dir = out_dir / "present-anomalies"
+    present_anom_dir.mkdir(parents=True, exist_ok=True)
 
     maps = _iter_all_map_names(data_root)
     if args.limit and args.limit > 0:
@@ -340,6 +343,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             env = os.environ.copy()
             env["F1R_AUTORUN_MAP"] = map_name
             env["F1R_AUTOSCREENSHOT"] = "1"
+            # Ensure the engine writes any present-anomaly BMPs into the out-dir rather than /tmp
+            env["F1R_PRESENT_ANOM_DIR"] = str(present_anom_dir)
             # If patchlog capture is enabled in the outer environment, set a unique per-map patchlog path
             if os.environ.get("F1R_PATCHLOG") and os.environ.get("F1R_PATCHLOG") != "0":
                 env["F1R_PATCHLOG"] = "1"
