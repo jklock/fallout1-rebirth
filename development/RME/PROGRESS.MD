@@ -62,6 +62,11 @@
 ## Recent Activity
 - 2026-02-10 — automation — Created PROGRESS.md (this file)
 
+- 2026-02-10T21:27:08Z — Executor — Installed `xdelta` via Homebrew and recorded verification.
+  - Commands: `brew install xdelta`, `which xdelta3`, `xdelta3 --version`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-install-xdelta.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
+  - Commit: e06d635
+
 ---
 
 *Do not modify the format of this file unless you understand the update rules above.*
