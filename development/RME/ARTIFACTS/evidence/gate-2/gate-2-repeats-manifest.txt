@@ -37,7 +37,16 @@ M-5 Flaky map repeats (10 runs each) — status: FAILED (stopped on first failur
   - Notes: The first repeat run produced suspicious GNW_SHOW_RECT events (see patchlog analyze). A screenshot was captured at development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/ZDESERT1.iter01.bmp
 
 - TEMPLAT1 (10)
-  - Result: NOT RUN (M-5 stopped due to CARAVAN failure)
+  - Result: FAIL (run 1 terminated; script exit code 3)
+  - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt
+    - SHA256: 8db5eda42f0991f5e5b51c83eeeb93d15c934ab51926afea47047291d9019722
+  - Fail artifact: development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.txt
+    - SHA256: 45100a1082b0d27e859a4b1eb785dff10e6d6fa4d726113d9faa79260b05bbb9
+  - Patchlog analyze: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.patchlog_analyze.txt
+    - SHA256: 3d6328ae3c3c6a73d40035e40e1d5c7fe17387f8264ee3c114f10e99422a6c18
+  - Run log: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.run.log
+    - SHA256: 286f98f149e69c889446e390b6ca154630899a5bc53bff6b818abe0d711ae1ea
+  - Notes: The first repeat run produced suspicious GNW_SHOW_RECT events (see patchlog analyze). A screenshot was captured at development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/TEMPLAT1.iter01.bmp
 
 
 Summary: M-5 stopped at first failure (CARAVAN). See the artifacts above for diagnostics. If desired, re-run M-5 for remaining maps after investigating CARAVAN failure.

@@ -110,6 +110,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/ZDESERT1.iter01.bmp`
   - Commit: 1661bd5
 
+- 2026-02-10T23:24:40Z — Executor — Re-ran M-5 TEMPLAT1 (10 repeats) (FAIL; stopped on run 1).
+  - Commands: `OUT_DIR="$(pwd)/development/RME/ARTIFACTS/evidence/gate-2/runtime" PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" ./scripts/patch/rme-repeat-map.sh TEMPLAT1 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/TEMPLAT1.iter01.bmp`
+  - Commit: 1ab55b0
+
 ---
 
 ## Phase 2 Task Checklist (follow `TODO.maps.md`)
