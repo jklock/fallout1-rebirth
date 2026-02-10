@@ -9,3 +9,6 @@ c4cc4217a57a6ff03bfb8c2ffffc5614edf43d052ae76960d60b6b31c8648d90  raw/rebirth_va
 ed655c8bf8bd6bc8daea733252c0663674fbb5b3dfe802e96dcf52113d93475e  development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt
 add32abb0917130d766f3c24fca984e558139330d90ce03b6fa70ee9068802c5  development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt
 # Updated: Tue Feb 10 21:32:56 UTC 2026
+8f0ec77ae4c84e991cc368affda40c42252740b74fcec9c90aa396a6735ca236  development/RME/ARTIFACTS/evidence/gate-1/gate-1-install-log.txt
+08eee696b4ff00592666455290b039ce8f0799d9b87df15c142dc0ca335f075d  development/RME/ARTIFACTS/evidence/gate-1/gate-1-smoke-test.txt
+# Updated: Tue Feb 10 21:36:35 UTC 2026

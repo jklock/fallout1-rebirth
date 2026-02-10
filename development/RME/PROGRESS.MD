@@ -51,10 +51,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
   - Commit: 91a231b
 
-- [ ] I-5 — Patched data installed in app bundle and smoke test passed
-  - Date: 
-  - Subagent: 
-  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/install-log.txt`, `game-launch-*.txt`, screenshots if available
+- [x] I-5 — Patched data installed in app bundle and smoke test passed
+  - Date: 2026-02-10T21:36:07Z
+  - Subagent: Executor
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-install-log.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-smoke-test.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
+  - Commit: 
 
 ---
 
@@ -68,6 +69,10 @@
 - 2026-02-10T21:32:41Z — Executor — Re-ran refresh validation using Python 3.11 (PASS).
   - Commands: `PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" ./scripts/patch/rebirth-refresh-validation.sh --unpatched GOG/unpatchedfiles --patched GOG/patchedfiles --rme third_party/rme/source --out development/RME/ARTIFACTS/evidence/gate-1/`
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
+
+- 2026-02-10T21:36:07Z — Executor — Installed patched DATs into app and performed smoke test (PASS).
+  - Commands: `cp GOG/patchedfiles/master.dat $APP_RESOURCES/ && cp GOG/patchedfiles/critter.dat $APP_RESOURCES/ && rsync -av GOG/patchedfiles/data/ $APP_RESOURCES/data/ && open "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app" && pgrep -f fallout1-rebirth`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-install-log.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-smoke-test.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
   - Commit: e06d635
 
 ---

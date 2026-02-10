@@ -1,0 +1,48 @@
+=== I-5 smoke test: Tue Feb 10 21:36:07 UTC 2026 ===
+
+--- Launching app ---
+
+--- pgrep -f fallout1-rebirth ---
+54290
+
+--- pgrep -f 'Fallout 1 Rebirth' ---
+54290
+
+--- log show (last 1m) predicate eventMessage CONTAINS 'fallout1' OR process CONTAINS 'Fallout' ---
+Timestamp                       (process)[PID]    
+2026-02-10 15:36:08.089584-0600  localhost lsd[393]: (MobileInstallation) [com.apple.appinstallation:TransactionLog] com.fallout1rebirth.game/Unknown Persona:5:5:1:1:Building bundle record for app
+2026-02-10 15:36:08.089685-0600  localhost lsd[393]: (MobileInstallation) [com.apple.appinstallation:TransactionLog] com.fallout1rebirth.game/Unknown Persona:5:5:2:1:Built bundle record for app
+2026-02-10 15:36:08.090130-0600  localhost lsd[393]: (MobileInstallation) [com.apple.appinstallation:TransactionLog] com.fallout1rebirth.game/Unknown Persona:5:4:2:1:_LSServerRegisterItemInfo result = 0
+2026-02-10 15:36:08.123417-0600  localhost dmd[9355]: Received xpc stream event (distributed notification matching) with name: com.apple.LaunchServices.applicationRegistered user info: {
+    CFBundleDisplayName = "Fallout 1 Rebirth";
+    bundleIDs =     (
+        "com.fallout1rebirth.game"
+    );
+    isPlaceholder = 0;
+}
+2026-02-10 15:36:08.339558-0600  localhost launchd[1]: [gui/501/application.com.fallout1rebirth.game.8394092.8396443 [54290]:] Successfully spawned fallout1-rebirth[54290] because launch job demand
+2026-02-10 15:36:08.349602-0600  localhost CoreServicesUIAgent[65349]: (LaunchServices) [com.apple.processmanager:front-35286506] LAUNCH: 0x0-0x496295e com.fallout1rebirth.game starting stopped process.
+2026-02-10 15:36:08.352516-0600  localhost gamepolicyd[65196]: (RunningBoardServices) [com.apple.runningboard:process] Hit the server for a process handle 85e42c30000d412 that resolved to: [app<application.com.fallout1rebirth.game.8394092.8396443(501)>:54290]
+2026-02-10 15:36:08.352547-0600  localhost gamepolicyd[65196]: (RunningBoardServices) [com.apple.runningboard:monitor] Received state update for 54290 (app<application.com.fallout1rebirth.game.8394092.8396443(501)>, running-active-NotVisible
+2026-02-10 15:36:08.352781-0600  localhost loginwindow[175]: [com.apple.loginwindow.logging:Standard] -[Application _updateInformationInternal] | Got App URL: file:///Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout%201%20Rebirth.app/
+2026-02-10 15:36:08.354521-0600  localhost distnoted[365]: [com.apple.distnoted:diagnostic] register name: com.apple.sharedfilelist.change object: com.apple.LSSharedFileList.ApplicationRecentDocuments/com.fallout1rebirth.game token: 49e00000047 pid: 425
+2026-02-10 15:36:08.383885-0600  localhost gamepolicyd[65196]: (RunningBoardServices) [com.apple.runningboard:monitor] Received state update for 54290 (app<application.com.fallout1rebirth.game.8394092.8396443(501)>, running-active-NotVisible
+2026-02-10 15:36:08.437301-0600  localhost gamepolicyd[65196]: [com.apple.gamepolicyd:Common] Found game GameProcess(Optional("fallout1-rebirt"), pid=54290, euid=501, labelReason=appStoreCategory)
+2026-02-10 15:36:08.440079-0600  localhost gamepolicyd[65196]: (RunningBoardServices) [com.apple.runningboard:monitor] Received state update for 54290 (app<application.com.fallout1rebirth.game.8394092.8396443(501)>, running-active-NotVisible
+2026-02-10 15:36:08.451624-0600  localhost gamepolicyd[65196]: (RunningBoardServices) [com.apple.runningboard:monitor] Received state update for 54290 (app<application.com.fallout1rebirth.game.8394092.8396443(501)>, running-active-NotVisible
+2026-02-10 15:36:08.462491-0600  localhost gamepolicyd[65196]: (RunningBoardServices) [com.apple.runningboard:monitor] Received state update for 54290 (app<application.com.fallout1rebirth.game.8394092.8396443(501)>, running-active-NotVisible
+2026-02-10 15:36:13.461234-0600  localhost runningboardd[176]: (RunningBoard) [com.apple.runningboard:process] [app<application.com.fallout1rebirth.game.8394092.8396443(501)>:54290] Ignoring jetsam update because this process is not memory-managed
+2026-02-10 15:36:13.461236-0600  localhost runningboardd[176]: (RunningBoard) [com.apple.runningboard:process] [app<application.com.fallout1rebirth.game.8394092.8396443(501)>:54290] Ignoring suspend because this process is not lifecycle managed
+2026-02-10 15:36:13.461238-0600  localhost runningboardd[176]: (RunningBoard) [com.apple.runningboard:process] [app<application.com.fallout1rebirth.game.8394092.8396443(501)>:54290] Ignoring GPU update because this process is not GPU managed
+2026-02-10 15:36:13.461241-0600  localhost runningboardd[176]: (RunningBoard) [com.apple.runningboard:process] [app<application.com.fallout1rebirth.game.8394092.8396443(501)>:54290] Ignoring memory limit update because this process is not memory-managed
+2026-02-10 15:36:13.461954-0600  localhost runningboardd[176]: (RunningBoard) [com.apple.runningboard:monitor] Calculated state for app<application.com.fallout1rebirth.game.8394092.8396443(501)>: running-active (role: UserInteractiveNonFocal) (endowments: <private>)
+2026-02-10 15:36:13.462527-0600  localhost gamepolicyd[65196]: (RunningBoardServices) [com.apple.runningboard:monitor] Received state update for 54290 (app<application.com.fallout1rebirth.game.8394092.8396443(501)>, running-active-NotVisible
+
+--- pkill -f fallout1-rebirth ---
+
+--- ps aux | grep -i 'fallout' ---
+klock            93999   4.0  0.1 435275472  17648 s008  S+   Sat01PM 233:55.57 /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -u /Volumes/Storage/FalloutDB/mediafire_pull.py --folder-key 2aheaguwymint --out /Volumes/Storage/FalloutDB/mediafire/Welcome_to_Fallout_Database --retry-failures 3 --fail-log /Volumes/Storage/FalloutDB/mediafire_failures.log
+klock            97285   0.0  0.0 435300256    496   ??  S    Sat02PM   0:00.01 sh -c cat >> /Volumes/Storage/FalloutDB/mediafire_download.log
+klock            93994   0.0  0.0 435299328    496 s008  Ss+  Sat01PM   0:00.02 bash -lc while true; do python3 -u /Volumes/Storage/FalloutDB/mediafire_pull.py --folder-key 2aheaguwymint --out /Volumes/Storage/FalloutDB/mediafire/Welcome_to_Fallout_Database --retry-failures 3 --fail-log /Volumes/Storage/FalloutDB/mediafire_failures.log; code=0; if [  -eq 0 ]; then break; fi; sleep 60; done
+klock            54313   0.0  0.0 435300080   1072 s003  R+    3:36PM   0:00.00 grep -i fallout
+== I-5 smoke test finished at Tue Feb 10 21:36:19 UTC 2026 ==
