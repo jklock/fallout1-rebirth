@@ -1,0 +1,65 @@
+Gate 1 Refresh Output
+Timestamp: 2026-02-10T21:03:29Z
+
+==== Running ./scripts/patch/rebirth-refresh-validation.sh --unpatched GOG/unpatchedfiles --patched GOG/patchedfiles --rme third_party/rme/source --out development/RME/ARTIFACTS/evidence/gate-1/ ====
+[0;34m>>>[0m 1) Quick tree diff (diff -qr)
+[0;34m>>>[0m 2) Unified diff (diff -ruN) (large)
+[0;34m>>>[0m 3) Config diffs
+[0;34m>>>[0m 4) DAT shasums
+[0;34m>>>[0m 5) RME crossref (patched/unpatched) + LST report
+[0;34m>>>[0m 5b) LST candidate scan (by basename)
+[0;34m>>>[0m 6) Crossref counts + promotions lists
+Traceback (most recent call last):
+  File "<stdin>", line 37, in <module>
+  File "<stdin>", line 35, in write_list
+TypeError: write_text() got an unexpected keyword argument 'newline'
+[ERR] refresh script failed (exit 1)
+
+==== Evidence dir listing ====
+total 184
+drwxr-xr-x@ 22 klock  staff    704 Feb 10 14:47 .
+drwxr-xr-x@  6 klock  staff    192 Feb 10 12:16 ..
+-rw-r--r--@  1 klock  staff    779 Feb 10 12:16 case_renames.txt
+-rw-r--r--@  1 klock  staff    451 Feb 10 12:16 case_test.log
+-rw-r--r--@  1 klock  staff     72 Feb 10 12:16 case_test_run_output.txt
+-rw-r--r--@  1 klock  staff     18 Feb 10 12:16 checksum_notice.txt
+-rw-r--r--@  1 klock  staff     63 Feb 10 12:16 critter_added_ext_counts.txt
+-rw-r--r--@  1 klock  staff   7514 Feb 10 12:16 critter_added_files.txt
+-rw-r--r--@  1 klock  staff    136 Feb 10 12:16 critter_patched.sha256
+-rw-r--r--@  1 klock  staff    138 Feb 10 12:16 critter_unpatched.sha256
+drwxr-xr-x@ 21 klock  staff    672 Feb 10 15:04 gate-1
+-rw-r--r--@  1 klock  staff     19 Feb 10 12:16 lst_copy_notice.txt
+-rw-r--r--@  1 klock  staff     63 Feb 10 12:16 master_added_ext_counts.txt
+-rw-r--r--@  1 klock  staff   3032 Feb 10 12:16 master_added_files.txt
+-rw-r--r--@  1 klock  staff    135 Feb 10 12:16 master_patched.sha256
+-rw-r--r--@  1 klock  staff    137 Feb 10 12:16 master_unpatched.sha256
+drwxr-xr-x@  3 klock  staff     96 Feb 10 12:16 overlay_data
+-rw-r--r--@  1 klock  staff   9776 Feb 10 12:16 patched_critter_files.txt
+-rw-r--r--@  1 klock  staff     54 Feb 10 12:16 patched_ext_counts.txt
+-rw-r--r--@  1 klock  staff  19308 Feb 10 12:16 patched_master_files.txt
+drwxr-xr-x@ 34 klock  staff   1088 Feb 10 12:16 raw
+drwxr-xr-x@  7 klock  staff    224 Feb 10 12:16 runtime
+
+==== gate-1 listing ====
+total 41336
+drwxr-xr-x@ 21 klock  staff       672 Feb 10 15:04 .
+drwxr-xr-x@ 22 klock  staff       704 Feb 10 14:47 ..
+-rw-r--r--@  1 klock  staff        18 Feb 10 15:04 checksum_notice.txt
+-rw-r--r--@  1 klock  staff        95 Feb 10 15:04 critter_patched.sha256
+-rw-r--r--@  1 klock  staff        97 Feb 10 15:04 critter_unpatched.sha256
+-rw-r--r--@  1 klock  staff   2202106 Feb 10 14:56 gate-1-build-log-20260210T205645Z.txt
+-rw-r--r--@  1 klock  staff   2202106 Feb 10 14:56 gate-1-build-log.txt
+-rw-r--r--@  1 klock  staff       575 Feb 10 14:57 gate-1-build-manifest-20260210T205717Z.txt
+-rw-r--r--@  1 klock  staff       575 Feb 10 14:57 gate-1-build-manifest.txt
+-rw-r--r--@  1 klock  staff      2383 Feb 10 14:59 gate-1-patch-log-20260210T205948Z.txt
+-rw-r--r--@  1 klock  staff      2383 Feb 10 14:59 gate-1-patch-log.txt
+-rw-r--r--@  1 klock  staff      1159 Feb 10 14:48 gate-1-prereq-check-20260210T204843Z.txt
+-rw-r--r--@  1 klock  staff      1159 Feb 10 14:48 gate-1-prereq-check.txt
+-rw-r--r--@  1 klock  staff      2331 Feb 10 15:04 gate-1-refresh-output.txt
+-rw-r--r--@  1 klock  staff      1394 Feb 10 15:02 gate-1-validate-output-20260210T210246Z.txt
+-rw-r--r--@  1 klock  staff      1394 Feb 10 15:01 gate-1-validate-output.txt
+-rw-r--r--@  1 klock  staff        19 Feb 10 15:04 lst_copy_notice.txt
+-rw-r--r--@  1 klock  staff        94 Feb 10 15:04 master_patched.sha256
+-rw-r--r--@  1 klock  staff        96 Feb 10 15:04 master_unpatched.sha256
+drwxr-xr-x@ 13 klock  staff       416 Feb 10 15:04 raw
+-rw-r--r--@  1 klock  staff  15257457 Feb 10 15:03 unpatched_vs_patched.diff
