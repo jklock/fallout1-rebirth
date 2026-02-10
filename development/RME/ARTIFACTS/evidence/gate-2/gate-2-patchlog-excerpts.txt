@@ -1,0 +1,32 @@
+=== Excerpt 1: missing font9.fon ===
+File: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/MNTCRVN2.MAP.patchlog.txt
+
+[2026-02-10 16:05:29] [DB_OPEN_FAIL] source=datafile reason=missing request="font6.fon" path=".\FONT6.FON" mode="rb"
+[2026-02-10 16:05:29] [DB_OPEN_FAIL] source=datafile reason=missing request="font7.fon" path=".\FONT7.FON" mode="rb"
+[2026-02-10 16:05:29] [DB_OPEN_FAIL] source=datafile reason=missing request="font8.fon" path=".\FONT8.FON" mode="rb"
+[2026-02-10 16:05:29] [DB_OPEN_FAIL] source=datafile reason=missing request="font9.fon" path=".\FONT9.FON" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="art\splash\splash5.rix" path=".\ART\SPLASH\SPLASH5.RIX" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="art\splash\splash6.rix" path=".\ART\SPLASH\SPLASH6.RIX" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="art\splash\splash7.rix" path=".\ART\SPLASH\SPLASH7.RIX" mode="rb"
+
+=== Excerpt 2: missing art splash9.rix ===
+File: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/MNTCRVN2.MAP.patchlog.txt
+
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="art\splash\splash6.rix" path=".\ART\SPLASH\SPLASH6.RIX" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="art\splash\splash7.rix" path=".\ART\SPLASH\SPLASH7.RIX" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="art\splash\splash8.rix" path=".\ART\SPLASH\SPLASH8.RIX" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="art\splash\splash9.rix" path=".\ART\SPLASH\SPLASH9.RIX" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="font5.aaf" path=".\FONT5.AAF" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="font6.aaf" path=".\FONT6.AAF" mode="rb"
+[2026-02-10 16:05:31] [DB_OPEN_FAIL] source=datafile reason=missing request="font7.aaf" path=".\FONT7.AAF" mode="rb"
+
+=== Excerpt 3: missing map ZDESERT3.GAM ===
+File: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT3.MAP.patchlog.txt
+
+[2026-02-10 16:08:54] [SQUARE_STATS] elevation=0 tiles=10000 floor=10000 roof=0 zero_id=0 min_id=1 max_id=1
+[2026-02-10 16:08:54] [FLOOR_DRAW_STATS] elevation=0 tiles=10000 floor_drawable=10000 floor_missing_art=0 floor_blank=0 unique_missing=0
+[2026-02-10 16:08:54] [FLOOR_DRAW_TOP] top_tiles=5400 top_drawable=5400 top_missing=0 top_blank=0
+[2026-02-10 16:08:54] [DB_OPEN_FAIL] source=datafile reason=missing request="maps\ZDESERT3.GAM" path=".\MAPS\ZDESERT3.GAM" mode="rt"
+[2026-02-10 16:08:55] [TILE_REFRESH_DISPLAY] called
+[2026-02-10 16:08:55] [REFRESH_GAME] rect=0,0,639,379
+[2026-02-10 16:08:55] [DISPLAY_STAGE_TOP_PIXELS] stage="BEFORE_DRAW" top_pixels=166400 non_zero=0 non_zero_pct=0
