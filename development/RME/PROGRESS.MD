@@ -27,10 +27,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-prereq-check.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-prereq-check-20260210T204843Z.txt`
   - Commit: dc52623
 
-- [ ] I-1 — Clean macOS build succeeded
-  - Date: 
-  - Subagent: 
-  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/build-log.txt`, `build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/...`
+- [x] I-1 — Clean macOS build succeeded
+  - Date: 2026-02-10T20:57:17Z
+  - Subagent: Executor
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-log.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-log-20260210T205645Z.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-manifest.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-manifest-20260210T205717Z.txt`
+  - Commit: d4bb39d87814548e81808bd2f773248ac3dcca2b
 
 - [ ] I-2 — Fresh patched data generated
   - Date: 
