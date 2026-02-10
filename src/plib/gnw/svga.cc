@@ -322,6 +322,62 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
     }
 
     long postSurfaceNonZero = 0;
+    // Defensive check: avoid copying an all-zero source over an existing non-zero
+    // surface for small regions since that leads to transient zeroing anomalies.
+    // Limit to small areas to avoid scan overhead.
+    int area = copyW * copyH;
+    bool src_all_zero = false;
+    if (area <= 4096) {
+        src_all_zero = true;
+        for (int r = 0; r < copyH && src_all_zero; r++) {
+            unsigned char* p = srcPtr + r * srcPitch;
+            for (int c = 0; c < copyW; c++) {
+                if (p[c] != 0) {
+                    src_all_zero = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (src_all_zero) {
+        // If src is all zero and destination has non-zero data, skip the copy to
+        // avoid clearing existing content (this prevents surf_pre>0 && surf_post==0).
+        long dest_non_zero = 0;
+        for (int r = 0; r < copyH; r++) {
+            unsigned char* p = surfacePtr + r * gSdlSurface->pitch;
+            for (int c = 0; c < copyW; c++) {
+                if (p[c] != 0) {
+                    dest_non_zero++;
+                    break;
+                }
+            }
+            if (dest_non_zero) {
+                break;
+            }
+        }
+
+        if (dest_non_zero) {
+            // Log the skipped copy for triage.
+            patchlog_write("GNW_SHOW_RECT_SKIP_ZERO", "dest=(%d,%d) copy=%dx%d area=%d srcPtr=%p preSurfaceNonZero=%ld", copyX, copyY, copyW, copyH, area, srcPtr, dest_non_zero);
+        } else {
+            buf_to_buf(srcPtr,
+                copyW,
+                copyH,
+                srcPitch,
+                surfacePtr,
+                gSdlSurface->pitch);
+        }
+    } else {
+        buf_to_buf(srcPtr,
+            copyW,
+            copyH,
+            srcPitch,
+            surfacePtr,
+            gSdlSurface->pitch);
+    }
+
+    long postSurfaceNonZero = 0;
     if (do_log) {
         unsigned char* rsurf = surfacePtr;
         for (int row = 0; row < copyH; row++) {
