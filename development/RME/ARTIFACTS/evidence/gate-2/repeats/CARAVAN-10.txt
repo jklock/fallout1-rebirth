@@ -1,0 +1,12 @@
+Running ./scripts/patch/rme-repeat-map.sh for CARAVAN (repeats=10)
+Run 1/10 for CARAVAN
+./scripts/patch/rme-repeat-map.sh: line 44: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.run.log: No such file or directory
+./scripts/patch/rme-repeat-map.sh: line 31:  8041 Terminated: 15          ( sleep "$TIMEOUT"; if kill -0 "$pid" 2> /dev/null; then
+    echo "[TIMEOUT] Killing pid $pid after $TIMEOUT seconds" >> "$RUN_LOG"; kill "$pid" 2> /dev/null || true; sleep 2; kill -9 "$pid" 2> /dev/null || true;
+fi )
+SUSPICIOUS event found in CARAVAN run 1; analyze output: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt
+Artifacts are available in:
+  patchlog: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt
+  run log: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.run.log
+  screenshot (if any): development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/CARAVAN.iter01.bmp
+EXIT:3

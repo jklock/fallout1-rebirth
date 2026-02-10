@@ -1,0 +1,22 @@
+Gate 2 — Repeats Manifest (M-5 / M-6)
+
+Generated: 2026-02-10T22:30:15Z UTC
+
+M-5 Flaky map repeats (10 runs each) — status: FAILED (stopped on first failure)
+
+- CARAVAN (10)
+  - Result: FAIL (run 1 terminated; script exit code 3)
+  - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt
+    - SHA256: 8ac978a4ed1594b15188eae945e0bbb0ead351dfbb1f48ff436b6ed1df425e71
+  - Patchlog analyze: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt
+    - SHA256: 2c7556b211908e84f3e43d619cd8e57decd8c3ef1ffaac0c2a65ad979e6e8644
+  - Notes: The run attempted to reference `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt` and `.../CARAVAN.iter01.run.log` but these files were not present; the analyze output contains a FileNotFoundError.
+
+- ZDESERT1 (10)
+  - Result: NOT RUN (M-5 stopped due to CARAVAN failure)
+
+- TEMPLAT1 (10)
+  - Result: NOT RUN (M-5 stopped due to CARAVAN failure)
+
+
+Summary: M-5 stopped at first failure (CARAVAN). See the artifacts above for diagnostics. If desired, re-run M-5 for remaining maps after investigating CARAVAN failure.
