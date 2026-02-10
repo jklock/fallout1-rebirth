@@ -1,0 +1,339 @@
+Tue Feb 10 15:09:21 CST 2026
+--- brew install python@3.11 (output) ---
+==> Auto-updating Homebrew...
+Adjust how often this is run with `$HOMEBREW_AUTO_UPDATE_SECS` or disable with
+`$HOMEBREW_NO_AUTO_UPDATE=1`. Hide these hints with `$HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+==> Auto-updated Homebrew!
+==> Updated Homebrew from 5.0.13 (8d25ecaf43) to 5.0.14 (8ab39821c5).
+Updated 3 taps (lizardbyte/homebrew, homebrew/core and homebrew/cask).
+==> New Formulae
+actions-up: Tool to update GitHub Actions to latest versions with SHA pinning
+agent-browser: Browser automation CLI for AI agents
+arcadedb: Multi-Model DBMS: Graph, Document, Key/Value, Search, Time Series, Vector
+cozyhr: Cozy wrapper around Helm and Flux CD for local development
+odiff: Very fast SIMD-first image comparison library (with nodejs API)
+picoruby: Smallest Ruby implementation for microcontrollers
+playwright-cli: CLI for Playwright: record/generate code, inspect selectors, take screenshots
+run-kit: Universal multi-language runner and smart REPL
+sheenbidi: Fast and stable implementation of the Unicode Bidirectional Algorithm
+skillshare: Sync skills across AI CLI tools
+static-web-apps-cli: SWA CLI serves as a local development tool for Azure Static Web Apps
+transifex-cli: Transifex command-line client
+try-rs: Temporary workspace manager for fast experimentation in the terminal
+yap: On-device audio transcription using Speech.framework
+==> New Casks
+clash-mi: Another Mihomo GUI based on Flutter
+desktop-composer: Appearance manager for the system and individual applications
+font-alyamama
+font-betania-patmos
+font-betania-patmos-gdl
+font-betania-patmos-guide-line
+font-betania-patmos-in
+font-betania-patmos-in-gdl
+font-dejavu-sans
+font-idiqlat
+font-ramsina
+luxury-yacht: Desktop app for managing Kubernetes clusters
+macpulse: System monitoring dashboard with historical analytics
+owocr: Optical character recognition for Japanese text
+supacode: Native terminal coding agents command center
+tana: Knowledge management workspace with AI-powered outlining
+thaw: Menu bar manager
+updatest: Utility that shows the latest app updates
+xkey: Vietnamese input method engine
+
+You have 52 outdated formulae and 1 outdated cask installed.
+
+
+The 5.0.14 changelog can be found at:
+  https://github.com/Homebrew/brew/releases/tag/5.0.14
+python@3.11 3.11.14_1 is already installed but outdated (so it will be upgraded).
+==> Fetching downloads for: python@3.11
+✔︎ Bottle Manifest python@3.11 (3.11.14_3)
+✔︎ Bottle Manifest openssl@3 (3.6.1)
+✔︎ Bottle Manifest sqlite (3.51.2_1)
+✔︎ Bottle openssl@3 (3.6.1)
+✔︎ Bottle sqlite (3.51.2_1)
+✔︎ Bottle python@3.11 (3.11.14_3)
+==> Upgrading python@3.11
+  3.11.14_1 -> 3.11.14_3 
+==> Installing dependencies for python@3.11: openssl@3 and sqlite
+==> Installing python@3.11 dependency: openssl@3
+==> Pouring openssl@3--3.6.1.arm64_tahoe.bottle.tar.gz
+🍺  /opt/homebrew/Cellar/openssl@3/3.6.1: 7,624 files, 37.6MB
+==> Installing python@3.11 dependency: sqlite
+==> Pouring sqlite--3.51.2_1.arm64_tahoe.bottle.tar.gz
+🍺  /opt/homebrew/Cellar/sqlite/3.51.2_1: 13 files, 5.2MB
+==> Installing python@3.11
+==> Pouring python@3.11--3.11.14_3.arm64_tahoe.bottle.tar.gz
+[34m==>[0m [1m/opt/homebrew/Cellar/python@3.11/3.11.14_3/bin/python3.11 -Im ensurepip[0m
+[34m==>[0m [1m/opt/homebrew/Cellar/python@3.11/3.11.14_3/bin/python3.11 -Im pip install -v[0m
+==> Caveats
+Python is installed as
+  /opt/homebrew/bin/python3.11
+
+Unversioned and major-versioned symlinks `python`, `python3`, `python-config`, `python3-config`, `pip`, `pip3`, etc. pointing to
+`python3.11`, `python3.11-config`, `pip3.11` etc., respectively, are installed into
+  /opt/homebrew/opt/python@3.11/libexec/bin
+
+You can install Python packages with
+  pip3.11 install <package>
+They will install into the site-package directory
+  /opt/homebrew/lib/python3.11/site-packages
+
+`idle3.11` requires tkinter, which is available separately:
+  brew install python-tk@3.11
+
+gdbm (`dbm.gnu`) is no longer included in this formula, but it is available separately:
+  brew install python-gdbm@3.11
+`dbm.ndbm` changed database backends in Homebrew Python 3.11.
+If you need to read a database from a previous Homebrew Python created via `dbm.ndbm`,
+you'll need to read your database using the older version of Homebrew Python and convert to another format.
+`dbm` still defaults to `dbm.gnu` when it is installed.
+
+If you do not need a specific version of Python, and always want Homebrew's `python3` in your PATH:
+  brew install python3
+
+For more information about Homebrew and Python, see: https://docs.brew.sh/Homebrew-and-Python
+==> Summary
+🍺  /opt/homebrew/Cellar/python@3.11/3.11.14_3: 3,306 files, 64.9MB
+==> Running `brew cleanup python@3.11`...
+Disable this behaviour by setting `HOMEBREW_NO_INSTALL_CLEANUP=1`.
+Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+Removing: /opt/homebrew/Cellar/python@3.11/3.11.14_1... (3,306 files, 65MB)
+Removing: /Users/klock/Library/Caches/Homebrew/python@3.11_bottle_manifest--3.11.14_1-1... (21.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/python@3.11--3.11.14_1... (15.8MB)
+==> `brew cleanup` has not been run in the last 30 days, running now...
+Disable this behaviour by setting `HOMEBREW_NO_INSTALL_CLEANUP=1`.
+Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+Removing: /Users/klock/Library/Caches/Homebrew/aom_bottle_manifest--3.13.1... (32.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/aom--3.13.1... (4.2MB)
+Removing: /Users/klock/Library/Caches/Homebrew/aribb24_bottle_manifest--1.0.4... (14.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/aribb24--1.0.4... (73.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/cairo_bottle_manifest--1.18.4-1... (37KB)
+Removing: /Users/klock/Library/Caches/Homebrew/cairo--1.18.4... (1.6MB)
+Removing: /Users/klock/Library/Caches/Homebrew/cjson_bottle_manifest--1.7.19... (11.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/cjson--1.7.19... (59.5KB)
+Removing: /opt/homebrew/Cellar/dav1d/1.5.1... (16 files, 938.8KB)
+Removing: /opt/homebrew/Cellar/dav1d/1.5.2... (16 files, 939.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/dav1d_bottle_manifest--1.5.1... (9.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/dav1d_bottle_manifest--1.5.2... (7.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/dav1d--1.5.1... (364.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/dav1d--1.5.2... (364.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/ffmpeg_bottle_manifest--8.0_1... (131.1KB)
+Removing: /Users/klock/Library/Caches/Homebrew/ffmpeg--8.0_1... (21.5MB)
+Removing: /Users/klock/Library/Caches/Homebrew/flac_bottle_manifest--1.5.0... (12.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/flac--1.5.0... (555.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/fontconfig_bottle_manifest--2.17.1-1... (17.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/fontconfig--2.17.1... (400.1KB)
+Removing: /Users/klock/Library/Caches/Homebrew/freetype_bottle_manifest--2.14.1_1... (9.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/freetype--2.14.1_1... (991KB)
+Removing: /Users/klock/Library/Caches/Homebrew/fribidi_bottle_manifest--1.0.16... (10KB)
+Removing: /Users/klock/Library/Caches/Homebrew/fribidi--1.0.16... (99.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/gdbm_bottle_manifest--1.26... (9.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/gdbm--1.26... (291KB)
+Removing: /opt/homebrew/Cellar/gettext/0.26_1... (2,428 files, 29.5MB)
+Removing: /Users/klock/Library/Caches/Homebrew/gettext_bottle_manifest--0.26_1... (13.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/gettext--0.26_1... (9.6MB)
+Removing: /Users/klock/Library/Caches/Homebrew/giflib_bottle_manifest--5.2.2... (10.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/giflib--5.2.2... (153.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/gmp_bottle_manifest--6.3.0... (13.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/gmp--6.3.0... (1MB)
+Removing: /Users/klock/Library/Caches/Homebrew/graphite2_bottle_manifest--1.3.14... (14.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/graphite2--1.3.14... (92.6KB)
+Removing: /opt/homebrew/Cellar/harfbuzz/12.1.0... (77 files, 12.4MB)
+Removing: /opt/homebrew/Cellar/harfbuzz/12.2.0_1... (77 files, 12.4MB)
+Removing: /Users/klock/Library/Caches/Homebrew/harfbuzz_bottle_manifest--12.1.0... (29.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/harfbuzz_bottle_manifest--12.2.0_1... (29.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/harfbuzz--12.1.0... (3.3MB)
+Removing: /Users/klock/Library/Caches/Homebrew/harfbuzz--12.2.0_1... (3.3MB)
+Removing: /Users/klock/Library/Caches/Homebrew/highway_bottle_manifest--1.3.0... (9.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/highway--1.3.0... (896.7KB)
+Removing: /opt/homebrew/Cellar/icu4c@78/78.1... (279 files, 87.7MB)
+Removing: /Users/klock/Library/Caches/Homebrew/icu4c@78_bottle_manifest--78.1... (9.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/icu4c@78--78.1... (31.8MB)
+Removing: /Users/klock/Library/Caches/Homebrew/jpeg-xl_bottle_manifest--0.11.1_3... (33.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/jpeg-xl--0.11.1_3... (13.8MB)
+Removing: /Users/klock/Library/Caches/Homebrew/lame_bottle_manifest--3.100... (16KB)
+Removing: /Users/klock/Library/Caches/Homebrew/lame--3.100... (792.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/leptonica_bottle_manifest--1.86.0... (17.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/leptonica--1.86.0... (2.7MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libarchive_bottle_manifest--3.8.1... (15.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libarchive--3.8.1... (1.6MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libass_bottle_manifest--0.17.4... (38.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libass--0.17.4... (232.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libb2_bottle_manifest--0.98.1... (15.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libb2--0.98.1... (36.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libmicrohttpd_bottle_manifest--1.0.2... (24.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libmicrohttpd--1.0.2... (482.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libogg_bottle_manifest--1.3.6... (9.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libogg--1.3.6... (234.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsamplerate_bottle_manifest--0.2.2-1... (9.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsamplerate--0.2.2... (2.7MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsndfile_bottle_manifest--1.2.2_1... (17.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsndfile--1.2.2_1... (614.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsodium_bottle_manifest--1.0.20... (10.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsodium--1.0.20... (306.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsoxr_bottle_manifest--0.1.3-1... (15.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libsoxr--0.1.3... (77.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libssh_bottle_manifest--0.11.3... (12.1KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libssh--0.11.3... (539.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libtasn1_bottle_manifest--4.20.0... (10.1KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libtasn1--4.20.0... (166.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libtiff_bottle_manifest--4.7.1... (12.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libtiff--4.7.1... (1.9MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libudfread_bottle_manifest--1.2.0... (9.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libudfread--1.2.0... (43.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libunibreak_bottle_manifest--6.1... (10.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libunibreak--6.1... (65.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libunistring_bottle_manifest--1.4.1... (7.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libunistring--1.4.1... (1.9MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvidstab_bottle_manifest--1.1.1... (12.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvidstab--1.1.1... (47.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvmaf_bottle_manifest--3.0.0-1... (11.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvmaf--3.0.0... (1MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvorbis_bottle_manifest--1.3.7-1... (14.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvorbis--1.3.7... (589.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvpx_bottle_manifest--1.15.2... (9.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libvpx--1.15.2... (1.9MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libx11_bottle_manifest--1.8.12... (18.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libx11--1.8.12... (2.3MB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxau_bottle_manifest--1.0.12... (10.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxau--1.0.12... (33.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxcb_bottle_manifest--1.17.0-1... (19.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxcb--1.17.0... (999.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxdmcp_bottle_manifest--1.1.5... (12.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxdmcp--1.1.5... (36.8KB)
+Removing: /opt/homebrew/Cellar/libxext/1.3.6... (88 files, 468.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxext_bottle_manifest--1.3.6... (16.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxext--1.3.6... (108.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxrender_bottle_manifest--0.9.12... (14.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/libxrender--0.9.12... (54.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/little-cms2_bottle_manifest--2.17... (15KB)
+Removing: /Users/klock/Library/Caches/Homebrew/little-cms2--2.17... (433.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/lzo_bottle_manifest--2.10... (16.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/lzo--2.10... (149.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/mpg123_bottle_manifest--1.33.3... (8.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/mpg123--1.33.3... (648.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/nettle_bottle_manifest--3.10.2... (11.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/nettle--3.10.2... (987.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/opencore-amr_bottle_manifest--0.1.6... (13.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/opencore-amr--0.1.6... (304.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openexr_bottle_manifest--3.4.0_2... (15.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openexr--3.4.0_2... (1.2MB)
+Removing: /Users/klock/Library/Caches/Homebrew/openjpeg_bottle_manifest--2.5.4... (14.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openjpeg--2.5.4... (2.2MB)
+Removing: /opt/homebrew/Cellar/openjph/0.24.1... (25 files, 634.6KB)
+Removing: /opt/homebrew/Cellar/openjph/0.25.3... (25 files, 634.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openjph_bottle_manifest--0.24.1... (12.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openjph_bottle_manifest--0.25.3... (12.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openjph--0.24.1... (157.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openjph--0.25.3... (157.5KB)
+Removing: /opt/homebrew/Cellar/openssl@3/3.6.0... (7,609 files, 37.7MB)
+Removing: /Users/klock/Library/Caches/Homebrew/openssl@3_bottle_manifest--3.6.0... (11.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/openssl@3--3.6.0... (10.9MB)
+Removing: /Users/klock/Library/Caches/Homebrew/opus_bottle_manifest--1.5.2... (10.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/opus--1.5.2... (484.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/p11-kit_bottle_manifest--0.25.10... (9.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/p11-kit--0.25.10... (938.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/pixman_bottle_manifest--0.46.4-1... (9.3KB)
+Removing: /Users/klock/Library/Caches/Homebrew/pixman--0.46.4... (416.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/pkgconf_bottle_manifest--2.5.1... (12.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/pkgconf--2.5.1... (121.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/rav1e_bottle_manifest--0.8.1... (9.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/rav1e--0.8.1... (13.2MB)
+Removing: /Users/klock/Library/Caches/Homebrew/rubberband_bottle_manifest--4.0.0... (23.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/rubberband--4.0.0... (630.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/sdl2_bottle_manifest--2.32.10... (23.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/sdl2--2.32.10... (1.8MB)
+Removing: /Users/klock/Library/Caches/Homebrew/snappy_bottle_manifest--1.2.2... (9.2KB)
+Removing: /Users/klock/Library/Caches/Homebrew/snappy--1.2.2... (47.0KB)
+Removing: /Users/klock/Library/Caches/Homebrew/speex_bottle_manifest--1.2.1... (14.6KB)
+Removing: /Users/klock/Library/Caches/Homebrew/speex--1.2.1... (550.8KB)
+Removing: /opt/homebrew/Cellar/sqlite/3.51.1... (13 files, 5.2MB)
+Removing: /Users/klock/Library/Caches/Homebrew/sqlite_bottle_manifest--3.51.1... (11.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/sqlite--3.51.1... (2.4MB)
+Removing: /Users/klock/Library/Caches/Homebrew/srt_bottle_manifest--1.5.4... (12.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/srt--1.5.4... (1.7MB)
+Removing: /Users/klock/Library/Caches/Homebrew/svt-av1_bottle_manifest--3.1.2... (9.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/svt-av1--3.1.2... (1.4MB)
+Removing: /Users/klock/Library/Caches/Homebrew/tesseract_bottle_manifest--5.5.1... (54.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/tesseract--5.5.1... (13.2MB)
+Removing: /Users/klock/Library/Caches/Homebrew/theora_bottle_manifest--1.2.0... (12KB)
+Removing: /Users/klock/Library/Caches/Homebrew/theora--1.2.0... (752.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/webp_bottle_manifest--1.6.0... (19.5KB)
+Removing: /Users/klock/Library/Caches/Homebrew/webp--1.6.0... (901.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/x264_bottle_manifest--r3222... (9.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/x264--r3222... (2MB)
+Removing: /Users/klock/Library/Caches/Homebrew/x265_bottle_manifest--4.1-1... (9.8KB)
+Removing: /Users/klock/Library/Caches/Homebrew/x265--4.1... (3.9MB)
+Removing: /Users/klock/Library/Caches/Homebrew/xvid_bottle_manifest--1.3.7... (14.1KB)
+Removing: /Users/klock/Library/Caches/Homebrew/xvid--1.3.7... (433.7KB)
+Removing: /Users/klock/Library/Caches/Homebrew/zeromq_bottle_manifest--4.3.5_2... (11KB)
+Removing: /Users/klock/Library/Caches/Homebrew/zeromq--4.3.5_2... (1.7MB)
+Removing: /Users/klock/Library/Caches/Homebrew/zimg_bottle_manifest--3.0.6... (9.4KB)
+Removing: /Users/klock/Library/Caches/Homebrew/zimg--3.0.6... (353.1KB)
+Removing: /Users/klock/Library/Caches/Homebrew/portable-ruby-3.4.8.arm64_big_sur.bottle.tar.gz... (12.2MB)
+Removing: /Users/klock/Library/Caches/Homebrew/mbedtls_bottle_manifest--3.6.4... (17.9KB)
+Removing: /Users/klock/Library/Caches/Homebrew/Cask/XQuartz-2.8.5.pkg--2.8.5.pkg... (107.5MB)
+Removing: /Users/klock/Library/Caches/Homebrew/bootsnap/aa63b2bf9ba1db3c5940867e30a0ca8156f3643776b6b443a3475a2f50fcf4bb... (646 files, 5.7MB)
+Removing: /Users/klock/Library/Caches/Homebrew/bootsnap/af1302dbf92394f6844c6728933903dc247921c87371c88c2f492e443b72b436... (650 files, 5.8MB)
+Removing: /Users/klock/Library/Caches/Homebrew/bootsnap/684c26d8211c6bacd91f8187e94767537f4d3bb555c2f7d7d582cc7ad2221890... (647 files, 5.7MB)
+Removing: /Users/klock/Library/Logs/Homebrew/pinentry... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/xorgproto... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/libksba... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/gpgme... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/readline... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/nss... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/libassuan... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/libgpg-error... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/xz... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/libgcrypt... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/gpgmepp... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/poppler... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/nspr... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/libusb... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/gnupg... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/jpeg-turbo... (64B)
+Removing: /Users/klock/Library/Logs/Homebrew/npth... (64B)
+Removing: /opt/homebrew/var/homebrew/tmp/.cellar/little-cms2... (22 files, 1.5MB)
+==> Caveats
+==> python@3.11
+Python is installed as
+  /opt/homebrew/bin/python3.11
+
+Unversioned and major-versioned symlinks `python`, `python3`, `python-config`, `python3-config`, `pip`, `pip3`, etc. pointing to
+`python3.11`, `python3.11-config`, `pip3.11` etc., respectively, are installed into
+  /opt/homebrew/opt/python@3.11/libexec/bin
+
+You can install Python packages with
+  pip3.11 install <package>
+They will install into the site-package directory
+  /opt/homebrew/lib/python3.11/site-packages
+
+`idle3.11` requires tkinter, which is available separately:
+  brew install python-tk@3.11
+
+gdbm (`dbm.gnu`) is no longer included in this formula, but it is available separately:
+  brew install python-gdbm@3.11
+`dbm.ndbm` changed database backends in Homebrew Python 3.11.
+If you need to read a database from a previous Homebrew Python created via `dbm.ndbm`,
+you'll need to read your database using the older version of Homebrew Python and convert to another format.
+`dbm` still defaults to `dbm.gnu` when it is installed.
+
+If you do not need a specific version of Python, and always want Homebrew's `python3` in your PATH:
+  brew install python3
+
+For more information about Homebrew and Python, see: https://docs.brew.sh/Homebrew-and-Python
+
+--- python3 --version ---
+Python 3.14.2
+
+--- python3.11 --version ---
+Python 3.11.14
+
+--- which python3 ---
+/opt/homebrew/bin/python3
+
+--- brew --prefix python@3.11 ---
+/opt/homebrew/opt/python@3.11
