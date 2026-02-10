@@ -55,7 +55,7 @@
   - Date: 2026-02-10T21:36:07Z
   - Subagent: Executor
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-install-log.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-smoke-test.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
-  - Commit: 
+  - Commit: 88eb4c0
 
 ---
 
