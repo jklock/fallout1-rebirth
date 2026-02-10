@@ -73,7 +73,29 @@
 - 2026-02-10T21:36:07Z — Executor — Installed patched DATs into app and performed smoke test (PASS).
   - Commands: `cp GOG/patchedfiles/master.dat $APP_RESOURCES/ && cp GOG/patchedfiles/critter.dat $APP_RESOURCES/ && rsync -av GOG/patchedfiles/data/ $APP_RESOURCES/data/ && open "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app" && pgrep -f fallout1-rebirth`
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-install-log.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-smoke-test.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
-  - Commit: e06d635
+  - Commit: a1c6465
+
+- 2026-02-10T21:55:25Z — Executor — Completed M-1 72-map runtime sweep (PASS).
+  - Commands: `PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --timeout 90 --out-dir development/RME/ARTIFACTS/evidence/gate-2/runtime > development/RME/ARTIFACTS/evidence/gate-2/sweep-log.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep.csv`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep_run.log`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep.md`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots/`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-sweep-check.txt`
+  - Commit: e3f2321
+
+---
+
+## Phase 2 Task Checklist (follow `TODO.maps.md`)
+- [x] M-1 — 72-map runtime sweep (PASS)
+  - Date: 2026-02-10T21:55:25Z
+  - Subagent: Executor
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/` (`runtime_map_sweep.csv`, `runtime_map_sweep_run.log`, `runtime_map_sweep.md`, `screenshots/`)
+
+- [ ] M-2 — Patchlog sweep
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/`
+
+- [ ] M-3 — Analyze patchlogs
+- [ ] M-4 — Review present-anomaly screenshots
+- [ ] M-5 — Flaky map repeats
+- [ ] M-6 — Big-endian map individual tests
+- [ ] M-7 — Manual map verification
 
 ---
 
