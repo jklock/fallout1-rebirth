@@ -1,0 +1,24 @@
+Gate 1 Manifest
+Timestamp: 2026-02-10T21:06:15Z
+
+Files and SHA256 checksums:
+071be6eaa32dc86600af0ad0467fb492ffecb688eba649fd705d10695d1c1b77  development/RME/ARTIFACTS/evidence/gate-1/checksum_notice.txt
+249fbbf844287b4a7339e14c7674acd8b79ba781d39e5bea85a82082a3d836de  development/RME/ARTIFACTS/evidence/gate-1/critter_patched.sha256
+51834d67138d983cd0b24e5013da6c59b4804ab001f202f54bd451f77e249843  development/RME/ARTIFACTS/evidence/gate-1/critter_unpatched.sha256
+ec7fdaba2420a627ae8d21227ad5538499115114857f9b878f8041da79adc18f  development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-log-20260210T205645Z.txt
+ec7fdaba2420a627ae8d21227ad5538499115114857f9b878f8041da79adc18f  development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-log.txt
+619242d4fcdc3c8dce81ab9e6b33b2aa7165910a90a9e33a7e38ae269e50fb18  development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-manifest-20260210T205717Z.txt
+619242d4fcdc3c8dce81ab9e6b33b2aa7165910a90a9e33a7e38ae269e50fb18  development/RME/ARTIFACTS/evidence/gate-1/gate-1-build-manifest.txt
+d67dcd39c81daf922d8228ddec4b0aef7ac18d5159fa3da69848cfc0c93ec282  development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt
+82a660a7b452758d87fbb9c59082774aae58e47baad4e63ff42728d1ad88c028  development/RME/ARTIFACTS/evidence/gate-1/gate-1-patch-log-20260210T205948Z.txt
+82a660a7b452758d87fbb9c59082774aae58e47baad4e63ff42728d1ad88c028  development/RME/ARTIFACTS/evidence/gate-1/gate-1-patch-log.txt
+61f7753243e93a8f3155c6816ac250725015bf9523c26f6aab63d34b21be24c3  development/RME/ARTIFACTS/evidence/gate-1/gate-1-prereq-check-20260210T204843Z.txt
+61f7753243e93a8f3155c6816ac250725015bf9523c26f6aab63d34b21be24c3  development/RME/ARTIFACTS/evidence/gate-1/gate-1-prereq-check.txt
+0317d7c817ea2028149d8950525b633a779d6dd4b3a9e0dd5e741469b4c2b934  development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210T210426Z.txt
+0317d7c817ea2028149d8950525b633a779d6dd4b3a9e0dd5e741469b4c2b934  development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt
+90beee286de6eeedd4777dc05191c74954329f0473149efca255b6884b6304b7  development/RME/ARTIFACTS/evidence/gate-1/gate-1-validate-output-20260210T210246Z.txt
+90beee286de6eeedd4777dc05191c74954329f0473149efca255b6884b6304b7  development/RME/ARTIFACTS/evidence/gate-1/gate-1-validate-output.txt
+8290a43d8f731354e62d6b407c3a5217a8e504fb8455651303cbee6f6ab4fe5c  development/RME/ARTIFACTS/evidence/gate-1/lst_copy_notice.txt
+07ea175d477d965403e494d6021cde25926ec4ded99f38ec0b5ca77bda18b56e  development/RME/ARTIFACTS/evidence/gate-1/master_patched.sha256
+244f93d418064c9378b0bb384b04d2912c70e87f10b65c0ed03b3b2b9bd29b03  development/RME/ARTIFACTS/evidence/gate-1/master_unpatched.sha256
+8ba4436a910b8451282ee5e33dd974f95f3863d9d4ed1a35aa6c65f467b5e118  development/RME/ARTIFACTS/evidence/gate-1/unpatched_vs_patched.diff
