@@ -49,7 +49,7 @@
   - Date: 2026-02-10T21:32:41Z
   - Subagent: Executor
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
-  - Commit: 
+  - Commit: 91a231b
 
 - [ ] I-5 — Patched data installed in app bundle and smoke test passed
   - Date: 
