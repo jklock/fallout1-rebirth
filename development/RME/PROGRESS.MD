@@ -95,6 +95,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-repeats-manifest.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt`
   - Commit: 328d51f
 
+- 2026-02-10T22:39:20Z — Executor — Re-ran CARAVAN once with increased TIMEOUT=180 and patchlogging (FAIL).
+  - Commands: `PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" F1R_PATCHLOG=1 TIMEOUT=180 OUT_DIR=development/RME/ARTIFACTS/evidence/gate-2/runtime ./scripts/patch/rme-repeat-map.sh CARAVAN 1 > development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-1-timeout180.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-1-timeout180.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-caravan-rerun-summary.md`
+  - Commit: 45ec8e4
+
 ---
 
 ## Phase 2 Task Checklist (follow `TODO.maps.md`)
