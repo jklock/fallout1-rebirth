@@ -45,12 +45,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-validate-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-validate-output-20260210T210246Z.txt`
   - Commit: 4e69bbc72a62e4df8e31213f0ce506d48e41f7d9
 
-- [FAILED] I-4 — Validation evidence refreshed (STOPPED)
-  - Date: 2026-02-10T21:16:04Z
+- [x] I-4 — Validation evidence refreshed
+  - Date: 2026-02-10T21:32:41Z
   - Subagent: Executor
-  - Error: Validation refresh failed during runtime validation: **Missing required tool `xdelta3`** (see `development/RME/ARTIFACTS/evidence/gate-1/raw/rebirth_validate.log`). Recommend: install `xdelta3` (e.g., `brew install xdelta3`) and re-run the refresh using Python 3.11.
-  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-211327UTC.txt`, `development/RME/ARTIFACTS/evidence/gate-1/raw/rebirth_validate.log`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`, `gate-1-manifest.txt` (repo root)
-  - Commit: a09729a7743ad0e70982764d91d8fbc8ee9d3431
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
+  - Commit: 
 
 - [ ] I-5 — Patched data installed in app bundle and smoke test passed
   - Date: 
@@ -65,6 +64,10 @@
 - 2026-02-10T21:27:08Z — Executor — Installed `xdelta` via Homebrew and recorded verification.
   - Commands: `brew install xdelta`, `which xdelta3`, `xdelta3 --version`
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-install-xdelta.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
+
+- 2026-02-10T21:32:41Z — Executor — Re-ran refresh validation using Python 3.11 (PASS).
+  - Commands: `PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" ./scripts/patch/rebirth-refresh-validation.sh --unpatched GOG/unpatchedfiles --patched GOG/patchedfiles --rme third_party/rme/source --out development/RME/ARTIFACTS/evidence/gate-1/`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-manifest.txt`
   - Commit: e06d635
 
 ---

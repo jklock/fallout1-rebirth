@@ -11,4 +11,3 @@
 [0;34m>>>[0m 12) Script reference audit (scripts.lst vs MAP/PRO)
 [0;32m[OK][0m Validation refreshed at: development/RME/ARTIFACTS/evidence/gate-1/
 REFRESH_EXIT:0
-COPIED_TO: development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt
