@@ -83,7 +83,7 @@
 - 2026-02-10T22:09:46Z — Executor — Completed M-2 patchlog sweep (PASS).
   - Commands: `F1R_PATCHLOG=1 PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --timeout 90 --out-dir development/RME/ARTIFACTS/evidence/gate-2/runtime > development/RME/ARTIFACTS/evidence/gate-2/sweep-patchlog-log.txt 2>&1`
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/` (72 patchlogs), `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-count.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-warnings.txt`, `development/RME/ARTIFACTS/evidence/gate-2/sweep-patchlog-log.txt`
-  - Commit: TBD
+  - Commit: c3c580a
 
 ---
 
