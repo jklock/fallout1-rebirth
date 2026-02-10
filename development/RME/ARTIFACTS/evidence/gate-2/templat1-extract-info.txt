@@ -1,0 +1,11 @@
+Source DAT: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/master.dat
+Key: MAPS\TEMPLAT1.MAP
+OFFSET=210667813 LENGTH=44848 FLAGS=0x40 FIELD_C=7733
+Extracted: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/data/maps/TEMPLAT1.MAP SIZE=44848 SHA256=337f930939de5db1d985793e5e2b9cb28e6d91a012e9d0c8bbc8f3776389f208
+file: data
+xxd head:
+00000000: 00 00 00 13 54 45 4d 50 4c 41 54 31 2e 4d 41 50  ....TEMPLAT1.MAP
+00000010: 00 00 00 00 00 00 4e 84 00 00 00 00 00 00 00 00  ......N.........
+00000020: 00 00 00 00 00 00 00 00 00 00 00 0c 00 00 00 01  ................
+00000030: 00 00 00 00 ff ff ff ff 00 00 00 00 00 00 00 00  ................
+map_endian_note: map_endian=big

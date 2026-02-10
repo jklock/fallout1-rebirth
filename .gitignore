@@ -66,6 +66,10 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+# Allow RME evidence artifacts to be committed (narrow exception)
+!development/RME/ARTIFACTS/evidence/
+!development/RME/ARTIFACTS/evidence/gate-2/
+!development/RME/ARTIFACTS/evidence/gate-2/*.txt
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
@@ -435,3 +439,8 @@ scripts/hideall.sh
 # Ignore local game data backups
 game-data/
 GOG/
+# Allow committed patched map artifacts needed for RME evidence
+!GOG/patchedfiles/
+!GOG/patchedfiles/data/
+!GOG/patchedfiles/data/maps/
+!GOG/patchedfiles/data/maps/*.MAP
