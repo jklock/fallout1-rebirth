@@ -15,7 +15,7 @@
 
 ## After placeholder fonts (rerun)
 
-- Rerun output: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-manual-after-fonts.txt`
-- Run started: 2026-02-10T22:57:33Z (UTC)
-- Result: **FAIL** — CARAVAN did not load successfully; `AUTORUN_MAP` returned `rc=-1` (missing `MAPS/CARAVAN`). See patchlog: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.manual.patchlog.txt`
+- Rerun output: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-after-extract.txt`
+- Run started: 2026-02-10T23:08:01Z (UTC)
+- Result: **PASS** — CARAVAN loaded successfully; `AUTORUN_MAP` returned `rc=0`. See patchlog: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.MAP.patchlog.txt`
 
