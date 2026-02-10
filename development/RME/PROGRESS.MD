@@ -90,6 +90,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/gate-2-anomaly-review.md`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep.md`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/present-anomalies/`
   - Commit: 49a3a1b
 
+- 2026-02-10T22:33:32Z — Executor — M-5 Flaky repeats (FAIL; stopped on CARAVAN run 1).
+  - Commands: `PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" OUT_DIR=development/RME/ARTIFACTS/evidence/gate-2/runtime ./scripts/patch/rme-repeat-map.sh CARAVAN 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-repeats-manifest.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt`
+  - Commit: 328d51f
+
 ---
 
 ## Phase 2 Task Checklist (follow `TODO.maps.md`)
