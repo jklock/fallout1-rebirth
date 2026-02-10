@@ -357,6 +357,10 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
             }
         }
 
+        if (do_log && preSrcNonZero == 0 && preSurfaceNonZero > 0) {
+            patchlog_write("GNW_SHOW_RECT_DEBUG", "preSrcNonZero=%ld preSurfaceNonZero=%ld sampleSrc0=%d sampleSurf0=%d area=%d srcPtr=%p surfacePtr=%p", preSrcNonZero, preSurfaceNonZero, sampleSrc0, sampleSurf0, area, srcPtr, surfacePtr);
+        }
+
         if (dest_non_zero) {
             // Log the skipped copy for triage.
             patchlog_write("GNW_SHOW_RECT_SKIP_ZERO", "dest=(%d,%d) copy=%dx%d area=%d srcPtr=%p preSurfaceNonZero=%ld", copyX, copyY, copyW, copyH, area, srcPtr, dest_non_zero);
