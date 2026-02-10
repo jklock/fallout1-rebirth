@@ -25,7 +25,16 @@ M-5 Flaky map repeats (10 runs each) — status: FAILED (stopped on first failur
     - Notes: No patchlog or run log was produced; analyzer indicated missing patchlog file on that run.
 
 - ZDESERT1 (10)
-  - Result: NOT RUN (M-5 stopped due to CARAVAN failure)
+  - Result: FAIL (run 1 terminated; script exit code 3)
+  - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt
+    - SHA256: 614139faf1c14e8f8704646a92980e5f034f0f213e33debff8f25ffb45b46110
+  - Fail artifact: development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.txt
+    - SHA256: b3490e246307a33185d38430785e821210df168612f1ee5270e8fe94187fd259
+  - Patchlog analyze: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.patchlog_analyze.txt
+    - SHA256: 681ffd6933a63c9f5c45916a63e6f3adb96be4559906fc875be62e255eb4c097
+  - Run log: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.run.log
+    - SHA256: 86cc0dff42cf41d992447fc0eaf521b50f8a584d6890f4e5a3b717f102e33174
+  - Notes: The first repeat run produced suspicious GNW_SHOW_RECT events (see patchlog analyze). A screenshot was captured at development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/ZDESERT1.iter01.bmp
 
 - TEMPLAT1 (10)
   - Result: NOT RUN (M-5 stopped due to CARAVAN failure)

@@ -105,6 +105,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/CARAVAN.iter01.bmp`
   - Commit: 1661bd5
 
+- 2026-02-10T23:22:49Z — Executor — Re-ran M-5 ZDESERT1 (10 repeats) (FAIL; stopped on run 1).
+  - Commands: `OUT_DIR="$(pwd)/development/RME/ARTIFACTS/evidence/gate-2/runtime" PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" ./scripts/patch/rme-repeat-map.sh ZDESERT1 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/ZDESERT1.iter01.bmp`
+  - Commit: 1661bd5
+
 ---
 
 ## Phase 2 Task Checklist (follow `TODO.maps.md`)
