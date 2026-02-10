@@ -99,7 +99,12 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/` (72 patchlogs), `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-count.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-warnings.txt`, `development/RME/ARTIFACTS/evidence/gate-2/sweep-patchlog-log.txt`
   - Commit: TBD
 
-- [ ] M-3 — Analyze patchlogs
+- [x] M-3 — Analyze patchlogs (PASS)
+  - Date: 2026-02-10T22:19:49Z
+  - Subagent: Executor
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-warn-counts.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-error-counts.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-map-warnings.csv`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-top20.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-excerpts.txt`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-summary.md`
+  - Commands: `grep -rh "WARN" development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ 2>/dev/null | sort | uniq -c | sort -rn > development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-warn-counts.txt`, `grep -rh "ERROR" development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ 2>/dev/null | sort | uniq -c | sort -rn > development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-error-counts.txt`, `for f in development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/*.patchlog.txt; do n=$(grep -c "reason=missing\|DB_OPEN_FAIL" "$f" 2>/dev/null || echo 0); b=$(basename "$f" .patchlog.txt); echo "$b,$n"; done > development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-map-warnings.csv`, `grep -rh "reason=missing" development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ 2>/dev/null | sed 's/^\[[^]]*\] //' | sort | uniq -c | sort -rn | head -n 40 > development/RME/ARTIFACTS/evidence/gate-2/gate-2-patchlog-top20.txt`, `# excerpts and summary generated (gate-2-patchlog-excerpts.txt, gate-2-patchlog-summary.md)`
+  - Commit: 74d05e5
 - [ ] M-4 — Review present-anomaly screenshots
 - [ ] M-5 — Flaky map repeats
 - [ ] M-6 — Big-endian map individual tests
