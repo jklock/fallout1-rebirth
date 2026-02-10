@@ -20,3 +20,25 @@ M-5 Flaky map repeats (10 runs each) — status: FAILED (stopped on first failur
 
 
 Summary: M-5 stopped at first failure (CARAVAN). See the artifacts above for diagnostics. If desired, re-run M-5 for remaining maps after investigating CARAVAN failure.
+
+M-6 Big-endian RME maps (3 runs each) — NOT RUN (blocked by M-5 failure)
+
+- BROHD12 (3)
+  - Result: NOT RUN
+- CHILDRN1 (3)
+  - Result: NOT RUN
+- CHILDRN2 (3)
+  - Result: NOT RUN
+- HUBDWNTN (3)
+  - Result: NOT RUN
+- HUBMIS1 (3)
+  - Result: NOT RUN
+- HUBOLDTN (3)
+  - Result: NOT RUN
+- HUBWATER (3)
+  - Result: NOT RUN
+- JUNKCSNO (3)
+  - Result: NOT RUN
+- JUNKKILL (3)
+  - Result: NOT RUN
+
