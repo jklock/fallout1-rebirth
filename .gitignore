@@ -398,6 +398,15 @@ FodyWeavers.xsd
 /build-*
 /_deps
 
+# RME runtime artifacts (do not commit large binary run artifacts)
+development/RME/validation/runtime/patchlogs/*
+development/RME/validation/runtime/present-anomalies/*
+development/RME/validation/runtime/screenshots-individual/*
+# Local tmp for build checks
+/tmp/
+/tmp
+tmp/
+
 # Game data (must not be committed - copyrighted)
 game-data/
 master.dat
