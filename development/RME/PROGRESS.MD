@@ -141,11 +141,11 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/gate-2-anomaly-review.md`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/runtime_map_sweep.md`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/present-anomalies/`
   - Commit: 49a3a1b
 - [x] M-5 — Flaky map repeats (FAIL)
-  - Date: 2026-02-10T22:30:15Z
+  - Date: 2026-02-10T23:24:40Z
   - Subagent: Executor
-  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/gate-2-repeats-manifest.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt`
-  - Commands: `PATH="$(brew --prefix python@3.11)/libexec/bin:$(brew --prefix python@3.11)/bin:$PATH" OUT_DIR=development/RME/ARTIFACTS/evidence/gate-2/runtime ./scripts/patch/rme-repeat-map.sh CARAVAN 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt 2>&1`
-  - Commit: 328d51f
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/gate-2-repeats-manifest.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt`
+  - Commands: Re-ran `./scripts/patch/rme-repeat-map.sh` for CARAVAN, ZDESERT1, TEMPLAT1 with 10 repeats each, captured outputs in `development/RME/ARTIFACTS/evidence/gate-2/repeats/` and per-run artifacts in `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/`
+  - Commit: 1a085a8
 - [ ] M-6 — Big-endian map individual tests
   - Note: NOT RUN (blocked by M-5 failure)
 - [ ] M-7 — Manual map verification
