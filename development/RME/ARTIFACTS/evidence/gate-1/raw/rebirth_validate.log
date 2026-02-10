@@ -1,0 +1,3 @@
+[0;34m>>>[0m Validating RME DATA overlay...
+[0;32m[OK][0m RME DATA overlay verified (1126 files)
+[0;31m[ERROR][0m Missing required tool: xdelta3
