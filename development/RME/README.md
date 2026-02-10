@@ -15,6 +15,11 @@ Documentation and planning materials for the Restoration Mod Engine (RME) integr
 | `todo/` | Outstanding tasks and work items |
 | `validation/` | Testing and validation procedures |
 
+## Navigation (what to read)
+- Coverage plan: [plan/coverage.md](plan/coverage.md)
+- Tasks (step-by-step): [todo/engine_todo.md](todo/engine_todo.md), [todo/game_data_todo.md](todo/game_data_todo.md), [todo/scripts_todo.md](todo/scripts_todo.md), [todo/validation_todo.md](todo/validation_todo.md)
+- Validation outputs: [validation/runtime](validation/runtime) (sweep logs, patchlogs, screenshots), [validation/raw](validation/raw) (crossref/LST/hash reports)
+
 ## About RME
 
 The Restoration Mod Engine extends Fallout 1 with:
@@ -28,6 +33,19 @@ The Restoration Mod Engine extends Fallout 1 with:
 RME integration is **COMPLETED** (Phase 3). See the following for details:
 - `third_party/rme/` - RME source code
 - `summary/` - Integration summary reports
+
+## Definition of Done (100% validated & working)
+- Data integrity: `rebirth-validate-data.sh` missing=0, mismatched=0; base DAT re-xdelta matches patched hashes.
+- Crossref/LST: `08_lst_missing.md` empty; no unresolved references.
+- Runtime: runtime_map_sweep.csv includes all maps (72) with zero failures/suspicious; `patchlog_summary.csv` all `suspicious=0`; present-anomalies empty; flaky-map repeats clean.
+- Functional: per-mod spot checks in [todo/validation_todo.md](todo/validation_todo.md) pass (dialogs, NPC mod behaviors, restored content, fonts/SFX/art) with no crashes.
+- Artifacts archived under `development/RME/validation/` (raw + runtime) with command lines used.
+
+## How to validate (quick path)
+- Patch data: `./scripts/patch/rebirth-patch-data.sh --base <unpatched> --out <patched> --rme third_party/rme/source`
+- Validate data: `./scripts/patch/rebirth-validate-data.sh --patched <patched> --base <unpatched> --rme third_party/rme/source`
+- Runtime sweep (macOS): `./scripts/patch/rme-run-validation.sh` (uses build-macos + default dirs) to produce runtime_map_sweep.* and patchlogs.
+- Flaky maps: `TIMEOUT=120 ./scripts/patch/rme-repeat-map.sh CARAVAN 5` (repeat for ZDESERT1/2/3, TEMPLAT1) and confirm analyzers are clean.
 
 ## Related Files
 

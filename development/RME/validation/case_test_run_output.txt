@@ -1,1 +1,0 @@
-Done case-test; results written to GOG/validation/case_test_results.txt

@@ -1,4 +1,0 @@
-map,exit_code,duration_s,screenshot,bmp_w,bmp_h,top_mean,top_black_pct,bot_mean,bot_black_pct
-BRODEAD.MAP,0,19.025,scr00000.bmp,640,480,224.36,0.00,160.01,0.83
-BROHD12.MAP,0,43.085,scr00000.bmp,640,480,92.43,0.10,149.13,0.83
-BROHD34.MAP,0,48.781,scr00000.bmp,640,480,88.36,1.27,147.34,0.83
