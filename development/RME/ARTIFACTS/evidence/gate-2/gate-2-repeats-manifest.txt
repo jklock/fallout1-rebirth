@@ -8,17 +8,21 @@ M-5 Flaky map repeats (10 runs each) — status: FAILED (stopped on first failur
   - Result: FAIL (run 1 terminated; script exit code 3)
   - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt
     - SHA256: 8ac978a4ed1594b15188eae945e0bbb0ead351dfbb1f48ff436b6ed1df425e71
+  - Fail artifact: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.txt
+    - SHA256: 293cfc08996c68568c7562d45dea9d816668dda6aa93712ca78d0e6fbacf4a32
   - Patchlog analyze: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt
-    - SHA256: 2c7556b211908e84f3e43d619cd8e57decd8c3ef1ffaac0c2a65ad979e6e8644
-  - Notes: The run attempted to reference `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt` and `.../CARAVAN.iter01.run.log` but these files were not present; the analyze output contains a FileNotFoundError.
+    - SHA256: 3fc3ef523f0992aed35e54c85562a709833e7b54ef17c2bd032b64b653b6845f
+  - Run log: development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.run.log
+    - SHA256: 63b01edc8f1a1789457bc1ba0b8eb27a7877924fcd5cff68b1c2b7feccdab74e
+  - Notes: The first repeat run produced suspicious GNW_SHOW_RECT events (see patchlog analyze). A screenshot was captured at development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/CARAVAN.iter01.bmp
 
-  - Rerun (single; TIMEOUT=180)
+  - Previous: Rerun (single; TIMEOUT=180)
     - Result: FAIL (iter01 terminated; exit code 3)
     - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-1-timeout180.txt
       - SHA256: 6555c83fa701e063ff1b75d719fde0a68c999ae7936fdb453f6284e90c3b0be5
     - Patchlog analyze: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN.iter01.patchlog_analyze.txt
       - SHA256: 89c6125d0ba53ef25c272aa2a9efb0828030d28e16767c238555ab6cde65d91c
-    - Notes: No patchlog or run log was produced; analyzer indicates missing patchlog file. No screenshot produced.
+    - Notes: No patchlog or run log was produced; analyzer indicated missing patchlog file on that run.
 
 - ZDESERT1 (10)
   - Result: NOT RUN (M-5 stopped due to CARAVAN failure)
