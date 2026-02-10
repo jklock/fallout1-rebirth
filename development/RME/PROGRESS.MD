@@ -45,10 +45,12 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-validate-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/gate-1-validate-output-20260210T210246Z.txt`
   - Commit: 4e69bbc72a62e4df8e31213f0ce506d48e41f7d9
 
-- [ ] I-4 — Validation evidence refreshed
-  - Date: 
-  - Subagent: 
-  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/*sha256`, `*_files.txt`
+- [FAILED] I-4 — Validation evidence refreshed (STOPPED)
+  - Date: 2026-02-10T21:03:29Z
+  - Subagent: Executor
+  - Error: TypeError: write_text() got an unexpected keyword argument 'newline' (Python 3.9.6). Recommend: install Python 3.11+ (e.g., `brew install python@3.11`) and re-run the refresh script.
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output.txt`, `development/RME/ARTIFACTS/evidence/gate-1/unpatched_vs_patched.diff`, `development/RME/ARTIFACTS/evidence/master_patched.sha256`, `development/RME/ARTIFACTS/evidence/critter_patched.sha256`, `development/RME/ARTIFACTS/evidence/master_added_files.txt`, `development/RME/ARTIFACTS/evidence/patched_master_files.txt`
+  - Commit: ab564e33dc42e5d9ffffedd47ac2e00c30824568
 
 - [ ] I-5 — Patched data installed in app bundle and smoke test passed
   - Date: 
