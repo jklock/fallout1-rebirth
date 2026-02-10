@@ -1,0 +1,29 @@
+=== CARAVAN manual run START: 2026-02-10T22:46:17Z ===
+PID=17989
+2026-02-10 16:46:18.029 fallout1-rebirth[17989:77437570] svga_init: starting with 640x480 (scale=1)
+2026-02-10 16:46:18.126 fallout1-rebirth[17989:77437570] svga_init: SDL video subsystem initialized
+2026-02-10 16:46:18.126 fallout1-rebirth[17989:77437570] svga_init: video driver=cocoa
+2026-02-10 16:46:18.126 fallout1-rebirth[17989:77437570] svga_init: creating window 640x480 flags=0x2001
+2026-02-10 16:46:18.215 fallout1-rebirth[17989:77437570] svga_init: window created - size=1512x892, pixels=3024x1784
+2026-02-10 16:46:18.215 fallout1-rebirth[17989:77437570] svga_init: safe area: x=0 y=0 w=1512 h=892
+2026-02-10 16:46:18.215 fallout1-rebirth[17989:77437570] createRenderer: creating renderer for 640x480
+2026-02-10 16:46:18.228 fallout1-rebirth[17989:77437570] createRenderer: renderer created
+2026-02-10 16:46:18.229 fallout1-rebirth[17989:77437570] Display refresh rate: 60.00 Hz
+2026-02-10 16:46:18.229 fallout1-rebirth[17989:77437570] Display resolution: 1512x892
+2026-02-10 16:46:18.229 fallout1-rebirth[17989:77437570] createRenderer: logical presentation set to 640x480
+2026-02-10 16:46:18.229 fallout1-rebirth[17989:77437570] createRenderer: texture created
+2026-02-10 16:46:18.229 fallout1-rebirth[17989:77437570] createRenderer: texture surface created - initialization complete
+2026-02-10 16:46:18.229 fallout1-rebirth[17989:77437570] svga_init: renderer created successfully
+2026-02-10 16:46:18.231 fallout1-rebirth[17989:77437570] mouse_init: click offsets loaded from config: touch=(0,0) mouse=(0,0)
+2026-02-10 16:46:18.231 fallout1-rebirth[17989:77437570] mouse_set_shape: size=8x8 hotspot=(1,1) mouse_pos=(-1,-1) click_pos=(0,0)
+2026-02-10 16:47:11.883 fallout1-rebirth[17989:77437570] MOUSE_POS: raw=(319,239) hot=(1,1) result=(320,240)
+2026-02-10 16:47:11.884 fallout1-rebirth[17989:77437570] mouse_set_shape: size=18x18 hotspot=(0,0) mouse_pos=(320,240) click_pos=(320,240)
+2026-02-10 16:47:13.089 fallout1-rebirth[17989:77437570] mouse_set_shape: size=1x1 hotspot=(0,0) mouse_pos=(320,240) click_pos=(320,240)
+2026-02-10 16:47:13.094 fallout1-rebirth[17989:77437570] MOUSE_SHOW: render at raw=(320,240) size=(1,1) hot=(0,0)
+2026-02-10 16:47:13.244 fallout1-rebirth[17989:77437570] mouse_set_shape: size=18x18 hotspot=(0,0) mouse_pos=(320,240) click_pos=(320,240)
+2026-02-10 16:47:13.244 fallout1-rebirth[17989:77437570] mouse_set_shape: size=8x8 hotspot=(1,1) mouse_pos=(319,239) click_pos=(320,240)
+2026-02-10 16:47:13.394 fallout1-rebirth[17989:77437570] mouse_set_shape: size=8x8 hotspot=(1,1) mouse_pos=(319,239) click_pos=(320,240)
+Process exited at 2026-02-10T22:47:14Z
+Patchlog found: /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.manual.patchlog.txt
+Analysis written to /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.manual.patchlog.txt_analyze.txt
+Found screenshot /Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/scr00000.bmp, copying to /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-manual-scr.bmp
