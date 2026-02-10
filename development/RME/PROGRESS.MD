@@ -115,6 +115,12 @@
   - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/TEMPLAT1.iter01.bmp`
   - Commit: 1ab55b0
 
+- 2026-02-10T23:40:00Z — Executor — M-5 triage completed (CARAVAN, ZDESERT1, TEMPLAT1).
+  - Commands: Created triage reports and summary
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-CARAVAN.md`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-ZDESERT1.md`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-TEMPLAT1.md`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-summary.md`
+  - Next: **Restore missing maps** (P0) and re-run M-5 repeats; if failures persist, collect `patchlog` + screenshot evidence and open render bug.
+
+
 ---
 
 ## Phase 2 Task Checklist (follow `TODO.maps.md`)
