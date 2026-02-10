@@ -1,3 +1,6 @@
 b5e75aceb61365bbc6762dbdf5dc9a5248756e9a7b738edec412b4a9d6c4ebbf  gate-1-install-python.txt
+113253dcbc7f47df49ca073a61c4cdbc89b7046bf2fe9cc0a5091458163547ac  gate-1-refresh-output.txt
+113253dcbc7f47df49ca073a61c4cdbc89b7046bf2fe9cc0a5091458163547ac  gate-1-refresh-output-20260210-211327UTC.txt
+c4cc4217a57a6ff03bfb8c2ffffc5614edf43d052ae76960d60b6b31c8648d90  raw/rebirth_validate.log
 
-# Manifest created: Tue Feb 10 15:10:30 CST 2026
+# Manifest created: Tue Feb 10 21:16:04 UTC 2026
