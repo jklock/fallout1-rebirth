@@ -44,6 +44,27 @@ RME adds or modifies **387 art-related files** across two categories:
 
 ---
 
+## Task A-0: Verify interface fonts (font*.aaf)
+
+**Purpose**: Ensure interface font files are present in the app Resources so FMInit can load fonts successfully and UI text renders correctly.
+
+- [ ] **Check for font files in app Resources**
+  ```bash
+  ls "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources" | grep -Ei "font[0-9]+\.aaf" || echo "No interface fonts found"
+  ```
+
+- [ ] **Install fonts from patched data**
+  ```bash
+  mkdir -p "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources"
+  cp GOG/patchedfiles/data/font*.aaf "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/"
+  ```
+
+- [ ] **Verify FMInit success in runtime logs**
+  ```bash
+  # Look for errors indicating fonts could not be loaded
+  grep -R "Couldn't find/load text fonts" -n development/RME/ARTIFACTS/evidence/gate-2 || echo "No font errors found"
+  ```
+
 ## Task A-1: Verify Critter FRM File Presence
 
 Confirm all expected critter art files were patched into the game data.
