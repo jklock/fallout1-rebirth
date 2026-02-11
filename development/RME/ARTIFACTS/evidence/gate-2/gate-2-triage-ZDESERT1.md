@@ -72,5 +72,9 @@ Classification: **timeout / hang**
 - `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt`
 - `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.patchlog.txt`
 - `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.iter01.patchlog_analyze.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.run.log`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog_analyze.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01-present.bmp`
 
 **Owner/next action:** Executor — restore map files / re-run M-5
