@@ -1,0 +1,14 @@
+A-7 Skilldex manual verification - artifact
+
+Automated check: No FRM/PAL files matching ADDICT/DRUGREST/REPCHILD were found in GOG/patchedfiles/data/art (see A-7-skilldex.txt).
+
+Manual test steps:
+1) Launch the game (local build or simulator) and open the Skilldex UI.
+2) Locate entries for Addiction/Drug Rest/Rep Child (or similar skill names). Verify the icon and label are present and not blank/placeholder.
+3) Record the screen or take screenshots for each missing item.
+4) If icons/graphics are missing or incorrect, collect game log (patch log) and attach screenshots and logs to this artifact folder.
+
+Notes:
+- This check requires opening the UI in-game; it cannot be verified by file presence alone.
+- Owner: RME team (assign to person who performs manual verification)
+
