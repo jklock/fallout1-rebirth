@@ -85,3 +85,14 @@ Classification: **timeout / hang**
 ---
 
 **Owner/next action:** Executor — restore map files / re-run M-5
+
+### Manual run evidence (2026-02-11T03:01:47Z)
+- 
+- 
+- 
+
+
+### Manual run evidence (2026-02-11T03:01:57Z)
+- development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-manual-run.log
+- development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-manual-scr.bmp
+- development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.manual.patchlog_analyze.txt
