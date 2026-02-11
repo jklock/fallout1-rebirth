@@ -1,0 +1,11 @@
+A-8 Skilldex FRM checks
+
+Files in skilldex (list):
+-rw-r--r--@ 1 klock  staff  16454 Feb  9 15:00 GOG/patchedfiles/data/art/skilldex/ADDICT.FRM
+-rw-r--r--@ 1 klock  staff  16454 Feb  9 15:00 GOG/patchedfiles/data/art/skilldex/DRUGREST.FRM
+-rw-r--r--@ 1 klock  staff  16454 Feb  9 15:00 GOG/patchedfiles/data/art/skilldex/REPCHILD.FRM
+
+Manual checks:
+- REPCHILD: kill a child NPC (manual) and confirm Childkiller entry displays REPCHILD image
+- ADDICT/DRUGREST: trigger addiction/drug restriction statuses and confirm images display
+
