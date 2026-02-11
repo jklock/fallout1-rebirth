@@ -1,4 +1,4 @@
-Analyzing /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt
+Analyzing development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt
 
 Found 2 suspicious events (showing up to 2).
 
