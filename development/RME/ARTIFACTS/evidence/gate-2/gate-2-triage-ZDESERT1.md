@@ -78,3 +78,8 @@ Classification: **timeout / hang**
 - `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01-present.bmp`
 
 **Owner/next action:** Executor — restore map files / re-run M-5
+
+### Manual run evidence (2026-02-11T03:04:30Z)
+- development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-manual-run.log
+- development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-manual-scr.bmp
+- development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/ZDESERT1.manual.patchlog_analyze.txt
