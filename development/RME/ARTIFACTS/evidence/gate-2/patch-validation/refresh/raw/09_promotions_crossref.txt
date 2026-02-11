@@ -1,0 +1,3 @@
+9) Promotions crossref rows
+master_added_rows.csv:  114
+critter_added_rows.csv:  289

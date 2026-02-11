@@ -1,0 +1,7 @@
+  92 pro
+   8 gam
+   5 frm
+   5 int
+   2 msg
+   1 pal
+   1 acm
