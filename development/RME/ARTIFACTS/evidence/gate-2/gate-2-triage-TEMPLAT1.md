@@ -73,5 +73,9 @@ Classification: **timeout / hang**
 - `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt`
 - `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.patchlog.txt`
 - `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/TEMPLAT1.iter01.patchlog_analyze.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog_analyze.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01-present.bmp`
 
 **Owner/next action:** Executor — restore map files / re-run M-5
