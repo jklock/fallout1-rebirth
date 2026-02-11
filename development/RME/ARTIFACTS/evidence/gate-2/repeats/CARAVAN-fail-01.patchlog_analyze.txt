@@ -1,0 +1,433 @@
+Analyzing development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt
+
+Found 2 suspicious events (showing up to 2).
+
+--- Event #1/2: 2184:2026-02-10 17:18:06 ---
+seq=131 surfacePtr=0xa166d3610 dest=(0,380) copy=640x100 src_nonzero=0 surf_pre=64000 surf_post=0 disp_pre=0 disp_post=0 tex_pre=64000 tex_post=64000
+
+Nearest prior GNW_SHOW_RECT_SRC:
+  2183: seq=130 srcPtr=0xa15588010 surfacePtr=0xa166d3610 dest=(0,380) copy=640x100 srcOffset=(0,0) sampleSrc0=0 sampleSurf0=228
+
+Matching WIN_FILL / SCRBLIT events (nearest first):
+  2181: dest=0,380 w=640 h=100 bk_color=0 srcPtr=0xa15588010
+
+Context (last 1000 lines):
+  1985: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/art/items/items.lst" mode="rt"
+  1986: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/art/critters/critters.lst" mode="rt"
+  1987: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/scenery/scenery.lst" mode="rt"
+  1988: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\SCENERY\SCENERY.LST" mode="rt" flags=64
+  1989: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/walls/walls.lst" mode="rt"
+  1990: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\WALLS\WALLS.LST" mode="rt" flags=64
+  1991: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/tiles/tiles.lst" mode="rt"
+  1992: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\TILES\TILES.LST" mode="rt" flags=64
+  1993: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/misc/misc.lst" mode="rt"
+  1994: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\MISC\MISC.LST" mode="rt" flags=64
+  1995: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/art/intrface/intrface.lst" mode="rt"
+  1996: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/art/inven/inven.lst" mode="rt"
+  1997: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/heads/heads.lst" mode="rt"
+  1998: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\HEADS\HEADS.LST" mode="rt" flags=64
+  1999: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/backgrnd/backgrnd.lst" mode="rt"
+  2000: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\BACKGRND\BACKGRND.LST" mode="rt" flags=64
+  2001: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/skilldex/skilldex.lst" mode="rt"
+  2002: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\SKILLDEX\SKILLDEX.LST" mode="rt" flags=64
+  2003: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/art/critters/critters.lst" mode="rt"
+  2004: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/heads/heads.lst" mode="rt"
+  2005: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\HEADS\HEADS.LST" mode="rt" flags=64
+  2006: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/IFACE.FRM" mode="rb"
+  2007: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\IFACE.FRM" mode="rb" flags=64
+  2008: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/IFACE.FRM" mode="rb"
+  2009: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\IFACE.FRM" mode="rb" flags=64
+  2010: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/INVBUTUP.FRM" mode="rb"
+  2011: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\INVBUTUP.FRM" mode="rb" flags=64
+  2012: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/INVBUTUP.FRM" mode="rb"
+  2013: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\INVBUTUP.FRM" mode="rb" flags=64
+  2014: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/INVBUTDN.FRM" mode="rb"
+  2015: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\INVBUTDN.FRM" mode="rb" flags=64
+  2016: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/INVBUTDN.FRM" mode="rb"
+  2017: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\INVBUTDN.FRM" mode="rb" flags=64
+  2018: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/OPTIUP.FRM" mode="rb"
+  2019: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\OPTIUP.FRM" mode="rb" flags=64
+  2020: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/OPTIUP.FRM" mode="rb"
+  2021: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\OPTIUP.FRM" mode="rb" flags=64
+  2022: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/OPTIDN.FRM" mode="rb"
+  2023: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\OPTIDN.FRM" mode="rb" flags=64
+  2024: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/OPTIDN.FRM" mode="rb"
+  2025: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\OPTIDN.FRM" mode="rb" flags=64
+  2026: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/bigredup.frm" mode="rb"
+  2027: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BIGREDUP.FRM" mode="rb" flags=64
+  2028: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/bigredup.frm" mode="rb"
+  2029: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BIGREDUP.FRM" mode="rb" flags=64
+  2030: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/bigreddn.frm" mode="rb"
+  2031: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BIGREDDN.FRM" mode="rb" flags=64
+  2032: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/bigreddn.frm" mode="rb"
+  2033: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BIGREDDN.FRM" mode="rb" flags=64
+  2034: [2026-02-10 17:18:05] [TRANS_SRC_COPY] rect=22x21 pre=462 writes=374 post=462
+  2035: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/MAPUP.FRM" mode="rb"
+  2036: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MAPUP.FRM" mode="rb" flags=64
+  2037: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/MAPUP.FRM" mode="rb"
+  2038: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MAPUP.FRM" mode="rb" flags=64
+  2039: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/MAPDN.FRM" mode="rb"
+  2040: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MAPDN.FRM" mode="rb" flags=64
+  2041: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/MAPDN.FRM" mode="rb"
+  2042: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MAPDN.FRM" mode="rb" flags=64
+  2043: [2026-02-10 17:18:05] [TRANS_SRC_COPY] rect=41x19 pre=779 writes=779 post=779
+  2044: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/pipup.frm" mode="rb"
+  2045: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\PIPUP.FRM" mode="rb" flags=64
+  2046: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/pipup.frm" mode="rb"
+  2047: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\PIPUP.FRM" mode="rb" flags=64
+  2048: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/pipdn.frm" mode="rb"
+  2049: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\PIPDN.FRM" mode="rb" flags=64
+  2050: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/pipdn.frm" mode="rb"
+  2051: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\PIPDN.FRM" mode="rb" flags=64
+  2052: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/chaup.frm" mode="rb"
+  2053: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\CHAUP.FRM" mode="rb" flags=64
+  2054: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/chaup.frm" mode="rb"
+  2055: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\CHAUP.FRM" mode="rb" flags=64
+  2056: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/chadn.frm" mode="rb"
+  2057: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\CHADN.FRM" mode="rb" flags=64
+  2058: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/chadn.frm" mode="rb"
+  2059: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\CHADN.FRM" mode="rb" flags=64
+  2060: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/SATTKBUP.FRM" mode="rb"
+  2061: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\SATTKBUP.FRM" mode="rb" flags=64
+  2062: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/SATTKBUP.FRM" mode="rb"
+  2063: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\SATTKBUP.FRM" mode="rb" flags=64
+  2064: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/SATTKBDN.FRM" mode="rb"
+  2065: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\SATTKBDN.FRM" mode="rb" flags=64
+  2066: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/SATTKBDN.FRM" mode="rb"
+  2067: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\SATTKBDN.FRM" mode="rb" flags=64
+  2068: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/SATURBUP.FRM" mode="rb"
+  2069: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\SATURBUP.FRM" mode="rb" flags=64
+  2070: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/SATURBUP.FRM" mode="rb"
+  2071: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\SATURBUP.FRM" mode="rb" flags=64
+  2072: [2026-02-10 17:18:05] [TRANS_SRC_COPY] rect=188x67 pre=12596 writes=12596 post=12596
+  2073: [2026-02-10 17:18:05] [TRANS_SRC_COPY] rect=22x21 pre=462 writes=374 post=462
+  2074: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/NUMBERS.FRM" mode="rb"
+  2075: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\NUMBERS.FRM" mode="rb" flags=64
+  2076: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/NUMBERS.FRM" mode="rb"
+  2077: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\NUMBERS.FRM" mode="rb" flags=64
+  2078: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/HLGRN.FRM" mode="rb"
+  2079: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\HLGRN.FRM" mode="rb" flags=64
+  2080: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/HLGRN.FRM" mode="rb"
+  2081: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\HLGRN.FRM" mode="rb" flags=64
+  2082: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/HLYEL.FRM" mode="rb"
+  2083: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\HLYEL.FRM" mode="rb" flags=64
+  2084: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/HLYEL.FRM" mode="rb"
+  2085: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\HLYEL.FRM" mode="rb" flags=64
+  2086: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/HLRED.FRM" mode="rb"
+  2087: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\HLRED.FRM" mode="rb" flags=64
+  2088: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/HLRED.FRM" mode="rb"
+  2089: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\HLRED.FRM" mode="rb" flags=64
+  2090: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/text/english/game/intrface.msg" mode="rt"
+  2091: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/WARNBOX.FRM" mode="rb"
+  2092: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\WARNBOX.FRM" mode="rb" flags=64
+  2093: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/WARNBOX.FRM" mode="rb"
+  2094: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\WARNBOX.FRM" mode="rb" flags=64
+  2095: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/ACTMENU.FRM" mode="rb"
+  2096: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\ACTMENU.FRM" mode="rb" flags=64
+  2097: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/ACTMENU.FRM" mode="rb"
+  2098: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\ACTMENU.FRM" mode="rb" flags=64
+  2099: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/ACTPICK.FRM" mode="rb"
+  2100: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\ACTPICK.FRM" mode="rb" flags=64
+  2101: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/ACTPICK.FRM" mode="rb"
+  2102: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\ACTPICK.FRM" mode="rb" flags=64
+  2103: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/ACTTOHIT.FRM" mode="rb"
+  2104: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\ACTTOHIT.FRM" mode="rb" flags=64
+  2105: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/ACTTOHIT.FRM" mode="rb"
+  2106: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\ACTTOHIT.FRM" mode="rb" flags=64
+  2107: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/blank.frm" mode="rb"
+  2108: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BLANK.FRM" mode="rb" flags=64
+  2109: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/blank.frm" mode="rb"
+  2110: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BLANK.FRM" mode="rb" flags=64
+  2111: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/msef000.frm" mode="rb"
+  2112: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MSEF000.FRM" mode="rb" flags=64
+  2113: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/msef000.frm" mode="rb"
+  2114: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MSEF000.FRM" mode="rb" flags=64
+  2115: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/STDARROW.FRM" mode="rb"
+  2116: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\STDARROW.FRM" mode="rb" flags=64
+  2117: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/art/intrface/STDARROW.FRM" mode="rb"
+  2118: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\STDARROW.FRM" mode="rb" flags=64
+  2119: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/proto/items/items.lst" mode="rt"
+  2120: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/proto/critters/critters.lst" mode="rt"
+  2121: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/proto/scenery/scenery.lst" mode="rt"
+  2122: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\PROTO\SCENERY\SCENERY.LST" mode="rt" flags=64
+  2123: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/proto/walls/walls.lst" mode="rt"
+  2124: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\PROTO\WALLS\WALLS.LST" mode="rt" flags=64
+  2125: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/proto/tiles/tiles.lst" mode="rt"
+  2126: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\PROTO\TILES\TILES.LST" mode="rt" flags=64
+  2127: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/proto/misc/misc.lst" mode="rt"
+  2128: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\PROTO\MISC\MISC.LST" mode="rt" flags=64
+  2129: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/premade/player.gcd" mode="rb"
+  2130: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\PREMADE\PLAYER.GCD" mode="rb" flags=64
+  2131: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/text/english/game/pro_item.msg" mode="rt"
+  2132: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/text/english/game/pro_crit.msg" mode="rt"
+  2133: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\TEXT\ENGLISH\GAME\PRO_CRIT.MSG" mode="rt" flags=64
+  2134: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/text/english/game/pro_scen.msg" mode="rt"
+  2135: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\TEXT\ENGLISH\GAME\PRO_SCEN.MSG" mode="rt" flags=64
+  2136: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/text/english/game/pro_wall.msg" mode="rt"
+  2137: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\TEXT\ENGLISH\GAME\PRO_WALL.MSG" mode="rt" flags=64
+  2138: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/text/english/game/pro_tile.msg" mode="rt"
+  2139: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\TEXT\ENGLISH\GAME\PRO_TILE.MSG" mode="rt" flags=64
+  2140: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/text/english/game/pro_misc.msg" mode="rt"
+  2141: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\TEXT\ENGLISH\GAME\PRO_MISC.MSG" mode="rt" flags=64
+  2142: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/text/english/game/proto.msg" mode="rt"
+  2143: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/scripts/scripts.lst" mode="rt"
+  2144: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/data/vault13.gam" mode="rt"
+  2145: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/text/english/game/script.msg" mode="rt"
+  2146: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/scripts/scripts.lst" mode="rt"
+  2147: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/text/english/game/combat.msg" mode="rt"
+  2148: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/MAPS/AUTOMAP.DB" mode="wb"
+  2149: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/text/english/game/misc.msg" mode="rt"
+  2150: [2026-02-10 17:18:05] [DB_OPEN_OK] source=patches path="data/text/english/game/combatai.msg" mode="rt"
+  2151: [2026-02-10 17:18:05] [GNW_SHOW_RECT_SRC] seq=124 srcPtr=0xa15588010 surfacePtr=0xa16698010 dest=(0,0) copy=640x480 srcOffset=(0,0) sampleSrc0=228 sampleSurf0=157
+  2152: [2026-02-10 17:18:05] [GNW_SHOW_RECT] seq=125 surfacePtr=0xa16698010 dest=(0,0) copy=640x480 src_nonzero=307200 surf_pre=307199 surf_post=307200 disp_pre=243200 disp_post=243200 tex_pre=306737 tex_post=307200
+  2153: [2026-02-10 17:18:05] [DB_OPEN_MISS] source=patches path="data/color.pal" mode="rb"
+  2154: [2026-02-10 17:18:05] [DB_OPEN_OK] source=datafile path=".\COLOR.PAL" mode="rb" flags=64
+  2155: [2026-02-10 17:18:05] [RENDER_PRESENT_ANOMALY] seq=126 pre=0 present=856080
+  2156: [2026-02-10 17:18:06] [RENDER_PRESENT_ANOMALY] screenshot=/Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/runtime/present-anomalies/f1r-present-anom-126.bmp
+  2157: [2026-02-10 17:18:06] [RENDER_PRESENT_TOP_PIXELS] seq=127 pre=0 present=856080
+  2158: [2026-02-10 17:18:06] [DB_OPEN_OK] source=patches path="data/text/english/game/map.msg" mode="rt"
+  2159: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/intrface/BLANK.FRM" mode="rb"
+  2160: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BLANK.FRM" mode="rb" flags=64
+  2161: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/intrface/BLANK.FRM" mode="rb"
+  2162: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\BLANK.FRM" mode="rb" flags=64
+  2163: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/critters/hmjmpsaa.frm" mode="rb"
+  2164: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\CRITTERS\HMJMPSAA.FRM" mode="rb" flags=64
+  2165: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/critters/hmjmpsaa.frm" mode="rb"
+  2166: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\CRITTERS\HMJMPSAA.FRM" mode="rb" flags=64
+  2167: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/intrface/egg.frm" mode="rb"
+  2168: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\EGG.FRM" mode="rb" flags=64
+  2169: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/intrface/egg.frm" mode="rb"
+  2170: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\EGG.FRM" mode="rb" flags=64
+  2171: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/intrface/MSEF003.FRM" mode="rb"
+  2172: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MSEF003.FRM" mode="rb" flags=64
+  2173: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/art/intrface/MSEF003.FRM" mode="rb"
+  2174: [2026-02-10 17:18:06] [DB_OPEN_OK] source=datafile path=".\ART\INTRFACE\MSEF003.FRM" mode="rb" flags=64
+  2175: [2026-02-10 17:18:06] [GNW_SHOW_RECT] seq=128 surfacePtr=0xa166bd950 dest=(320,240) copy=1x1 src_nonzero=1 surf_pre=1 surf_post=1 disp_pre=1 disp_post=1 tex_pre=0 tex_post=0
+  2176: [2026-02-10 17:18:06] [AUTORUN_MAP] load_start map="CARAVAN"
+  2177: [2026-02-10 17:18:06] [DB_OPEN_MISS] source=patches path="data/MAPS/CARAVAN" mode="rb"
+  2178: [2026-02-10 17:18:06] [DB_OPEN_FAIL] source=datafile reason=missing request="MAPS\CARAVAN" path=".\MAPS\CARAVAN" mode="rb"
+  2179: [2026-02-10 17:18:06] [AUTORUN_MAP] load_end map="CARAVAN" rc=-1
+  2180: [2026-02-10 17:18:06] [RENDER_PRESENT_TOP_PIXELS] seq=129 pre=230400 present=856080
+  2181: [2026-02-10 17:18:06] [WIN_FILL_RECT] dest=0,380 w=640 h=100 bk_color=0 srcPtr=0xa15588010
+  2182: [2026-02-10 17:18:06] [DEBUG_MEM] no-overlap buf=0xa15588010 width=640 height=100
+  2183: [2026-02-10 17:18:06] [GNW_SHOW_RECT_SRC] seq=130 srcPtr=0xa15588010 surfacePtr=0xa166d3610 dest=(0,380) copy=640x100 srcOffset=(0,0) sampleSrc0=0 sampleSurf0=228
+  2184: [2026-02-10 17:18:06] [GNW_SHOW_RECT] seq=131 surfacePtr=0xa166d3610 dest=(0,380) copy=640x100 src_nonzero=0 surf_pre=64000 surf_post=0 disp_pre=0 disp_post=0 tex_pre=64000 tex_post=64000
+
+
+--- Event #2/2: 2992:2026-02-10 17:18:07 ---
+seq=160 surfacePtr=0xa16698010 dest=(0,0) copy=640x380 src_nonzero=0 surf_pre=243200 surf_post=0 disp_pre=0 disp_post=0 tex_pre=243200 tex_post=0
+
+Nearest prior GNW_SHOW_RECT_SRC:
+  2991: seq=159 srcPtr=0xa1554c010 surfacePtr=0xa16698010 dest=(0,0) copy=640x380 srcOffset=(0,0) sampleSrc0=0 sampleSurf0=207
+
+Matching WIN_FILL / SCRBLIT events (nearest first):
+  2989: dest=0,0 w=640 h=380 bk_color=0 srcPtr=0xa1554c010
+  2984: dest=0,380 w=640 h=100 bk_color=0 srcPtr=0xa167e0010
+  2961: dest=320,240 w=18 h=18 bk_color=0 srcPtr=0xa158a3010
+  2958: dest=320,240 w=18 h=18 bk_color=0 srcPtr=0xa158a3010
+  2952: dest=320,240 w=1 h=1 bk_color=0 srcPtr=0xa179fdd50
+
+Context (last 1000 lines):
+  2793: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=1 srcRow=0xa15571d10 dstRow=0xa155a0290
+  2794: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=2 srcRow=0xa15571f90 dstRow=0xa155a0510
+  2795: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=3 srcRow=0xa15572210 dstRow=0xa155a0790
+  2796: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=4 srcRow=0xa15572490 dstRow=0xa155a0a10
+  2797: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=5 srcRow=0xa15572710 dstRow=0xa155a0c90
+  2798: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=6 srcRow=0xa15572990 dstRow=0xa155a0f10
+  2799: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=7 srcRow=0xa15572c10 dstRow=0xa155a1190
+  2800: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=8 srcRow=0xa15572e90 dstRow=0xa155a1410
+  2801: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=9 srcRow=0xa15573110 dstRow=0xa155a1690
+  2802: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=10 srcRow=0xa15573390 dstRow=0xa155a1910
+  2803: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=11 srcRow=0xa15573610 dstRow=0xa155a1b90
+  2804: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=12 srcRow=0xa15573890 dstRow=0xa155a1e10
+  2805: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=13 srcRow=0xa15573b10 dstRow=0xa155a2090
+  2806: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=14 srcRow=0xa15573d90 dstRow=0xa155a2310
+  2807: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=15 srcRow=0xa15574010 dstRow=0xa155a2590
+  2808: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=16 srcRow=0xa15574290 dstRow=0xa155a2810
+  2809: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=17 srcRow=0xa15574510 dstRow=0xa155a2a90
+  2810: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=18 srcRow=0xa15574790 dstRow=0xa155a2d10
+  2811: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=19 srcRow=0xa15574a10 dstRow=0xa155a2f90
+  2812: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=20 srcRow=0xa15574c90 dstRow=0xa155a3210
+  2813: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=21 srcRow=0xa15574f10 dstRow=0xa155a3490
+  2814: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=22 srcRow=0xa15575190 dstRow=0xa155a3710
+  2815: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=23 srcRow=0xa15575410 dstRow=0xa155a3990
+  2816: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=24 srcRow=0xa15575690 dstRow=0xa155a3c10
+  2817: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=25 srcRow=0xa15575910 dstRow=0xa155a3e90
+  2818: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=26 srcRow=0xa15575b90 dstRow=0xa155a4110
+  2819: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=27 srcRow=0xa15575e10 dstRow=0xa155a4390
+  2820: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=28 srcRow=0xa15576090 dstRow=0xa155a4610
+  2821: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=29 srcRow=0xa15576310 dstRow=0xa155a4890
+  2822: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=30 srcRow=0xa15576590 dstRow=0xa155a4b10
+  2823: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=31 srcRow=0xa15576810 dstRow=0xa155a4d90
+  2824: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=32 srcRow=0xa15576a90 dstRow=0xa155a5010
+  2825: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=33 srcRow=0xa15576d10 dstRow=0xa155a5290
+  2826: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=34 srcRow=0xa15576f90 dstRow=0xa155a5510
+  2827: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=35 srcRow=0xa15577210 dstRow=0xa155a5790
+  2828: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=36 srcRow=0xa15577490 dstRow=0xa155a5a10
+  2829: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=37 srcRow=0xa15577710 dstRow=0xa155a5c90
+  2830: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=38 srcRow=0xa15577990 dstRow=0xa155a5f10
+  2831: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=39 srcRow=0xa15577c10 dstRow=0xa155a6190
+  2832: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=40 srcRow=0xa15577e90 dstRow=0xa155a6410
+  2833: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=41 srcRow=0xa15578110 dstRow=0xa155a6690
+  2834: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=42 srcRow=0xa15578390 dstRow=0xa155a6910
+  2835: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=43 srcRow=0xa15578610 dstRow=0xa155a6b90
+  2836: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=44 srcRow=0xa15578890 dstRow=0xa155a6e10
+  2837: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=45 srcRow=0xa15578b10 dstRow=0xa155a7090
+  2838: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=46 srcRow=0xa15578d90 dstRow=0xa155a7310
+  2839: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=47 srcRow=0xa15579010 dstRow=0xa155a7590
+  2840: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=48 srcRow=0xa15579290 dstRow=0xa155a7810
+  2841: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=49 srcRow=0xa15579510 dstRow=0xa155a7a90
+  2842: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=50 srcRow=0xa15579790 dstRow=0xa155a7d10
+  2843: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=51 srcRow=0xa15579a10 dstRow=0xa155a7f90
+  2844: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=52 srcRow=0xa15579c90 dstRow=0xa155a8210
+  2845: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=53 srcRow=0xa15579f10 dstRow=0xa155a8490
+  2846: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=54 srcRow=0xa1557a190 dstRow=0xa155a8710
+  2847: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=55 srcRow=0xa1557a410 dstRow=0xa155a8990
+  2848: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=56 srcRow=0xa1557a690 dstRow=0xa155a8c10
+  2849: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=57 srcRow=0xa1557a910 dstRow=0xa155a8e90
+  2850: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=58 srcRow=0xa1557ab90 dstRow=0xa155a9110
+  2851: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=59 srcRow=0xa1557ae10 dstRow=0xa155a9390
+  2852: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=60 srcRow=0xa1557b090 dstRow=0xa155a9610
+  2853: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=61 srcRow=0xa1557b310 dstRow=0xa155a9890
+  2854: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=62 srcRow=0xa1557b590 dstRow=0xa155a9b10
+  2855: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=63 srcRow=0xa1557b810 dstRow=0xa155a9d90
+  2856: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=64 srcRow=0xa1557ba90 dstRow=0xa155aa010
+  2857: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=65 srcRow=0xa1557bd10 dstRow=0xa155aa290
+  2858: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=66 srcRow=0xa1557bf90 dstRow=0xa155aa510
+  2859: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=67 srcRow=0xa1557c210 dstRow=0xa155aa790
+  2860: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=68 srcRow=0xa1557c490 dstRow=0xa155aaa10
+  2861: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=69 srcRow=0xa1557c710 dstRow=0xa155aac90
+  2862: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=70 srcRow=0xa1557c990 dstRow=0xa155aaf10
+  2863: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=71 srcRow=0xa1557cc10 dstRow=0xa155ab190
+  2864: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=72 srcRow=0xa1557ce90 dstRow=0xa155ab410
+  2865: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=73 srcRow=0xa1557d110 dstRow=0xa155ab690
+  2866: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=74 srcRow=0xa1557d390 dstRow=0xa155ab910
+  2867: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=75 srcRow=0xa1557d610 dstRow=0xa155abb90
+  2868: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=76 srcRow=0xa1557d890 dstRow=0xa155abe10
+  2869: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=77 srcRow=0xa1557db10 dstRow=0xa155ac090
+  2870: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=78 srcRow=0xa1557dd90 dstRow=0xa155ac310
+  2871: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=79 srcRow=0xa1557e010 dstRow=0xa155ac590
+  2872: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=80 srcRow=0xa1557e290 dstRow=0xa155ac810
+  2873: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=81 srcRow=0xa1557e510 dstRow=0xa155aca90
+  2874: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=82 srcRow=0xa1557e790 dstRow=0xa155acd10
+  2875: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=83 srcRow=0xa1557ea10 dstRow=0xa155acf90
+  2876: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=84 srcRow=0xa1557ec90 dstRow=0xa155ad210
+  2877: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=85 srcRow=0xa1557ef10 dstRow=0xa155ad490
+  2878: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=86 srcRow=0xa1557f190 dstRow=0xa155ad710
+  2879: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=87 srcRow=0xa1557f410 dstRow=0xa155ad990
+  2880: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=88 srcRow=0xa1557f690 dstRow=0xa155adc10
+  2881: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=89 srcRow=0xa1557f910 dstRow=0xa155ade90
+  2882: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=90 srcRow=0xa1557fb90 dstRow=0xa155ae110
+  2883: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=91 srcRow=0xa1557fe10 dstRow=0xa155ae390
+  2884: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=92 srcRow=0xa15580090 dstRow=0xa155ae610
+  2885: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=93 srcRow=0xa15580310 dstRow=0xa155ae890
+  2886: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=94 srcRow=0xa15580590 dstRow=0xa155aeb10
+  2887: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=95 srcRow=0xa15580810 dstRow=0xa155aed90
+  2888: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=96 srcRow=0xa15580a90 dstRow=0xa155af010
+  2889: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=97 srcRow=0xa15580d10 dstRow=0xa155af290
+  2890: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=98 srcRow=0xa15580f90 dstRow=0xa155af510
+  2891: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=99 srcRow=0xa15581210 dstRow=0xa155af790
+  2892: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=100 srcRow=0xa15581490 dstRow=0xa155afa10
+  2893: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=101 srcRow=0xa15581710 dstRow=0xa155afc90
+  2894: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=102 srcRow=0xa15581990 dstRow=0xa155aff10
+  2895: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=103 srcRow=0xa15581c10 dstRow=0xa155b0190
+  2896: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=104 srcRow=0xa15581e90 dstRow=0xa155b0410
+  2897: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=105 srcRow=0xa15582110 dstRow=0xa155b0690
+  2898: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=106 srcRow=0xa15582390 dstRow=0xa155b0910
+  2899: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=107 srcRow=0xa15582610 dstRow=0xa155b0b90
+  2900: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=108 srcRow=0xa15582890 dstRow=0xa155b0e10
+  2901: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=109 srcRow=0xa15582b10 dstRow=0xa155b1090
+  2902: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=110 srcRow=0xa15582d90 dstRow=0xa155b1310
+  2903: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=111 srcRow=0xa15583010 dstRow=0xa155b1590
+  2904: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=112 srcRow=0xa15583290 dstRow=0xa155b1810
+  2905: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=113 srcRow=0xa15583510 dstRow=0xa155b1a90
+  2906: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=114 srcRow=0xa15583790 dstRow=0xa155b1d10
+  2907: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=115 srcRow=0xa15583a10 dstRow=0xa155b1f90
+  2908: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=116 srcRow=0xa15583c90 dstRow=0xa155b2210
+  2909: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=117 srcRow=0xa15583f10 dstRow=0xa155b2490
+  2910: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=118 srcRow=0xa15584190 dstRow=0xa155b2710
+  2911: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=119 srcRow=0xa15584410 dstRow=0xa155b2990
+  2912: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=120 srcRow=0xa15584690 dstRow=0xa155b2c10
+  2913: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=121 srcRow=0xa15584910 dstRow=0xa155b2e90
+  2914: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=122 srcRow=0xa15584b90 dstRow=0xa155b3110
+  2915: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=123 srcRow=0xa15584e10 dstRow=0xa155b3390
+  2916: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=124 srcRow=0xa15585090 dstRow=0xa155b3610
+  2917: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=125 srcRow=0xa15585310 dstRow=0xa155b3890
+  2918: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=126 srcRow=0xa15585590 dstRow=0xa155b3b10
+  2919: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=127 srcRow=0xa15585810 dstRow=0xa155b3d90
+  2920: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=128 srcRow=0xa15585a90 dstRow=0xa155b4010
+  2921: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=129 srcRow=0xa15585d10 dstRow=0xa155b4290
+  2922: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=130 srcRow=0xa15585f90 dstRow=0xa155b4510
+  2923: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=131 srcRow=0xa15586210 dstRow=0xa155b4790
+  2924: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=132 srcRow=0xa15586490 dstRow=0xa155b4a10
+  2925: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=133 srcRow=0xa15586710 dstRow=0xa155b4c90
+  2926: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=134 srcRow=0xa15586990 dstRow=0xa155b4f10
+  2927: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=135 srcRow=0xa15586c10 dstRow=0xa155b5190
+  2928: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=136 srcRow=0xa15586e90 dstRow=0xa155b5410
+  2929: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=137 srcRow=0xa15587110 dstRow=0xa155b5690
+  2930: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=138 srcRow=0xa15587390 dstRow=0xa155b5910
+  2931: [2026-02-10 17:18:07] [GNW_SHOW_RECT_SRC] seq=149 srcPtr=0xa155a0010 surfacePtr=0xa166bda90 dest=(0,241) copy=640x139 srcOffset=(0,0) sampleSrc0=207 sampleSurf0=207
+  2932: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=150 surfacePtr=0xa166bda90 dest=(0,241) copy=640x139 src_nonzero=88960 surf_pre=88960 surf_post=88960 disp_pre=88960 disp_post=88960 tex_pre=88960 tex_post=88960
+  2933: [2026-02-10 17:18:07] [DEBUG_MEM] compBuf=0xa155a0010 compW=640 compH=139 buf=0xa15588010
+  2934: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa15588010
+  2935: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=0,240 w=320 h=1 bk_color=0 srcPtr=0xa158a2e90
+  2936: [2026-02-10 17:18:07] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(0,240,319,240) inter=(0,240,319,240) compW=320 compH=1 src=0xa1554c010 comp=0xa158a3010
+  2937: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=0 srcRow=0xa15571810 dstRow=0xa158a3010
+  2938: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=151 surfacePtr=0xa166bd810 dest=(0,240) copy=320x1 src_nonzero=320 surf_pre=320 surf_post=320 disp_pre=320 disp_post=320 tex_pre=320 tex_post=320
+  2939: [2026-02-10 17:18:07] [DEBUG_MEM] compBuf=0xa158a3010 compW=320 compH=1 buf=0xa158a2e90
+  2940: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa158a2e90
+  2941: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=321,240 w=319 h=1 bk_color=0 srcPtr=0xa158a2e90
+  2942: [2026-02-10 17:18:07] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(321,240,639,240) inter=(321,240,639,240) compW=319 compH=1 src=0xa1554c010 comp=0xa158a3010
+  2943: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=0 srcRow=0xa15571951 dstRow=0xa158a3010
+  2944: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=152 surfacePtr=0xa166bd951 dest=(321,240) copy=319x1 src_nonzero=319 surf_pre=319 surf_post=319 disp_pre=319 disp_post=319 tex_pre=319 tex_post=319
+  2945: [2026-02-10 17:18:07] [DEBUG_MEM] compBuf=0xa158a3010 compW=319 compH=1 buf=0xa158a2e90
+  2946: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa158a2e90
+  2947: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=320,240 w=1 h=1 bk_color=0 srcPtr=0xa179fdd50
+  2948: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa179fdd50
+  2949: [2026-02-10 17:18:07] [GNW_SHOW_RECT_DEBUG] preSrcNonZero=0 preSurfaceNonZero=1 sampleSrc0=0 sampleSurf0=207 area=1 srcPtr=0xa179fdd30 surfacePtr=0xa166bd950
+  2950: [2026-02-10 17:18:07] [GNW_SHOW_RECT_SKIP_ZERO] dest=(320,240) copy=1x1 area=1 srcPtr=0xa179fdd30 preSurfaceNonZero=1
+  2951: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=153 surfacePtr=0xa166bd950 dest=(320,240) copy=1x1 src_nonzero=0 surf_pre=1 surf_post=1 disp_pre=1 disp_post=1 tex_pre=1 tex_post=1
+  2952: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=320,240 w=1 h=1 bk_color=0 srcPtr=0xa179fdd50
+  2953: [2026-02-10 17:18:07] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(320,240,320,240) inter=(320,240,320,240) compW=1 compH=1 src=0xa1554c010 comp=0xa179fdd70
+  2954: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=0 srcRow=0xa15571950 dstRow=0xa179fdd70
+  2955: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=154 surfacePtr=0xa166bd950 dest=(320,240) copy=1x1 src_nonzero=1 surf_pre=1 surf_post=1 disp_pre=1 disp_post=1 tex_pre=1 tex_post=1
+  2956: [2026-02-10 17:18:07] [DEBUG_MEM] compBuf=0xa179fdd70 compW=1 compH=1 buf=0xa179fdd50
+  2957: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa179fdd50
+  2958: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=320,240 w=18 h=18 bk_color=0 srcPtr=0xa158a3010
+  2959: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa158a3010
+  2960: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=155 surfacePtr=0xa166bd950 dest=(320,240) copy=18x18 src_nonzero=215 surf_pre=324 surf_post=215 disp_pre=324 disp_post=324 tex_pre=324 tex_post=215
+  2961: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=320,240 w=18 h=18 bk_color=0 srcPtr=0xa158a3010
+  2962: [2026-02-10 17:18:07] [DEBUG_COPY] mapPitch=640 mapRect=(0,0,639,379) vRect=(320,240,337,257) inter=(320,240,337,257) compW=18 compH=18 src=0xa1554c010 comp=0xa158a3190
+  2963: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=0 srcRow=0xa15571950 dstRow=0xa158a3190
+  2964: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=1 srcRow=0xa15571bd0 dstRow=0xa158a31a2
+  2965: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=2 srcRow=0xa15571e50 dstRow=0xa158a31b4
+  2966: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=3 srcRow=0xa155720d0 dstRow=0xa158a31c6
+  2967: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=4 srcRow=0xa15572350 dstRow=0xa158a31d8
+  2968: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=5 srcRow=0xa155725d0 dstRow=0xa158a31ea
+  2969: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=6 srcRow=0xa15572850 dstRow=0xa158a31fc
+  2970: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=7 srcRow=0xa15572ad0 dstRow=0xa158a320e
+  2971: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=8 srcRow=0xa15572d50 dstRow=0xa158a3220
+  2972: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=9 srcRow=0xa15572fd0 dstRow=0xa158a3232
+  2973: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=10 srcRow=0xa15573250 dstRow=0xa158a3244
+  2974: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=11 srcRow=0xa155734d0 dstRow=0xa158a3256
+  2975: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=12 srcRow=0xa15573750 dstRow=0xa158a3268
+  2976: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=13 srcRow=0xa155739d0 dstRow=0xa158a327a
+  2977: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=14 srcRow=0xa15573c50 dstRow=0xa158a328c
+  2978: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=15 srcRow=0xa15573ed0 dstRow=0xa158a329e
+  2979: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=16 srcRow=0xa15574150 dstRow=0xa158a32b0
+  2980: [2026-02-10 17:18:07] [DEBUG_COPY_ROW] r=17 srcRow=0xa155743d0 dstRow=0xa158a32c2
+  2981: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=156 surfacePtr=0xa166bd950 dest=(320,240) copy=18x18 src_nonzero=324 surf_pre=215 surf_post=324 disp_pre=324 disp_post=324 tex_pre=215 tex_post=324
+  2982: [2026-02-10 17:18:07] [DEBUG_MEM] compBuf=0xa158a3190 compW=18 compH=18 buf=0xa158a3010
+  2983: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa158a3010
+  2984: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=0,380 w=640 h=100 bk_color=0 srcPtr=0xa167e0010
+  2985: [2026-02-10 17:18:07] [DEBUG_MEM] no-overlap buf=0xa167e0010 width=640 height=100
+  2986: [2026-02-10 17:18:07] [GNW_SHOW_RECT_SRC] seq=157 srcPtr=0xa167e0010 surfacePtr=0xa166d3610 dest=(0,380) copy=640x100 srcOffset=(0,0) sampleSrc0=0 sampleSurf0=0
+  2987: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=158 surfacePtr=0xa166d3610 dest=(0,380) copy=640x100 src_nonzero=0 surf_pre=0 surf_post=0 disp_pre=0 disp_post=0 tex_pre=0 tex_post=0
+  2988: [2026-02-10 17:18:07] [DEBUG_MEM] freeing buf=0xa167e0010
+  2989: [2026-02-10 17:18:07] [WIN_FILL_RECT] dest=0,0 w=640 h=380 bk_color=0 srcPtr=0xa1554c010
+  2990: [2026-02-10 17:18:07] [DEBUG_MEM] no-map-rect buf=0xa1554c010 width=640 height=380
+  2991: [2026-02-10 17:18:07] [GNW_SHOW_RECT_SRC] seq=159 srcPtr=0xa1554c010 surfacePtr=0xa16698010 dest=(0,0) copy=640x380 srcOffset=(0,0) sampleSrc0=0 sampleSurf0=207
+  2992: [2026-02-10 17:18:07] [GNW_SHOW_RECT] seq=160 surfacePtr=0xa16698010 dest=(0,0) copy=640x380 src_nonzero=0 surf_pre=243200 surf_post=0 disp_pre=0 disp_post=0 tex_pre=243200 tex_post=0
+
+
+Done

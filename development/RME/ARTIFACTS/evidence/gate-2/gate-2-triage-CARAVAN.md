@@ -77,6 +77,10 @@ Classification: **timeout / hang**
 - `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog.txt`
 - `development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.iter01.patchlog_analyze.txt`
 - `development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/CARAVAN.iter01.bmp`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.run.log`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog_analyze.txt`
+- `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01-present.bmp`
 
 ---
 
