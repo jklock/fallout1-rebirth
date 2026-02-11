@@ -1,0 +1,38 @@
+A-4 Mutant walking (MAMTNT) presence check
+FRM files (count and sample):
+mamtntbe.fr0
+mamtntbe.fr1
+mamtntbe.fr2
+mamtntbe.fr3
+mamtntbe.fr4
+mamtntbe.fr5
+mamtntbh.fr0
+mamtntbh.fr1
+mamtntbh.fr2
+mamtntbh.fr3
+mamtntbh.fr4
+mamtntbh.fr5
+mamtntbj.fr0
+mamtntbj.fr1
+mamtntbj.fr2
+mamtntbj.fr3
+mamtntbj.fr4
+mamtntbj.fr5
+mamtntbk.fr0
+mamtntbk.fr1
+mamtntbk.fr2
+mamtntbk.fr3
+mamtntbk.fr4
+mamtntbk.fr5
+mamtntbn.frm
+mamtntkb.frm
+mamtntmb.frm
+mamtntre.frm
+mamtntrh.frm
+mamtntrj.frm
+Count:       30
+
+CRITTERS.LST entries (grep):
+22:mamtnt,21
+
+Manual check required: Visit Necropolis / Military Base and confirm mutant walking animations. Evidence path: development/RME/ARTIFACTS/evidence/gate-2/art/A-4-mutant-walking.txt
