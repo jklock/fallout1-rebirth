@@ -60,6 +60,15 @@
 ---
 
 ## Recent Activity
+- 2026-02-11T01:10:23Z — Executor — Re-ran M-5 CARAVAN (10 repeats, TIMEOUT=180) (FAIL).
+  - Commands: `PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH" OUT_DIR=development/RME/ARTIFACTS/evidence/gate-2/runtime F1R_PATCHLOG=1 TIMEOUT=180 ./scripts/patch/rme-repeat-map.sh CARAVAN 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10-retry.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10-retry.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.bmp`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-manual-run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-manual-scr.bmp`
+- 2026-02-11T01:10:23Z — Executor — Re-ran M-5 ZDESERT1 (10 repeats, TIMEOUT=180) (FAIL).
+  - Commands: `PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH" OUT_DIR=development/RME/ARTIFACTS/evidence/gate-2/runtime F1R_PATCHLOG=1 TIMEOUT=180 ./scripts/patch/rme-repeat-map.sh ZDESERT1 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10-retry.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10-retry.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.bmp`
+- 2026-02-11T01:10:23Z — Executor — Re-ran M-5 TEMPLAT1 (10 repeats, TIMEOUT=180) (FAIL).
+  - Commands: `PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH" OUT_DIR=development/RME/ARTIFACTS/evidence/gate-2/runtime F1R_PATCHLOG=1 TIMEOUT=180 ./scripts/patch/rme-repeat-map.sh TEMPLAT1 10 > development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10-retry.txt 2>&1`
+  - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10-retry.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.bmp`
 - 2026-02-10 — automation — Created PROGRESS.md (this file)
 
 - 2026-02-10T21:27:08Z — Executor — Installed `xdelta` via Homebrew and recorded verification.
