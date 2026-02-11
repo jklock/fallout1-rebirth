@@ -208,7 +208,7 @@ Three maps showed inconsistent behavior in prior testing. Run each 10 times to v
   - **Result:** **FAIL** — stopped on run 1
     - Date: 2026-02-11T00:51:11Z
     - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01-present.bmp`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-CARAVAN.md`
-    - Commit: `a1e8b90`
+    - Commit: `19be36e`
 
 - [ ] **ZDESERT1 — 10 iterations**
   ```bash
@@ -219,7 +219,7 @@ Three maps showed inconsistent behavior in prior testing. Run each 10 times to v
   - **Result:** **FAIL** — stopped on run 1
     - Date: 2026-02-11T00:51:11Z
     - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01-present.bmp`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-ZDESERT1.md`
-    - Commit: `d13921f`
+    - Commit: `9a106e7`
 
 - [ ] **TEMPLAT1 — 10 iterations**
   ```bash
@@ -230,7 +230,7 @@ Three maps showed inconsistent behavior in prior testing. Run each 10 times to v
   - **Result:** **FAIL** — stopped on run 1
     - Date: 2026-02-11T00:51:11Z
     - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01-present.bmp`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-TEMPLAT1.md`
-    - Commit: `55cc8e7`
+    - Commit: `d7b1baa`
 
 - [ ] **Verify results**
   ```bash
