@@ -79,3 +79,9 @@ Classification: **timeout / hang**
 - `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01-present.bmp`
 
 **Owner/next action:** Executor — restore map files / re-run M-5
+
+### Manual run evidence (2026-02-11T03:06:41Z)
+- no manual patchlog produced; using  artifacts:
+  - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt
+  - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log
+  - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.bmp
