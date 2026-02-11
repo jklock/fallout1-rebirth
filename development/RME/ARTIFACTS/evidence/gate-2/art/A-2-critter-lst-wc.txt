@@ -1,0 +1,1 @@
+      60 GOG/patchedfiles/data/art/critters/critters.lst
