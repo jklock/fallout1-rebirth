@@ -6,9 +6,11 @@
 #include <TargetConditionals.h>
 #endif
 
+#include "game/map.h"
 #include "game/palette.h"
 #include "plib/color/color.h"
 #include "plib/db/db.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/button.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/grbuf.h"
@@ -809,6 +811,81 @@ void win_draw_rect(int win, const Rect* rect)
 }
 
 // 0x4C3094
+static bool merge_fill_group_and_blit(rectdata* group_start, rectdata* group_end, int bk_color)
+{
+    int group_ulx = group_start->rect.ulx;
+    int group_uly = group_start->rect.uly;
+    int group_lrx = group_end->rect.lrx;
+    int group_lry = group_end->rect.lry;
+    int compW = group_lrx - group_ulx + 1;
+    int compH = group_lry - group_uly + 1;
+
+    unsigned char* compBuf = (unsigned char*)mem_malloc((size_t)compW * (size_t)compH);
+    if (compBuf == NULL) {
+        return false;
+    }
+
+    for (int r = 0; r < compH; r++) {
+        memset(compBuf + r * compW, (unsigned char)bk_color, compW);
+    }
+
+    rectdata* g = group_start;
+    while (true) {
+        int w = g->rect.lrx - g->rect.ulx + 1;
+        int h = g->rect.lry - g->rect.uly + 1;
+        unsigned char* gbuf = (unsigned char*)mem_malloc(w * h);
+        if (gbuf == NULL) {
+            mem_free(compBuf);
+            return false;
+        }
+        buf_fill(gbuf, w, h, w, bk_color);
+
+        int dx = g->rect.ulx - group_ulx;
+        int dy = g->rect.uly - group_uly;
+        for (int r = 0; r < h; r++) {
+            memcpy(compBuf + (dy + r) * compW + dx, gbuf + r * w, w);
+        }
+
+        patchlog_write("DEBUG_MEM", "merged buf=%p w=%d h=%d into compBuf at dx=%d dy=%d", gbuf, w, h, dx, dy);
+        mem_free(gbuf);
+
+        if (g == group_end) {
+            break;
+        }
+        g = g->next;
+    }
+
+    Rect mapRect;
+    if (win_get_rect(display_win, &mapRect) == 0) {
+        int inter_ulx = std::max(mapRect.ulx, group_ulx);
+        int inter_uly = std::max(mapRect.uly, group_uly);
+        int inter_lrx = std::min(mapRect.lrx, group_lrx);
+        int inter_lry = std::min(mapRect.lry, group_lry);
+
+        if (inter_lrx >= inter_ulx && inter_lry >= inter_uly) {
+            unsigned char* mapBuf = win_get_buf(display_win);
+            if (mapBuf != NULL) {
+                int mapPitch = mapRect.lrx - mapRect.ulx + 1;
+                int inter_w = inter_lrx - inter_ulx + 1;
+                int inter_h = inter_lry - inter_uly + 1;
+                for (int r = 0; r < inter_h; r++) {
+                    unsigned char* srcRow = mapBuf + (inter_uly + r) * mapPitch + inter_ulx;
+                    unsigned char* dstRow = compBuf + (inter_uly - group_uly + r) * compW + (inter_ulx - group_ulx);
+                    patchlog_write("DEBUG_COPY_ROW", "r=%d srcRow=%p dstRow=%p", r, srcRow, dstRow);
+                    memcpy(dstRow, srcRow, inter_w);
+                }
+            }
+        }
+    }
+
+    scr_blit(compBuf, compW, compH, 0, 0, compW, compH, group_ulx, group_uly);
+    patchlog_write("DEBUG_MEM", "merged compBuf=%p compW=%d compH=%d group_ulx=%d group_uly=%d", compBuf, compW, compH, group_ulx, group_uly);
+    mem_free(compBuf);
+
+    return true;
+}
+
+// 0x4C3094
 void GNW_win_refresh(Window* w, Rect* rect, unsigned char* a3)
 {
     RectPtr v26, v20, v23, v24;
@@ -908,6 +985,11 @@ void GNW_win_refresh(Window* w, Rect* rect, unsigned char* a3)
                     unsigned char* buf = (unsigned char*)mem_malloc(width * height);
                     if (buf != NULL) {
                         buf_fill(buf, width, height, width, bk_color);
+
+                        if (patchlog_verbose()) {
+                            patchlog_write("WIN_FILL_RECT", "dest=%d,%d w=%d h=%d bk_color=%d srcPtr=%p",
+                                v16->rect.ulx, v16->rect.uly, width, height, bk_color, buf);
+                        }
                         if (dest_pitch != 0) {
                             buf_to_buf(
                                 buf,
@@ -918,6 +1000,10 @@ void GNW_win_refresh(Window* w, Rect* rect, unsigned char* a3)
                                 dest_pitch);
                         } else {
                             if (buffering) {
+                                if (patchlog_verbose()) {
+                                    patchlog_write("WIN_FILL_RECT_SCREENBUF", "dest=%d,%d w=%d h=%d bk_color=%d srcPtr=%p screenPtr=%p",
+                                        v16->rect.ulx, v16->rect.uly, width, height, bk_color, buf, screen_buffer + v16->rect.uly * (scr_size.lrx - scr_size.ulx + 1) + v16->rect.ulx);
+                                }
                                 buf_to_buf(buf,
                                     width,
                                     height,
@@ -925,10 +1011,115 @@ void GNW_win_refresh(Window* w, Rect* rect, unsigned char* a3)
                                     screen_buffer + v16->rect.uly * (scr_size.lrx - scr_size.ulx + 1) + v16->rect.ulx,
                                     scr_size.lrx - scr_size.ulx + 1);
                             } else {
-                                scr_blit(buf, width, height, 0, 0, width, height, v16->rect.ulx, v16->rect.uly);
+                                // To avoid a window into which a background fill briefly
+                                // overwrites map content (which can be presented to the
+                                // screen in the middle of the operation), build a single
+                                // composite buffer that contains the fill and any
+                                // overlapping map pixels, and perform exactly one scr_blit
+                                // to apply the final content atomically.
+                                Rect mapRect;
+                                if (win_get_rect(display_win, &mapRect) == 0) {
+                                    int inter_ulx = std::max(mapRect.ulx, v16->rect.ulx);
+                                    int inter_uly = std::max(mapRect.uly, v16->rect.uly);
+                                    int inter_lrx = std::min(mapRect.lrx, v16->rect.lrx);
+                                    int inter_lry = std::min(mapRect.lry, v16->rect.lry);
+
+                                    if (inter_lrx >= inter_ulx && inter_lry >= inter_uly) {
+                                        // Overlap exists - create a composite buffer
+                                        int compW = width;
+                                        int compH = height;
+                                        unsigned char* compBuf = (unsigned char*)mem_malloc((size_t)compW * (size_t)compH);
+                                        if (compBuf != NULL) {
+                                            // Copy the fill into the composite buffer
+                                            for (int r = 0; r < compH; r++) {
+                                                memcpy(compBuf + r * compW, buf + r * width, compW);
+                                            }
+
+                                            // Overlay the overlapping portion from the display buffer
+                                            int inter_w = inter_lrx - inter_ulx + 1;
+                                            int inter_h = inter_lry - inter_uly + 1;
+                                            unsigned char* mapBuf = win_get_buf(display_win);
+                                            if (mapBuf != NULL) {
+                                                int mapPitch = mapRect.lrx - mapRect.ulx + 1;
+                                                patchlog_write("DEBUG_COPY", "mapPitch=%d mapRect=(%d,%d,%d,%d) vRect=(%d,%d,%d,%d) inter=(%d,%d,%d,%d) compW=%d compH=%d src=%p comp=%p", mapPitch, mapRect.ulx, mapRect.uly, mapRect.lrx, mapRect.lry, v16->rect.ulx, v16->rect.uly, v16->rect.lrx, v16->rect.lry, inter_ulx, inter_uly, inter_lrx, inter_lry, compW, compH, mapBuf, compBuf);
+                                                for (int r = 0; r < inter_h; r++) {
+                                                    unsigned char* srcRow = mapBuf + (inter_uly + r) * mapPitch + inter_ulx;
+                                                    unsigned char* dstRow = compBuf + (inter_uly - v16->rect.uly + r) * compW + (inter_ulx - v16->rect.ulx);
+                                                    patchlog_write("DEBUG_COPY_ROW", "r=%d srcRow=%p dstRow=%p", r, srcRow, dstRow);
+                                                    memcpy(dstRow, srcRow, inter_w);
+                                                }
+                                            }
+
+                                            // Apply composite in a single blit so there is no window
+                                            // where the fill exists without the restored map content.
+                                            scr_blit(compBuf, compW, compH, 0, 0, compW, compH, v16->rect.ulx, v16->rect.uly);
+                                            patchlog_write("DEBUG_MEM", "compBuf=%p compW=%d compH=%d buf=%p", compBuf, compW, compH, buf);
+                                            mem_free(compBuf);
+                                        } else {
+                                            // Fallback to original behavior if allocation fails
+                                            patchlog_write("DEBUG_MEM", "fallback buf=%p width=%d height=%d", buf, width, height);
+                                            scr_blit(buf, width, height, 0, 0, width, height, v16->rect.ulx, v16->rect.uly);
+                                            unsigned char* mapBuf = win_get_buf(display_win);
+                                            if (mapBuf != NULL) {
+                                                int inter_w = inter_lrx - inter_ulx + 1;
+                                                int inter_h = inter_lry - inter_uly + 1;
+                                                unsigned char* src = mapBuf + inter_uly * (mapRect.lrx - mapRect.ulx + 1) + inter_ulx;
+                                                scr_blit(src, mapRect.lrx - mapRect.ulx + 1, 0, inter_ulx, inter_uly, inter_w, inter_h, inter_ulx, inter_uly);
+                                            }
+                                        }
+                                    } else {
+                                        // No overlap - try merging adjacent rects with the same vertical span
+                                        rectdata* group_start = v16;
+                                        rectdata* group_end = v16;
+                                        int group_lrx = v16->rect.lrx;
+                                        rectdata* probe = v16->next;
+                                        while (probe != NULL && probe->rect.uly == v16->rect.uly && probe->rect.lry == v16->rect.lry && probe->rect.ulx <= group_lrx + 1) {
+                                            group_lrx = std::max(group_lrx, probe->rect.lrx);
+                                            group_end = probe;
+                                            probe = probe->next;
+                                        }
+
+                                        if (group_start == group_end) {
+                                            patchlog_write("DEBUG_MEM", "no-overlap buf=%p width=%d height=%d", buf, width, height);
+                                            scr_blit(buf, width, height, 0, 0, width, height, v16->rect.ulx, v16->rect.uly);
+                                        } else {
+                                            // Attempt merged composite blit for the whole group
+                                            if (!merge_fill_group_and_blit(group_start, group_end, bk_color)) {
+                                                // Fallback: process each rect in the group individually
+                                                rectdata* g = group_start;
+                                                while (true) {
+                                                    int gw = g->rect.lrx - g->rect.ulx + 1;
+                                                    int gh = g->rect.lry - g->rect.uly + 1;
+                                                    unsigned char* gbuf = (unsigned char*)mem_malloc(gw * gh);
+                                                    if (gbuf != NULL) {
+                                                        buf_fill(gbuf, gw, gh, gw, bk_color);
+                                                        if (patchlog_verbose()) {
+                                                            patchlog_write("WIN_FILL_RECT", "dest=%d,%d w=%d h=%d bk_color=%d srcPtr=%p", g->rect.ulx, g->rect.uly, gw, gh, bk_color, gbuf);
+                                                        }
+                                                        scr_blit(gbuf, gw, gh, 0, 0, gw, gh, g->rect.ulx, g->rect.uly);
+                                                        mem_free(gbuf);
+                                                    }
+
+                                                    if (g == group_end) break;
+                                                    g = g->next;
+                                                }
+                                            }
+
+                                            // Advance v16 to the end of the group; the loop bottom will advance to group_end->next
+                                            v16 = group_end;
+                                        }
+                                    }
+                                } else {
+                                    // Couldn't get display rect - fall back to simple blit
+                                    patchlog_write("DEBUG_MEM", "no-map-rect buf=%p width=%d height=%d", buf, width, height);
+                                    scr_blit(buf, width, height, 0, 0, width, height, v16->rect.ulx, v16->rect.uly);
+                                }
+
+                                /* deferred free - moved to end of block */
                             }
                         }
 
+                        patchlog_write("DEBUG_MEM", "freeing buf=%p", buf);
                         mem_free(buf);
                     }
                     v16 = v16->next;
@@ -940,6 +1131,11 @@ void GNW_win_refresh(Window* w, Rect* rect, unsigned char* a3)
                 v24 = v23->next;
 
                 if (buffering && !a3) {
+                    if (patchlog_verbose()) {
+                        patchlog_write("WIN_SCRBLIT", "dest=%d,%d w=%d h=%d srcPtr=%p",
+                            v23->rect.ulx, v23->rect.uly, v23->rect.lrx - v23->rect.ulx + 1, v23->rect.lry - v23->rect.uly + 1,
+                            screen_buffer + v23->rect.ulx + (scr_size.lrx - scr_size.ulx + 1) * v23->rect.uly);
+                    }
                     scr_blit(
                         screen_buffer + v23->rect.ulx + (scr_size.lrx - scr_size.ulx + 1) * v23->rect.uly,
                         scr_size.lrx - scr_size.ulx + 1,

@@ -238,6 +238,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/plib/color/color.h"
     "src/plib/db/db.cc"
     "src/plib/db/db.h"
+    "src/plib/db/patchlog.cc"
+    "src/plib/db/patchlog.h"
     "src/plib/db/lzss.cc"
     "src/plib/db/lzss.h"
     "src/plib/gnw/button.cc"

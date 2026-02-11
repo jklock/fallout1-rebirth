@@ -2,8 +2,13 @@
 
 #include <SDL3/SDL.h>
 
+#include "plib/db/patchlog.h"
 #include <algorithm>
+#include <limits.h>
+#include <stdlib.h>
+#include <sys/stat.h>
 
+#include "game/map.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -22,6 +27,25 @@ namespace fallout {
 static bool createRenderer(int width, int height);
 static void destroyRenderer();
 
+// Monotonic sequence number for GNW_SHOW_RECT / renderPresent events
+static unsigned long long g_seq = 0;
+
+// Recent suspicious surface wipe events (ring buffer for diagnostics)
+struct SurfSuspect {
+    unsigned long long seq;
+    unsigned char* surfacePtr;
+    int destX;
+    int destY;
+    int copyW;
+    int copyH;
+    int sampleSurf0;
+    long preSurfaceNonZero;
+    long postSurfaceNonZero;
+};
+
+static SurfSuspect g_suspects[16];
+static int g_suspect_pos = 0;
+
 // screen rect
 Rect scr_size;
 
@@ -33,6 +57,11 @@ SDL_Surface* gSdlSurface = NULL;
 SDL_Renderer* gSdlRenderer = NULL;
 SDL_Texture* gSdlTexture = NULL;
 SDL_Surface* gSdlTextureSurface = NULL;
+
+// When running under a non-Cocoa SDL video driver (dummy/offscreen), we treat
+// rendering as "headless". Some renderer features (like logical presentation)
+// are optional in that mode and should not hard-fail initialization.
+static bool gHeadlessVideo = false;
 
 #if __APPLE__ && TARGET_OS_IOS
 // iOS-specific: Custom destination rect for fullscreen rendering
@@ -176,12 +205,138 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
         return;
     }
 
-    buf_to_buf(src + srcPitch * srcOffsetY + srcOffsetX,
-        copyW,
-        copyH,
-        srcPitch,
-        (unsigned char*)gSdlSurface->pixels + gSdlSurface->pitch * copyY + copyX,
-        gSdlSurface->pitch);
+    bool do_log = false;
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            do_log = true;
+        }
+    }
+
+    unsigned char* srcPtr = src + srcPitch * srcOffsetY + srcOffsetX;
+    unsigned char* surfacePtr = (unsigned char*)gSdlSurface->pixels + gSdlSurface->pitch * copyY + copyX;
+
+    long preSrcNonZero = 0;
+    long preSurfaceNonZero = 0;
+    long preDisplayNonZero = 0;
+    long postDisplayNonZero = 0;
+    int sampleSrc0 = 0;
+    int sampleSurf0 = 0;
+
+    // Additional diagnostics: when copying a full-width region that likely
+    // covers the map area, capture pointer addresses and the first few bytes
+    // of the source/surface to help detect pointer mismatches.
+    if (do_log) {
+        sampleSrc0 = (int)srcPtr[0];
+        sampleSurf0 = (int)surfacePtr[0];
+
+        if (copyW >= 640) {
+            unsigned long long seq = ++g_seq;
+            patchlog_write("GNW_SHOW_RECT_SRC", "seq=%llu srcPtr=%p surfacePtr=%p dest=(%d,%d) copy=%dx%d srcOffset=(%d,%d) sampleSrc0=%d sampleSurf0=%d", seq, srcPtr, surfacePtr, copyX, copyY, copyW, copyH, srcOffsetX, srcOffsetY, sampleSrc0, sampleSurf0);
+        }
+    }
+
+    if (do_log) {
+        unsigned char* rsrc = srcPtr;
+        for (int row = 0; row < copyH; row++) {
+            unsigned char* p = rsrc;
+            for (int col = 0; col < copyW; col++) {
+                if (p[col] != 0) {
+                    preSrcNonZero++;
+                }
+            }
+            rsrc += srcPitch;
+        }
+        unsigned char* rsurf = surfacePtr;
+        for (int row = 0; row < copyH; row++) {
+            unsigned char* p = rsurf;
+            for (int col = 0; col < copyW; col++) {
+                if (p[col] != 0) {
+                    preSurfaceNonZero++;
+                }
+            }
+            rsurf += gSdlSurface->pitch;
+        }
+
+        // Sample the display buffer for the same rectangle (pre-copy)
+        preDisplayNonZero = map_count_display_non_zero(copyX, copyY, copyW, copyH);
+    }
+
+    // Defensive check: avoid copying an all-zero source over an existing non-zero
+    // surface for small regions since that leads to transient zeroing anomalies.
+    // Limit to small areas to avoid scan overhead.
+    int area = copyW * copyH;
+    bool src_all_zero = false;
+    if (area <= 4096) {
+        src_all_zero = true;
+        for (int r = 0; r < copyH && src_all_zero; r++) {
+            unsigned char* p = srcPtr + r * srcPitch;
+            for (int c = 0; c < copyW; c++) {
+                if (p[c] != 0) {
+                    src_all_zero = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (src_all_zero) {
+        // If src is all zero and destination has non-zero data, skip the copy to
+        // avoid clearing existing content (this prevents surf_pre>0 && surf_post==0).
+        long dest_non_zero = 0;
+        for (int r = 0; r < copyH; r++) {
+            unsigned char* p = surfacePtr + r * gSdlSurface->pitch;
+            for (int c = 0; c < copyW; c++) {
+                if (p[c] != 0) {
+                    dest_non_zero++;
+                    break;
+                }
+            }
+            if (dest_non_zero) {
+                break;
+            }
+        }
+
+        if (do_log && preSrcNonZero == 0 && preSurfaceNonZero > 0) {
+            patchlog_write("GNW_SHOW_RECT_DEBUG", "preSrcNonZero=%ld preSurfaceNonZero=%ld sampleSrc0=%d sampleSurf0=%d area=%d srcPtr=%p surfacePtr=%p", preSrcNonZero, preSurfaceNonZero, sampleSrc0, sampleSurf0, area, srcPtr, surfacePtr);
+        }
+
+        if (dest_non_zero) {
+            // Log the skipped copy for triage.
+            patchlog_write("GNW_SHOW_RECT_SKIP_ZERO", "dest=(%d,%d) copy=%dx%d area=%d srcPtr=%p preSurfaceNonZero=%ld", copyX, copyY, copyW, copyH, area, srcPtr, dest_non_zero);
+        } else {
+            buf_to_buf(srcPtr,
+                copyW,
+                copyH,
+                srcPitch,
+                surfacePtr,
+                gSdlSurface->pitch);
+        }
+    } else {
+        buf_to_buf(srcPtr,
+            copyW,
+            copyH,
+            srcPitch,
+            surfacePtr,
+            gSdlSurface->pitch);
+    }
+
+    long postSurfaceNonZero = 0;
+    if (do_log) {
+        unsigned char* rsurf = surfacePtr;
+        for (int row = 0; row < copyH; row++) {
+            unsigned char* p = rsurf;
+            for (int col = 0; col < copyW; col++) {
+                if (p[col] != 0) {
+                    postSurfaceNonZero++;
+                }
+            }
+            rsurf += gSdlSurface->pitch;
+        }
+
+        // Sample the display buffer for the same rectangle (post-copy)
+        postDisplayNonZero = map_count_display_non_zero(copyX, copyY, copyW, copyH);
+    }
 
     SDL_Rect srcRect;
     srcRect.x = copyX;
@@ -209,7 +364,110 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
         return;
     }
 
+    long preTextureNonZero = 0;
+    if (do_log && gSdlTextureSurface != NULL) {
+        int bpp = (gSdlTextureSurface->w > 0) ? (gSdlTextureSurface->pitch / gSdlTextureSurface->w) : 1;
+        unsigned char* tptr = (unsigned char*)gSdlTextureSurface->pixels + gSdlTextureSurface->pitch * destRect.y + destRect.x * bpp;
+        for (int row = 0; row < destRect.h; row++) {
+            unsigned char* r = tptr;
+            for (int col = 0; col < destRect.w; col++) {
+                unsigned char* pixel = r + col * bpp;
+                bool any_non_zero = false;
+                for (int byte = 0; byte < bpp; byte++) {
+                    if (pixel[byte] != 0) {
+                        any_non_zero = true;
+                        break;
+                    }
+                }
+                if (any_non_zero) {
+                    preTextureNonZero++;
+                }
+            }
+            tptr += gSdlTextureSurface->pitch;
+        }
+    }
+
     SDL_BlitSurface(gSdlSurface, &srcRect, gSdlTextureSurface, &destRect);
+
+    if (do_log) {
+        long postTextureNonZero = 0;
+        if (gSdlTextureSurface != NULL) {
+            int bpp = (gSdlTextureSurface->w > 0) ? (gSdlTextureSurface->pitch / gSdlTextureSurface->w) : 1;
+            unsigned char* tptr = (unsigned char*)gSdlTextureSurface->pixels + gSdlTextureSurface->pitch * destRect.y + destRect.x * bpp;
+            for (int row = 0; row < destRect.h; row++) {
+                unsigned char* r = tptr;
+                for (int col = 0; col < destRect.w; col++) {
+                    unsigned char* pixel = r + col * bpp;
+                    bool any_non_zero = false;
+                    for (int byte = 0; byte < bpp; byte++) {
+                        if (pixel[byte] != 0) {
+                            any_non_zero = true;
+                            break;
+                        }
+                    }
+                    if (any_non_zero) {
+                        postTextureNonZero++;
+                    }
+                }
+                tptr += gSdlTextureSurface->pitch;
+            }
+        }
+        unsigned long long seq = ++g_seq;
+        patchlog_write("GNW_SHOW_RECT", "seq=%llu surfacePtr=%p dest=(%d,%d) copy=%dx%d src_nonzero=%ld surf_pre=%ld surf_post=%ld disp_pre=%ld disp_post=%ld tex_pre=%ld tex_post=%ld", seq, surfacePtr, copyX, copyY, copyW, copyH, preSrcNonZero, preSurfaceNonZero, postSurfaceNonZero, preDisplayNonZero, postDisplayNonZero, preTextureNonZero, postTextureNonZero);
+
+        if (preSurfaceNonZero > 0 && postSurfaceNonZero == 0) {
+            // Very suspicious: surface had non-zero data before the copy and is zero afterwards.
+            // Attempt a single retry of the copy to recover transient zeroing (pragmatic mitigation).
+            if (do_log) {
+                patchlog_write("GNW_SHOW_RECT_RECOVER_ATTEMPT", "seq=%llu surfacePtr=%p dest=(%d,%d) copy=%dx%d srcPtr=%p preSurfaceNonZero=%ld postSurfaceNonZero=%ld", seq + 0ULL, surfacePtr, copyX, copyY, copyW, copyH, srcPtr, preSurfaceNonZero, postSurfaceNonZero);
+            }
+
+            // Retry the copy once
+            buf_to_buf(srcPtr,
+                copyW,
+                copyH,
+                srcPitch,
+                surfacePtr,
+                gSdlSurface->pitch);
+
+            // Re-scan postSurfaceNonZero after retry
+            long retryPostSurfaceNonZero = 0;
+            unsigned char* rsurf_retry = surfacePtr;
+            for (int row = 0; row < copyH; row++) {
+                unsigned char* p = rsurf_retry;
+                for (int col = 0; col < copyW; col++) {
+                    if (p[col] != 0) {
+                        retryPostSurfaceNonZero++;
+                    }
+                }
+                rsurf_retry += gSdlSurface->pitch;
+            }
+
+            if (retryPostSurfaceNonZero > 0) {
+                // Recovered — log and do not treat as suspect
+                postSurfaceNonZero = retryPostSurfaceNonZero;
+                if (do_log) {
+                    patchlog_write("GNW_SHOW_RECT_RECOVERED", "seq=%llu surfacePtr=%p dest=(%d,%d) copy=%dx%d preSurfaceNonZero=%ld postSurfaceNonZero=%ld recovered=%ld", seq, surfacePtr, copyX, copyY, copyW, copyH, preSurfaceNonZero, postSurfaceNonZero, retryPostSurfaceNonZero);
+                }
+            } else {
+                // Not recovered — proceed with suspect logging and storing the record
+                int postSurf0 = (int)surfacePtr[0];
+                patchlog_write("GNW_SURF_SUSPECT", "seq=%llu surfacePtr=%p dest=(%d,%d) copy=%dx%d sampleSurf0=%d preSurfaceNonZero=%ld postSurfaceNonZero=%ld postTextureNonZero=%ld", seq, surfacePtr, copyX, copyY, copyW, copyH, sampleSurf0, preSurfaceNonZero, postSurfaceNonZero, postTextureNonZero);
+
+                // Store a compact record for later correlation with present anomalies
+                g_suspects[g_suspect_pos].seq = seq;
+                g_suspects[g_suspect_pos].surfacePtr = surfacePtr;
+                g_suspects[g_suspect_pos].destX = copyX;
+                g_suspects[g_suspect_pos].destY = copyY;
+                g_suspects[g_suspect_pos].copyW = copyW;
+                g_suspects[g_suspect_pos].copyH = copyH;
+                g_suspects[g_suspect_pos].sampleSurf0 = sampleSurf0;
+                g_suspects[g_suspect_pos].preSurfaceNonZero = preSurfaceNonZero;
+                g_suspects[g_suspect_pos].postSurfaceNonZero = postSurfaceNonZero;
+                g_suspect_pos = (g_suspect_pos + 1) % 16;
+            }
+        }
+    }
 }
 
 bool svga_init(VideoOptions* video_options)
@@ -217,7 +475,6 @@ bool svga_init(VideoOptions* video_options)
     SDL_Log("svga_init: starting with %dx%d (scale=%d)",
         video_options->width, video_options->height, video_options->scale);
 
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
 #if __APPLE__ && TARGET_OS_IOS
     SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
 #endif
@@ -227,6 +484,24 @@ bool svga_init(VideoOptions* video_options)
         return false;
     }
     SDL_Log("svga_init: SDL video subsystem initialized");
+
+    const char* video_driver = SDL_GetCurrentVideoDriver();
+    if (video_driver != NULL) {
+        SDL_Log("svga_init: video driver=%s", video_driver);
+    } else {
+        SDL_Log("svga_init: video driver unavailable");
+    }
+
+    gHeadlessVideo = video_driver != NULL
+        && (SDL_strcasecmp(video_driver, "dummy") == 0
+            || SDL_strcasecmp(video_driver, "offscreen") == 0);
+    if (gHeadlessVideo) {
+        SDL_Log("svga_init: headless video driver detected");
+    }
+
+    if (!gHeadlessVideo) {
+        SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
+    }
 
     SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
@@ -419,9 +694,13 @@ static bool createRenderer(int width, int height)
     // to have better control over fullscreen scaling.
     if (!SDL_SetRenderLogicalPresentation(gSdlRenderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
         SDL_Log("createRenderer: SDL_SetRenderLogicalPresentation failed: %s", SDL_GetError());
-        return false;
+        if (!gHeadlessVideo) {
+            return false;
+        }
+        SDL_Log("createRenderer: headless video - continuing without logical presentation");
+    } else {
+        SDL_Log("createRenderer: logical presentation set to %dx%d", width, height);
     }
-    SDL_Log("createRenderer: logical presentation set to %dx%d", width, height);
 #else
     SDL_Log("createRenderer: iOS - skipping logical presentation (using custom dest rect)");
 #endif
@@ -503,6 +782,40 @@ bool handleWindowSizeChanged()
 
 void renderPresent()
 {
+    long pre_texture_surface_non_zero = 0;
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            int window_h = gSdlTextureSurface->h;
+            int ui_h = 120;
+            int top_h = window_h - ui_h;
+            if (top_h < 0) {
+                top_h = 0;
+            }
+
+            int bpp = (gSdlTextureSurface->w > 0) ? (gSdlTextureSurface->pitch / gSdlTextureSurface->w) : 1;
+            unsigned char* pixels = (unsigned char*)gSdlTextureSurface->pixels;
+            int pitch = gSdlTextureSurface->pitch;
+            int width = gSdlTextureSurface->w;
+            for (int row = 0; row < top_h; row++) {
+                unsigned char* rowp = pixels + row * pitch;
+                for (int col = 0; col < width; col++) {
+                    unsigned char* pixel = rowp + col * bpp;
+                    bool any_non_zero = false;
+                    for (int byte = 0; byte < bpp; byte++) {
+                        if (pixel[byte] != 0) {
+                            any_non_zero = true;
+                            break;
+                        }
+                    }
+                    if (any_non_zero) {
+                        pre_texture_surface_non_zero++;
+                    }
+                }
+            }
+        }
+    }
+
     SDL_UpdateTexture(gSdlTexture, NULL, gSdlTextureSurface->pixels, gSdlTextureSurface->pitch);
     SDL_RenderClear(gSdlRenderer);
 #if __APPLE__ && TARGET_OS_IOS
@@ -516,6 +829,77 @@ void renderPresent()
     SDL_RenderTexture(gSdlRenderer, gSdlTexture, NULL, NULL);
 #endif
     SDL_RenderPresent(gSdlRenderer);
+
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            int window_h = gSdlTextureSurface->h;
+            int ui_h = 120;
+            int top_h = window_h - ui_h;
+            if (top_h < 0) {
+                top_h = 0;
+            }
+
+            long present_non_zero = 0;
+            SDL_Surface* surf = SDL_RenderReadPixels(gSdlRenderer, NULL);
+            if (surf != NULL) {
+                int surfW = surf->w;
+                int surfH = surf->h;
+                int surfBpp = (surfW > 0) ? (surf->pitch / surfW) : 4;
+                unsigned char* surfPixels = (unsigned char*)surf->pixels;
+                int surfPitch = surf->pitch;
+                int rows = top_h < surfH ? top_h : surfH;
+                for (int row = 0; row < rows; row++) {
+                    unsigned char* rowp = surfPixels + row * surfPitch;
+                    for (int col = 0; col < surfW; col++) {
+                        unsigned char* pixel = rowp + col * surfBpp;
+                        if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0 || (surfBpp > 3 && pixel[3] != 0)) {
+                            present_non_zero++;
+                        }
+                    }
+                }
+
+                // Detect anomaly: texture claims zero content for top area, but the actual
+                // presented pixels contain non-zero content (possible race between fills
+                // and re-blit, or an out-of-band present).
+                if (pre_texture_surface_non_zero == 0 && present_non_zero > 0) {
+                    unsigned long long anomaly_seq = ++g_seq;
+                    patchlog_write("RENDER_PRESENT_ANOMALY", "seq=%llu pre=%ld present=%ld", anomaly_seq, pre_texture_surface_non_zero, present_non_zero);
+
+                    // Dump recent GNW_SURF_SUSPECT records for correlation
+                    for (int i = 0; i < 16; i++) {
+                        if (g_suspects[i].seq != 0) {
+                            patchlog_write("RENDER_PRESENT_ANOMALY_CONTEXT", "suspect_seq=%llu surfacePtr=%p dest=(%d,%d) copy=%dx%d sampleSurf0=%d pre=%ld post=%ld", g_suspects[i].seq, g_suspects[i].surfacePtr, g_suspects[i].destX, g_suspects[i].destY, g_suspects[i].copyW, g_suspects[i].copyH, g_suspects[i].sampleSurf0, g_suspects[i].preSurfaceNonZero, g_suspects[i].postSurfaceNonZero);
+                        }
+                    }
+
+                    // Save presented pixels as a BMP for offline inspection if configured.
+                    const char* anom_dir = getenv("F1R_PRESENT_ANOM_DIR");
+                    if (anom_dir != NULL && anom_dir[0] != '\0') {
+                        char path[PATH_MAX];
+                        snprintf(path, sizeof(path), "%s/f1r-present-anom-%llu.bmp", anom_dir, anomaly_seq);
+                        if (surf != NULL) {
+                            // Best-effort: create the directory if it doesn't exist (ignore failures)
+                            struct stat st;
+                            if (stat(anom_dir, &st) != 0) {
+                                mkdir(anom_dir, 0755);
+                            }
+                            SDL_SaveBMP(surf, path);
+                            patchlog_write("RENDER_PRESENT_ANOMALY", "screenshot=%s", path);
+                        }
+                    } else {
+                        // Not configured; do not write present anomaly files by default.
+                        patchlog_write("RENDER_PRESENT_ANOMALY", "screenshot=(not-saved - F1R_PRESENT_ANOM_DIR not set)");
+                    }
+                }
+
+                SDL_DestroySurface(surf);
+            }
+
+            unsigned long long seq = ++g_seq;
+            patchlog_write("RENDER_PRESENT_TOP_PIXELS", "seq=%llu pre=%ld present=%ld", seq, pre_texture_surface_non_zero, present_non_zero);
+        }
+    }
 }
 
 #if __APPLE__ && TARGET_OS_IOS
