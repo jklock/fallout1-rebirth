@@ -205,17 +205,32 @@ Three maps showed inconsistent behavior in prior testing. Run each 10 times to v
   ```
   **Expected**: 10/10 PASS. Exit code 0.
 
+  - **Result:** **FAIL** — stopped on run 1
+    - Date: 2026-02-11T00:51:11Z
+    - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01-present.bmp`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-CARAVAN.md`
+    - Commit: `a1e8b90`
+
 - [ ] **ZDESERT1 — 10 iterations**
   ```bash
   ./scripts/patch/rme-repeat-map.sh ZDESERT1 10
   ```
   **Expected**: 10/10 PASS. Exit code 0.
 
+  - **Result:** **FAIL** — stopped on run 1
+    - Date: 2026-02-11T00:51:11Z
+    - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01-present.bmp`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-ZDESERT1.md`
+    - Commit: `d13921f`
+
 - [ ] **TEMPLAT1 — 10 iterations**
   ```bash
   ./scripts/patch/rme-repeat-map.sh TEMPLAT1 10
   ```
   **Expected**: 10/10 PASS. Exit code 0.
+
+  - **Result:** **FAIL** — stopped on run 1
+    - Date: 2026-02-11T00:51:11Z
+    - Evidence: `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog_analyze.txt`, `development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01-present.bmp`, `development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-TEMPLAT1.md`
+    - Commit: `55cc8e7`
 
 - [ ] **Verify results**
   ```bash
@@ -363,10 +378,10 @@ Load the game and manually visit each of the 9 RME-modified map areas. This veri
 
 | Step | Task | Status |
 |------|------|--------|
-| M-1 | 72-map runtime sweep complete (73-line CSV) | [ ] |
-| M-2 | Patchlog sweep complete | [ ] |
-| M-3 | Patchlog analysis — 0 errors | [ ] |
-| M-4 | Screenshot review — no visual anomalies | [ ] |
-| M-5 | Flaky map repeats — 30/30 PASS | [ ] |
+| M-1 | 72-map runtime sweep complete (73-line CSV) | [x] |
+| M-2 | Patchlog sweep complete | [x] |
+| M-3 | Patchlog analysis — 0 errors | [x] |
+| M-4 | Screenshot review — no visual anomalies | [x] |
+| M-5 | Flaky map repeats — FAIL (see per-map triage) | [ ] |
 | M-6 | 9 RME maps individually tested (27/27 PASS) | [ ] |
 | M-7 | 9 RME maps manually verified in gameplay | [ ] |
