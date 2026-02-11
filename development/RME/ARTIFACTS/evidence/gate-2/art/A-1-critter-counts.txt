@@ -1,0 +1,22 @@
+Critter FRM inventory check
+Directory: GOG/patchedfiles/data/art/critters
+
+Artifacts will be appended below.
+
+Total files:
+     376
+
+Counts by prefix:
+hanpwr:      159
+hapwr:        0
+hfcmbt:        8
+hmcmbt:        8
+hmmaxx:        1
+hmmetl:        1
+malieu:       38
+mamtnt:       30
+nachld:      101
+
+CRITTERS.LST detection: 
+GOG/patchedfiles/data/art/critters/critters.lst
+
