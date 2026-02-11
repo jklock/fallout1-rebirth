@@ -2,7 +2,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
+#include "game/rme_log.h"
 #include "platform_compat.h"
 
 namespace fallout {
@@ -48,6 +50,9 @@ bool gconfig_init(bool isMapper, int argc, char** argv)
     if (gconfig_initialized) {
         return false;
     }
+
+    // Allow env-driven logging before config is available.
+    rme_log_init_from_env();
 
     if (!config_init(&game_config)) {
         return false;
@@ -105,6 +110,7 @@ bool gconfig_init(bool isMapper, int argc, char** argv)
     config_set_value(&game_config, GAME_CONFIG_INPUT_KEY, GAME_CONFIG_MAP_SCROLL_DELAY_KEY, 66);
     config_set_value(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_SCRIPT_MESSAGES_KEY, 0);
     config_set_value(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_LOAD_INFO_KEY, 0);
+    config_set_value(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_RME_LOG_KEY, 0);
     config_set_value(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_OUTPUT_MAP_DATA_INFO_KEY, 0);
 
     if (isMapper) {
@@ -138,6 +144,55 @@ bool gconfig_init(bool isMapper, int argc, char** argv)
     // Add key-values from command line, which overrides both defaults and
     // whatever was loaded from `fallout.cfg`.
     config_cmd_line_parse(&game_config, argc, argv);
+
+    rme_log_sync_config(&game_config);
+
+    if (rme_log_topic_enabled("config")) {
+        const bool cfg_exists = access(gconfig_file_name, R_OK) == 0;
+
+        char cwd[COMPAT_MAX_PATH];
+        if (getcwd(cwd, sizeof(cwd)) == nullptr) {
+            cwd[0] = '\0';
+        }
+
+        char* master_dat = nullptr;
+        char* master_patches = nullptr;
+        char* critter_dat = nullptr;
+        char* critter_patches = nullptr;
+        char* language = nullptr;
+        char* music1 = nullptr;
+        char* music2 = nullptr;
+        int splash = 0;
+        int hashing = 0;
+
+        config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_DAT_KEY, &master_dat);
+        config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_PATCHES_KEY, &master_patches);
+        config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_CRITTER_DAT_KEY, &critter_dat);
+        config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_CRITTER_PATCHES_KEY, &critter_patches);
+        config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_LANGUAGE_KEY, &language);
+        config_get_string(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_MUSIC_PATH1_KEY, &music1);
+        config_get_string(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_MUSIC_PATH2_KEY, &music2);
+        config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_SPLASH_KEY, &splash);
+        config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_HASHING_KEY, &hashing);
+
+        rme_logf("config",
+            "fallout.cfg path=%s exists=%d cwd=%s language=%s hashing=%d splash=%d",
+            gconfig_file_name,
+            cfg_exists ? 1 : 0,
+            cwd,
+            language != nullptr ? language : "(null)",
+            hashing,
+            splash);
+
+        rme_logf("config",
+            "config master_dat=%s master_patches=%s critter_dat=%s critter_patches=%s music1=%s music2=%s",
+            master_dat != nullptr ? master_dat : "(null)",
+            master_patches != nullptr ? master_patches : "(null)",
+            critter_dat != nullptr ? critter_dat : "(null)",
+            critter_patches != nullptr ? critter_patches : "(null)",
+            music1 != nullptr ? music1 : "(null)",
+            music2 != nullptr ? music2 : "(null)");
+    }
 
     gconfig_initialized = true;
 

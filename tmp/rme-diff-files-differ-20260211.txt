@@ -1,0 +1,2 @@
+Files GOG/unpatchedfiles/critter.dat and GOG/patchedfiles/critter.dat differ
+Files GOG/unpatchedfiles/master.dat and GOG/patchedfiles/master.dat differ

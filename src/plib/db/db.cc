@@ -5,9 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <strings.h>
 
 #include <fpattern/fpattern.h>
 
+#include "game/rme_log.h"
 #include "platform_compat.h"
 #include "plib/assoc/assoc.h"
 #include "plib/db/lzss.h"
@@ -91,6 +94,7 @@ static int fread_short(FILE* stream, unsigned short* s);
 
 static inline bool fileFindIsDirectory(DB_FIND_DATA* find_data);
 static inline char* fileFindGetName(DB_FIND_DATA* find_data);
+static bool db_has_case_variant(const std::string& full_path, std::string& actual_name);
 
 // 0x4FE058
 static char empty_patches_path[] = "";
@@ -556,6 +560,15 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
         return NULL;
     }
 
+    if (rme_log_topic_enabled("db")) {
+        rme_logf("db",
+            "db_fopen request file=%s mode=%s patch_path=%s datafile=%s",
+            filename != NULL ? filename : "(null)",
+            mode != NULL ? mode : "(null)",
+            current_database->patches_path != NULL ? current_database->patches_path : "(null)",
+            current_database->datafile != NULL ? current_database->datafile : "(null)");
+    }
+
     stream = NULL;
     flags = 1;
     if (mode_is_text) {
@@ -577,6 +590,10 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
 
         compat_windows_path_to_native(path);
 
+        if (rme_log_topic_enabled("db")) {
+            rme_logf("db", "db_fopen patch try path=%s mode=%s", path, mode);
+        }
+
         if (mode_value == 0) {
             db_add_hash_entry_to_database(current_database, path, PATH_SEP);
             v2 = true;
@@ -591,7 +608,19 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
         }
 
         if (stream != NULL) {
+            if (rme_log_topic_enabled("db")) {
+                rme_logf("db", "db_fopen success patch path=%s", path);
+            }
             return db_add_fp_rec(stream, NULL, 0, flags | 0x4);
+        }
+
+        if (rme_log_topic_enabled("db")) {
+            std::string actual;
+            if (db_has_case_variant(path, actual)) {
+                rme_log_once(std::string("case:") + path, "db", "case mismatch patch path=%s actual=%s", path, actual.c_str());
+            } else {
+                rme_logf("db", "db_fopen patch miss path=%s", path);
+            }
         }
     }
 
@@ -609,11 +638,26 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
 
     compat_strupr(path);
 
+    if (rme_log_topic_enabled("db")) {
+        rme_logf("db", "db_fopen dat try path=%s", path);
+    }
+
     if (db_find_dir_entry(path, &de) == -1) {
+        if (rme_log_topic_enabled("db")) {
+            std::string actual;
+            if (db_has_case_variant(path, actual)) {
+                rme_log_once(std::string("case:") + path, "db", "case mismatch dat path=%s actual=%s", path, actual.c_str());
+            } else {
+                rme_logf("db", "db_fopen dat miss path=%s", path);
+            }
+        }
         return NULL;
     }
 
     if (current_database->stream == NULL) {
+        if (rme_log_topic_enabled("db")) {
+            rme_logf("db", "db_fopen dat miss stream path=%s", path);
+        }
         return NULL;
     }
 
@@ -2714,6 +2758,30 @@ static inline bool fileFindIsDirectory(DB_FIND_DATA* findData)
 static inline char* fileFindGetName(DB_FIND_DATA* findData)
 {
     return findData->entry->d_name;
+}
+
+static bool db_has_case_variant(const std::string& full_path, std::string& actual_name)
+{
+    size_t sep = full_path.find_last_of(PATH_SEP);
+    std::string dir = sep != std::string::npos ? full_path.substr(0, sep) : std::string(".");
+    std::string target = sep != std::string::npos ? full_path.substr(sep + 1) : full_path;
+
+    DIR* d = opendir(dir.c_str());
+    if (d == NULL) {
+        return false;
+    }
+
+    struct dirent* ent;
+    while ((ent = readdir(d)) != NULL) {
+        if (strcasecmp(ent->d_name, target.c_str()) == 0 && strcmp(ent->d_name, target.c_str()) != 0) {
+            actual_name = ent->d_name;
+            closedir(d);
+            return true;
+        }
+    }
+
+    closedir(d);
+    return false;
 }
 
 int db_freadUInt8(DB_FILE* stream, unsigned char* valuePtr)

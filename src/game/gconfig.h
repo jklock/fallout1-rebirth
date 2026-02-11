@@ -14,6 +14,7 @@ namespace fallout {
 #define GAME_CONFIG_MAPPER_KEY "mapper"
 #define GAME_CONFIG_DEBUG_KEY "debug"
 #define GAME_CONFIG_INPUT_KEY "input"
+#define GAME_CONFIG_RME_LOG_KEY "rme_log"
 
 #define GAME_CONFIG_EXECUTABLE_KEY "executable"
 #define GAME_CONFIG_MASTER_DAT_KEY "master_dat"
