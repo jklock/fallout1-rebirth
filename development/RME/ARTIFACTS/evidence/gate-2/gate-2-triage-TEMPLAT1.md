@@ -85,3 +85,9 @@ Classification: **timeout / hang**
   - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt
   - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log
   - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.bmp
+
+### Manual run evidence ($now)
+- no manual patchlog produced; using iter01 artifacts:
+  - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt
+  - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log
+  - development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.bmp
