@@ -1,0 +1,67 @@
+Destination dir: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font10.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font10.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font10.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font11.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font11.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font11.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font12.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font12.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font12.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font13.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font13.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font13.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font14.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font14.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font14.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font15.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font15.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font15.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font3.aaf
+Source sha256: aca178cfdbe15b2e29120a582e34437f9fd15136dc2c4adeb831691370f5d64f  GOG/patchedfiles/data/font3.aaf
+Dest sha256:   aca178cfdbe15b2e29120a582e34437f9fd15136dc2c4adeb831691370f5d64f  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font3.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font4.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font4.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font4.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font5.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font5.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font5.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font6.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font6.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font6.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font7.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font7.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font7.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font8.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font8.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font8.aaf
+
+EXISTS: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font9.aaf
+Source sha256: db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  GOG/patchedfiles/data/font9.aaf
+Dest sha256:   db93faf17705da32754ae12f0b2fc361504c13f06e8aa87dcbfd45eacd1fa5a4  build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/font9.aaf
+
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font10.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font11.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font12.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font13.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font14.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font15.aaf
+-rw-r--r--@  1 klock  staff      19303 Feb  9 15:00 font3.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb  9 15:00 font4.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font5.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font6.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font7.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font8.aaf
+-rw-r--r--@  1 klock  staff      33469 Feb 10 16:55 font9.aaf
