@@ -9,6 +9,7 @@
 #include "game/gconfig.h"
 #include "game/object.h"
 #include "game/proto.h"
+#include "game/rme_log.h"
 #include "platform_compat.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/grbuf.h"
@@ -941,6 +942,8 @@ int art_data_size(int fid, int* sizePtr)
                 result = 0;
             }
             db_fclose(stream);
+        } else if (rme_log_topic_enabled("art")) {
+            rme_logf("art", "art_data_size missing fid=%d path=%s", fid, artFilePath);
         }
     }
 
@@ -1070,8 +1073,15 @@ Art* load_frame(const char* path)
     DB_FILE* stream;
     Art header;
 
+    if (rme_log_topic_enabled("art")) {
+        rme_logf("art", "load_frame path=%s", path != NULL ? path : "(null)");
+    }
+
     stream = db_fopen(path, "rb");
     if (stream == NULL) {
+        if (rme_log_topic_enabled("art")) {
+            rme_logf("art", "load_frame missing path=%s", path != NULL ? path : "(null)");
+        }
         return nullptr;
     }
 
@@ -1100,6 +1110,9 @@ int load_frame_into(const char* path, unsigned char* data)
 {
     DB_FILE* stream = db_fopen(path, "rb");
     if (stream == NULL) {
+        if (rme_log_topic_enabled("art")) {
+            rme_logf("art", "load_frame_into missing path=%s", path != NULL ? path : "(null)");
+        }
         return -2;
     }
 

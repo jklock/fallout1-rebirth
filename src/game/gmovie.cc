@@ -9,6 +9,7 @@
 #include "game/gmouse.h"
 #include "game/gsound.h"
 #include "game/moviefx.h"
+#include "game/rme_log.h"
 #include "game/palette.h"
 #include "int/movie.h"
 #include "int/window.h"
@@ -108,8 +109,15 @@ int gmovie_play(int game_movie, int game_movie_flags)
 
     snprintf(movieFilePath, sizeof(movieFilePath), "art\\cuts\\%s", movie_list[game_movie]);
 
+    if (rme_log_topic_enabled("movie")) {
+        rme_logf("movie", "movie_play request=%s path=%s", movie_list[game_movie], movieFilePath);
+    }
+
     if (db_dir_entry(movieFilePath, &de) != 0) {
         debug_printf("\ngmovie_play() - Error: Unable to open %s\n", movie_list[game_movie]);
+        if (rme_log_topic_enabled("movie")) {
+            rme_logf("movie", "movie missing path=%s", movieFilePath);
+        }
         return -1;
     }
 
@@ -152,6 +160,9 @@ int gmovie_play(int game_movie, int game_movie_flags)
         if (db_dir_entry(subtitlesFilePath, &de) == 0) {
             movie_flags |= 0x8;
         } else {
+            if (rme_log_topic_enabled("movie")) {
+                rme_logf("movie", "subtitle missing path=%s", subtitlesFilePath);
+            }
             subtitlesEnabled = false;
         }
     }

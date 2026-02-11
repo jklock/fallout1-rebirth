@@ -139,7 +139,7 @@ bool gconfig_init(bool isMapper, int argc, char** argv)
 
     // Read contents of `fallout.cfg` into config. The values from the file
     // will override the defaults above.
-    config_load(&game_config, gconfig_file_name, false);
+    const bool cfg_loaded = config_load(&game_config, gconfig_file_name, false);
 
     // Add key-values from command line, which overrides both defaults and
     // whatever was loaded from `fallout.cfg`.
@@ -176,9 +176,11 @@ bool gconfig_init(bool isMapper, int argc, char** argv)
         config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_HASHING_KEY, &hashing);
 
         rme_logf("config",
-            "fallout.cfg path=%s exists=%d cwd=%s language=%s hashing=%d splash=%d",
+            "fallout.cfg path=%s exists=%d loaded=%d argv_count=%d cwd=%s language=%s hashing=%d splash=%d",
             gconfig_file_name,
             cfg_exists ? 1 : 0,
+            cfg_loaded ? 1 : 0,
+            argc,
             cwd,
             language != nullptr ? language : "(null)",
             hashing,

@@ -222,12 +222,6 @@ int db_total()
         }
     }
 
-    if (rme_log_topic_enabled("db")) {
-        rme_log_once(std::string("filelist-count:") + filespec_copy,
-            "db",
-            "db_get_file_list count=%d filespec=%s", count, filespec_copy);
-    }
-
     return count;
 }
 
@@ -1665,13 +1659,14 @@ int db_get_file_list(const char* filespec, char*** filelist, char*** desclist, i
 
     char filespec_copy_buffer[COMPAT_MAX_PATH];
     char* filespec_copy = filespec_copy_buffer;
+    const char* filespec_log = filespec_copy;
     strcpy(filespec_copy, filespec);
 
     if (rme_log_topic_enabled("db")) {
-        rme_log_once(std::string("filelist:") + filespec_copy,
+        rme_log_once(std::string("filelist:") + filespec_log,
             "db",
             "db_get_file_list filespec=%s patches=%s datafile=%s",
-            filespec_copy,
+            filespec_log,
             current_database->patches_path != NULL ? current_database->patches_path : "(null)",
             current_database->datafile != NULL ? current_database->datafile : "(null)");
     }
@@ -1817,6 +1812,16 @@ int db_get_file_list(const char* filespec, char*** filelist, char*** desclist, i
         if (temp != NULL) {
             internal_free(temp);
         }
+    }
+
+    if (rme_log_topic_enabled("db")) {
+        rme_log_once(std::string("filelist-result:") + filespec_log,
+            "db",
+            "db_get_file_list result filespec=%s count=%d patches=%s datafile=%s",
+            filespec_log,
+            count,
+            current_database->patches_path != NULL ? current_database->patches_path : "(null)",
+            current_database->datafile != NULL ? current_database->datafile : "(null)");
     }
 
     return count;

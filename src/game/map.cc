@@ -827,7 +827,7 @@ int map_scroll_and_full_refresh(int dx, int dy)
 #endif
     }
     if (rme_log_topic_enabled("map")) {
-        rme_logf("map", "map_load result=%d name=%s", rc, file_name != NULL ? file_name : "(null)");
+        rme_logf("map", "map_scroll_and_full_refresh result=%d name=%s", rc, map_data.name[0] != '\0' ? map_data.name : "(none)");
     }
 
     return rc;

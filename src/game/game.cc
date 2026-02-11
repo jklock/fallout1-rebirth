@@ -55,6 +55,7 @@
 #include "int/window.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
+#include "plib/db/db.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -122,6 +123,47 @@ static std::string rme_join_path(const std::string& base, const std::string& chi
     return base + '/' + child;
 }
 
+static void rme_log_inventory_list(const char* topic, const char* label, const char* pattern)
+{
+    if (!rme_log_topic_enabled(topic)) {
+        return;
+    }
+
+    char** filelist = NULL;
+    int count = db_get_file_list(pattern, &filelist, NULL, 0);
+    rme_logf(topic, "inventory %s pattern=%s count=%d", label != NULL ? label : "(null)", pattern != NULL ? pattern : "(null)", count);
+    db_free_file_list(&filelist, NULL);
+}
+
+static void rme_log_startup_inventories()
+{
+    if (!rme_log_enabled()) {
+        return;
+    }
+
+    rme_log_inventory_list("map", "maps", "MAPS\\*.MAP");
+
+    const char* proto_dirs[] = { "items", "critters", "scenery", "walls", "tiles", "misc" };
+    for (const char* dir : proto_dirs) {
+        char pattern[COMPAT_MAX_PATH];
+        snprintf(pattern, sizeof(pattern), "proto\\%s\\*.pro", dir);
+        rme_log_inventory_list("proto", dir, pattern);
+    }
+
+    rme_log_inventory_list("text", "text/english/game", "text\\english\\game\\*.msg");
+    rme_log_inventory_list("text", "text/english/dialog", "text\\english\\dialog\\*.msg");
+    rme_log_inventory_list("art", "art/intrface", "art\\intrface\\*.frm");
+
+    if (rme_log_topic_enabled("art")) {
+        dir_entry de;
+        if (db_dir_entry("art\\tiles\\grid000.frm", &de) != 0) {
+            rme_logf("art", "art missing path=%s", "art\\tiles\\grid000.frm");
+        } else {
+            rme_logf("art", "art present path=%s size=%ld", "art\\tiles\\grid000.frm", static_cast<long>(de.length));
+        }
+    }
+}
+
 static void rme_log_patch_tree(const char* label, const char* path)
 {
     if (!rme_log_topic_enabled("db")) {
@@ -146,6 +188,7 @@ static void rme_log_patch_tree(const char* label, const char* path)
     const char* expected_dirs[] = {
         "art",
         "data",
+        "data/data",
         "sound",
         "music",
         "proto",
@@ -154,6 +197,9 @@ static void rme_log_patch_tree(const char* label, const char* path)
         "maps",
         "movies",
     };
+
+    int missing_entries = 0;
+    int case_mismatches = 0;
 
     for (const char* dirName : expected_dirs) {
         std::string full = rme_join_path(root, dirName);
@@ -165,9 +211,11 @@ static void rme_log_patch_tree(const char* label, const char* path)
         std::string actual;
         if (rme_find_case_variant(root, dirName, actual)) {
             if (strcasecmp(actual.c_str(), dirName) != 0) {
+                case_mismatches++;
                 rme_log_once(std::string("case:") + root + dirName, "db", "patch tree %s case mismatch %s->%s", tag, dirName, actual.c_str());
             }
         } else {
+            missing_entries++;
             rme_logf("db", "patch tree %s missing dir %s", tag, dirName);
         }
     }
@@ -185,12 +233,20 @@ static void rme_log_patch_tree(const char* label, const char* path)
             std::string parent = rme_join_path(root, "data/data");
             if (rme_find_case_variant(parent, fileName, actual)) {
                 if (strcasecmp(actual.c_str(), fileName) != 0) {
+                    case_mismatches++;
                     rme_log_once(std::string("case:") + hardcodedPath, "db", "patch tree %s case mismatch %s->%s", tag, fileName, actual.c_str());
                 }
             } else {
+                missing_entries++;
                 rme_logf("db", "patch tree %s missing %s", tag, hardcodedPath.c_str());
             }
         }
+    }
+
+    if (missing_entries > 0 || case_mismatches > 0) {
+        rme_logf("db", "patch tree %s summary missing=%d case_mismatch=%d", tag, missing_entries, case_mismatches);
+    } else {
+        rme_logf("db", "patch tree %s summary missing=%d case_mismatch=%d", tag, 0, 0);
     }
 }
 
@@ -263,6 +319,8 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
         return -1;
     }
 
+    rme_log_startup_inventories();
+
     win_set_minimized_title(windowTitle);
 
     VideoOptions video_options;
@@ -280,9 +338,17 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
         if (resFile != NULL) {
             f1ResPresent = true;
             fclose(resFile);
+        } else {
+            std::string actual;
+            if (rme_find_case_variant(".", "f1_res.ini", actual)) {
+                if (rme_log_topic_enabled("config")) {
+                    rme_log_once("case:f1_res.ini", "config", "f1_res.ini case mismatch expected=f1_res.ini actual=%s", actual.c_str());
+                }
+            }
         }
 
-        if (config_load(&resolutionConfig, "f1_res.ini", false)) {
+        const bool resLoaded = config_load(&resolutionConfig, "f1_res.ini", false);
+        if (resLoaded) {
             int screenWidth;
             if (config_get_value(&resolutionConfig, "MAIN", "SCR_WIDTH", &screenWidth)) {
                 video_options.width = std::max(screenWidth, 640);
@@ -313,6 +379,9 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
                 video_options.width = std::max(video_options.width, 640);
                 video_options.height = std::max(video_options.height, 480);
             }
+        }
+        if (!resLoaded && rme_log_topic_enabled("config")) {
+            rme_logf("config", "f1_res.ini load failed using defaults");
         }
         config_exit(&resolutionConfig);
     }

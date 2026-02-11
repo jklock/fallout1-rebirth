@@ -11,6 +11,7 @@
 #include "game/object.h"
 #include "game/proto.h"
 #include "game/queue.h"
+#include "game/rme_log.h"
 #include "game/roll.h"
 #include "game/sfxcache.h"
 #include "game/stat.h"
@@ -193,6 +194,15 @@ int gsound_init()
 
     if (gsound_get_music_path(&sound_music_path2, GAME_CONFIG_MUSIC_PATH2_KEY) != 0) {
         return -1;
+    }
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound",
+            "gsound paths music1=%s music2=%s sfx=%s speech=%s",
+            sound_music_path1 != NULL ? sound_music_path1 : "(null)",
+            sound_music_path2 != NULL ? sound_music_path2 : "(null)",
+            sound_sfx_path != NULL ? sound_sfx_path : "(null)",
+            sound_speech_path != NULL ? sound_speech_path : "(null)");
     }
 
     if (strlen(sound_music_path1) > 247 || strlen(sound_music_path2) > 247) {
@@ -740,6 +750,10 @@ int gsound_background_play(const char* fileName, int a2, int a3, int a4)
             debug_printf("failed on call to soundLoad.\n");
         }
 
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "music load failed path=%s rc=%d requested=%s", path, rc, fileName != NULL ? fileName : "(null)");
+        }
+
         soundDelete(gsound_background_tag);
         gsound_background_tag = NULL;
 
@@ -1064,6 +1078,10 @@ int gsound_speech_play(const char* fname, int a2, int a3, int a4)
         debug_printf("succeeded.\n");
     }
 
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound", "music start path=%s storage=%d loop=%d", path, a3, a4);
+    }
+
     return 0;
 }
 
@@ -1188,12 +1206,28 @@ Sound* gsound_load_sound(const char* name, Object* object)
 
     ++gsound_active_effect_counter;
 
+    int object_pid = object != NULL ? object->pid : -1;
     char path[COMPAT_MAX_PATH];
+    char primary_path[COMPAT_MAX_PATH];
     snprintf(path, sizeof(path), "%s%s%s", sound_sfx_path, name, ".ACM");
+    strncpy(primary_path, path, COMPAT_MAX_PATH);
+    primary_path[COMPAT_MAX_PATH - 1] = '\0';
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound",
+            "sfx request name=%s path=%s pid=%d",
+            name != NULL ? name : "(null)",
+            primary_path,
+            object_pid);
+    }
 
     if (soundLoad(sound, path) == 0) {
         if (gsound_debug) {
             debug_printf("succeeded.\n");
+        }
+
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "sfx hit path=%s pid=%d", path, object_pid);
         }
 
         return sound;
@@ -1223,6 +1257,10 @@ Sound* gsound_load_sound(const char* name, Object* object)
                     debug_printf("succeeded (with alias).\n");
                 }
 
+                if (rme_log_topic_enabled("sound")) {
+                    rme_logf("sound", "sfx alias hit path=%s pid=%d", path, object_pid);
+                }
+
                 return sound;
             }
 
@@ -1236,6 +1274,10 @@ Sound* gsound_load_sound(const char* name, Object* object)
                 if (soundLoad(sound, path) == 0) {
                     if (gsound_debug) {
                         debug_printf("succeeded (with male alias).\n");
+                    }
+
+                    if (rme_log_topic_enabled("sound")) {
+                        rme_logf("sound", "sfx alias hit path=%s pid=%d", path, object_pid);
                     }
 
                     return sound;
@@ -1256,6 +1298,10 @@ Sound* gsound_load_sound(const char* name, Object* object)
                 debug_printf("succeeded (with alias).\n");
             }
 
+            if (rme_log_topic_enabled("sound")) {
+                rme_logf("sound", "sfx alias hit path=%s pid=%d", path, object_pid);
+            }
+
             return sound;
         }
     }
@@ -1266,6 +1312,10 @@ Sound* gsound_load_sound(const char* name, Object* object)
 
     if (gsound_debug) {
         debug_printf("failed.\n");
+    }
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound", "sfx miss name=%s primary=%s last=%s pid=%d", name != NULL ? name : "(null)", primary_path, path, object_pid);
     }
 
     return NULL;
@@ -1797,8 +1847,11 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
     char outPath[COMPAT_MAX_PATH];
     snprintf(outPath, sizeof(outPath), "%s%s%s", sound_music_path1, src, ".ACM");
     if (gsound_file_exists_f(outPath)) {
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "music hit path=%s", outPath);
+        }
         strncpy(dest, outPath, COMPAT_MAX_PATH);
-        dest[COMPAT_MAX_PATH] = '\0';
+        dest[COMPAT_MAX_PATH - 1] = '\0';
         return 0;
     }
 
@@ -1817,6 +1870,10 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
             debug_printf("Unable to find music file %s to copy down.\n", src);
         }
 
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "music miss copy source=%s dest=%s", inPath, outPath);
+        }
+
         return -1;
     }
 
@@ -1824,6 +1881,10 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
     if (outStream == NULL) {
         if (gsound_debug) {
             debug_printf("Unable to open music file %s for copying to.", src);
+        }
+
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "music copy open failed source=%s dest=%s", inPath, outPath);
         }
 
         fclose(inStream);
@@ -1866,13 +1927,21 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
             debug_printf("likely out of disc space.\n");
         }
 
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "music copy failed source=%s dest=%s", inPath, outPath);
+        }
+
         return -1;
     }
 
     strcpy(background_fname_copied, src);
 
     strncpy(dest, outPath, COMPAT_MAX_PATH);
-    dest[COMPAT_MAX_PATH] = '\0';
+    dest[COMPAT_MAX_PATH - 1] = '\0';
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound", "music copy hit source=%s dest=%s", inPath, outPath);
+    }
 
     return 0;
 }
@@ -1881,7 +1950,12 @@ static int gsound_background_find_with_copy(char* dest, const char* src)
 static int gsound_background_find_dont_copy(char* dest, const char* src)
 {
     char path[COMPAT_MAX_PATH];
+    char primary_path[COMPAT_MAX_PATH];
+    char secondary_path[COMPAT_MAX_PATH];
     int len;
+
+    primary_path[0] = '\0';
+    secondary_path[0] = '\0';
 
     len = static_cast<int>(strlen(src) + strlen(".ACM"));
     if (strlen(sound_music_path1) + len > COMPAT_MAX_PATH || strlen(sound_music_path2) + len > COMPAT_MAX_PATH) {
@@ -1897,9 +1971,14 @@ static int gsound_background_find_dont_copy(char* dest, const char* src)
     }
 
     snprintf(path, sizeof(path), "%s%s%s", sound_music_path1, src, ".ACM");
+    strncpy(primary_path, path, COMPAT_MAX_PATH);
+    primary_path[COMPAT_MAX_PATH - 1] = '\0';
     if (gsound_file_exists_f(path)) {
         strncpy(dest, path, COMPAT_MAX_PATH);
-        dest[COMPAT_MAX_PATH] = '\0';
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "music hit path=%s", path);
+        }
         return 0;
     }
 
@@ -1908,14 +1987,23 @@ static int gsound_background_find_dont_copy(char* dest, const char* src)
     }
 
     snprintf(path, sizeof(path), "%s%s%s", sound_music_path2, src, ".ACM");
+    strncpy(secondary_path, path, COMPAT_MAX_PATH);
+    secondary_path[COMPAT_MAX_PATH - 1] = '\0';
     if (gsound_file_exists_f(path)) {
         strncpy(dest, path, COMPAT_MAX_PATH);
-        dest[COMPAT_MAX_PATH] = '\0';
+        dest[COMPAT_MAX_PATH - 1] = '\0';
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "music hit path=%s", path);
+        }
         return 0;
     }
 
     if (gsound_debug) {
         debug_printf("-- find failed ");
+    }
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound", "music miss primary=%s secondary=%s", primary_path, secondary_path);
     }
 
     return -1;
@@ -1948,11 +2036,19 @@ static int gsound_speech_find_dont_copy(char* dest, const char* src)
             debug_printf("-- find failed ");
         }
 
+        if (rme_log_topic_enabled("sound")) {
+            rme_logf("sound", "speech miss path=%s", path);
+        }
+
         return -1;
     }
 
     strncpy(dest, path, COMPAT_MAX_PATH);
-    dest[COMPAT_MAX_PATH] = '\0';
+    dest[COMPAT_MAX_PATH - 1] = '\0';
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound", "speech hit path=%s", path);
+    }
 
     return 0;
 }
@@ -2032,6 +2128,10 @@ static int gsound_get_music_path(char** out_value, const char* key)
 
     value = *out_value;
     len = static_cast<int>(strlen(value));
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound", "music_path key=%s value=%s", key, value != NULL ? value : "(null)");
+    }
 
     if (value[len - 1] == '\\' || value[len - 1] == '/') {
         return 0;

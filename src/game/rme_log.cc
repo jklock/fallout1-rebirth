@@ -29,6 +29,8 @@ namespace {
     FILE* g_log_file = nullptr;
     std::string g_source;
 
+    void emit(const char* topic, const char* message, bool force = false);
+
     std::string toLower(const std::string& value)
     {
         std::string lowered(value);
@@ -65,9 +67,10 @@ namespace {
         return lowered == "1" || lowered == "true" || lowered == "yes" || lowered == "on" || lowered == "all" || lowered == "*";
     }
 
-    void rotateIfNeeded()
+    bool rotateIfNeeded()
     {
         struct stat st {};
+        bool rotated = false;
         if (g_log_file != nullptr) {
             if (fstat(fileno(g_log_file), &st) == 0 && static_cast<size_t>(st.st_size) >= kMaxLogSize) {
                 fclose(g_log_file);
@@ -79,8 +82,11 @@ namespace {
             if (stat(kLogFileName, &st) == 0 && static_cast<size_t>(st.st_size) >= kMaxLogSize) {
                 unlink(kLogBackupName);
                 rename(kLogFileName, kLogBackupName);
+                rotated = true;
             }
         }
+
+        return rotated;
     }
 
     void ensureLogFile()
@@ -89,10 +95,14 @@ namespace {
             return;
         }
 
-        rotateIfNeeded();
+        const bool rotated = rotateIfNeeded();
 
         if (g_log_file == nullptr) {
             g_log_file = compat_fopen(kLogFileName, "a");
+        }
+
+        if (rotated && g_log_file != nullptr) {
+            emit("config", "rme.log rotated (size>=1MiB, moved to rme.log.1)", true);
         }
     }
 

@@ -17,6 +17,7 @@
 #include "game/editor.h"
 #include "game/game.h"
 #include "game/gconfig.h"
+#include "game/rme_log.h"
 #include "game/gmouse.h"
 #include "game/gmovie.h"
 #include "game/gsound.h"
@@ -1525,9 +1526,16 @@ static int SaveSlot()
 
     debug_printf("\nLOADSAVE: Save name: %s\n", gmpath);
 
+    if (rme_log_topic_enabled("save")) {
+        rme_logf("save", "SaveSlot open path=%s patches=%s", gmpath, patches != NULL ? patches : "(null)");
+    }
+
     flptr = db_fopen(gmpath, "wb");
     if (flptr == NULL) {
         debug_printf("\nLOADSAVE: ** Error opening save game for writing! **\n");
+        if (rme_log_topic_enabled("save")) {
+            rme_logf("save", "SaveSlot open failed path=%s", gmpath);
+        }
         RestoreSave();
         snprintf(gmpath, sizeof(gmpath), "%s\\%s%.2d\\", "SAVEGAME", "SLOT", slot_cursor + 1);
         MapDirErase(gmpath, "BAK");
@@ -1610,9 +1618,16 @@ static int LoadSlot(int slot)
     LoadSaveSlotData* ptr = &(LSData[slot]);
     debug_printf("\nLOADSAVE: Load name: %s\n", ptr->description);
 
+    if (rme_log_topic_enabled("save")) {
+        rme_logf("save", "LoadSlot open path=%s", gmpath);
+    }
+
     flptr = db_fopen(gmpath, "rb");
     if (flptr == NULL) {
         debug_printf("\nLOADSAVE: ** Error opening load game file for reading! **\n");
+        if (rme_log_topic_enabled("save")) {
+            rme_logf("save", "LoadSlot open failed path=%s", gmpath);
+        }
         loadingGame = 0;
         return -1;
     }

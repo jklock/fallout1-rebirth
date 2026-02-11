@@ -46,6 +46,9 @@ int main(int argc, char* argv[])
     }
     if (basePath != NULL) {
         std::string workingDir(basePath);
+        std::string macosPath;
+        std::string resourcesPath;
+        bool haveAppRoot = false;
 
         auto hasGameFiles = [](const std::string& dir) {
             std::string cfg = dir + "fallout.cfg";
@@ -69,8 +72,9 @@ int main(int argc, char* argv[])
                 appRoot.assign(basePath, macos - basePath);
             }
 
-            std::string macosPath = appRoot + "/Contents/MacOS/";
-            std::string resourcesPath = appRoot + "/Contents/Resources/";
+            macosPath = appRoot + "/Contents/MacOS/";
+            resourcesPath = appRoot + "/Contents/Resources/";
+            haveAppRoot = true;
 
             auto pathExists = [](const std::string& path) {
                 return access(path.c_str(), R_OK) == 0;
@@ -162,8 +166,8 @@ int main(int argc, char* argv[])
         if (rme_log_topic_enabled("config")) {
             rme_logf("config", "working directory selected=%s", workingDir.c_str());
             const bool chosen_has_data = access((workingDir + "data").c_str(), R_OK) == 0;
-            const bool macos_has_data = access((macosPath + "data").c_str(), R_OK) == 0;
-            const bool resources_has_data = access((resourcesPath + "data").c_str(), R_OK) == 0;
+            const bool macos_has_data = haveAppRoot ? access((macosPath + "data").c_str(), R_OK) == 0 : false;
+            const bool resources_has_data = haveAppRoot ? access((resourcesPath + "data").c_str(), R_OK) == 0 : false;
             if (!chosen_has_data && (macos_has_data || resources_has_data)) {
                 rme_logf("config",
                     "bundle warning data missing in chosen dir=%s macos_has_data=%d resources_has_data=%d",

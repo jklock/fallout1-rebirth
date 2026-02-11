@@ -27,6 +27,7 @@ static int GNW_text_mono_width(const char* str);
 static int GNW_text_spacing();
 static int GNW_text_size(const char* str);
 static int GNW_text_max();
+static bool font_asset_exists(int n, const char* ext);
 
 // 0x53A204
 static int curr_font_num = -1;
@@ -139,6 +140,16 @@ int GNW_text_init()
     return 0;
 }
 
+static bool font_asset_exists(int n, const char* ext)
+{
+    dir_entry de;
+    char path[COMPAT_MAX_PATH];
+
+    snprintf(path, sizeof(path), "font%d.%s", n, ext);
+
+    return db_dir_entry(path, &de) == 0;
+}
+
 // 0x4C168C
 void GNW_text_exit()
 {
@@ -158,7 +169,6 @@ static int load_font(int n)
     int rc = -1;
 
     char path[COMPAT_MAX_PATH];
-    snprintf(path, sizeof(path), "font%d.fon", n);
 
     // NOTE: Original code is slightly different. It uses deep nesting and
     // unwinds everything from the point of failure.
@@ -166,10 +176,17 @@ static int load_font(int n)
     textFontDescriptor->data = NULL;
     textFontDescriptor->info = NULL;
 
-    DB_FILE* stream = db_fopen(path, "rb");
+    DB_FILE* stream = NULL;
+    if (font_asset_exists(n, "fon")) {
+        snprintf(path, sizeof(path), "font%d.fon", n);
+        stream = db_fopen(path, "rb");
+    }
+
     if (stream == NULL) {
         snprintf(path, sizeof(path), "font%d.aaf", n);
-        stream = db_fopen(path, "rb");
+        if (font_asset_exists(n, "aaf")) {
+            stream = db_fopen(path, "rb");
+        }
     }
     int dataSize;
     if (stream == NULL) {

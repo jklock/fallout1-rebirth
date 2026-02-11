@@ -15,6 +15,7 @@
 #include "game/map.h"
 #include "game/object.h"
 #include "game/perk.h"
+#include "game/rme_log.h"
 #include "game/skill.h"
 #include "game/stat.h"
 #include "game/trait.h"
@@ -204,6 +205,16 @@ int proto_list_str(int pid, char* proto_path)
     strcat(path, ".lst");
 
     DB_FILE* stream = db_fopen(path, "rt");
+    if (stream == NULL) {
+        if (rme_log_topic_enabled("proto")) {
+            rme_logf("proto", "proto_list_str missing lst pid=%d path=%s", pid, path);
+        }
+        return -1;
+    }
+
+    if (rme_log_topic_enabled("proto")) {
+        rme_logf("proto", "proto_list_str request pid=%d path=%s", pid, path);
+    }
 
     int i = 1;
     char string[256];
@@ -232,6 +243,10 @@ int proto_list_str(int pid, char* proto_path)
     }
 
     strcpy(proto_path, string);
+
+    if (rme_log_topic_enabled("proto")) {
+        rme_logf("proto", "proto_list_str result pid=%d entry=%s", pid, proto_path);
+    }
 
     return 0;
 }
@@ -1202,6 +1217,9 @@ int proto_header_load()
 
         DB_FILE* stream = db_fopen(path, "rt");
         if (stream == NULL) {
+            if (rme_log_topic_enabled("proto")) {
+                rme_logf("proto", "proto_header_load missing lst type=%d path=%s", index, path);
+            }
             return -1;
         }
 
@@ -1222,6 +1240,25 @@ int proto_header_load()
         }
 
         db_fclose(stream);
+
+        if (rme_log_topic_enabled("proto")) {
+            char dirPath[COMPAT_MAX_PATH];
+            strncpy(dirPath, path, sizeof(dirPath));
+            dirPath[sizeof(dirPath) - 1] = '\0';
+            char* sep = strrchr(dirPath, '\\');
+            if (sep != NULL) {
+                *(sep + 1) = '\0';
+            }
+
+            char proPattern[COMPAT_MAX_PATH];
+            snprintf(proPattern, sizeof(proPattern), "%s*.pro", dirPath);
+
+            char** fileList = NULL;
+            int proCount = db_get_file_list(proPattern, &fileList, NULL, 0);
+            db_free_file_list(&fileList, NULL);
+
+            rme_logf("proto", "proto_header_load type=%d lst=%s entries=%d pro_count=%d", index, path, ptr->max_entries_num, proCount);
+        }
     }
 
     return 0;
@@ -1630,12 +1667,18 @@ int proto_load_pid(int pid, Proto** protoPtr)
     strcat(path, "\\");
 
     if (proto_list_str(pid, path + strlen(path)) == -1) {
+        if (rme_log_topic_enabled("proto")) {
+            rme_logf("proto", "proto_load_pid missing lst pid=%d path=%s", pid, path);
+        }
         return -1;
     }
 
     DB_FILE* stream = db_fopen(path, "rb");
     if (stream == NULL) {
         debug_printf("\nError: Can't fopen proto!\n");
+        if (rme_log_topic_enabled("proto")) {
+            rme_logf("proto", "proto_load_pid missing pro pid=%d path=%s", pid, path);
+        }
         *protoPtr = NULL;
         return -1;
     }
