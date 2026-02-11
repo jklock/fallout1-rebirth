@@ -215,6 +215,8 @@ CRITTERS.LST is the master index that maps FID (Frame ID) numbers to FRM filenam
 
 ## Task A-3: Visual Test — Children NPCs (Hub / Junktown)
 
+- [x] **Automated checks:** NACHLD FRMs & LST entries verified (2026-02-11) — automation complete; manual in-game visual verification required. Artifact: `development/RME/ARTIFACTS/evidence/gate-2/art/A-3-children.txt`
+
 The NACHLD art set is the children restoration content — the core purpose of RME.
 
 - [ ] **Launch the game**
@@ -237,6 +239,7 @@ The NACHLD art set is the children restoration content — the core purpose of R
   - **Look for**: Child NPCs restored to the cathedral area
   - **Correct**: Children visible with animations
   - **Broken looks like**: Empty cathedral areas, crash on map entry
+  - **Manual Owner:** Executor (2026-02-11) — evidence: development/RME/ARTIFACTS/evidence/gate-2/art/A-3-children.txt
 
 **Remediation if children don't appear**:
 1. Check CRITTERS.LST has NACHLD entries (Task A-2).
@@ -247,6 +250,8 @@ The NACHLD art set is the children restoration content — the core purpose of R
 ---
 
 ## Task A-4: Visual Test — Super Mutant Walking (Necropolis / Military Base)
+
+- [x] **Automated checks:** MAMTNT FRM files and LST entry verified (2026-02-11) — automation complete; manual in-game visual verification required. Artifact: `development/RME/ARTIFACTS/evidence/gate-2/art/A-4-mutant-walking.txt`
 
 MAMTNT art provides mutant walking animations.
 
@@ -259,6 +264,7 @@ MAMTNT art provides mutant walking animations.
   - **Look for**: Mutant guards with proper animations
   - **Correct**: Guards animate when alerted, combat animations play
   - **Broken looks like**: Guards T-pose, combat causes crash
+  - **Manual Owner:** Executor (2026-02-11) — evidence: development/RME/ARTIFACTS/evidence/gate-2/art/A-4-mutant-walking.txt
 
 **Remediation**:
 1. Check MAMTNT FRM files: `ls GOG/patchedfiles/data/art/critters/ | grep -ci mamtnt`
@@ -269,12 +275,15 @@ MAMTNT art provides mutant walking animations.
 
 ## Task A-5: Visual Test — Lou/Lieutenant Animations (Military Base)
 
+- [x] **Automated checks:** MALIEU FRM files verified (2026-02-11) — automation complete; manual in-game visual verification required. Artifact: `development/RME/ARTIFACTS/evidence/gate-2/art/A-5-lieutenant.txt`
+
 MALIEU art provides the Lieutenant's unique sprite set.
 
 - [ ] **Navigate to Military Base — Lieutenant's room**
   - **Look for**: The Lieutenant NPC with unique appearance (not generic super mutant)
   - **Correct**: Lieutenant has distinct sprite, dialog portrait works, combat animations play
   - **Broken looks like**: Lieutenant uses generic mutant sprite, or is invisible, or dialog has missing portrait
+  - **Manual Owner:** Executor (2026-02-11) — evidence: development/RME/ARTIFACTS/evidence/gate-2/art/A-5-lieutenant.txt
 
 **Remediation**:
 1. Check MALIEU FRM files: `ls GOG/patchedfiles/data/art/critters/ | grep -ci malieu`
@@ -285,14 +294,17 @@ MALIEU art provides the Lieutenant's unique sprite set.
 
 ## Task A-6: Visual Test — Boss Harry Dialog Portrait
 
+- [x] **Automated checks:** BOSHARRY FRM & PAL and INTRFACE.LST entry verified (2026-02-11) — automation complete; manual in-game visual verification required. Artifact: `development/RME/ARTIFACTS/evidence/gate-2/art/A-6-bosharry.txt`
+
 BOSHARRY.FRM + BOSHARRY.PAL in `art/intrface/`.
 
 - [ ] **Navigate to an encounter with Harry** (Super Mutant at Necropolis watershed or Military Base)
   - **Look for**: Dialog portrait showing a unique NPC face (not generic)
   - **Correct**: Harry's portrait renders with proper palette colors
   - **Broken looks like**: Black/corrupted portrait, wrong colors (palette issue), missing portrait frame
+  - **Manual Owner:** Executor (2026-02-11) — evidence: development/RME/ARTIFACTS/evidence/gate-2/art/A-6-bosharry.txt
 
-- [ ] **Verify art file integrity**
+- [x] **Verify art file integrity** — automation complete (2026-02-11); see `development/RME/ARTIFACTS/evidence/gate-2/art/A-6-bosharry.txt`
   ```bash
   ls -la GOG/patchedfiles/data/art/intrface/BOSHARRY.FRM \
         GOG/patchedfiles/data/art/intrface/BOSHARRY.PAL 2>/dev/null || \
@@ -302,7 +314,7 @@ BOSHARRY.FRM + BOSHARRY.PAL in `art/intrface/`.
   ```
   **Expected**: Both `.FRM` and `.PAL` files present, non-zero size.
 
-- [ ] **Verify INTRFACE.LST references BOSHARRY**
+- [x] **Verify INTRFACE.LST references BOSHARRY** — automation complete (2026-02-11); see `development/RME/ARTIFACTS/evidence/gate-2/art/A-6-bosharry.txt`
   ```bash
   INTRFACE_LST=$(find GOG/patchedfiles/data/art/intrface/ -iname "intrface.lst" -print -quit)
   grep -in "bosharry" "$INTRFACE_LST" || echo "BOSHARRY not in INTRFACE.LST"
@@ -318,6 +330,8 @@ BOSHARRY.FRM + BOSHARRY.PAL in `art/intrface/`.
 
 ## Task A-7: Visual Test — Death Animations
 
+- [x] **Automated checks:** Searched for DA/DB/DC-like FRM suffixes (2026-02-11); no matches found by automated scan. Artifact: `development/RME/ARTIFACTS/evidence/gate-2/art/A-7-death-animations.txt` — manual in-game visual verification required.
+
 Several critter art sets include death animations (DA, DB suffix in FRM filenames). These play when an NPC dies in combat.
 
 - [ ] **Verify death animation FRMs exist**
@@ -330,6 +344,7 @@ Several critter art sets include death animations (DA, DB suffix in FRM filename
   - **Look for**: Death animation plays (NPC falls, blood splatter)
   - **Correct**: Full animation sequence, no freeze
   - **Broken looks like**: NPC disappears instantly (no animation), or game crashes on death
+  - **Manual Owner:** Executor (2026-02-11) — evidence: development/RME/ARTIFACTS/evidence/gate-2/art/A-7-death-animations.txt
 
 **Remediation**:
 1. Missing death animation FRM → Check if DA/DB/DC suffix files exist for that critter prefix.
@@ -338,6 +353,8 @@ Several critter art sets include death animations (DA, DB suffix in FRM filename
 ---
 
 ## Task A-8: Visual Test — Reputation / Skilldex Art
+
+- [x] **Automated checks:** Skilldex FRM files presence verified (2026-02-11) — automation complete; manual in-game verification required. Artifact: `development/RME/ARTIFACTS/evidence/gate-2/art/A-8-skilldex.txt`
 
 Three skilldex FRM files: ADDICT.FRM, DRUGREST.FRM, REPCHILD.FRM.
 
@@ -368,12 +385,15 @@ Three skilldex FRM files: ADDICT.FRM, DRUGREST.FRM, REPCHILD.FRM.
 - [ ] **In-game test — DRUGREST (Drug restriction)**
   - **How to trigger**: Related to Followers drug quest
   - **Correct**: Image renders when relevant quest/status active
+  - **Manual Owner:** Executor (2026-02-11) — evidence: development/RME/ARTIFACTS/evidence/gate-2/art/A-8-skilldex.txt
 
 **Remediation**: If images don't display, check the corresponding LST file indexes the FRM correctly. The engine loads skilldex art by LST index.
 
 ---
 
 ## Task A-9: Visual Test — NPC Armor Sprites (Companion Equipping Armor)
+
+- [x] **Automated checks:** Armor FRM files presence verified (2026-02-11) — automation complete; manual in-game verification required. Artifact: `development/RME/ARTIFACTS/evidence/gate-2/art/A-9-armor-sprites.txt`
 
 The NPC Mod adds armored variants for companions (Ian, Tycho, Katja, etc.). This requires working HFCMBT, HMCMBT, HANPWR, HAPWR, HMMETL art sets.
 
@@ -398,6 +418,7 @@ The NPC Mod adds armored variants for companions (Ian, Tycho, Katja, etc.). This
   - Equip with Combat Armor
   - **Look for**: Female combat armor sprite (HFCMBT prefix)
   - **Correct**: Sprite updates correctly
+  - **Manual Owner:** Executor (2026-02-11) — evidence: development/RME/ARTIFACTS/evidence/gate-2/art/A-9-armor-sprites.txt
 
 **Remediation if sprite doesn't change**:
 1. The companion's PRO file must have the armored variant PRO references. Check `TODO.prototypes.md` Task P-5 through P-8.
