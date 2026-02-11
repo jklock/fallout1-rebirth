@@ -1,1 +1,26 @@
-No interface fonts found
+font10.aaf
+font11.aaf
+font12.aaf
+font13.aaf
+font14.aaf
+font15.aaf
+font3.aaf
+font4.aaf
+font5.aaf
+font6.aaf
+font7.aaf
+font8.aaf
+font9.aaf
+exists: font14.aaf
+exists: font15.aaf
+exists: font12.aaf
+exists: font13.aaf
+exists: font11.aaf
+exists: font10.aaf
+exists: font4.aaf
+exists: font5.aaf
+exists: font7.aaf
+exists: font6.aaf
+exists: font3.aaf
+exists: font8.aaf
+exists: font9.aaf
