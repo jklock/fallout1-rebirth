@@ -48,24 +48,26 @@ RME adds or modifies **387 art-related files** across two categories:
 
 **Purpose**: Ensure interface font files are present in the app Resources so FMInit can load fonts successfully and UI text renders correctly.
 
-- [ ] **Check for font files in app Resources**
+- [x] **Check for font files in app Resources** — automation complete (2026-02-11); see `development/RME/ARTIFACTS/evidence/gate-2/art/A-0-fonts-in-resources.txt`
   ```bash
   ls "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources" | grep -Ei "font[0-9]+\.aaf" || echo "No interface fonts found"
   ```
 
-- [ ] **Install fonts from patched data**
+- [x] **Install fonts from patched data** — automation complete (2026-02-11); installed/verified SHA256s recorded in `development/RME/ARTIFACTS/evidence/gate-2/art/A-0-fonts-installed-sha256.txt`
   ```bash
   mkdir -p "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources"
   cp GOG/patchedfiles/data/font*.aaf "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/"
   ```
 
-- [ ] **Verify FMInit success in runtime logs**
+- [x] **Verify FMInit success in runtime logs** — automation complete (2026-02-11); see `development/RME/ARTIFACTS/evidence/gate-2/art/A-0-fonts-runtime-misses.txt` (note: DB_OPEN_FAIL entries found in runtime patchlogs)
   ```bash
   # Look for errors indicating fonts could not be loaded
   grep -R "Couldn't find/load text fonts" -n development/RME/ARTIFACTS/evidence/gate-2 || echo "No font errors found"
   ```
 
 ## Task A-1: Verify Critter FRM File Presence
+
+- [x] **Automated checks:** counts and prefix inventory run (2026-02-11) — automation complete; manual visual verification still required. Evidence: `development/RME/ARTIFACTS/evidence/gate-2/art/A-1-critter-counts.txt`
 
 Confirm all expected critter art files were patched into the game data.
 
@@ -149,6 +151,8 @@ Confirm all expected critter art files were patched into the game data.
 ---
 
 ## Task A-2: Verify CRITTERS.LST Integrity
+
+- [x] **Automated checks:** LST integrity and cross-reference run (2026-02-11) — automation complete; manual visual verification still required where applicable. Evidence: `development/RME/ARTIFACTS/evidence/gate-2/art/A-2-critter-lst-wc.txt`, `development/RME/ARTIFACTS/evidence/gate-2/art/A-2-critter-lst-snippet.txt`, `development/RME/ARTIFACTS/evidence/gate-2/art/A-2-lst-entries.txt`, `development/RME/ARTIFACTS/evidence/gate-2/art/A-2-frm-vs-lst-diff.txt`
 
 CRITTERS.LST is the master index that maps FID (Frame ID) numbers to FRM filenames. If entries are wrong or missing, critters appear as invisible or cause crashes.
 
