@@ -1,0 +1,5 @@
+>>> Indexing DATs from: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles
+>>> Scanning RME payload: /Volumes/Storage/GitHub/fallout1-rebirth/third_party/rme/source/DATA
+[OK] Wrote: /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/patch-validation/rme-xref/rme-crossref.csv
+[OK] Wrote: /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/patch-validation/rme-xref/rme-crossref.md
+[OK] Wrote: /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/patch-validation/rme-xref/rme-lst-report.md
