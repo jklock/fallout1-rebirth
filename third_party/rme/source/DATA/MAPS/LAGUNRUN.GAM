@@ -1,6 +1,0 @@
-MAP_GLOBAL_VARS:
-//MAP VAR                              NUMBER
-
-discount              := 0;   // (0) Tells if the dude gets a weapons discount.
-Peaceful              := 0;   // (1)
-InvasionForcesCreated := 0;   // (2) Have the invasion forces been created.
