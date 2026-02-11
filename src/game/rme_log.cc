@@ -134,15 +134,20 @@ namespace {
         }
 
         const bool enable_all = isEnabledValue(raw);
+        const std::vector<std::string> topics = splitTopics(raw);
+
+        if (!enable_all && topics.empty()) {
+            return;
+        }
+
         g_enabled = true;
         g_source = raw;
+        g_has_filters = false;
+        g_filters.clear();
 
-        if (!enable_all) {
-            const std::vector<std::string> topics = splitTopics(raw);
-            if (!topics.empty()) {
-                g_has_filters = true;
-                g_filters.insert(topics.begin(), topics.end());
-            }
+        if (!enable_all && !topics.empty()) {
+            g_has_filters = true;
+            g_filters.insert(topics.begin(), topics.end());
         }
 
         char summary[256];

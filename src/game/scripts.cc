@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <time.h>
 
 #include "game/actions.h"
@@ -19,6 +20,7 @@
 #include "game/protinst.h"
 #include "game/proto.h"
 #include "game/queue.h"
+#include "game/rme_log.h"
 #include "game/tile.h"
 #include "game/worldmap.h"
 #include "int/dialog.h"
@@ -543,7 +545,19 @@ Program* loadProgram(const char* name)
     strcat(path, name);
     strcat(path, ".int");
 
-    return allocateProgram(path);
+    Program* program = allocateProgram(path);
+
+    if (rme_log_topic_enabled("script")) {
+        rme_logf("script",
+            "loadProgram name=%s cd_base=%s script_base=%s path=%s result=%p",
+            name != NULL ? name : "(null)",
+            cd_path_base,
+            script_path_base,
+            path,
+            (void*)program);
+    }
+
+    return program;
 }
 
 // 0x491F20
@@ -1181,6 +1195,9 @@ int scr_find_str_run_info(int scr_script_idx, int* run_info_flags, int sid)
 
     stream = db_fopen(path, "rt");
     if (stream == NULL) {
+        if (rme_log_topic_enabled("script")) {
+            rme_log_once(std::string("scripts.lst:") + path, "script", "scripts.lst missing path=%s", path);
+        }
         return -1;
     }
 
@@ -1259,6 +1276,10 @@ static int scr_index_to_name(int scr_script_idx, char* name, size_t size)
             snprintf(name, size, "%s.%s", string, "int");
             rc = 0;
         }
+    }
+
+    if (rme_log_topic_enabled("script") && rc == 0) {
+        rme_log_once(std::string("script-entry:") + name, "script", "scripts.lst entry index=%d name=%s", scr_script_idx, name);
     }
 
     db_fclose(stream);
@@ -1586,6 +1607,9 @@ static int scr_header_load()
 
     stream = db_fopen(path, "rt");
     if (stream == NULL) {
+        if (rme_log_topic_enabled("script")) {
+            rme_log_once(std::string("scripts.lst:") + path, "script", "scripts.lst missing path=%s", path);
+        }
         return -1;
     }
 
@@ -1603,6 +1627,10 @@ static int scr_header_load()
     num_script_indexes++;
 
     db_fclose(stream);
+
+    if (rme_log_topic_enabled("script")) {
+        rme_logf("script", "scripts.lst path=%s entries=%d", path, num_script_indexes);
+    }
 
     for (int scriptType = 0; scriptType < SCRIPT_TYPE_COUNT; scriptType++) {
         ScriptList* scriptList = &(scriptlists[scriptType]);

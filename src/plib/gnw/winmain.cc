@@ -1,5 +1,6 @@
 #include "plib/gnw/winmain.h"
 
+#include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -71,6 +72,35 @@ int main(int argc, char* argv[])
             std::string macosPath = appRoot + "/Contents/MacOS/";
             std::string resourcesPath = appRoot + "/Contents/Resources/";
 
+            auto pathExists = [](const std::string& path) {
+                return access(path.c_str(), R_OK) == 0;
+            };
+
+            auto findWithExtension = [](const std::string& dir, const char* ext) {
+                DIR* d = opendir(dir.c_str());
+                if (d == NULL) {
+                    return std::string();
+                }
+
+                std::string found;
+                struct dirent* ent;
+                const size_t extLen = strlen(ext);
+                while ((ent = readdir(d)) != NULL) {
+                    if (ent->d_name[0] == '.') {
+                        continue;
+                    }
+
+                    std::string name(ent->d_name);
+                    if (name.size() >= extLen && name.rfind(ext) == name.size() - extLen) {
+                        found = name;
+                        break;
+                    }
+                }
+
+                closedir(d);
+                return found;
+            };
+
             std::string parentDir;
             size_t sep = appRoot.find_last_of('/');
             if (sep != std::string::npos) {
@@ -108,18 +138,39 @@ int main(int argc, char* argv[])
                 const bool info_plist = access((appRoot + "/Contents/Info.plist").c_str(), R_OK) == 0;
                 const bool macos_dir = access(macosPath.c_str(), R_OK) == 0;
                 const bool resources_dir = access(resourcesPath.c_str(), R_OK) == 0;
+                const bool macos_data = pathExists(macosPath + "data");
+                const bool resources_data = pathExists(resourcesPath + "data");
+                std::string icns = findWithExtension(resourcesPath, ".icns");
+                std::string storyboard = findWithExtension(resourcesPath, ".storyboardc");
+                if (storyboard.empty()) {
+                    storyboard = findWithExtension(resourcesPath, ".storyboard");
+                }
                 rme_logf("config",
-                    "bundle probe appRoot=%s info_plist=%d macos_dir=%d resources_dir=%d",
+                    "bundle probe appRoot=%s info_plist=%d macos_dir=%d resources_dir=%d macos_data=%d resources_data=%d icns=%s storyboard=%s",
                     appRoot.c_str(),
                     info_plist ? 1 : 0,
                     macos_dir ? 1 : 0,
-                    resources_dir ? 1 : 0);
+                    resources_dir ? 1 : 0,
+                    macos_data ? 1 : 0,
+                    resources_data ? 1 : 0,
+                    icns.empty() ? "(none)" : icns.c_str(),
+                    storyboard.empty() ? "(none)" : storyboard.c_str());
             }
         }
 
         chdir(workingDir.c_str());
         if (rme_log_topic_enabled("config")) {
             rme_logf("config", "working directory selected=%s", workingDir.c_str());
+            const bool chosen_has_data = access((workingDir + "data").c_str(), R_OK) == 0;
+            const bool macos_has_data = access((macosPath + "data").c_str(), R_OK) == 0;
+            const bool resources_has_data = access((resourcesPath + "data").c_str(), R_OK) == 0;
+            if (!chosen_has_data && (macos_has_data || resources_has_data)) {
+                rme_logf("config",
+                    "bundle warning data missing in chosen dir=%s macos_has_data=%d resources_has_data=%d",
+                    workingDir.c_str(),
+                    macos_has_data ? 1 : 0,
+                    resources_has_data ? 1 : 0);
+            }
         }
         // SDL3 returns const char* but it's still allocated memory that needs freeing
         SDL_free((void*)basePath);

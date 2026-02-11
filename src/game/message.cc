@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "game/gconfig.h"
+#include "game/rme_log.h"
 #include "game/roll.h"
 #include "platform_compat.h"
 #include "plib/db/db.h"
@@ -189,8 +190,33 @@ bool message_load(MessageList* messageList, const char* path)
 
     snprintf(localized_path, sizeof(localized_path), "%s\\%s\\%s", "text", language, path);
 
+    if (rme_log_topic_enabled("text")) {
+        char cwd[COMPAT_MAX_PATH];
+        if (getcwd(cwd, sizeof(cwd)) == nullptr) {
+            cwd[0] = '\0';
+        }
+        rme_logf("text",
+            "message_load language=%s path=%s localized=%s cwd=%s",
+            language != NULL ? language : "(null)",
+            path != NULL ? path : "(null)",
+            localized_path,
+            cwd);
+    }
+
     file_ptr = db_fopen(localized_path, "rt");
     if (file_ptr == NULL) {
+        if (rme_log_topic_enabled("text")) {
+            char cwd[COMPAT_MAX_PATH];
+            if (getcwd(cwd, sizeof(cwd)) == nullptr) {
+                cwd[0] = '\0';
+            }
+            rme_logf("text",
+                "message_load missing language=%s path=%s localized=%s cwd=%s",
+                language != NULL ? language : "(null)",
+                path != NULL ? path : "(null)",
+                localized_path,
+                cwd);
+        }
         return false;
     }
 
@@ -236,6 +262,14 @@ err:
     }
 
     db_fclose(file_ptr);
+
+    if (rme_log_topic_enabled("text")) {
+        rme_logf("text",
+            "message_load result=%d entries=%d localized=%s",
+            success ? 1 : 0,
+            messageList->entries_num,
+            localized_path);
+    }
 
     return success;
 }

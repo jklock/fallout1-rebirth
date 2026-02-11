@@ -67,6 +67,14 @@ static FontMgr font_managers[FONT_MANAGER_MAX];
 // 0x6AC118
 static Font* curr_font;
 
+// Tracks which base font a slot is using. An alias points to an already
+// loaded font to avoid double-free.
+static int font_alias_of[TEXT_FONT_MAX];
+
+// Fallback mapping for missing fonts. Later fonts reuse an earlier style if
+// the asset is absent.
+static const int font_fallback[TEXT_FONT_MAX] = { 0, 0, 0, 0, 3, 3, 3, 3, 3, 3 };
+
 // 0x4C161C
 int GNW_text_init()
 {
@@ -91,9 +99,27 @@ int GNW_text_init()
     first_font = -1;
 
     for (i = 0; i < TEXT_FONT_MAX; i++) {
+        font_alias_of[i] = -1;
+    }
+
+    for (i = 0; i < TEXT_FONT_MAX; i++) {
         if (load_font(i) == -1) {
-            font[i].num = 0;
+            int fallback = font_fallback[i];
+
+            // Resolve to a base font that is already loaded.
+            while (fallback >= 0 && fallback < TEXT_FONT_MAX && font_alias_of[fallback] != fallback) {
+                fallback = font_fallback[fallback];
+            }
+
+            if (fallback >= 0 && fallback < TEXT_FONT_MAX && font[fallback].num != 0) {
+                font[i] = font[fallback];
+                font_alias_of[i] = fallback;
+            } else {
+                font[i].num = 0;
+                font_alias_of[i] = -1;
+            }
         } else {
+            font_alias_of[i] = i;
             if (first_font == -1) {
                 first_font = i;
             }
@@ -119,7 +145,7 @@ void GNW_text_exit()
     int i;
 
     for (i = 0; i < TEXT_FONT_MAX; i++) {
-        if (font[i].num != 0) {
+        if (font[i].num != 0 && font_alias_of[i] == i) {
             mem_free(font[i].info);
             mem_free(font[i].data);
         }
@@ -141,6 +167,10 @@ static int load_font(int n)
     textFontDescriptor->info = NULL;
 
     DB_FILE* stream = db_fopen(path, "rb");
+    if (stream == NULL) {
+        snprintf(path, sizeof(path), "font%d.aaf", n);
+        stream = db_fopen(path, "rb");
+    }
     int dataSize;
     if (stream == NULL) {
         goto out;
@@ -438,4 +468,9 @@ static int GNW_text_max()
     return len + curr_font->spacing;
 }
 
+// Tracks which base font a slot is using. An alias points to an already
+// loaded font to avoid double-free.
+
+// Fallback mapping for missing fonts. Later fonts reuse an earlier style if
+// the asset is absent.
 } // namespace fallout

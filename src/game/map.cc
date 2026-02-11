@@ -26,6 +26,7 @@
 #include "game/protinst.h"
 #include "game/proto.h"
 #include "game/queue.h"
+#include "game/rme_log.h"
 #include "game/roll.h"
 #include "game/scripts.h"
 #include "game/textobj.h"
@@ -825,6 +826,10 @@ int map_scroll_and_full_refresh(int dx, int dy)
         renderPresent();
 #endif
     }
+    if (rme_log_topic_enabled("map")) {
+        rme_logf("map", "map_load result=%d name=%s", rc, file_name != NULL ? file_name : "(null)");
+    }
+
     return rc;
 }
 
@@ -875,6 +880,10 @@ int map_load(char* file_name)
     DB_FILE* stream;
     char* extension;
     char* file_path;
+
+    if (rme_log_topic_enabled("map")) {
+        rme_logf("map", "map_load request name=%s", file_name != NULL ? file_name : "(null)");
+    }
 
     compat_strupr(file_name);
 
@@ -1062,8 +1071,14 @@ int map_load_file(DB_FILE* stream)
         debug_printf(message);
         map_new_map();
         rc = -1;
+        if (rme_log_topic_enabled("map")) {
+            rme_logf("map", "map_load_file failed map=%s error=%s", map_data.name, error);
+        }
     } else {
         obj_preload_art_cache(map_data.flags);
+        if (rme_log_topic_enabled("map")) {
+            rme_logf("map", "map_load_file success map=%s flags=%d", map_data.name, map_data.flags);
+        }
     }
 
     partyMemberRecoverLoad();
@@ -1101,6 +1116,10 @@ int map_load_file(DB_FILE* stream)
 int map_load_in_game(char* fileName)
 {
     debug_printf("\nMAP: Loading SAVED map.");
+
+    if (rme_log_topic_enabled("map")) {
+        rme_logf("map", "map_load_in_game file=%s", fileName != NULL ? fileName : "(null)");
+    }
 
     char mapName[16]; // TODO: Size is probably wrong.
     strmfe(mapName, fileName, "SAV");

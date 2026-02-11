@@ -1,6 +1,7 @@
 #include "plib/db/db.h"
 
 #include <dirent.h>
+#include <cctype>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,7 +67,7 @@ static int db_create_database(DB_DATABASE** database_ptr);
 static int db_destroy_database(DB_DATABASE** database_ptr);
 static int db_init_database(DB_DATABASE* database, const char* datafile, const char* datafile_path);
 static void db_exit_database(DB_DATABASE* database);
-static int db_init_patches(DB_DATABASE* database, const char* path);
+static int db_init_patches(DB_DATABASE* database, const char* path, const char* datafile_dir);
 static void db_exit_patches(DB_DATABASE* database);
 static int db_init_hash_table(DB_DATABASE* database);
 static int db_reset_hash_table(DB_DATABASE* database);
@@ -137,9 +138,23 @@ static DB_DATABASE* database_list[DB_DATABASE_LIST_CAPACITY];
 DB_DATABASE* db_init(const char* datafile, const char* datafile_path, const char* patches_path, int show_cursor)
 {
     DB_DATABASE* database;
+    std::string datafile_dir;
 
     if (db_create_database(&database) != 0) {
         return INVALID_DATABASE_HANDLE;
+    }
+
+    if (datafile != NULL) {
+        const char* last_forward_sep = strrchr(datafile, PATH_SEP);
+        const char* last_backward_sep = strrchr(datafile, '\\');
+        const char* last_sep = last_forward_sep;
+        if (last_sep == NULL || (last_backward_sep != NULL && last_backward_sep > last_sep)) {
+            last_sep = last_backward_sep;
+        }
+
+        if (last_sep != NULL) {
+            datafile_dir.assign(datafile, last_sep - datafile + 1);
+        }
     }
 
     if (db_init_database(database, datafile, datafile_path) != 0) {
@@ -147,7 +162,7 @@ DB_DATABASE* db_init(const char* datafile, const char* datafile_path, const char
         return INVALID_DATABASE_HANDLE;
     }
 
-    if (db_init_patches(database, patches_path) != 0) {
+    if (db_init_patches(database, patches_path, datafile_dir.empty() ? NULL : datafile_dir.c_str()) != 0) {
         db_close(database);
         return INVALID_DATABASE_HANDLE;
     }
@@ -205,6 +220,12 @@ int db_total()
         if (database_list[index] != NULL) {
             count++;
         }
+    }
+
+    if (rme_log_topic_enabled("db")) {
+        rme_log_once(std::string("filelist-count:") + filespec_copy,
+            "db",
+            "db_get_file_list count=%d filespec=%s", count, filespec_copy);
     }
 
     return count;
@@ -315,7 +336,7 @@ int db_dir_entry(const char* name, dir_entry* de)
     compat_strupr(path);
 
     if (db_find_dir_entry(path, de) != 0) {
-        return -1;
+        return -1; // Return if entry not found
     }
 
     if (de->flags == 0) {
@@ -350,7 +371,6 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
     if (filename == NULL) {
         return -1;
     }
-
     if (buf == NULL) {
         return -1;
     }
@@ -521,6 +541,8 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
     int k;
     dir_entry de;
     unsigned char* buf;
+    bool patch_attempted = false;
+    bool patch_hit = false;
 
     if (current_database == NULL) {
         return NULL;
@@ -582,6 +604,7 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
     }
 
     if (current_database->patches_path != NULL) {
+        patch_attempted = true;
         v2 = false;
 
         if (v1) {
@@ -608,6 +631,7 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
         }
 
         if (stream != NULL) {
+            patch_hit = true;
             if (rme_log_topic_enabled("db")) {
                 rme_logf("db", "db_fopen success patch path=%s", path);
             }
@@ -624,6 +648,10 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
         }
     }
 
+    if (rme_log_topic_enabled("db") && patch_attempted && !patch_hit) {
+        rme_logf("db", "db_fopen patch fallback to dat file=%s datafile=%s", filename, current_database->datafile != NULL ? current_database->datafile : "(null)");
+    }
+
     if (mode_value == 0) {
         return NULL;
     }
@@ -635,8 +663,6 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
     if (v1) {
         snprintf(path, sizeof(path), "%s%s", current_database->datafile_path, filename);
     }
-
-    compat_strupr(path);
 
     if (rme_log_topic_enabled("db")) {
         rme_logf("db", "db_fopen dat try path=%s", path);
@@ -663,6 +689,10 @@ DB_FILE* db_fopen(const char* filename, const char* mode)
 
     if (fseek(current_database->stream, de.offset, SEEK_SET) != 0) {
         return NULL;
+    }
+
+    if (rme_log_topic_enabled("db")) {
+        rme_logf("db", "db_fopen dat hit path=%s flags=%d length=%d field_C=%d", path, de.flags, de.length, de.field_C);
     }
 
     if (de.flags == 0) {
@@ -1637,6 +1667,15 @@ int db_get_file_list(const char* filespec, char*** filelist, char*** desclist, i
     char* filespec_copy = filespec_copy_buffer;
     strcpy(filespec_copy, filespec);
 
+    if (rme_log_topic_enabled("db")) {
+        rme_log_once(std::string("filelist:") + filespec_copy,
+            "db",
+            "db_get_file_list filespec=%s patches=%s datafile=%s",
+            filespec_copy,
+            current_database->patches_path != NULL ? current_database->patches_path : "(null)",
+            current_database->datafile != NULL ? current_database->datafile : "(null)");
+    }
+
     temp = NULL;
 
     v1 = true;
@@ -1957,8 +1996,8 @@ static int db_init_database(DB_DATABASE* database, const char* datafile, const c
 {
     assoc_func_list funcs;
     int index;
-    const char* v1;
-    size_t v2;
+    std::string normalizedPath;
+    size_t normalizedLength;
 
     if (database == NULL) {
         return -1;
@@ -2032,16 +2071,25 @@ static int db_init_database(DB_DATABASE* database, const char* datafile, const c
     }
 
     if (datafile_path != NULL && strlen(datafile_path) != 0) {
-        v1 = datafile_path;
-        if (datafile_path[0] == PATH_SEP) {
-            v1 = datafile_path + 1;
+        normalizedPath = datafile_path;
+
+        if (!normalizedPath.empty() && normalizedPath.front() == PATH_SEP) {
+            normalizedPath.erase(0, 1);
         }
-    } else {
-        v1 = ".\\";
+
+        for (char& ch : normalizedPath) {
+            if (ch == '\\') {
+                ch = PATH_SEP;
+            }
+        }
     }
 
-    v2 = strlen(v1);
-    database->datafile_path = (char*)internal_malloc(v2 + 2);
+    if (!normalizedPath.empty() && normalizedPath.back() != PATH_SEP) {
+        normalizedPath.push_back(PATH_SEP);
+    }
+
+    normalizedLength = normalizedPath.length();
+    database->datafile_path = (char*)internal_malloc(normalizedLength + 1);
     if (database->datafile_path == NULL) {
         internal_free(database->entries);
         assoc_free(&(database->root));
@@ -2051,11 +2099,26 @@ static int db_init_database(DB_DATABASE* database, const char* datafile, const c
         return -1;
     }
 
-    strcpy(database->datafile_path, v1);
+    strcpy(database->datafile_path, normalizedPath.c_str());
 
-    if (database->datafile_path[v2 - 1] != '\\') {
-        database->datafile_path[v2] = '\\';
-        database->datafile_path[v2 + 1] = '\0';
+    if (rme_log_topic_enabled("db") && database->entries != NULL && database->root.size > 0) {
+        bool found_font0 = false;
+        int root_entries = database->entries[0].size;
+        if (database->entries[0].list != NULL) {
+            for (int i = 0; i < root_entries; i++) {
+                const char* name = database->entries[0].list[i].name;
+                if (name != NULL && strcasecmp(name, "font0.fon") == 0) {
+                    found_font0 = true;
+                    break;
+                }
+            }
+        }
+        rme_logf("db",
+            "db_init_database loaded datafile=%s root_dirs=%d root_entries=%d font0_in_root=%d",
+            database->datafile != NULL ? database->datafile : "(null)",
+            database->root.size,
+            root_entries,
+            found_font0);
     }
 
     return 0;
@@ -2097,9 +2160,27 @@ static void db_exit_database(DB_DATABASE* database)
 }
 
 // 0x4B1E70
-static int db_init_patches(DB_DATABASE* database, const char* path)
+static int db_init_patches(DB_DATABASE* database, const char* path, const char* datafile_dir)
 {
     size_t path_len;
+
+    auto dir_exists = [](const std::string& candidate) {
+        DIR* dir = opendir(candidate.c_str());
+        if (dir != NULL) {
+            closedir(dir);
+            return true;
+        }
+        return false;
+    };
+
+    auto ensure_trailing_sep = [](std::string& candidate) {
+        if (!candidate.empty()) {
+            char last = candidate.back();
+            if (last != PATH_SEP && last != '\\') {
+                candidate.push_back(PATH_SEP);
+            }
+        }
+    };
 
     if (database == NULL) {
         return -1;
@@ -2116,17 +2197,51 @@ static int db_init_patches(DB_DATABASE* database, const char* path)
         return 0;
     }
 
-    database->patches_path = (char*)internal_malloc(path_len + 2);
+    std::string resolved_path(path);
+    for (char& ch : resolved_path) {
+        if (ch == '\\') {
+            ch = PATH_SEP;
+        }
+    }
+
+    bool used_datafile_dir = false;
+    const bool is_absolute = !resolved_path.empty()
+        && (resolved_path.front() == PATH_SEP
+            || resolved_path.front() == '\\'
+            || (resolved_path.size() > 1 && resolved_path[1] == ':' && (resolved_path.size() == 2 || resolved_path[2] == '\\' || resolved_path[2] == PATH_SEP)));
+
+    if (!is_absolute && !dir_exists(resolved_path) && datafile_dir != NULL && datafile_dir[0] != '\0') {
+        std::string base_dir(datafile_dir);
+        for (char& ch : base_dir) {
+            if (ch == '\\') {
+                ch = PATH_SEP;
+            }
+        }
+        ensure_trailing_sep(base_dir);
+
+        std::string candidate = base_dir + resolved_path;
+        if (dir_exists(candidate)) {
+            resolved_path.swap(candidate);
+            used_datafile_dir = true;
+        }
+    }
+
+    ensure_trailing_sep(resolved_path);
+
+    database->patches_path = (char*)internal_malloc(resolved_path.length() + 1);
     if (database->patches_path == NULL) {
         return -1;
     }
 
     database->should_free_patches_path = true;
-    strcpy(database->patches_path, path);
+    strcpy(database->patches_path, resolved_path.c_str());
 
-    if (database->patches_path[path_len - 1] != '\\') {
-        database->patches_path[path_len] = PATH_SEP;
-        database->patches_path[path_len + 1] = '\0';
+    if (rme_log_topic_enabled("db")) {
+        rme_logf("db",
+            "db_init_patches path=%s absolute=%d used_datafile_dir=%d",
+            database->patches_path != NULL ? database->patches_path : "(null)",
+            is_absolute ? 1 : 0,
+            used_datafile_dir ? 1 : 0);
     }
 
     return 0;
@@ -2519,37 +2634,30 @@ static int db_find_empty_position(int* position_ptr)
 }
 
 // 0x4B2714
-static int db_find_dir_entry(char* path, dir_entry* de)
+static int db_find_dir_entry_internal(char* path, dir_entry* de)
 {
-    char* normalized_path;
+    char* normalized_path = path;
+    char original_separator;
     int pos;
     int dir_index;
     int entry_index;
 
-    normalized_path = path;
-
-    if (current_database->datafile == NULL) {
-        return -1;
-    }
-
-    if (path == NULL) {
-        return -1;
-    }
-
-    if (de == NULL) {
+    if (current_database->datafile == NULL || path == NULL || de == NULL) {
         return -1;
     }
 
     if (path[0] == '.') {
         normalized_path = path + 1;
-        if (path[1] == '\\') {
+        if (path[1] == '\\' || path[1] == PATH_SEP) {
             normalized_path = path + 2;
         }
     }
 
     pos = strlen(normalized_path) - 1;
+    original_separator = '\0';
     while (pos >= 0) {
-        if (normalized_path[pos] == '\\') {
+        if (normalized_path[pos] == '\\' || normalized_path[pos] == PATH_SEP) {
+            original_separator = normalized_path[pos];
             break;
         }
         pos--;
@@ -2578,12 +2686,65 @@ static int db_find_dir_entry(char* path, dir_entry* de)
     }
 
     if (pos >= 0) {
-        normalized_path[pos] = '\\';
+        normalized_path[pos] = original_separator;
     }
 
     *de = *((dir_entry*)current_database->entries[dir_index].list[entry_index].data);
 
     return 0;
+}
+
+static int db_find_dir_entry(char* path, dir_entry* de)
+{
+    char temp[COMPAT_MAX_PATH];
+    char alt[COMPAT_MAX_PATH];
+
+    if (path == NULL || de == NULL) {
+        return -1;
+    }
+
+    // First try with the path as given.
+    strncpy(temp, path, sizeof(temp) - 1);
+    temp[sizeof(temp) - 1] = '\0';
+    if (db_find_dir_entry_internal(temp, de) == 0) {
+        return 0;
+    }
+
+    // Retry with swapped separators to handle DAT entries that may use the
+    // opposite slash direction.
+    strncpy(alt, path, sizeof(alt) - 1);
+    alt[sizeof(alt) - 1] = '\0';
+    for (size_t i = 0; alt[i] != '\0'; i++) {
+        if (alt[i] == '\\') {
+            alt[i] = PATH_SEP;
+        } else if (alt[i] == PATH_SEP) {
+            alt[i] = '\\';
+        }
+    }
+
+    if (db_find_dir_entry_internal(alt, de) == 0) {
+        return 0;
+    }
+
+    // Retry with uppercase to match archives that store uppercased entries.
+    strncpy(temp, path, sizeof(temp) - 1);
+    temp[sizeof(temp) - 1] = '\0';
+    for (size_t i = 0; temp[i] != '\0'; i++) {
+        temp[i] = toupper(static_cast<unsigned char>(temp[i]));
+    }
+
+    if (db_find_dir_entry_internal(temp, de) == 0) {
+        return 0;
+    }
+
+    // Retry with lowercase as final attempt.
+    strncpy(alt, path, sizeof(alt) - 1);
+    alt[sizeof(alt) - 1] = '\0';
+    for (size_t i = 0; alt[i] != '\0'; i++) {
+        alt[i] = tolower(static_cast<unsigned char>(alt[i]));
+    }
+
+    return db_find_dir_entry_internal(alt, de);
 }
 
 // 0x4B2810
