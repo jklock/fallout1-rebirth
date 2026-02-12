@@ -130,7 +130,6 @@ void rme_logf(const char* topic, const char* fmt, ...)
 }
 
 } // extern "C"
-
 #ifdef __cplusplus
 namespace fallout {
 
