@@ -66,6 +66,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/game/automap.h"
     "src/game/bmpdlog.cc"
     "src/game/bmpdlog.h"
+    "src/game/rme_log.cc"
+    "src/game/rme_log.h"
     "src/game/cache.cc"
     "src/game/cache.h"
     "src/game/combat_defs.h"

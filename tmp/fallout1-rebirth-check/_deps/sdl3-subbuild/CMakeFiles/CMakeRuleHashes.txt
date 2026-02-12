@@ -1,0 +1,11 @@
+# Hashes of file build rules.
+640ceda7d26de341fc6e23963c752e6e CMakeFiles/sdl3-populate
+d2f4fcee3111ef0b2a28b44896aff249 CMakeFiles/sdl3-populate-complete
+056bf44ad2b3cccb6f99e19206cba398 sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-build
+15cf75864ad3649a403db6343a7be063 sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-configure
+19e2cbe060987904f171585399c3dd30 sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-download
+0728d8c22c156259dacbbc299de3cc99 sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-install
+551ea85e65dd6054d3853b1730846f2d sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-mkdir
+8bd35962d9e97e748414ee102ffb8ab3 sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-patch
+6373acf1b27bc11e3ca2a9dcfd1f8003 sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-test
+bf7549f734fad3f91d59fceeeb5f6f0a sdl3-populate-prefix/src/sdl3-populate-stamp/sdl3-populate-update

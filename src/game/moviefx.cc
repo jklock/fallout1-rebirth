@@ -7,8 +7,8 @@
 #include "game/config.h"
 #include "game/palette.h"
 #include "int/movie.h"
-#include "plib/db/db.h"
 #include "platform_compat.h"
+#include "plib/db/db.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/memory.h"
 

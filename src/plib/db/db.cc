@@ -1,7 +1,7 @@
 #include "plib/db/db.h"
 
-#include <dirent.h>
 #include <cctype>
+#include <dirent.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>

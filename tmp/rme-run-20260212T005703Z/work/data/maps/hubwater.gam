@@ -1,0 +1,13 @@
+// Map variables for the Hub Water Merchant area
+
+MAP_GLOBAL_VARS:
+//GLOBAL                                NUMBER
+
+JAIN_DISMISSES          :=0;     // 0
+WM_WILL_GIVE_JOB        :=0;     // 1
+WM_WILL_DEAL_WITH       :=1;     // 2
+COUNSELOR_SUMMONED	    :=0;	 // 3
+DOOR_UNLOCK_FAILED      :=0;     // 4
+GUARD_DEAD              :=0;     // 5
+CHILDREN_ANGRY          :=0;     // 6
+Invasion                :=0;     // 7

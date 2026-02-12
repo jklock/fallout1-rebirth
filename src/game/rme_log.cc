@@ -1,248 +1,130 @@
 #include "game/rme_log.h"
 
-#include "game/gconfig.h"
-
-#include <algorithm>
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <ctime>
-#include <set>
+#include <mutex>
 #include <string>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <vector>
 
-#include "platform_compat.h"
+static FILE* rme_log_fp = nullptr;
+static std::string rme_log_env;
+static std::mutex rme_log_mutex;
+static bool rme_log_initialized = false;
 
-namespace fallout {
-
-namespace {
-
-    constexpr size_t kMaxLogSize = 1024 * 1024; // 1 MiB
-    constexpr const char* kLogFileName = "rme.log";
-    constexpr const char* kLogBackupName = "rme.log.1";
-
-    bool g_enabled = false;
-    bool g_has_filters = false;
-    std::set<std::string> g_filters;
-    std::set<std::string> g_once_keys;
-    FILE* g_log_file = nullptr;
-    std::string g_source;
-
-    void emit(const char* topic, const char* message, bool force = false);
-
-    std::string toLower(const std::string& value)
-    {
-        std::string lowered(value);
-        std::transform(lowered.begin(), lowered.end(), lowered.begin(), [](unsigned char ch) { return static_cast<char>(tolower(ch)); });
-        return lowered;
-    }
-
-    std::vector<std::string> splitTopics(const std::string& value)
-    {
-        std::vector<std::string> topics;
-
-        std::string current;
-        for (char ch : value) {
-            if (ch == ',') {
-                if (!current.empty()) {
-                    topics.push_back(toLower(current));
-                    current.clear();
-                }
-            } else if (!isspace(static_cast<unsigned char>(ch))) {
-                current.push_back(ch);
-            }
-        }
-
-        if (!current.empty()) {
-            topics.push_back(toLower(current));
-        }
-
-        return topics;
-    }
-
-    bool isEnabledValue(const std::string& value)
-    {
-        const std::string lowered = toLower(value);
-        return lowered == "1" || lowered == "true" || lowered == "yes" || lowered == "on" || lowered == "all" || lowered == "*";
-    }
-
-    bool rotateIfNeeded()
-    {
-        struct stat st {};
-        bool rotated = false;
-        if (g_log_file != nullptr) {
-            if (fstat(fileno(g_log_file), &st) == 0 && static_cast<size_t>(st.st_size) >= kMaxLogSize) {
-                fclose(g_log_file);
-                g_log_file = nullptr;
-            }
-        }
-
-        if (g_log_file == nullptr) {
-            if (stat(kLogFileName, &st) == 0 && static_cast<size_t>(st.st_size) >= kMaxLogSize) {
-                unlink(kLogBackupName);
-                rename(kLogFileName, kLogBackupName);
-                rotated = true;
-            }
-        }
-
-        return rotated;
-    }
-
-    void ensureLogFile()
-    {
-        if (!g_enabled) {
-            return;
-        }
-
-        const bool rotated = rotateIfNeeded();
-
-        if (g_log_file == nullptr) {
-            g_log_file = compat_fopen(kLogFileName, "a");
-        }
-
-        if (rotated && g_log_file != nullptr) {
-            emit("config", "rme.log rotated (size>=1MiB, moved to rme.log.1)", true);
-        }
-    }
-
-    void emit(const char* topic, const char* message, bool force)
-    {
-        if (!force && !g_enabled) {
-            return;
-        }
-
-        const std::time_t now = std::time(nullptr);
-        std::tm time_info {};
-        localtime_r(&now, &time_info);
-
-        char timestamp[32];
-        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", &time_info);
-
-        if (topic == nullptr) {
-            topic = "general";
-        }
-
-        char line[2048];
-        std::snprintf(line, sizeof(line), "[RME %s] %s: %s\n", timestamp, topic, message);
-
-        // stderr output for immediate visibility
-        fputs(line, stderr);
-        fflush(stderr);
-
-        ensureLogFile();
-        if (g_log_file != nullptr) {
-            fputs(line, g_log_file);
-            fflush(g_log_file);
-        }
-    }
-
-    void applyTopics(const std::string& raw)
-    {
-        if (raw.empty()) {
-            return;
-        }
-
-        const bool enable_all = isEnabledValue(raw);
-        const std::vector<std::string> topics = splitTopics(raw);
-
-        if (!enable_all && topics.empty()) {
-            return;
-        }
-
-        g_enabled = true;
-        g_source = raw;
-        g_has_filters = false;
-        g_filters.clear();
-
-        if (!enable_all && !topics.empty()) {
-            g_has_filters = true;
-            g_filters.insert(topics.begin(), topics.end());
-        }
-
-        char summary[256];
-        std::snprintf(summary, sizeof(summary), "logging enabled via %s topics=%s", g_source.c_str(), g_has_filters ? "filtered" : "all");
-        emit("config", summary, true);
-    }
-
-} // namespace
-
-void rme_log_init_from_env()
+static void rme_format_time(char* buf, size_t bufsize)
 {
-    const char* env = getenv("RME_LOG");
-    if (env == nullptr) {
+    std::time_t t = std::time(nullptr);
+    std::tm tm;
+#if defined(_WIN32)
+    gmtime_s(&tm, &t);
+#else
+    gmtime_r(&t, &tm);
+#endif
+    std::snprintf(buf, bufsize, "%04d-%02d-%02dT%02d:%02d:%02dZ",
+        tm.tm_year + 1900,
+        tm.tm_mon + 1,
+        tm.tm_mday,
+        tm.tm_hour,
+        tm.tm_min,
+        tm.tm_sec);
+}
+
+extern "C" {
+
+void rme_log_init_from_env(void)
+{
+    std::lock_guard<std::mutex> lock(rme_log_mutex);
+    if (rme_log_initialized) {
         return;
     }
 
-    applyTopics(env);
-}
-
-void rme_log_sync_config(const Config* config)
-{
-    if (config == nullptr) {
+    const char* env = std::getenv("RME_LOG");
+    if (env == nullptr || env[0] == '\0') {
+        rme_log_initialized = true;
         return;
     }
 
-    char* value = nullptr;
-    if (!config_get_string(const_cast<Config*>(config), GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_RME_LOG_KEY, &value)) {
+    rme_log_env = std::string(env);
+
+    const char* file = std::getenv("RME_LOG_FILE");
+    if (file == nullptr || file[0] == '\0') {
+        file = "rme.log";
+    }
+
+    // Open for write to create a fresh log for each run
+    rme_log_fp = std::fopen(file, "w");
+    if (rme_log_fp != nullptr) {
+        // line buffering
+        setvbuf(rme_log_fp, nullptr, _IOLBF, 1024);
+    }
+
+    rme_log_initialized = true;
+}
+
+int rme_log_topic_enabled(const char* topic)
+{
+    if (!rme_log_initialized) {
+        rme_log_init_from_env();
+    }
+
+    if (rme_log_fp == nullptr) {
+        return 0;
+    }
+
+    if (rme_log_env == "all") {
+        return 1;
+    }
+
+    // Simple substring match for comma-separated list
+    const std::string needle(topic);
+    size_t pos = 0;
+    while (pos < rme_log_env.size()) {
+        size_t comma = rme_log_env.find(',', pos);
+        if (comma == std::string::npos) comma = rme_log_env.size();
+        std::string token = rme_log_env.substr(pos, comma - pos);
+        // trim
+        size_t start = token.find_first_not_of(" \t\n\r");
+        size_t end = token.find_last_not_of(" \t\n\r");
+        if (start != std::string::npos && end != std::string::npos) {
+            token = token.substr(start, end - start + 1);
+            if (token == needle) return 1;
+        }
+        pos = comma + 1;
+    }
+
+    return 0;
+}
+
+void rme_logf(const char* topic, const char* fmt, ...)
+{
+    if (!rme_log_initialized) {
+        rme_log_init_from_env();
+    }
+
+    if (rme_log_fp == nullptr) {
         return;
     }
 
-    if (value != nullptr && value[0] != '\0') {
-        applyTopics(value);
-    }
-}
-
-bool rme_log_enabled()
-{
-    return g_enabled;
-}
-
-bool rme_log_topic_enabled(const char* topic)
-{
-    if (!g_enabled) {
-        return false;
-    }
-
-    if (!g_has_filters || topic == nullptr) {
-        return true;
-    }
-
-    return g_filters.find(toLower(topic)) != g_filters.end();
-}
-
-void rme_logf(const char* topic, const char* format, ...)
-{
     if (!rme_log_topic_enabled(topic)) {
         return;
     }
 
-    char buffer[1536];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
+    char timebuf[32];
+    rme_format_time(timebuf, sizeof(timebuf));
 
-    emit(topic, buffer, false);
+    char msgbuf[1024];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(msgbuf, sizeof(msgbuf), fmt, ap);
+    va_end(ap);
+
+    std::lock_guard<std::mutex> lock(rme_log_mutex);
+    if (rme_log_fp) {
+        std::fprintf(rme_log_fp, "%s %s %s\n", timebuf, topic, msgbuf);
+        std::fflush(rme_log_fp);
+    }
 }
 
-void rme_log_once(const std::string& key, const char* topic, const char* format, ...)
-{
-    if (!rme_log_topic_enabled(topic)) {
-        return;
-    }
-
-    if (!g_once_keys.insert(key).second) {
-        return;
-    }
-
-    char buffer[1536];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-
-    emit(topic, buffer, false);
-}
-
-} // namespace fallout
+} // extern "C"

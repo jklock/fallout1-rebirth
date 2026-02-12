@@ -19,3 +19,14 @@ Tracking completion of the 2026-02-11 RME patch logging checklist.
 - [x] f1_res.ini: detection, overrides, display/touch values
 - [x] Bundle resource sweep and case warnings
 - [x] Headless run with RME_LOG=1 filters and zero missing assets (14:53 RME_LOG=1, no dat misses)
+
+## Subagent Run (automated)
+
+- start_time: 2026-02-11T23:53:55Z
+- branch: fix/rme-zero-copy-skip
+- actor: automated-subagent
+
+### Actions
+
+- 2026-02-11T23:53:55Z - **START**: Beginning work on **T001** (add RME_WORKING_DIR override). Subsequent tasks will be logged here with timestamps, commits, and run artifacts.
+- 2026-02-12T00:10:00Z - **COMPLETE**: **T001** implemented. Added `RME_WORKING_DIR` handling in `winmain.cc` and expanded `scripts/test/test-rme-working-dir.sh` to assert presence of working directory override message in runtime logs.

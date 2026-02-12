@@ -1,0 +1,12 @@
+
+ // Comments
+
+MAP_GLOBAL_VARS:
+//GLOBAL                                NUMBER
+
+WARNED          :=0;            //      (0)   has the player been warned to put his weapon away?
+TANDI_EXP       :=0;            //      (1)
+Caught_Stealing :=0;            //      (2)
+Map_Only_once   :=0;            //      (3)
+Map_one_Time    :=0;            //      (4)
+Invasion        :=0;            //      (5)

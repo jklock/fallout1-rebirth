@@ -1,0 +1,10 @@
+
+ // Comments
+
+MAP_GLOBAL_VARS:
+//GLOBAL                                NUMBER
+
+DanFlag2          :=0;            //      (0)   Did Dan Yell at Billy?
+DanFlag4          :=0;            //      (1)
+Caravan_Leaving   :=0;            //      (2)
+Invasion          :=0;            //      (3)

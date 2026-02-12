@@ -4,7 +4,7 @@ Status values: not-started | in-progress | completed | blocked
 
 | ID | Title | Owner | Priority | Status | Estimate | Acceptance Criteria |
 |----|-------|-------|----------|--------|----------|--------------------|
-| T001 | Add runtime `RME_WORKING_DIR` override | Implement | P1 | not-started | 1d | Game respects `RME_WORKING_DIR` when set, logs override at `config` topic.
+| T001 | Add runtime `RME_WORKING_DIR` override | Implement | P1 | in-progress | 1d | Game respects `RME_WORKING_DIR` when set, logs override at `config` topic.
 | T002 | Add in-process `RME_SELFTEST` runner | Implement | P1 | not-started | 3d | Selftest enumerates assets, writes `rme-selftest.json`, logs `selftest` summary lines. Exit code non-zero on failures.
 | T003 | Hook selftest into startup (opt-in) | Implement | P1 | not-started | 0.5d | `game_init` calls selftest when `RME_SELFTEST=1` and stops early with artifacts.
 | T004 | Add test orchestrator `test-rme-patchflow.sh` | Test | P1 | not-started | 2d | Creates `tmp/rme-run-*`, runs binary with envs, captures artifacts, and times out safely.
