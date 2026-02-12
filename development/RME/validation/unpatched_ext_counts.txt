@@ -1,5 +1,0 @@
-  68 edg
-  27 int
-  19 acm
-  15 frm
-   6 msg

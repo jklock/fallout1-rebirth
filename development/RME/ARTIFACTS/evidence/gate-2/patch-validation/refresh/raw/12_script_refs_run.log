@@ -1,9 +1,0 @@
->>> Indexing DATs: master.dat, critter.dat
->>> Scanning overlay: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/data
->>> Reading scripts.lst: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/data/scripts/scripts.lst
->>> Scanning PROs: overlay=99
->>> Scanning PROs: dat-only=4299
->>> Scanning MAPs: overlay=12
->>> Scanning MAPs: dat-only=60
-[OK] Wrote: /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/patch-validation/refresh/raw/12_script_refs.csv
-[OK] Wrote: /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/patch-validation/refresh/raw/12_script_refs.md

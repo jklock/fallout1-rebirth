@@ -1,2 +1,0 @@
-2) Unified diff
--rw-r--r--@ 1 klock  staff    15M Feb 10 22:27 development/RME/ARTIFACTS/evidence/gate-2/patch-validation/refresh/unpatched_vs_patched.diff

@@ -1,4 +1,0 @@
-Searched: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/master.dat
-Found 1 entries containing 'CARAVAN'
-
-MAPS\CARAVAN.MAP OFFSET=207994355 LENGTH=43936 FLAGS=0x40 FIELD_C=5613

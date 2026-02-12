@@ -1,4 +1,0 @@
-Searched: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/master.dat
-Found 1 entries containing 'TEMPLAT1'
-
-MAPS\TEMPLAT1.MAP OFFSET=210667813 LENGTH=44848 FLAGS=0x40 FIELD_C=7733

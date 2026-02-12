@@ -1,1 +1,0 @@
-No fonts were copied; resources already contain patched font files or Resources missing.

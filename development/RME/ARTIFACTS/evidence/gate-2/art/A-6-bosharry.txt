@@ -1,9 +1,0 @@
-A-6 Boss Harry (BOSHARRY) presence check
-Files (FRM/PAL):
--rw-r--r--@ 1 klock  staff  307274 Feb  9 15:00 GOG/patchedfiles/data/art/intrface/BOSHARRY.FRM
--rw-r--r--@ 1 klock  staff   33536 Feb  9 15:00 GOG/patchedfiles/data/art/intrface/BOSHARRY.PAL
-
-INTRFACE.LST entries (grep):
-337:bosharry.frm   ; endgame picture
-
-Manual check: Trigger dialog with Boss Harry and verify portrait renders with correct palette/colors. Evidence path: development/RME/ARTIFACTS/evidence/gate-2/art/A-6-bosharry.txt

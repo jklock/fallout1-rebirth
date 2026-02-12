@@ -1,5 +1,0 @@
---- /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/validation/whitelist.txt
-+++ /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/validation/whitelist.txt.proposed
-@@ -0,0 +1,2 @@
-+
-+message:data/text/english/game/map.msg  # Auto-proposed whitelist for message:data/text/english/game/map.msg (error: message_load failed)

@@ -1,2 +1,0 @@
-CRITTERS.LST path: GOG/patchedfiles/data/art/critters/critters.lst
-line_count:       60

@@ -1,7 +1,0 @@
-A-1 missing check - generated Wed Feb 11 03:46:35 UTC 2026
-Total files in GOG/patchedfiles/data/art/critters:      376
-
-Missing/zero-count prefixes (from requested list):
-HAPWR
-
-Recommendation: If any of the above prefixes are expected, re-run the patch process or re-apply GOG patchedfiles data to include the missing FRMs. Do NOT auto-patch; confirm source of missing files before adding.

@@ -1,1 +1,0 @@
-CRITTERS_LST_PATH: GOG/patchedfiles/data/art/critters/critters.lst

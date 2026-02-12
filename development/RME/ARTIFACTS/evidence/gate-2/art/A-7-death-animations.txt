@@ -1,7 +1,0 @@
-A-7 Death animations presence check
-Matches (first 200 lines):
-
-Count matches:
-       0 /tmp/A7_matches.txt
-
-Manual check required: In combat, verify death animations play (child, mutant, power armor, lieutenant). Evidence path: development/RME/ARTIFACTS/evidence/gate-2/art/A-7-death-animations.txt

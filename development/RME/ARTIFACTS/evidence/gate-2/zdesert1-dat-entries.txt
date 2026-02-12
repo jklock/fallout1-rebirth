@@ -1,4 +1,0 @@
-Searched: /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/master.dat
-Found 1 entries containing 'ZDESERT1'
-
-MAPS\ZDESERT1.MAP OFFSET=211119594 LENGTH=45728 FLAGS=0x40 FIELD_C=7998

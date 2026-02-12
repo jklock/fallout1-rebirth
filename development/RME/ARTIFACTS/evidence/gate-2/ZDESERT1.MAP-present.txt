@@ -1,2 +1,0 @@
-Found: GOG/patchedfiles/data/maps/ZDESERT1.MAP
-SHA256: 810a5a3022119a5c38eaa6e2614870801d6baa1bbd280baeb31128973e66cb39
