@@ -35,6 +35,7 @@
 #include "game/pipboy.h"
 #include "game/proto.h"
 #include "game/queue.h"
+#include "game/rme_log.h"
 #include "game/rme_selftest.h"
 #include "game/roll.h"
 #include "game/scripts.h"

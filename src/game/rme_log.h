@@ -11,6 +11,13 @@ void rme_logf(const char* topic, const char* fmt, ...);
 
 #ifdef __cplusplus
 }
+// C++ helpers
+#include "game/config.h"
+#include <string>
+namespace fallout {
+void rme_log_once(const std::string& key, const char* topic, const char* fmt, ...);
+void rme_log_sync_config(const Config* cfg);
+} // namespace fallout
 #endif
 
 #endif // FALLOUT_GAME_RME_LOG_H_

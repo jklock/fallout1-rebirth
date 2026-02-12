@@ -1,4 +1,5 @@
 #include "game/rme_log.h"
+#include "game/gconfig.h"
 
 #include <cstdarg>
 #include <cstdio>
@@ -7,6 +8,7 @@
 #include <ctime>
 #include <mutex>
 #include <string>
+#include <unordered_set>
 
 static FILE* rme_log_fp = nullptr;
 static std::string rme_log_env;
@@ -128,3 +130,72 @@ void rme_logf(const char* topic, const char* fmt, ...)
 }
 
 } // extern "C"
+
+#ifdef __cplusplus
+namespace fallout {
+
+void rme_log_once(const std::string& key, const char* topic, const char* fmt, ...)
+{
+    if (!rme_log_initialized) {
+        rme_log_init_from_env();
+    }
+
+    if (rme_log_fp == nullptr) {
+        return;
+    }
+
+    if (!rme_log_topic_enabled(topic)) {
+        return;
+    }
+
+    static std::unordered_set<std::string> seen;
+    {
+        std::lock_guard<std::mutex> lock(rme_log_mutex);
+        if (seen.find(key) != seen.end()) return;
+        seen.insert(key);
+    }
+
+    char timebuf[32];
+    rme_format_time(timebuf, sizeof(timebuf));
+
+    char msgbuf[1024];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(msgbuf, sizeof(msgbuf), fmt, ap);
+    va_end(ap);
+
+    std::lock_guard<std::mutex> lock(rme_log_mutex);
+    if (rme_log_fp) {
+        std::fprintf(rme_log_fp, "%s %s %s\n", timebuf, topic, msgbuf);
+        std::fflush(rme_log_fp);
+    }
+}
+
+// Sync logging config from game config (reads DEBUG.rme_log)
+void rme_log_sync_config(const Config* cfg)
+{
+    char* val = nullptr;
+    if (cfg != nullptr && config_get_string(const_cast<Config*>(cfg), GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_RME_LOG_KEY, &val) && val != nullptr && val[0] != '\0') {
+        // Apply to environment so the existing init path can pick it up
+        setenv("RME_LOG", val, 1);
+    } else {
+        // Remove any existing env override
+        unsetenv("RME_LOG");
+    }
+
+    // Reinitialize logging from env (close/reopen file as necessary)
+    {
+        std::lock_guard<std::mutex> lock(rme_log_mutex);
+        if (rme_log_fp) {
+            std::fclose(rme_log_fp);
+            rme_log_fp = nullptr;
+        }
+        rme_log_initialized = false;
+    }
+
+    rme_log_init_from_env();
+}
+
+} // namespace fallout
+
+#endif // __cplusplus
