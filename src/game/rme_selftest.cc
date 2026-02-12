@@ -1,5 +1,6 @@
 #include "game/rme_selftest.h"
 
+#include <cctype>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
@@ -8,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 #include "game/gsound.h"
@@ -110,7 +112,7 @@ void rme_selftest_maybe_run(void)
                 if (!fs::is_regular_file(p.path())) continue;
                 std::string ext = p.path().extension().string();
                 for (auto& c : ext)
-                    c = tolower(c);
+                    c = (char)std::tolower((unsigned char)c);
                 if (ext == ".map") {
                     if (++maps_checked > 10) break;
                     FILE* f = fopen(p.path().c_str(), "rb");
@@ -142,7 +144,7 @@ void rme_selftest_maybe_run(void)
                 if (!fs::is_regular_file(p.path())) continue;
                 std::string ext = p.path().extension().string();
                 for (auto& c : ext)
-                    c = tolower(c);
+                    c = (char)std::tolower((unsigned char)c);
                 if (ext == ".lst") {
                     if (++proto_checked > 10) break;
                     FILE* f = fopen(p.path().c_str(), "rb");
@@ -173,18 +175,19 @@ void rme_selftest_maybe_run(void)
                 if (!fs::is_regular_file(p.path())) continue;
                 std::string ext = p.path().extension().string();
                 for (auto& c : ext)
-                    c = tolower(c);
+                    c = (char)std::tolower((unsigned char)c);
                 if (ext == ".msg") {
                     if (++msgs_checked > 10) break;
                     // Try to use message_load on the path (safe-ish)
-                    MessageList ml;
-                    if (!message_init(&ml)) {
+                    fallout::MessageList ml;
+                    if (!fallout::message_init(&ml)) {
                         add_failure("message", p.path().string(), "message_init failed");
                         continue;
                     }
-                    if (!message_load(&ml, p.path().c_str())) {
+                    if (!fallout::message_load(&ml, p.path().c_str())) {
                         add_failure("message", p.path().string(), "message_load failed");
                     }
+                    fallout::message_exit(&ml);
                 }
             }
         } else {
@@ -295,8 +298,8 @@ void rme_selftest_maybe_run(void)
     // Attempt conservative cleanup
     rme_logf("selftest", "performing conservative cleanup prior to exit");
     // Close databases and sound systems
-    db_exit();
-    gsound_exit();
+    fallout::db_exit();
+    fallout::gsound_exit();
 
     // Exit process; 0=success, 2=some failures
     if (failures.empty()) {

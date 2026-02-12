@@ -398,6 +398,7 @@ FodyWeavers.xsd
 # Game data (must not be committed - copyrighted)
 game-data/
 master.dat
+tmp/
 critter.dat
 *.sav
 
