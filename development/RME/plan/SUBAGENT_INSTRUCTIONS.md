@@ -51,6 +51,7 @@ E. Report agent
 F. Governance & safety
 - Do not edit `GOG/patchedfiles` in place.
 - If a data-only normalization is strictly required for a reproducible run, implement it as an **optional** test helper script and document intent in `development/RME/plan/`.
+- Do NOT create/checkout/push branches without explicit human instruction; create diffs and blocking files instead.
 - If the parser reports false positives, update the whitelist at `development/RME/validation/whitelist.txt` with an explanatory comment.
 
 ---
