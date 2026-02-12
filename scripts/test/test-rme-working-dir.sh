@@ -42,10 +42,13 @@ elif [ -x "$REPO_ROOT/build-macos/RelWithDebInfo/fallout1-rebirth" ]; then
     BINARY="$REPO_ROOT/build-macos/RelWithDebInfo/fallout1-rebirth"
 elif [ -x "$REPO_ROOT/build/RelWithDebInfo/fallout1-rebirth" ]; then
     BINARY="$REPO_ROOT/build/RelWithDebInfo/fallout1-rebirth"
+# macOS app bundle layout (Xcode build places binary inside the .app bundle)
+elif [ -x "$REPO_ROOT/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" ]; then
+    BINARY="$REPO_ROOT/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth"
 fi
 
 if [ -z "$BINARY" ]; then
-    echo "Could not find built binary after build; expected at build/fallout1-rebirth or build-macos/RelWithDebInfo/fallout1-rebirth" >&2
+    echo "Could not find built binary after build; expected at build/fallout1-rebirth or build-macos/RelWithDebInfo/fallout1-rebirth or build-macos/.app/Contents/MacOS/fallout1-rebirth" >&2
     exit 3
 fi
 
