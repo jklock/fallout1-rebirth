@@ -70,8 +70,27 @@ def test_autofix_dry_run_creates_proposed_diff():
         assert os.path.isfile(prop)
 
 
-if __name__ == '__main__':
-    test_ensure_fallout_cfg_language()
+def test_whitelist_propose_and_blocking():
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = os.path.join(tmp, 'work')
+        os.makedirs(workdir, exist_ok=True)
+        st = {"failures": [{"kind": "message", "path": "data/text/english/game/map.msg", "error": "message_load failed"}]}
+        with open(os.path.join(workdir, 'rme-selftest.json'), 'w', encoding='utf-8') as f:
+            json.dump(st, f)
+        # Run autofix requesting whitelist apply
+        proc = subprocess.run([SCRIPT, '--workdir', workdir, '--iterations', '1', '--apply-whitelist', '--dry-run'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        assert proc.returncode == 0
+        # Check that a proposed diff was written into development/RME/fixes-proposed
+        outdiff = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'development', 'RME', 'fixes-proposed', 'whitelist-proposed.diff')
+        assert os.path.isfile(os.path.normpath(outdiff))
+        # Check a blocking file was created under development/RME/todo
+        todo_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'development', 'RME', 'todo')
+        found = False
+        for f in os.listdir(os.path.normpath(todo_dir)):
+            if f.endswith('-blocking-whitelist-apply.md'):
+                found = True
+                break
+        assert found
     test_relocate_text_for_message_load()
     test_autofix_dry_run_creates_proposed_diff()
     print('rme-autofix.py unit tests: OK')
