@@ -201,7 +201,8 @@ void rme_selftest_maybe_run(void)
 
                     std::string rel_path = rel_after_lang.string();
                     // Normalize separators to backslash which the engine expects
-                    for (auto& ch : rel_path) if (ch == '/') ch = '\\';
+                    for (auto& ch : rel_path)
+                        if (ch == '/') ch = '\\';
 
                     // Try to use message_load on the relative path (safe-ish)
                     fallout::MessageList ml;

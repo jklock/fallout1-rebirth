@@ -104,9 +104,11 @@ echo "Building macOS app (low parallelism)"
 # Use build-macos.sh which invokes xcodebuild
 $REPO_ROOT/scripts/build/build-macos.sh --build-only
 
-# Locate binary inside app bundle or fallback
+# Locate binary inside app bundle or fallback. Test harness may set TEST_FALLBACK_BINARY to point to a fake binary for integration tests.
 BINARY=""
-if [ -x "$REPO_ROOT/build/fallout1-rebirth" ]; then
+if [ -n "${TEST_FALLBACK_BINARY:-}" ] && [ -x "${TEST_FALLBACK_BINARY}" ]; then
+    BINARY="${TEST_FALLBACK_BINARY}"
+elif [ -x "$REPO_ROOT/build/fallout1-rebirth" ]; then
     BINARY="$REPO_ROOT/build/fallout1-rebirth"
 elif [ -x "$REPO_ROOT/build-macos/RelWithDebInfo/fallout1-rebirth" ]; then
     BINARY="$REPO_ROOT/build-macos/RelWithDebInfo/fallout1-rebirth"
@@ -215,13 +217,15 @@ if [ "$PASS" -ne 1 ]; then
 
     if [ "$AUTO_FIX" -eq 1 ]; then
         echo "Auto-fix enabled; snapshotting original artifacts"
+        # Use rsync to snapshot artifacts, excluding previously created snapshots to avoid recursion
         mkdir -p "$RUNDIR/artifacts/original"
-        cp -a "$RUNDIR/artifacts/." "$RUNDIR/artifacts/original/" || true
+        rsync -a --exclude 'original' "$RUNDIR/artifacts/" "$RUNDIR/artifacts/original/" || true
 
         # Invoke autofix engine
         echo "Invoking rme-autofix.py (iterations=${AUTO_FIX_ITERATIONS}, apply=${AUTO_FIX_APPLY}, apply-whitelist=${AUTO_FIX_APPLY_WHITELIST})"
         PYTHON=python3
-        "$PYTHON" "$REPO_ROOT/scripts/test/rme-autofix.py" --workdir "$WORKDIR" --iterations "$AUTO_FIX_ITERATIONS" $( [ "$AUTO_FIX_APPLY" -eq 1 ] && echo "--apply" ) $( [ "$AUTO_FIX_APPLY_WHITELIST" -eq 1 ] && echo "--apply-whitelist" ) --verbose || true
+        "$PYTHON" "$REPO_ROOT/scripts/test/rme-autofix.py" --workdir "$WORKDIR" --iterations "$AUTO_FIX_ITERATIONS" $( [ "$AUTO_FIX_APPLY" -eq 1 ] && echo "--apply" ) $( [ "$AUTO_FIX_APPLY_WHITELIST" -eq 1 ] && echo "--apply-whitelist" ) --verbose
+        AUTOFIX_RC=$?
 
         # Collect per-iter artifacts if present
         if [ -d "$WORKDIR/fixes" ]; then
@@ -229,13 +233,10 @@ if [ "$PASS" -ne 1 ]; then
             cp -a "$WORKDIR/fixes" "$RUNDIR/artifacts/" || true
         fi
 
-        # Re-run parser on the latest run summary if present
-        SUMMARY="$RUNDIR/rme-run-summary.json"
-        if [ -f "$SUMMARY" ]; then
-            if jq -e '.pass == true' "$SUMMARY" >/dev/null 2>&1; then
-                echo "PASS achieved after autofix; artifacts at $RUNDIR"
-                exit 0
-            fi
+        # If rme-autofix succeeded (exit 0) treat it as pass
+        if [ "$AUTOFIX_RC" -eq 0 ]; then
+            echo "PASS achieved after autofix; artifacts at $RUNDIR"
+            exit 0
         fi
 
         echo "Autofix completed but run still failing; see proposed fixes under $RUNDIR/artifacts/fixes/proposed" >&2

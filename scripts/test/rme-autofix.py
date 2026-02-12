@@ -266,19 +266,40 @@ def main(argv):
             # Invoke test-rme-patchflow.sh with --skip-build to avoid rebuilds
             runner = os.path.join(REPO_ROOT, "scripts", "test", "test-rme-patchflow.sh")
             try:
-                subprocess.run([runner, "--skip-build" , workdir], check=False)
+                proc = subprocess.run([runner, "--skip-build" , workdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+                out = (proc.stdout or "") + "\n" + (proc.stderr or "")
             except Exception as e:
                 print(f"Runner invocation failed: {e}", file=sys.stderr)
+                out = ""
+
+            # Try to locate the new run dir from runner output (it prints 'artifacts at $RUNDIR')
+            import re
+            new_rundir = None
+            m = re.search(r"artifacts at (.+)", out)
+            if m:
+                new_rundir = m.group(1).strip()
 
             # Refresh summary and selftest
-            summary = load_run_summary(workdir)
-            st_path = os.path.join(os.path.dirname(workdir), "rme-selftest.json")
-            if os.path.isfile(st_path):
-                try:
-                    with open(st_path, "r", encoding="utf-8") as f:
-                        selftest = json.load(f)
-                except Exception:
-                    selftest = {}
+            if new_rundir and os.path.isfile(os.path.join(new_rundir, "rme-run-summary.json")):
+                with open(os.path.join(new_rundir, "rme-run-summary.json"), "r", encoding="utf-8") as f:
+                    summary = json.load(f)
+                # also pick up selftest from that run if present
+                st_path = os.path.join(new_rundir, "rme-selftest.json")
+                if os.path.isfile(st_path):
+                    try:
+                        with open(st_path, "r", encoding="utf-8") as f:
+                            selftest = json.load(f)
+                    except Exception:
+                        selftest = {}
+            else:
+                summary = load_run_summary(workdir)
+                st_path = os.path.join(os.path.dirname(workdir), "rme-selftest.json")
+                if os.path.isfile(st_path):
+                    try:
+                        with open(st_path, "r", encoding="utf-8") as f:
+                            selftest = json.load(f)
+                    except Exception:
+                        selftest = {}
 
             # If pass, move applied diffs to work/fixes/fixes_successful or similar
             if summary.get("pass"):

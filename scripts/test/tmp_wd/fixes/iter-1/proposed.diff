@@ -1,0 +1,11 @@
+--- a/fallout.cfg
++++ b/fallout.cfg
+@@ -0,0 +1,2 @@
++[system]
++language=english
+--- /dev/null
++++ b/data/text/english/game/map.msg
+--- /dev/null
++++ b/data/text/english/game/map.msg
+@@ -0,0 +1 @@
++dummy
