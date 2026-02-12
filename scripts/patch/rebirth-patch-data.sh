@@ -423,6 +423,30 @@ except Exception as e:
 PYCODE
 
 # -----------------------------------------------------------------------------
+# Normalize text line endings (CRLF -> LF) for list/message files
+# -----------------------------------------------------------------------------
+log_info "Normalizing line endings for .lst/.msg/.txt files..."
+python3 - "$OUT_DIR/data" <<'PYCODE'
+import os
+import sys
+
+root = os.path.abspath(sys.argv[1])
+exts = ('.lst', '.msg', '.txt')
+
+for dirpath, _, filenames in os.walk(root):
+    for name in filenames:
+        if not name.lower().endswith(exts):
+            continue
+        path = os.path.join(dirpath, name)
+        with open(path, 'rb') as f:
+            data = f.read()
+        if b'\r\n' in data:
+            data = data.replace(b'\r\n', b'\n')
+            with open(path, 'wb') as f:
+                f.write(data)
+PYCODE
+
+# -----------------------------------------------------------------------------
 # Copy configs
 # -----------------------------------------------------------------------------
 if [[ -n "$CONFIG_DIR" ]]; then

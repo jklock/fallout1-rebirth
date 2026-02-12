@@ -21,6 +21,10 @@
 #   - master.dat    (main game assets)
 #   - critter.dat   (character assets)
 #   - data/         (additional game data)
+#
+# OPTIONAL FILES (copied if present):
+#   - fallout.cfg
+#   - f1_res.ini
 # =============================================================================
 set -euo pipefail
 
@@ -189,6 +193,7 @@ echo ""
 log_info "Validating source files..."
 
 REQUIRED_FILES=("master.dat" "critter.dat")
+OPTIONAL_FILES=("fallout.cfg" "f1_res.ini")
 REQUIRED_DIRS=("data")
 MISSING=()
 
@@ -198,6 +203,12 @@ for file in "${REQUIRED_FILES[@]}"; do
         log_step "$file ($size)"
     else
         MISSING+=("$file")
+    fi
+done
+
+for file in "${OPTIONAL_FILES[@]}"; do
+    if [[ -f "$SOURCE_PATH/$file" ]]; then
+        log_step "$file (optional)"
     fi
 done
 
@@ -306,6 +317,19 @@ if ! cp -R "$SOURCE_PATH/data" "$RESOURCES_DIR/"; then
     exit 1
 fi
 
+# Copy optional config files (if present)
+for file in "${OPTIONAL_FILES[@]}"; do
+    if [[ -f "$SOURCE_PATH/$file" ]]; then
+        log_step "Copying $file..."
+        if ! cp "$SOURCE_PATH/$file" "$RESOURCES_DIR/"; then
+            log_error "Failed to copy $file"
+            exit 1
+        fi
+    else
+        log_warn "Optional file missing: $file"
+    fi
+done
+
 # -----------------------------------------------------------------------------
 # Verification
 # -----------------------------------------------------------------------------
@@ -343,6 +367,11 @@ done
 for dir in "${REQUIRED_DIRS[@]}"; do
     size=$(du -sh "$RESOURCES_DIR/$dir" | cut -f1)
     echo "    - $dir/ ($size)"
+done
+for file in "${OPTIONAL_FILES[@]}"; do
+    if [[ -f "$RESOURCES_DIR/$file" ]]; then
+        echo "    - $file"
+    fi
 done
 
 echo ""

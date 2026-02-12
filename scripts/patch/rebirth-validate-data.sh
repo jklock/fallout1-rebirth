@@ -79,6 +79,21 @@ PYCODE
     fi
 }
 
+sha256_text_normalized() {
+    python3 - "$1" <<'PYCODE'
+import hashlib
+import sys
+
+path = sys.argv[1]
+with open(path, 'rb') as f:
+    data = f.read()
+data = data.replace(b'\r\n', b'\n')
+h = hashlib.sha256()
+h.update(data)
+print(h.hexdigest())
+PYCODE
+}
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --patched)
@@ -175,8 +190,15 @@ while IFS= read -r -d '' SRC; do
         continue
     fi
 
-    SRC_HASH=$(sha256_file "$SRC")
-    DST_HASH=$(sha256_file "$DST")
+    EXT="${SRC##*.}"
+    EXT_LC=$(printf '%s' "$EXT" | tr '[:upper:]' '[:lower:]')
+    if [[ "$EXT_LC" == "lst" || "$EXT_LC" == "msg" || "$EXT_LC" == "txt" ]]; then
+        SRC_HASH=$(sha256_text_normalized "$SRC")
+        DST_HASH=$(sha256_text_normalized "$DST")
+    else
+        SRC_HASH=$(sha256_file "$SRC")
+        DST_HASH=$(sha256_file "$DST")
+    fi
     if [[ "$SRC_HASH" != "$DST_HASH" ]]; then
         MISMATCH=$((MISMATCH + 1))
         MISMATCH_LIST+=("$REL")
@@ -196,6 +218,37 @@ else
         log_warn "Mismatched files (first 20):"
         printf '%s\n' "${MISMATCH_LIST[@]:0:20}" | sed 's/^/  - /'
     fi
+fi
+
+# -----------------------------------------------------------------------------
+# Validate CRLF normalization for LST/MSG/TXT in patched data
+# -----------------------------------------------------------------------------
+log_info "Validating text line endings (CRLF -> LF)..."
+CRLF_COUNT=0
+CRLF_FILES=()
+
+while IFS= read -r -d '' FILE; do
+    if python3 - "$FILE" <<'PYCODE'
+import sys
+path = sys.argv[1]
+with open(path, 'rb') as f:
+    data = f.read()
+sys.exit(0 if b'\r\n' not in data else 1)
+PYCODE
+    then
+        continue
+    else
+        CRLF_COUNT=$((CRLF_COUNT + 1))
+        CRLF_FILES+=("$FILE")
+    fi
+done < <(find "$PATCHED_DIR/data" -type f -iregex '.*\\.(lst|msg|txt)$' -print0)
+
+if [[ "$CRLF_COUNT" -eq 0 ]]; then
+    log_ok "Text line endings normalized"
+else
+    log_error "Found CRLF line endings in patched data"
+    log_warn "Files with CRLF (first 20):"
+    printf '%s\\n' \"${CRLF_FILES[@]:0:20}\" | sed 's/^/  - /'
 fi
 
 DAT_OK=true

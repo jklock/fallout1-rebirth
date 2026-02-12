@@ -1,10 +1,10 @@
-# RME Integration Documentation
+# RME (Restoration Mod Enhanced) Integration Documentation
 
-**Last Updated:** 2026-02-07
+**Last Updated:** 2026-02-08
 
 ## Purpose
 
-Documentation and planning materials for the Restoration Mod Engine (RME) integration into Fallout 1 Rebirth. RME provides extended scripting capabilities and mod support.
+Documentation and planning materials for integrating the Restoration Mod Enhanced (RME) data payload into Fallout 1 Rebirth. RME is a curated data pack (TeamX patches + restoration content) applied on top of user-supplied Fallout 1 assets.
 
 ## Contents
 
@@ -22,16 +22,17 @@ Documentation and planning materials for the Restoration Mod Engine (RME) integr
 
 ## About RME
 
-The Restoration Mod Engine extends Fallout 1 with:
-- Additional script opcodes
-- Enhanced modding capabilities
-- Compatibility with community content
-- TeamX Patch 1.3.5 support
+Restoration Mod Enhanced (RME) bundles:
+- TeamX Patch 1.2 / 1.2.1 / 1.3.5
+- NPC Mod 3.5 (+ Fix, with optional No Armor variant)
+- Restoration Mod 1.0b1
+- Restored Good Endings 2.0
+- Dialog and assorted fix packs
 
 ## Integration Status
 
-RME integration is **COMPLETED** (Phase 3). See the following for details:
-- `third_party/rme/` - RME source code
+Patch pipeline is implemented and validated at the data/script level. In-game visual verification and variant selection (NPC Mod No Armor) are pending. See the following for details:
+- `third_party/rme/` - RME payload
 - `summary/` - Integration summary reports
 
 ## Definition of Done (100% validated & working)
@@ -49,8 +50,8 @@ RME integration is **COMPLETED** (Phase 3). See the following for details:
 
 ## Related Files
 
-- `third_party/rme/README.md` - RME library documentation
-- `src/int/support/intextra.cc` - Script opcode implementations
+- `third_party/rme/README.md` - RME payload documentation
+- `scripts/patch/` - Patch pipeline scripts
 - `.github/copilot-instructions.md` - Project phases overview
 
 ## RME Validation harness (how-to)

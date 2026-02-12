@@ -59,6 +59,12 @@ static void roof_fill_on(int x, int y, int elevation);
 static void roof_fill_off(int x, int y, int elevation);
 static void roof_draw(int fid, int x, int y, Rect* rect, int light);
 
+static int floor_draw_calls = 0;
+static int floor_draw_skipped = 0;
+static int floor_draw_art_null = 0;
+static int floor_draw_ok = 0;
+static int floor_draw_tile_fail = 0;
+
 // 0x508330
 static bool borderInitialized = false;
 
@@ -528,7 +534,7 @@ void tile_refresh_display()
 {
     if (refresh_enabled) {
         if (patchlog_enabled()) {
-            patchlog_write("TILE_REFRESH_DISPLAY", "called");
+            patchlog_write("TILE_REFRESH_DISPLAY", "elevation=%d", map_elevation);
         }
         tile_refresh(&buf_rect, map_elevation);
     }
@@ -1515,10 +1521,18 @@ void square_render_floor(Rect* rect, int elevation)
     }
 
     if (patchlog_enabled()) {
-        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
-        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
-            patchlog_write("SQUARE_RENDER_FLOOR_DRAWN", "minX=%d maxX=%d minY=%d maxY=%d drawn=%ld drawn_top=%ld", minX, maxX, minY, maxY, drawn_tiles, drawn_top_tiles);
-        }
+        patchlog_write("FLOOR_DRAW",
+            "calls=%d ok=%d art_null=%d skipped=%d tile_fail=%d",
+            floor_draw_calls,
+            floor_draw_ok,
+            floor_draw_art_null,
+            floor_draw_skipped,
+            floor_draw_tile_fail);
+        floor_draw_calls = 0;
+        floor_draw_ok = 0;
+        floor_draw_art_null = 0;
+        floor_draw_skipped = 0;
+        floor_draw_tile_fail = 0;
     }
 }
 
@@ -1674,15 +1688,19 @@ void draw_grid(int tile, int elevation, Rect* rect)
 // 0x49FB64
 void floor_draw(int fid, int x, int y, Rect* rect)
 {
+    floor_draw_calls++;
     if (art_get_disable(FID_TYPE(fid)) != 0) {
+        floor_draw_skipped++;
         return;
     }
 
     CacheEntry* cacheEntry;
     Art* art = art_ptr_lock(fid, &cacheEntry);
     if (art == NULL) {
+        floor_draw_art_null++;
         return;
     }
+    floor_draw_ok++;
 
     int elev = map_elevation;
     int left = rect->ulx;
@@ -1783,7 +1801,21 @@ void floor_draw(int fid, int x, int y, Rect* rect)
     }
 
     tile = tile_num(savedX, savedY + 13, map_elevation);
-    if (tile != -1) {
+    if (tile == -1) {
+        floor_draw_tile_fail++;
+        unsigned char* frame_data = art_frame_data(art, 0, 0);
+        dark_trans_buf_to_buf(frame_data + frameWidth * v78 + v79,
+            v77,
+            v76,
+            frameWidth,
+            buf,
+            x,
+            y,
+            buf_full,
+            light_get_ambient());
+        goto out;
+    }
+    {
         int parity = tile & 1;
         int ambientIntensity = light_get_ambient();
         for (int i = 0; i < 10; i++) {
@@ -2177,6 +2209,22 @@ void tile_update_bounds_base()
     tile_bounds_top_off = min_y - geometric_center_y;
     tile_bounds_right_off = max_x - geometric_center_x;
     tile_bounds_bottom_off = max_y - geometric_center_y;
+
+    if (patchlog_enabled()) {
+        patchlog_write("BOUNDS_BASE",
+            "elev=%d min=(%d,%d) max=(%d,%d) center=(%d,%d) off=(%d,%d,%d,%d)",
+            map_elevation,
+            min_x,
+            min_y,
+            max_x,
+            max_y,
+            geometric_center_x,
+            geometric_center_y,
+            tile_bounds_left_off,
+            tile_bounds_top_off,
+            tile_bounds_right_off,
+            tile_bounds_bottom_off);
+    }
 }
 
 void tile_update_bounds_rect()
@@ -2233,6 +2281,24 @@ void tile_update_bounds_rect()
     // Decrement one px to make sure rect is what engine expects it to be.
     tile_bounds_rect.lrx -= 1;
     tile_bounds_rect.lry -= 1;
+
+    if (patchlog_enabled()) {
+        int tile_center_x;
+        int tile_center_y;
+        tile_coord(tile_center_tile, &tile_center_x, &tile_center_y, map_elevation);
+        tile_center_x += 16;
+        tile_center_y += 8;
+        patchlog_write("BOUNDS_RECT",
+            "elev=%d center_tile=%d center=(%d,%d) rect=(%d,%d)-(%d,%d)",
+            map_elevation,
+            tile_center_tile,
+            tile_center_x,
+            tile_center_y,
+            tile_bounds_rect.ulx,
+            tile_bounds_rect.uly,
+            tile_bounds_rect.lrx,
+            tile_bounds_rect.lry);
+    }
 }
 
 int tile_inside_bound(Rect* rect)

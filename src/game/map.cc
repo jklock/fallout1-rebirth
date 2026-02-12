@@ -70,6 +70,18 @@ static void map_log_floor_art_stats(int elevation);
 static void map_log_display_pixel_stats(int elevation);
 static int map_write_MapData(MapHeader* ptr, DB_FILE* stream);
 static int map_read_MapData(MapHeader* ptr, DB_FILE* stream);
+static int map_count_scroll_blockers(int elevation);
+
+static int map_count_scroll_blockers(int elevation)
+{
+    int count = 0;
+    for (int tile = 1; tile < HEX_GRID_SIZE; tile++) {
+        if (obj_scroll_blocking_at(tile, elevation) == 0) {
+            count++;
+        }
+    }
+    return count;
+}
 
 static void map_log_square_stats(int elevation)
 {
@@ -1270,8 +1282,13 @@ int map_load(char* file_name)
     char* extension;
     char* file_path;
 
+    if (patchlog_enabled()) {
+        const char* requested_name = file_name != NULL ? file_name : "(null)";
+        patchlog_write("MAP_LOAD", "request=\"%s\"", requested_name);
+    }
     if (rme_log_topic_enabled("map")) {
         rme_logf("map", "map_load request name=%s", file_name != NULL ? file_name : "(null)");
+    }
     }
 
     compat_strupr(file_name);
@@ -1291,6 +1308,8 @@ int map_load(char* file_name)
         if (stream != NULL) {
             rc = map_load_in_game(file_name);
             PlayCityMapMusic();
+        } else if (patchlog_enabled()) {
+            patchlog_write("MAP_OPEN_FAIL", "path=\"%s\"", file_path);
         }
     }
 
@@ -1300,6 +1319,8 @@ int map_load(char* file_name)
         if (stream != NULL) {
             rc = map_load_file(stream);
             db_fclose(stream);
+        } else if (patchlog_enabled()) {
+            patchlog_write("MAP_OPEN_FAIL", "path=\"%s\"", file_path);
         }
 
         if (rc == 0) {
@@ -1406,6 +1427,10 @@ int map_load_file(DB_FILE* stream)
 
         error = "Error setting map elevation";
         if (map_set_elevation(map_data.enteringElevation) != 0) break;
+        if (patchlog_enabled()) {
+            int blockers = map_count_scroll_blockers(map_data.enteringElevation);
+            patchlog_write("MAP_SCROLL_BLOCKERS", "elevation=%d count=%d", map_data.enteringElevation, blockers);
+        }
 
         error = "Error setting tile center";
         if (tile_set_center(map_data.enteringTile, TILE_SET_CENTER_FLAG_IGNORE_SCROLL_RESTRICTIONS) != 0) break;
@@ -1468,6 +1493,9 @@ int map_load_file(DB_FILE* stream)
         char message[100]; // TODO: Size is probably wrong.
         snprintf(message, sizeof(message), "%s while loading map, version = %d", error, map_data.version);
         debug_printf(message);
+        if (patchlog_enabled()) {
+            patchlog_write("MAP_LOAD_FAIL", "error=\"%s\" map=\"%s\" version=%d", error, map_data.name, map_data.version);
+        }
         map_new_map();
         rc = -1;
         if (rme_log_topic_enabled("map")) {
@@ -1475,8 +1503,12 @@ int map_load_file(DB_FILE* stream)
         }
     } else {
         obj_preload_art_cache(map_data.flags);
+        if (patchlog_enabled()) {
+            patchlog_write("MAP_LOAD_OK", "map=\"%s\" version=%d", map_data.name, map_data.version);
+        }
         if (rme_log_topic_enabled("map")) {
             rme_logf("map", "map_load_file success map=%s flags=%d", map_data.name, map_data.flags);
+        }
         }
     }
 
@@ -1513,6 +1545,14 @@ int map_load_file(DB_FILE* stream)
     db_register_callback(NULL, 0);
     gmouse_enable_scrolling();
     gmouse_set_cursor(MOUSE_CURSOR_NONE);
+
+    const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");
+    if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {
+        dump_screen();
+        if (patchlog_enabled()) {
+            patchlog_write("SCREENSHOT", "dump_screen invoked");
+        }
+    }
 
     return rc;
 }
@@ -2278,6 +2318,65 @@ static int square_load(DB_FILE* stream, int flags)
                 v8 = v6 & 0xFFF;
                 v9 = arr[tile] & 0xFFFF;
                 arr[tile] = ((v8 | (v7 << 12)) << 16) | v9;
+            }
+
+            if (patchlog_enabled()) {
+                int floor_drawable = 0;
+                int roof_drawable = 0;
+                int floor_zero_id = 0;
+                int roof_zero_id = 0;
+                int floor_min_id = INT_MAX;
+                int floor_max_id = INT_MIN;
+                int roof_min_id = INT_MAX;
+                int roof_max_id = INT_MIN;
+
+                for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
+                    int floor = arr[tile] & 0xFFFF;
+                    int roof = (arr[tile] >> 16) & 0xFFFF;
+
+                    int floor_id = floor & 0x0FFF;
+                    int floor_flags = (floor & 0xF000) >> 12;
+                    if ((floor_flags & 0x01) == 0) {
+                        floor_drawable++;
+                    }
+                    if (floor_id == 0) {
+                        floor_zero_id++;
+                    }
+                    if (floor_id < floor_min_id) {
+                        floor_min_id = floor_id;
+                    }
+                    if (floor_id > floor_max_id) {
+                        floor_max_id = floor_id;
+                    }
+
+                    int roof_id = roof & 0x0FFF;
+                    int roof_flags = (roof & 0xF000) >> 12;
+                    if ((roof_flags & 0x01) == 0) {
+                        roof_drawable++;
+                    }
+                    if (roof_id == 0) {
+                        roof_zero_id++;
+                    }
+                    if (roof_id < roof_min_id) {
+                        roof_min_id = roof_id;
+                    }
+                    if (roof_id > roof_max_id) {
+                        roof_max_id = roof_id;
+                    }
+                }
+
+                patchlog_write("SQUARE_STATS",
+                    "elevation=%d tiles=%d floor_drawable=%d floor_zero=%d floor_min=%d floor_max=%d roof_drawable=%d roof_zero=%d roof_min=%d roof_max=%d",
+                    elevation,
+                    SQUARE_GRID_SIZE,
+                    floor_drawable,
+                    floor_zero_id,
+                    floor_min_id == INT_MAX ? -1 : floor_min_id,
+                    floor_max_id == INT_MIN ? -1 : floor_max_id,
+                    roof_drawable,
+                    roof_zero_id,
+                    roof_min_id == INT_MAX ? -1 : roof_min_id,
+                    roof_max_id == INT_MIN ? -1 : roof_max_id);
             }
         }
     }
