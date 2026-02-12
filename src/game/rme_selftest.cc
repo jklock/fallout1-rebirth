@@ -178,13 +178,38 @@ void rme_selftest_maybe_run(void)
                     c = (char)std::tolower((unsigned char)c);
                 if (ext == ".msg") {
                     if (++msgs_checked > 10) break;
-                    // Try to use message_load on the path (safe-ish)
+
+                    // Compute a path relative to data/text/<language>/ so
+                    // message_load is invoked with a path like "game/map.msg".
+                    fs::path rel = fs::relative(p.path(), text_dir);
+                    auto it = rel.begin();
+                    if (it == rel.end()) {
+                        add_failure("message", p.path().string(), "unexpected text path layout");
+                        continue;
+                    }
+                    // language component
+                    std::string language = it->string();
+                    ++it;
+                    if (it == rel.end()) {
+                        add_failure("message", p.path().string(), "unexpected text path layout");
+                        continue;
+                    }
+                    fs::path rel_after_lang;
+                    for (; it != rel.end(); ++it) {
+                        rel_after_lang /= *it;
+                    }
+
+                    std::string rel_path = rel_after_lang.string();
+                    // Normalize separators to backslash which the engine expects
+                    for (auto& ch : rel_path) if (ch == '/') ch = '\\';
+
+                    // Try to use message_load on the relative path (safe-ish)
                     fallout::MessageList ml;
                     if (!fallout::message_init(&ml)) {
                         add_failure("message", p.path().string(), "message_init failed");
                         continue;
                     }
-                    if (!fallout::message_load(&ml, p.path().c_str())) {
+                    if (!fallout::message_load(&ml, rel_path.c_str())) {
                         add_failure("message", p.path().string(), "message_load failed");
                     }
                     fallout::message_exit(&ml);
