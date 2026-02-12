@@ -6,6 +6,7 @@ GOG_DIR="$REPO_ROOT/scripts/test/data/failing_run"
 
 # 1) Dry-run: expect proposed.diff exists
 echo "== Dry-run auto-fix (no apply) =="
+export TEST_FALLBACK_BINARY="$REPO_ROOT/scripts/test/tools/fake_fallout_runner"
 if "$REPO_ROOT/scripts/test/test-rme-patchflow.sh" --auto-fix --auto-fix-iterations 1 --skip-build "$GOG_DIR"; then
     echo "Expected failure but run succeeded (dry-run)" >&2
     exit 2
