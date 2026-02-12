@@ -22,9 +22,9 @@ M-5 Flaky map repeats (10 runs each) — status: FAILED (stopped on first failur
 
   - Previous: Rerun (single; TIMEOUT=180)
     - Result: FAIL (iter01 terminated; exit code 3)
-    - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-1-timeout180.txt
+    - Repeats log: ARCHIVED → `development/RME/ARTIFACTS/archive/gate-2-repeats-20260212.tar.gz` (contains `CARAVAN-1-timeout180.txt`)
       - SHA256: 6555c83fa701e063ff1b75d719fde0a68c999ae7936fdb453f6284e90c3b0be5
-    - Patchlog analyze: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN.iter01.patchlog_analyze.txt
+    - Patchlog analyze: ARCHIVED → `development/RME/ARTIFACTS/archive/gate-2-repeats-20260212.tar.gz` (contains `CARAVAN.iter01.patchlog_analyze.txt`)
       - SHA256: 89c6125d0ba53ef25c272aa2a9efb0828030d28e16767c238555ab6cde65d91c
     - Notes: No patchlog or run log was produced; analyzer indicated missing patchlog file on that run.
 
