@@ -2,40 +2,40 @@ blank.frm      ; used to be mset000.frm for top of bouncing mouse cursor
 msef000.frm    ; hex mouse cursor
 egg.frm        ; used for the translucent "egg" effect around player
 msef001.frm
-actionh.frm    ; *** NO LONGER USED ***     
-actionm.frm    ; *** NO LONGER USED ***
+;actionh.frm    ; *** NO LONGER USED ***     
+;actionm.frm    ; *** NO LONGER USED ***
 bigredup.frm   ; big red button up
 bigreddn.frm   ; big red button down
 lilredup.frm   ; little red button up
 lilreddn.frm   ; little red button down
 MAPDN.FRM      ; automap button down
-AMAPHV.FRM     ; *** NO LONGER USED ***
-MAPMK.FRM      ; *** NO LONGER USED ***
+;AMAPHV.FRM     ; *** NO LONGER USED ***
+;MAPMK.FRM      ; *** NO LONGER USED ***
 MAPUP.FRM      ; automap button up
-ENDTDN.FRM     ; *** NO LONGER USED ***
-ENDTUP.FRM     ; *** NO LONGER USED ***
+;ENDTDN.FRM     ; *** NO LONGER USED ***
+;ENDTUP.FRM     ; *** NO LONGER USED ***
 IFACE.FRM      ; main interface
 OPTIDN.FRM     ; options button down
 OPTIUP.FRM     ; options button up
-TMAPDN.FRM     ; *** NO LONGER USED ***
-TMAPHV.FRM     ; *** NO LONGER USED ***
-TMAPUP.FRM     ; *** NO LONGER USED ***
-WMAPDN.FRM     ; *** NO LONGER USED ***
-WMAPHV.FRM     ; *** NO LONGER USED ***
-WMAPUP.FRM     ; *** NO LONGER USED ***
-LATTKBDN.FRM   ; *** NO LONGER USED ***
-LATTKBDS.FRM   ; *** NO LONGER USED ***
-LATTKBUP.FRM   ; *** NO LONGER USED ***
-LATTKSDN.FRM   ; *** NO LONGER USED ***
-LATTKSDS.FRM   ; *** NO LONGER USED ***
-LATTKSUP.FRM   ; *** NO LONGER USED ***
+;TMAPDN.FRM     ; *** NO LONGER USED ***
+;TMAPHV.FRM     ; *** NO LONGER USED ***
+;TMAPUP.FRM     ; *** NO LONGER USED ***
+;WMAPDN.FRM     ; *** NO LONGER USED ***
+;WMAPHV.FRM     ; *** NO LONGER USED ***
+;WMAPUP.FRM     ; *** NO LONGER USED ***
+;LATTKBDN.FRM   ; *** NO LONGER USED ***
+;LATTKBDS.FRM   ; *** NO LONGER USED ***
+;LATTKBUP.FRM   ; *** NO LONGER USED ***
+;LATTKSDN.FRM   ; *** NO LONGER USED ***
+;LATTKSDS.FRM   ; *** NO LONGER USED ***
+;LATTKSUP.FRM   ; *** NO LONGER USED ***
 SATTKBDN.FRM   ; single attack big down
 SATTKBUP.FRM   ; single attack big up
-SATTKSUP.FRM   ; single attack small up
-UATTKBDN.FRM   ; *** NO LONGER USED ***
-UATTKBUP.FRM   ; *** NO LONGER USED ***
-UATTKSDN.FRM   ; *** NO LONGER USED ***
-UATTKSUP.FRM   ; *** NO LONGER USED ***
+blank.frm   ; single attack small up
+;UATTKBDN.FRM   ; *** NO LONGER USED ***
+;UATTKBUP.FRM   ; *** NO LONGER USED ***
+;UATTKSDN.FRM   ; *** NO LONGER USED ***
+;UATTKSUP.FRM   ; *** NO LONGER USED ***
 KARMAFDR.FRM   ; Character editor  * Place holder for traits folder image *
 TBLCRD.FRM     ; Interface stuff.
 BURST.FRM      ; burst text
@@ -51,35 +51,35 @@ INVUPOUT.FRM
 INVUPIN.FRM
 INVDNOUT.FRM
 INVDNIN.FRM
-TWOHAND.FRM    ; *** NO LONGER USED ***
-autodim.frm    ; *** NO LONGER USED ***
-autohi.frm     ; *** NO LONGER USED ***
+;TWOHAND.FRM    ; *** NO LONGER USED ***
+;autodim.frm    ; *** NO LONGER USED ***
+;autohi.frm     ; *** NO LONGER USED ***
 chadn.frm      ; character button down
 chaup.frm      ; character button up
 pipdn.frm      ; pipboy button down
 pipup.frm      ; pipboy button up
 tinreddn.frm   ; tiny red button down
 tinredup.frm   ; tiny red button up
-towndim.frm    ; *** NO LONGER USED ***
-townhi.frm     ; *** NO LONGER USED ***
-worlddim.frm   ; *** NO LONGER USED ***
-worldhi.frm    ; *** NO LONGER USED ***
-LATURBDN.FRM   ; *** NO LONGER USED ***
-LATURBDS.FRM   ; *** NO LONGER USED ***
-LATURBUP.FRM   ; *** NO LONGER USED ***
-LATURSDN.FRM   ; *** NO LONGER USED ***
-LATURSDS.FRM   ; *** NO LONGER USED ***
-LATURSUP.FRM   ; *** NO LONGER USED ***
+;towndim.frm    ; *** NO LONGER USED ***
+;townhi.frm     ; *** NO LONGER USED ***
+;worlddim.frm   ; *** NO LONGER USED ***
+;worldhi.frm    ; *** NO LONGER USED ***
+;LATURBDN.FRM   ; *** NO LONGER USED ***
+;LATURBDS.FRM   ; *** NO LONGER USED ***
+;LATURBUP.FRM   ; *** NO LONGER USED ***
+;LATURSDN.FRM   ; *** NO LONGER USED ***
+;LATURSDS.FRM   ; *** NO LONGER USED ***
+;LATURSUP.FRM   ; *** NO LONGER USED ***
 SATURBDN.FRM   ; single attack big down unreadied
 SATURBUP.FRM   ; single attack big up unreadied
 SATURSUP.FRM   ; single attack small up unreadied
-UATURBDN.FRM   ; *** NO LONGER USED ***
-UATURBUP.FRM   ; *** NO LONGER USED ***
-UATURSDN.FRM   ; *** NO LONGER USED ***
-UATURSUP.FRM   ; *** NO LONGER USED ***
+;UATURBDN.FRM   ; *** NO LONGER USED ***
+;UATURBUP.FRM   ; *** NO LONGER USED ***
+;UATURSDN.FRM   ; *** NO LONGER USED ***
+;UATURSUP.FRM   ; *** NO LONGER USED ***
 SATURSDN.FRM   ; single attack small down unreadied
-ACTIONT.FRM    ; *** NO LONGER USED ***
-ACTIONI.FRM    ; *** NO LONGER USED ***
+;ACTIONT.FRM    ; *** NO LONGER USED ***
+;ACTIONI.FRM    ; *** NO LONGER USED ***
 NUMBERS.FRM    ; numbers for the hit points and fatigue counters
 HLGRN.FRM      ; green health light
 HLYEL.FRM      ; yellow health light
@@ -228,13 +228,13 @@ BOMB1.FRM      ; Pipboy
 upsell00.frm   ; Upsell screen for interactive demo
 upsell01.frm   ; Upsell screen for interactive demo
 upsell02.frm   ; Upsell screen for interactive demo
-upsell03.frm   ; Upsell screen for interactive demo
-upsell04.frm   ; Upsell screen for interactive demo
-upsell05.frm   ; Upsell screen for interactive demo
-upsell06.frm   ; Upsell screen for interactive demo
-upsell07.frm   ; Upsell screen for interactive demo
-upsell08.frm   ; Upsell screen for interactive demo
-upsell09.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
+blank.frm   ; Upsell screen for interactive demo
 LSGAME.FRM     ; Load/Save game
 LSGBOX.FRM     ; Load/Save game
 LSCOVER.FRM    ; Load/Save game
@@ -246,7 +246,7 @@ PRFXIN.FRM     ; Options screen
 PRFXOUT.FRM    ; Options screen
 PREFCVR.FRM    ; Options screen
 PRFSLDON.FRM   ; Options screen
-PREFTRCK.FRM   ; *** NO LONGER USED ***
+;PREFTRCK.FRM   ; *** NO LONGER USED ***
 MSEF003.FRM    ; Action move
 ACTARROW.FRM   ; Action arrow
 ACRSHAIR.FRM   ; Action crosshair
@@ -319,8 +319,8 @@ SEQ5D.FRM      ; endgame picture
 SEQ6A.FRM      ; endgame picture
 SEQ6B.FRM      ; endgame picture
 SEQ8ABC.FRM    ; endgame picture
-SHABAD3.FRM    ; *** NO LONGER USED ***
-SHAGOD2.FRM    ; *** NO LONGER USED ***
+;SHABAD3.FRM    ; *** NO LONGER USED ***
+;SHAGOD2.FRM    ; *** NO LONGER USED ***
 SEQ4ABC.FRM    ; endgame picture
 SEQ4DE.FRM     ; endgame picture
 SEQ7A.FRM      ; endgame picture

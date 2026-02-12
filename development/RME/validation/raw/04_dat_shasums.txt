@@ -1,0 +1,5 @@
+4) DAT checksums
+a79090e035e33c178aee23fe72f7ef0a5f3be76f733c252522983aad22f87364  /Volumes/Storage/GitHub/fallout1-rebirth/GOG/unpatchedfiles/master.dat
+66800803fc06030573561b4d25ed7a9f0ea7a4b84b734e6d18a9fefaeeb990a9  /Volumes/Storage/GitHub/fallout1-rebirth/GOG/unpatchedfiles/critter.dat
+fbfa03b6d43d17b6a4f935d8466720e607b781f283ca04178cf525eb44cee12d  /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/master.dat
+69cdf6252dd0cdc883fba4d2cfe2fe0e25f79f3666945ae774615cbbbd14f1db  /Volumes/Storage/GitHub/fallout1-rebirth/GOG/patchedfiles/critter.dat
