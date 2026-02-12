@@ -18,3 +18,4 @@ void patchlog_context(const char* patches_path, const char* datafile_path);
 } // namespace fallout
 
 #endif // FALLOUT_PLIB_DB_PATCHLOG_H_
+

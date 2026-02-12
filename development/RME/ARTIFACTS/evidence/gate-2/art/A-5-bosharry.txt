@@ -1,0 +1,8 @@
+A-5 BOSHARRY FRM/PAL & LST check - Wed Feb 11 03:50:03 UTC 2026
+Files in art/intrface matching bosharr:
+
+art/intrface file details:
+-rw-r--r--@ 1 klock  staff  307274 Feb  9 15:00 GOG/patchedfiles/data/art/intrface/bosharry.frm
+-rw-r--r--@ 1 klock  staff  33536 Feb  9 15:00 GOG/patchedfiles/data/art/intrface/bosharry.pal
+
+Check LSTs for bosharry entries:

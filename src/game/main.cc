@@ -40,11 +40,13 @@
 #include "game/scripts.h"
 #include "game/select.h"
 #include "game/selfrun.h"
+#include "game/tile.h"
 #include "game/wordwrap.h"
 #include "game/worldmap.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
 #include "plib/db/db.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -315,13 +317,42 @@ static int main_load_new(char* mapFileName)
     map_init();
     gmouse_set_cursor(MOUSE_CURSOR_NONE);
     mouse_show();
-    map_load(mapFileName);
+    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+    if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+        // Count only map-load phase failures; game init often probes optional files.
+        db_diag_reset_open_fail_count();
+        if (patchlog_enabled()) {
+            patchlog_write("AUTORUN_MAP", "load_start map=\"%s\"", mapFileName);
+        }
+    }
+    int rc = map_load(mapFileName);
+    if (patchlog_enabled()) {
+        patchlog_write("AUTORUN_MAP", "load_end map=\"%s\" rc=%d", mapFileName, rc);
+    }
     PlayCityMapMusic();
     palette_fade_to(white_palette);
     win_delete(win);
     loadColorTable("color.pal");
     palette_fade_to(cmap);
-    return 0;
+
+    // Ensure render refresh is enabled for autorun/patchlog runs so that
+    // tile rendering (and our stage-level diagnostics) are executed.
+    if (patchlog_enabled()) {
+        tile_enable_refresh();
+    }
+
+    tile_refresh_display();
+
+    if (patchlog_enabled()) {
+        map_log_display_pixel_stats_public(map_elevation);
+    }
+
+    const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");
+    if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {
+        dump_screen();
+    }
+
+    return rc;
 }
 
 // 0x472A04

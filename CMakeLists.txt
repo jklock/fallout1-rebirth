@@ -246,6 +246,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/plib/db/patchlog.h"
     "src/plib/db/lzss.cc"
     "src/plib/db/lzss.h"
+    "src/plib/db/patchlog.cc"
+    "src/plib/db/patchlog.h"
     "src/plib/gnw/button.cc"
     "src/plib/gnw/button.h"
     "src/plib/gnw/debug.cc"

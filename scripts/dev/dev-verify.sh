@@ -203,14 +203,15 @@ echo "✅ Found $CC_COUNT .cc files and $H_COUNT .h files"
 # 6. CMake configuration test
 echo ""
 echo ">>> Test 6: CMake iOS Configuration"
-if cmake -B /tmp/ios-test \
+TMP_IOS_TEST_DIR="$PWD/tmp/ios-test"
+if cmake -B "$TMP_IOS_TEST_DIR" \
     -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
     -D ENABLE_BITCODE=0 \
     -D PLATFORM=OS64 \
     -G Xcode \
     -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' > /dev/null 2>&1; then
     echo "✅ iOS CMake configuration valid"
-    rm -rf /tmp/ios-test
+    rm -rf "$TMP_IOS_TEST_DIR"
 else
     echo "❌ iOS CMake configuration failed"
     ERRORS=$((ERRORS + 1))

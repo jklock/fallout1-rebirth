@@ -1,0 +1,2 @@
+Found: GOG/patchedfiles/data/maps/TEMPLAT1.MAP
+SHA256: 337f930939de5db1d985793e5e2b9cb28e6d91a012e9d0c8bbc8f3776389f208

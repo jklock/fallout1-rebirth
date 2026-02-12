@@ -1,0 +1,7 @@
+A-6 Death animation suffix check (da/db/dc) - Wed Feb 11 03:51:38 UTC 2026
+Searching for *da.frm *db.frm *dc.frm under GOG/patchedfiles/data/art
+GOG/patchedfiles/data/art/critters/hanpwrda.frm
+GOG/patchedfiles/data/art/critters/hanpwrdc.frm
+GOG/patchedfiles/data/art/critters/hanpwrdb.frm
+
+Samples (first 200 lines):

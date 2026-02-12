@@ -1,0 +1,14 @@
+[0;34m>>>[0m 1) Quick tree diff (diff -qr)
+[0;34m>>>[0m 2) Unified diff (diff -ruN) (large)
+[0;34m>>>[0m 3) Config diffs
+[0;34m>>>[0m 4) DAT shasums
+[0;34m>>>[0m 5) RME crossref (patched/unpatched) + LST report
+[0;34m>>>[0m 5b) LST candidate scan (by basename)
+[0;34m>>>[0m 6) Crossref counts + promotions lists
+[0;34m>>>[0m 7) Map endian signal (from patched crossref)
+[0;34m>>>[0m 8) LST missing (copied from crossref output)
+[0;34m>>>[0m 11) Run validation script (overlay + DAT xdelta)
+[0;34m>>>[0m 12) Script reference audit (scripts.lst vs MAP/PRO)
+[0;32m[OK][0m Validation refreshed at: development/RME/ARTIFACTS/evidence/gate-1/
+REFRESH_EXIT:0
+COPIED_TO: development/RME/ARTIFACTS/evidence/gate-1/gate-1-refresh-output-20260210-213241UTC.txt

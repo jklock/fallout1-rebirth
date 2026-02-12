@@ -1,0 +1,86 @@
+Gate 2 — Repeats Manifest (M-5 / M-6)
+
+Generated: 2026-02-10T22:30:15Z UTC
+
+M-5 Flaky map repeats (10 runs each) — status: FAILED (stopped on first failure)
+
+- CARAVAN (10)
+  - Result: FAIL (run 1 terminated; script exit code 3)
+  - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-10.txt
+    - SHA256: 9cebe3e22c8a2f467ba7796e5521bb3785924d57ba061b65d2f423726bed6fbd
+  - Fail patchlog (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog.txt
+    - SHA256: 4c3371e3d6ce6dd4b34a98fc27ae6c350bae5175146d098267cc093d67ccb231
+  - Fail patchlog analyze (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.patchlog_analyze.txt
+    - SHA256: 66245481695d0a9c182094281b8207c106b815a63014859e6d20214c96af0ab8
+  - Fail run log (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01.run.log
+    - SHA256: 63b01edc8f1a1789457bc1ba0b8eb27a7877924fcd5cff68b1c2b7feccdab74e
+  - Fail present screenshot (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-fail-01-present.bmp
+    - SHA256: e2b4ad17685e4bd1ad25047f9df7df2cf9324502989d2ed4e1375c0dc9464059
+  - Triage report: development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-CARAVAN.md
+    - SHA256: ebafc0447fcc733303b24dacf9ec11e8fc0cf143c10a9aa2d6cc8b4257dedfe9
+  - Notes: The first repeat run produced suspicious GNW_SHOW_RECT events (see patchlog analyze). A screenshot was captured at development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/CARAVAN.iter01.bmp
+
+  - Previous: Rerun (single; TIMEOUT=180)
+    - Result: FAIL (iter01 terminated; exit code 3)
+    - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN-1-timeout180.txt
+      - SHA256: 6555c83fa701e063ff1b75d719fde0a68c999ae7936fdb453f6284e90c3b0be5
+    - Patchlog analyze: development/RME/ARTIFACTS/evidence/gate-2/repeats/CARAVAN.iter01.patchlog_analyze.txt
+      - SHA256: 89c6125d0ba53ef25c272aa2a9efb0828030d28e16767c238555ab6cde65d91c
+    - Notes: No patchlog or run log was produced; analyzer indicated missing patchlog file on that run.
+
+- ZDESERT1 (10)
+  - Result: FAIL (run 1 terminated; script exit code 3)
+  - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-10.txt
+    - SHA256: 6528eaf109868476d328db2fe740d4b4c834cfc366fd355dc659c7ac33945b54
+  - Fail patchlog (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog.txt
+    - SHA256: 01b9ed18bdb6f31cf1461f3aa98ea136fd28c83b8a0bb877c8969cfb6060c96f
+  - Fail patchlog analyze (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.patchlog_analyze.txt
+    - SHA256: eb52d9487c743db0acb3a8b9ced98ac1187a8dc5e19b0b246330556e3fe9080e
+  - Fail run log (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01.run.log
+    - SHA256: 5ee11dcab6aa774c45e8c2a89f67d888c96fa74ee2cb20c78fda6646ed676a4c
+  - Fail present screenshot (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/ZDESERT1-fail-01-present.bmp
+    - SHA256: 0d5eb473c24e3436ee42e5f7090cc077f484ffc8f45ecc931a63f3509f4bd24f
+  - Triage report: development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-ZDESERT1.md
+    - SHA256: d6d495a26c500f2e653dc58abd4dd9278c47920629603fed0def21c5d2b8373b
+  - Notes: The first repeat run produced suspicious GNW_SHOW_RECT events (see patchlog analyze). A screenshot was captured at development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/ZDESERT1.iter01.bmp
+
+- TEMPLAT1 (10)
+  - Result: FAIL (run 1 terminated; script exit code 3)
+  - Repeats log: development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-10.txt
+    - SHA256: fa921c1b37cde295af39724d394bfd44ae8db77c4e50ca6f4247a4488bd7cae1
+  - Fail patchlog (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog.txt
+    - SHA256: 6e19bdce3ca712c8e490b6fcecb0f01800b8f9f247d8a81c1442d40751fa3106
+  - Fail patchlog analyze (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.patchlog_analyze.txt
+    - SHA256: 8a122d2cfb75831ab81e2c1d779a7b24864877c690453d227df5f6ce0d83216b
+  - Fail run log (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01.run.log
+    - SHA256: 286f98f149e69c889446e390b6ca154630899a5bc53bff6b818abe0d711ae1ea
+  - Fail present screenshot (repeats): development/RME/ARTIFACTS/evidence/gate-2/repeats/TEMPLAT1-fail-01-present.bmp
+    - SHA256: 0d5eb473c24e3436ee42e5f7090cc077f484ffc8f45ecc931a63f3509f4bd24f
+  - Triage report: development/RME/ARTIFACTS/evidence/gate-2/gate-2-triage-TEMPLAT1.md
+    - SHA256: a90757c5851fdaa8aea900744b62a3cd90f4615b4cc4b7355c48aea20fdae07c
+  - Notes: The first repeat run produced suspicious GNW_SHOW_RECT events (see patchlog analyze). A screenshot was captured at development/RME/ARTIFACTS/evidence/gate-2/runtime/screenshots-individual/TEMPLAT1.iter01.bmp
+
+
+Summary: M-5 stopped at first failure (CARAVAN). See the artifacts above for diagnostics. If desired, re-run M-5 for remaining maps after investigating CARAVAN failure.
+
+M-6 Big-endian RME maps (3 runs each) — NOT RUN (blocked by M-5 failure)
+
+- BROHD12 (3)
+  - Result: NOT RUN
+- CHILDRN1 (3)
+  - Result: NOT RUN
+- CHILDRN2 (3)
+  - Result: NOT RUN
+- HUBDWNTN (3)
+  - Result: NOT RUN
+- HUBMIS1 (3)
+  - Result: NOT RUN
+- HUBOLDTN (3)
+  - Result: NOT RUN
+- HUBWATER (3)
+  - Result: NOT RUN
+- JUNKCSNO (3)
+  - Result: NOT RUN
+- JUNKKILL (3)
+  - Result: NOT RUN
+

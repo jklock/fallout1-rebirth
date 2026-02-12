@@ -1,0 +1,4 @@
+A-3 Children (NACHLD) FRM & LST check - Wed Feb 11 03:49:18 UTC 2026
+FRMs in GOG/patchedfiles/data/art/critters matching nachld:
+
+CRITTERS.LST lines matching nachld:

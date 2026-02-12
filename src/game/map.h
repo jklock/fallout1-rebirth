@@ -126,6 +126,13 @@ int map_save_in_game(bool a1);
 void map_setup_paths();
 int map_match_map_name(const char* name);
 
+// Public wrapper to log display top pixel stats (calls internal static helper).
+void map_log_display_pixel_stats_public(int elevation);
+
+// Count non-zero pixels in the display buffer for the given rectangle.
+// Coordinates and size are in display buffer (game) pixels.
+long map_count_display_non_zero(int x, int y, int w, int h);
+
 } // namespace fallout
 
 #endif /* FALLOUT_GAME_MAP_H_ */

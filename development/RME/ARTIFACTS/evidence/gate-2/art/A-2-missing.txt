@@ -1,0 +1,18 @@
+A-2 CRITTERS.LST integrity - missing/critical items (generated Wed Feb 11 03:56:33 UTC 2026)
+CRITTERS.LST path: GOG/patchedfiles/data/art/critters/critters.lst
+line_count:       60
+
+Observation: CRITTERS.LST is significantly shorter than expected (expected ~400+ lines). Many FRM files in GOG/patchedfiles/data/art/critters are NOT represented in LST (see A-2-frm-vs-lst-diff.txt).
+Recommendation: Re-run patch generation (do not auto-patch). Steps: 1) Re-run patch process (Unknown option: ...
+RME Patch (macOS)
+
+USAGE:
+  ./scripts/patch/rebirth-patch-app.sh --base <path> --out <path> [--rme <path>] [--skip-checksums] [--force]
+
+OPTIONS:
+  --base PATH        Base Fallout 1 data folder
+  --out PATH         Output folder for patched data
+  --rme PATH          RME payload directory (default: third_party/rme/source)
+  --skip-checksums    Skip base DAT checksum validation
+  --force             Overwrite existing output folder
+  --help              Show this help), 2) Compare CRITTERS.LST with third_party RME source LST and with GOG/patchedfiles-case copies, 3) If needed, reapply/repair patched data and re-generate artifact evidence.

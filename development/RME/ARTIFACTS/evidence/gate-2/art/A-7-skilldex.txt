@@ -1,0 +1,9 @@
+A-7 Skilldex FRM checks (ADDICT/DRUGREST/REPCHILD) - Wed Feb 11 03:51:57 UTC 2026
+Search for FRM/PAL files matching the terms under GOG/patchedfiles/data/art:
+-- addict --
+
+-- drugrest --
+
+-- repchild --
+
+Search in LST files:

@@ -1,11 +1,13 @@
 #include "game/map.h"
 
 #include <limits.h>
-#include <map>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+#include <map>
+#include <string>
 #include <vector>
 
 #include "game/anim.h"
@@ -63,7 +65,12 @@ static void map_place_dude_and_mouse();
 static void square_init();
 static void square_reset();
 static int square_load(DB_FILE* stream, int a2);
-static unsigned char* display_buf = NULL;
+static void map_log_square_stats(int elevation);
+static void map_log_floor_art_stats(int elevation);
+static void map_log_display_pixel_stats(int elevation);
+static int map_write_MapData(MapHeader* ptr, DB_FILE* stream);
+static int map_read_MapData(MapHeader* ptr, DB_FILE* stream);
+
 static void map_log_square_stats(int elevation)
 {
     if (!patchlog_enabled()) {
@@ -172,158 +179,131 @@ static void map_log_floor_art_stats(int elevation)
                     int w = art_frame_width(art, 0, 0);
                     int h = art_frame_length(art, 0, 0);
                     long total = (long)w * (long)h;
-                    long non_zero = 0;
-                    for (int i = 0; i < total; i++) {
-                        if (frame[i] != 0) {
-                            non_zero++;
+                    bool found_nonzero = false;
+                    if (total <= 1000) {
+                        for (long i = 0; i < total; i++) {
+                            if (frame[i] != 0) {
+                                found_nonzero = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        int sample = 1000;
+                        for (int i = 0; i < sample; i++) {
+                            long idx = (i * total) / sample;
+                            if (frame[idx] != 0) {
+                                found_nonzero = true;
+                                break;
+                            }
                         }
                     }
-
-                    if (non_zero == 0) {
+                    if (found_nonzero) {
                         fid_status[fid] = 3;
                         status = 3;
                     } else {
-                        fid_status[fid] = 4;
-                        status = 4;
+                        fid_status[fid] = 2;
+                        status = 2;
                     }
                 }
                 art_ptr_unlock(handle);
             }
         }
 
-        switch (status) {
-        case 1:
+        if (status == 1) {
             floor_missing++;
             missing_by_tid[tile_id]++;
-            break;
-        case 2:
-        case 3:
+        } else if (status == 2) {
             floor_blank++;
             blank_by_tid[tile_id]++;
-            break;
-        case 4:
+        } else if (status == 3) {
             floor_drawable++;
             drawable_by_tid[tile_id]++;
-            break;
-        default:
-            break;
         }
     }
 
-    patchlog_write("FLOOR_ART",
-        "elevation=%d tiles=%d drawable=%d missing=%d blank=%d",
+    int unique_missing = 0;
+    for (auto& kv : fid_status) {
+        if (kv.second == 1) {
+            unique_missing++;
+        }
+    }
+
+    patchlog_write("FLOOR_DRAW_STATS",
+        "elevation=%d tiles=%d floor_drawable=%d floor_missing_art=%d floor_blank=%d unique_missing=%d",
         elevation,
         floor_tiles,
         floor_drawable,
         floor_missing,
-        floor_blank);
+        floor_blank,
+        unique_missing);
 
-    auto log_map_counts = [](const char* category, const std::map<int, int>& counts) {
-        for (const auto& pair : counts) {
-            patchlog_write(category, "tile_id=%d count=%d", pair.first, pair.second);
-        }
-    };
-
-    log_map_counts("FLOOR_ART_DRAWABLE", drawable_by_tid);
-    log_map_counts("FLOOR_ART_MISSING", missing_by_tid);
-    log_map_counts("FLOOR_ART_BLANK", blank_by_tid);
-}
-
-static void map_log_display_pixel_stats(int elevation)
-{
-    if (!patchlog_enabled()) {
-        return;
-    }
-
-    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
-    if (autorun_env == NULL || autorun_env[0] == '\0' || autorun_env[0] == '0') {
-        return;
-    }
-
-    if (display_buf == NULL) {
-        return;
-    }
-
-    int width = scr_size.lrx - scr_size.ulx + 1;
-    int height = scr_size.lry - scr_size.uly - 99;
+    int window_h = scr_size.lry - scr_size.uly - 99;
     int ui_h = 120;
-    int top_h = height - ui_h;
-    if (top_h < 1) {
-        top_h = 1;
+    int top_h = window_h - ui_h;
+    if (top_h < 0) {
+        top_h = 0;
     }
 
-    long total = (long)width * (long)top_h;
-    if (total <= 0) {
-        return;
-    }
+    int top_tiles = 0;
+    int top_drawable = 0;
+    int top_missing = 0;
+    int top_blank = 0;
 
-    long non_zero = 0;
-    for (int y = 0; y < top_h; y++) {
-        unsigned char* row = display_buf + (long)y * width;
-        for (int x = 0; x < width; x++) {
-            if (row[x] != 0) {
-                non_zero++;
-            }
+    for (int tile = 0; tile < SQUARE_GRID_SIZE; tile++) {
+        int upper = (arr[tile] >> 16) & 0xFFFF;
+        int tile_id = upper & 0x0FFF;
+        int flags = (upper & 0xF000) >> 12;
+        if ((flags & 0x01) != 0) {
+            continue;
+        }
+        int sx, sy;
+        if (square_coord(tile, &sx, &sy, elevation) != 0) {
+            continue;
+        }
+        if (sy >= top_h) {
+            continue;
+        }
+        top_tiles++;
+        int fid = art_id(OBJ_TYPE_TILE, tile_id, 0, 0, 0);
+        auto it2 = fid_status.find(fid);
+        int status = it2 != fid_status.end() ? it2->second : 0;
+        if (status == 1) {
+            top_missing++;
+        } else if (status == 2) {
+            top_blank++;
+        } else if (status == 3) {
+            top_drawable++;
         }
     }
 
-    int non_zero_pct = (int)((non_zero * 100 + total / 2) / total);
+    patchlog_write("FLOOR_DRAW_TOP",
+        "top_tiles=%d top_drawable=%d top_missing=%d top_blank=%d",
+        top_tiles,
+        top_drawable,
+        top_missing,
+        top_blank);
 
-    patchlog_write("DISPLAY_TOP_PIXELS", "top_pixels=%ld non_zero=%ld non_zero_pct=%d", total, non_zero, non_zero_pct);
+    std::vector<std::pair<int, int>> v;
+    for (auto& kv : missing_by_tid) {
+        v.push_back(kv);
+    }
+    std::sort(v.begin(), v.end(), [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+        return a.second > b.second;
+    });
+
+    int limit = (int)std::min(static_cast<size_t>(5), v.size());
+    for (int i = 0; i < limit; i++) {
+        int tid = v[i].first;
+        int cnt = v[i].second;
+        int fid = art_id(OBJ_TYPE_TILE, tid, 0, 0, 0);
+        const char* name = art_get_name(fid);
+        patchlog_write("FLOOR_DRAW_MISSING",
+            "tileid=%d count=%d file=\"%s\"",
+            tid,
+            cnt,
+            name ? name : "unknown");
+    }
 }
-
-void map_log_display_pixel_stats_public(int elevation)
-{
-    map_log_display_pixel_stats(elevation);
-}
-
-long map_count_display_non_zero(int x, int y, int w, int h)
-{
-    if (display_buf == NULL) {
-        return 0;
-    }
-
-    int width = scr_size.lrx - scr_size.ulx + 1;
-    int height = scr_size.lry - scr_size.uly - 99;
-
-    if (x < 0) {
-        w += x;
-        x = 0;
-    }
-    if (y < 0) {
-        h += y;
-        y = 0;
-    }
-    if (x + w > width) {
-        w = width - x;
-    }
-    if (y + h > height) {
-        h = height - y;
-    }
-
-    if (w <= 0 || h <= 0) {
-        return 0;
-    }
-
-    long non_zero = 0;
-    for (int row = 0; row < h; row++) {
-        unsigned char* r = display_buf + (long)(y + row) * width + x;
-        for (int col = 0; col < w; col++) {
-            if (r[col] != 0) {
-                non_zero++;
-            }
-        }
-    }
-
-    return non_zero;
-}
-static void map_log_square_stats(int elevation);
-static void map_log_floor_art_stats(int elevation);
-static void map_log_display_pixel_stats(int elevation);
-long map_count_display_non_zero(int x, int y, int w, int h);
-void map_log_display_pixel_stats_public(int elevation);
-static int map_write_MapData(MapHeader* ptr, DB_FILE* stream);
-static int map_read_MapData(MapHeader* ptr, DB_FILE* stream);
 
 // 0x4735CE
 static const short city_vs_city_idx_table[MAP_COUNT][5] = {
@@ -519,6 +499,100 @@ static Rect map_display_rect;
 // 0x6302C4
 MessageList map_msg_file;
 
+// 0x6302CC
+static unsigned char* display_buf;
+
+static void map_log_display_pixel_stats(int elevation)
+{
+    if (!patchlog_enabled()) {
+        return;
+    }
+
+    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+    if (autorun_env == NULL || autorun_env[0] == '\0' || autorun_env[0] == '0') {
+        return;
+    }
+
+    if (display_buf == NULL) {
+        return;
+    }
+
+    int width = scr_size.lrx - scr_size.ulx + 1;
+    int height = scr_size.lry - scr_size.uly - 99;
+    int ui_h = 120;
+    int top_h = height - ui_h;
+    if (top_h < 1) {
+        top_h = 1;
+    }
+
+    long total = (long)width * (long)top_h;
+    if (total <= 0) {
+        return;
+    }
+
+    long non_zero = 0;
+    for (int y = 0; y < top_h; y++) {
+        unsigned char* row = display_buf + (long)y * width;
+        for (int x = 0; x < width; x++) {
+            if (row[x] != 0) {
+                non_zero++;
+            }
+        }
+    }
+
+    int non_zero_pct = (int)((non_zero * 100 + total / 2) / total);
+
+    patchlog_write("DISPLAY_TOP_PIXELS", "top_pixels=%ld non_zero=%ld non_zero_pct=%d", total, non_zero, non_zero_pct);
+}
+
+void map_log_display_pixel_stats_public(int elevation)
+{
+    map_log_display_pixel_stats(elevation);
+}
+
+// Count non-zero pixels in the display buffer for the given rectangle.
+// Coordinates and size are in display buffer (game) pixels.
+long map_count_display_non_zero(int x, int y, int w, int h)
+{
+    if (display_buf == NULL) {
+        return 0;
+    }
+
+    int width = scr_size.lrx - scr_size.ulx + 1;
+    int height = scr_size.lry - scr_size.uly - 99;
+
+    // Clip rectangle to display bounds
+    if (x < 0) {
+        w += x;
+        x = 0;
+    }
+    if (y < 0) {
+        h += y;
+        y = 0;
+    }
+    if (x + w > width) {
+        w = width - x;
+    }
+    if (y + h > height) {
+        h = height - y;
+    }
+    if (w <= 0 || h <= 0) {
+        return 0;
+    }
+
+    long non_zero = 0;
+    for (int row = 0; row < h; row++) {
+        unsigned char* p = display_buf + (long)(y + row) * width + x;
+        for (int col = 0; col < w; col++) {
+            if (p[col] != 0) {
+                non_zero++;
+            }
+        }
+    }
+
+    return non_zero;
+}
+
 // 0x6302D0
 MapHeader map_data;
 
@@ -550,6 +624,13 @@ int iso_init()
     if (display_buf == NULL) {
         debug_printf("win_get_buf failed in iso_init\n");
         return -1;
+    }
+
+    // Diagnostic: report the display buffer pointer and pitch for autorun runs.
+    if (patchlog_enabled()) {
+        int width = scr_size.lrx - scr_size.ulx + 1;
+        int height = scr_size.lry - scr_size.uly - 99;
+        patchlog_write("DISPLAY_BUF_PTR", "display_buf=%p width=%d height=%d", display_buf, width, height);
     }
 
     if (win_get_rect(display_win, &map_display_rect) != 0) {
@@ -1056,54 +1137,53 @@ int map_scroll(int dx, int dy)
         step = pitch;
     }
 
-    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
-    bool autorun_active = autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0';
-
-    if (patchlog_verbose() && autorun_active) {
-        long pre_src_non_zero = 0;
-        long pre_dest_non_zero = 0;
-        unsigned char* srcBase = src;
-        unsigned char* destBase = dest;
-        int localStep = step;
-        for (int row = 0; row < height; row++) {
-            unsigned char* srow = srcBase + (long)row * localStep;
-            unsigned char* drow = destBase + (long)row * localStep;
-            for (int col = 0; col < width; col++) {
-                if (srow[col] != 0) {
-                    pre_src_non_zero++;
-                }
-                if (drow[col] != 0) {
-                    pre_dest_non_zero++;
-                }
-            }
-        }
-
-        for (int y = 0; y < height; y++) {
-            memmove(dest, src, width);
-            dest += step;
-            src += step;
-        }
-
-        long post_dest_non_zero = 0;
-        unsigned char* drow2 = destBase;
-        for (int row = 0; row < height; row++) {
-            unsigned char* r = drow2 + (long)row * localStep;
-            for (int col = 0; col < width; col++) {
-                if (r[col] != 0) {
-                    post_dest_non_zero++;
+    // Diagnostic sampling for autorun/patchlog runs: sample src/dest before and after memmove.
+    if (patchlog_verbose()) {
+        const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+        if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+            long pre_src_non_zero = 0;
+            long pre_dest_non_zero = 0;
+            unsigned char* srcBase = src;
+            unsigned char* destBase = dest;
+            int localStep = step;
+            for (int row = 0; row < height; row++) {
+                unsigned char* srow = srcBase + (long)row * localStep;
+                unsigned char* drow = destBase + (long)row * localStep;
+                for (int col = 0; col < width; col++) {
+                    if (srow[col] != 0) {
+                        pre_src_non_zero++;
+                    }
+                    if (drow[col] != 0) {
+                        pre_dest_non_zero++;
+                    }
                 }
             }
-        }
 
-        patchlog_write("MAP_SCROLL_MEMMOVE",
-            "dx=%d dy=%d width=%d height=%d pre_src=%ld pre_dest=%ld post_dest=%ld",
-            screenDx,
-            screenDy,
-            width,
-            height,
-            pre_src_non_zero,
-            pre_dest_non_zero,
-            post_dest_non_zero);
+            for (int y = 0; y < height; y++) {
+                memmove(dest, src, width);
+                dest += step;
+                src += step;
+            }
+
+            long post_dest_non_zero = 0;
+            unsigned char* drow2 = destBase;
+            for (int row = 0; row < height; row++) {
+                unsigned char* r = drow2 + (long)row * localStep;
+                for (int col = 0; col < width; col++) {
+                    if (r[col] != 0) {
+                        post_dest_non_zero++;
+                    }
+                }
+            }
+
+            patchlog_write("MAP_SCROLL_MEMMOVE", "dx=%d dy=%d width=%d height=%d pre_src=%ld pre_dest=%ld post_dest=%ld", screenDx, screenDy, width, height, pre_src_non_zero, pre_dest_non_zero, post_dest_non_zero);
+        } else {
+            for (int y = 0; y < height; y++) {
+                memmove(dest, src, width);
+                dest += step;
+                src += step;
+            }
+        }
     } else {
         for (int y = 0; y < height; y++) {
             memmove(dest, src, width);
@@ -1139,7 +1219,6 @@ int map_scroll_and_full_refresh(int dx, int dy)
     if (rme_log_topic_enabled("map")) {
         rme_logf("map", "map_scroll_and_full_refresh result=%d name=%s", rc, map_data.name[0] != '\0' ? map_data.name : "(none)");
     }
-
     return rc;
 }
 
@@ -1953,7 +2032,10 @@ static void map_match_map_number()
 // 0x475C3C
 static void map_display_draw(Rect* rect)
 {
-    win_draw_rect(display_win, rect);
+    // Refresh all windows for this rectangle so background fills are
+    // processed before the display window is drawn (prevents background
+    // WIN_FILL_RECT from overwriting freshly blitted map content).
+    win_refresh_all(rect);
 }
 
 // 0x475C50
@@ -1972,12 +2054,24 @@ static void map_scroll_refresh_game(Rect* rect)
         rectGetWidth(&map_display_rect),
         0);
 
+    // Diagnostic sampling for autorun/patchlog runs.
+    tile_log_stage_top_pixels_public("BEFORE_DRAW");
+
     square_render_floor(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_FLOOR");
+
     grid_render(&rectToUpdate, map_elevation);
+
     obj_render_pre_roof(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_PRE_ROOF");
+
     square_render_roof(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_ROOF");
+
     bounds_render(&rectToUpdate, map_elevation);
+
     obj_render_post_roof(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_POST_ROOF");
 }
 
 // 0x475CB0
@@ -1994,11 +2088,22 @@ static void map_scroll_refresh_mapper(Rect* rect)
         rectGetWidth(&map_display_rect),
         0);
 
+    // Diagnostic sampling for autorun/patchlog runs.
+    tile_log_stage_top_pixels_public("BEFORE_DRAW");
+
     square_render_floor(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_FLOOR");
+
     grid_render(&rectToUpdate, map_elevation);
+
     obj_render_pre_roof(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_PRE_ROOF");
+
     square_render_roof(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_ROOF");
+
     obj_render_post_roof(&rectToUpdate, map_elevation);
+    tile_log_stage_top_pixels_public("AFTER_POST_ROOF");
 }
 
 // 0x475D50
@@ -2216,6 +2321,23 @@ static int map_read_MapData(MapHeader* ptr, DB_FILE* stream)
     if (db_freadInt32(stream, &(ptr->field_34)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->lastVisitTime)) == -1) return -1;
     if (db_freadInt32List(stream, ptr->field_3C, 44) == -1) return -1;
+
+    if (patchlog_enabled()) {
+        patchlog_write("MAP_HEADER",
+            "version=%d name=\"%s\" tile=%d elev=%d rot=%d locals=%d script=%d flags=0x%08X dark=%d globals=%d field_34=%d last=%d",
+            ptr->version,
+            ptr->name,
+            ptr->enteringTile,
+            ptr->enteringElevation,
+            ptr->enteringRotation,
+            ptr->localVariablesCount,
+            ptr->scriptIndex,
+            ptr->flags,
+            ptr->darkness,
+            ptr->globalVariablesCount,
+            ptr->field_34,
+            ptr->lastVisitTime);
+    }
 
     return 0;
 }

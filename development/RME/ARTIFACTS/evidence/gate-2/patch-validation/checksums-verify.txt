@@ -1,0 +1,168 @@
+Checksums verification report
+=============================
+
+Total checksum entries: 1131
+Files matched: 1128
+Missing files: 3
+Mismatches: 4
+Ambiguous matches: 0
+Unexpected extras in overlay: 130
+
+--- Missing files (present in checksums, not found in overlay) ---
+critter.xdelta
+master.xdelta
+readme.txt
+
+--- Mismatches (expected_hash vs actual_hash; found_at relative path) ---
+ExpectedPath: BASE/master.dat
+ FoundAt: master.dat
+ Expected: a79090e035e33c178aee23fe72f7ef0a5f3be76f733c252522983aad22f87364
+ Actual: fbfa03b6d43d17b6a4f935d8466720e607b781f283ca04178cf525eb44cee12d
+---
+ExpectedPath: BASE/critter.dat
+ FoundAt: critter.dat
+ Expected: 66800803fc06030573561b4d25ed7a9f0ea7a4b84b734e6d18a9fefaeeb990a9
+ Actual: 69cdf6252dd0cdc883fba4d2cfe2fe0e25f79f3666945ae774615cbbbd14f1db
+---
+ExpectedPath: DATA/ART/INTRFACE/INTRFACE.LST
+ FoundAt: data/art/intrface/intrface.lst
+ Expected: 0044abd9362f157f3db06362f3d644ee803315b0f15e89746c052691c8d3ed30
+ Actual: bdf624a5c7d591b7159c9890baaa4fcf6cc8e00cec6c24fcad80b3d7191ef88b
+---
+ExpectedPath: DATA/SCRIPTS/SCRIPTS.LST
+ FoundAt: data/scripts/scripts.lst
+ Expected: ecb09e15952ccfd77043cb658156c88b074ce319f2bb35f87e3f037e5e0c01b3
+ Actual: 6bb1d292c6464e58b0833f5a081f42757902bb8c4c244059e5e0b5c890bcd3b4
+---
+
+--- Unexpected extras found in GOG/patchedfiles (not referenced in checksums) ---
+data/art/intrface/hr_alltlk.frm
+data/art/intrface/hr_iface_800.frm
+data/art/intrface/hr_iface_select.frm
+data/art/intrface/hr_ifacelft1.frm
+data/art/intrface/hr_ifacelft2.frm
+data/art/intrface/hr_ifacerht1.frm
+data/art/intrface/hr_ifacerht2.frm
+data/art/intrface/hr_mainmenu.frm
+data/art/intrface/hr_menu_bg.frm
+data/art/intrface/hr_options_bg.frm
+data/art/intrface/hr_options_dn.frm
+data/art/intrface/hr_options_up.frm
+data/art/intrface/hr_scrn_bg.frm
+data/art/intrface/mainmenu.frm
+data/art/tiles/grid000.frm
+data/font10.aaf
+data/font11.aaf
+data/font12.aaf
+data/font13.aaf
+data/font14.aaf
+data/font15.aaf
+data/font5.aaf
+data/font6.aaf
+data/font7.aaf
+data/font8.aaf
+data/font9.aaf
+data/maps/brodead.edg
+data/maps/brohd12.edg
+data/maps/brohd34.edg
+data/maps/brohdent.edg
+data/maps/caravan
+data/maps/caravan.edg
+data/maps/caravan.map
+data/maps/caves.edg
+data/maps/childead.edg
+data/maps/childrn1.edg
+data/maps/childrn2.edg
+data/maps/city1.edg
+data/maps/coast1.edg
+data/maps/coast2.edg
+data/maps/colatruk.edg
+data/maps/descrvn1.edg
+data/maps/descrvn2.edg
+data/maps/descrvn3.edg
+data/maps/descrvn4.edg
+data/maps/desert1.edg
+data/maps/desert2.edg
+data/maps/desert3.edg
+data/maps/dethclaw.edg
+data/maps/foot.edg
+data/maps/fsauser.edg
+data/maps/glow1.edg
+data/maps/glow2.edg
+data/maps/glowent.edg
+data/maps/hallded.edg
+data/maps/hotel.edg
+data/maps/hubdwntn.edg
+data/maps/hubent.edg
+data/maps/hubheigt.edg
+data/maps/hubmis1.edg
+data/maps/huboldtn.edg
+data/maps/hubwater.edg
+data/maps/junkcsno.edg
+data/maps/junkdemo.edg
+data/maps/junkent.edg
+data/maps/junkkill.edg
+data/maps/laadytum.edg
+data/maps/lablades.edg
+data/maps/lafollwr.edg
+data/maps/lagunrun.edg
+data/maps/laripper.edg
+data/maps/mbdead.edg
+data/maps/mbent.edg
+data/maps/mbstrg12.edg
+data/maps/mbvats12.edg
+data/maps/mntcrvn1.edg
+data/maps/mntcrvn2.edg
+data/maps/mntcrvn3.edg
+data/maps/mntcrvn4.edg
+data/maps/mountn1.edg
+data/maps/mountn2.edg
+data/maps/mstrlr12.edg
+data/maps/mstrlr34.edg
+data/maps/raiders.edg
+data/maps/shadye.edg
+data/maps/shadyw.edg
+data/maps/talkcow.edg
+data/maps/tardis.edg
+data/maps/templat1
+data/maps/templat1.map
+data/maps/usedcar.edg
+data/maps/v13ent.edg
+data/maps/vault13.edg
+data/maps/vaultbur.edg
+data/maps/vaultent.edg
+data/maps/vaultnec.edg
+data/maps/vipers.edg
+data/maps/watrshd.edg
+data/maps/zdesert1
+data/maps/zdesert1.map
+data/scripts/bitsbob.int
+data/scripts/cocdoor.int
+data/scripts/glowgen.int
+data/scripts/inblade.int
+data/scripts/nh2opump.int
+data/scripts/rhomdoor.int
+data/sound/music/01hub.acm
+data/sound/music/02mstrlr.acm
+data/sound/music/03wrldmp.acm
+data/sound/music/04brthrh.acm
+data/sound/music/05raider.acm
+data/sound/music/06vault.acm
+data/sound/music/07desert.acm
+data/sound/music/08vats.acm
+data/sound/music/09glow.acm
+data/sound/music/10labone.acm
+data/sound/music/11chilrn.acm
+data/sound/music/12junktn.acm
+data/sound/music/13carvrn.acm
+data/sound/music/14necro.acm
+data/sound/music/15shady.acm
+data/sound/music/16follow.acm
+data/sound/music/maybe.acm
+data/sound/music/wind1.acm
+data/sound/music/wind2.acm
+data/text/english/game/combat.msg
+data/text/english/game/map.msg
+data/text/english/game/scrnset.msg
+f1_res.ini
+fallout.cfg

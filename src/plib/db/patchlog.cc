@@ -93,6 +93,7 @@ static void patchlog_write_prefix(const char* category)
 
     time_t now = time(NULL);
     struct tm tm_info = { 0 };
+    /* Apple-only fork: prefer POSIX `localtime_r`. */
     localtime_r(&now, &tm_info);
 
     char ts[32];

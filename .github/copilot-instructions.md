@@ -18,6 +18,22 @@ Short, actionable instructions to help an AI coding agent get productive quickly
 
 The scripts handle simulator management, proper build configs, and cleanup. Ignoring them causes test failures and wastes time.
 
+## ⚠️ CRITICAL: Git Safety (NO Rebases / NO PRs Unless Explicitly Asked)
+
+**NEVER** perform history-rewriting git operations or create/open Pull Requests unless the user explicitly tells you to.
+
+### Forbidden unless explicitly instructed
+- `git rebase` (including `-i`) and any in-progress rebase continuation
+- `git reset --hard`, `git reset --keep`, `git commit --amend`
+- `git filter-branch`, `git filter-repo`, aggressive cleanup (`git gc`, `git reflog expire`)
+- `git push --force` / `--force-with-lease`
+- Creating/opening PRs (e.g. `gh pr create`, GitHub PR tooling that changes remote state)
+
+### Allowed by default (read-only)
+- `git status`, `git log`, `git diff`, `git reflog`, `git show`, `git branch -vv`, `git remote -v`
+
+If a rebase is detected (detached `HEAD`, `.git/rebase-*` present), **stop and ask** before running any `--continue/--abort/--skip` unless the user explicitly requested it.
+
 ## Project Status
 
 All development phases are complete:

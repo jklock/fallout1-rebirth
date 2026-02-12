@@ -34,6 +34,9 @@ bld/
 [Ll]ogs/
 build-outputs/
 
+# Local validation byproducts (regeneratable, can be large).
+development/RME/validation/overlay_data/
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -63,6 +66,10 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+# Allow RME evidence artifacts to be committed (narrow exception)
+!development/RME/ARTIFACTS/evidence/
+!development/RME/ARTIFACTS/evidence/gate-2/
+!development/RME/ARTIFACTS/evidence/gate-2/*.txt
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
@@ -395,6 +402,15 @@ FodyWeavers.xsd
 /build-*
 /_deps
 
+# RME runtime artifacts (do not commit large binary run artifacts)
+development/RME/validation/runtime/patchlogs/*
+development/RME/validation/runtime/present-anomalies/*
+development/RME/validation/runtime/screenshots-individual/*
+# Local tmp for build checks
+/tmp/
+/tmp
+tmp/
+
 # Game data (must not be committed - copyrighted)
 game-data/
 master.dat
@@ -423,3 +439,8 @@ scripts/hideall.sh
 # Ignore local game data backups
 game-data/
 GOG/
+# Allow committed patched map artifacts needed for RME evidence
+!GOG/patchedfiles/
+!GOG/patchedfiles/data/
+!GOG/patchedfiles/data/maps/
+!GOG/patchedfiles/data/maps/*.MAP

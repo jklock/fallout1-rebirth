@@ -1,0 +1,7 @@
+Destination: build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/data/MAPS/TEMPLAT1.MAP
+
+ls -l:
+-rw-r--r--@ 1 klock  staff  44848 Feb 10 17:33 /Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/data/MAPS/TEMPLAT1.MAP
+
+sha256:
+337f930939de5db1d985793e5e2b9cb28e6d91a012e9d0c8bbc8f3776389f208  /Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/data/MAPS/TEMPLAT1.MAP

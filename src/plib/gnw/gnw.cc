@@ -46,10 +46,6 @@ int GNW_wcolor[6] = {
     0,
     0,
     0,
-    0,
-};
-
-// 0x53A250
 static unsigned char* screen_buffer = NULL;
 
 // 0x6AC120

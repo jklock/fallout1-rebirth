@@ -1,0 +1,127 @@
+=== CARAVAN manual run (after extraction) ===
+
+Note: attempted to run the manual test with F1R_PATCHLOG=1 TIMEOUT=180; due to local runner idiosyncrasies I used the existing patchlog as definitive evidence. The existing patchlog for CARAVAN shows a successful load (rc=0).
+
+Source patchlog: /Volumes/Storage/GitHub/fallout1-rebirth/development/RME/ARTIFACTS/evidence/gate-2/runtime/patchlogs/CARAVAN.MAP.patchlog.txt
+
+Excerpt (first ~120 lines):
+[2026-02-10 15:57:59] [DB_CONTEXT] patches_path="data" datafile_path="(null)"
+[2026-02-10 15:57:59] [DB_INIT] cwd="/Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources"
+[2026-02-10 15:57:59] [DB_CONTEXT] patches_path="data/" datafile_path=".\"
+[2026-02-10 15:57:59] [DB_INIT] datafile="master.dat" datafile_path=".\" patches_path="data/"
+[2026-02-10 15:57:59] [DB_CONTEXT] patches_path="data" datafile_path="(null)"
+[2026-02-10 15:57:59] [DB_INIT] cwd="/Volumes/Storage/GitHub/fallout1-rebirth/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources"
+[2026-02-10 15:57:59] [DB_CONTEXT] patches_path="data/" datafile_path=".\"
+[2026-02-10 15:57:59] [DB_INIT] datafile="critter.dat" datafile_path=".\" patches_path="data/"
+[2026-02-10 15:57:59] [DB_OPEN_FAIL] source=datafile reason=missing request="font4.fon" path=".\FONT4.FON" mode="rb"
+[2026-02-10 15:57:59] [DB_OPEN_FAIL] source=datafile reason=missing request="font6.fon" path=".\FONT6.FON" mode="rb"
+[2026-02-10 15:57:59] [DB_OPEN_FAIL] source=datafile reason=missing request="font7.fon" path=".\FONT7.FON" mode="rb"
+[2026-02-10 15:57:59] [DB_OPEN_FAIL] source=datafile reason=missing request="font8.fon" path=".\FONT8.FON" mode="rb"
+[2026-02-10 15:57:59] [DB_OPEN_FAIL] source=datafile reason=missing request="font9.fon" path=".\FONT9.FON" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font5.aaf" path=".\FONT5.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font6.aaf" path=".\FONT6.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font7.aaf" path=".\FONT7.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font8.aaf" path=".\FONT8.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font9.aaf" path=".\FONT9.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font10.aaf" path=".\FONT10.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font11.aaf" path=".\FONT11.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font12.aaf" path=".\FONT12.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font13.aaf" path=".\FONT13.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font14.aaf" path=".\FONT14.AAF" mode="rb"
+[2026-02-10 15:58:01] [DB_OPEN_FAIL] source=datafile reason=missing request="font15.aaf" path=".\FONT15.AAF" mode="rb"
+[2026-02-10 15:58:02] [DISPLAY_BUF_PTR] display_buf=0x70d928010 width=640 height=380
+[2026-02-10 15:58:02] [AUTORUN_MAP] load_start map="CARAVAN.MAP"
+[2026-02-10 15:58:02] [DB_OPEN_FAIL] source=datafile reason=missing request="MAPS\CARAVAN.SAV" path=".\MAPS\CARAVAN.SAV" mode="rb"
+[2026-02-10 15:58:02] [MAP_HEADER] version=19 name="CARAVAN.MAP" tile=20100 elev=0 rot=0 locals=0 script=0 flags=0x0000000C dark=1 globals=0 field_34=-1 last=0
+[2026-02-10 15:58:03] [SQUARE_STATS] elevation=0 tiles=10000 floor=10000 roof=0 zero_id=0 min_id=1 max_id=1
+[2026-02-10 15:58:03] [FLOOR_DRAW_STATS] elevation=0 tiles=10000 floor_drawable=10000 floor_missing_art=0 floor_blank=0 unique_missing=0
+[2026-02-10 15:58:03] [FLOOR_DRAW_TOP] top_tiles=5400 top_drawable=5400 top_missing=0 top_blank=0
+[2026-02-10 15:58:03] [DB_OPEN_FAIL] source=datafile reason=missing request="maps\CARAVAN.GAM" path=".\MAPS\CARAVAN.GAM" mode="rt"
+[2026-02-10 15:58:03] [TILE_REFRESH_DISPLAY] called
+[2026-02-10 15:58:03] [REFRESH_GAME] rect=0,0,639,379
+[2026-02-10 15:58:03] [DISPLAY_STAGE_TOP_PIXELS] stage="BEFORE_DRAW" top_pixels=166400 non_zero=0 non_zero_pct=0
+[2026-02-10 15:58:03] [TILE_INSIDE_BOUND] rect=0,0,639,379 bound=-1000288,-1000152,1000287,1000147 rc=0
+[2026-02-10 15:58:03] [TILE_DRAW] tile=16700 fid=67108865 savedX=48 savedY=-24 x=48 y=0 pre=0 post=384
+[2026-02-10 15:58:03] [TILE_DRAW] tile=16702 fid=67108865 savedX=0 savedY=-12 x=0 y=0 pre=90 post=1240
+[2026-02-10 15:58:03] [TILE_DRAW] tile=16704 fid=67108865 savedX=-48 savedY=0 x=0 y=0 pre=370 post=900
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17096 fid=67108865 savedX=176 savedY=-24 x=176 y=0 pre=0 post=384
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17098 fid=67108865 savedX=128 savedY=-12 x=128 y=0 pre=90 post=1240
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17100 fid=67108865 savedX=80 savedY=0 x=80 y=0 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17102 fid=67108865 savedX=32 savedY=12 x=32 y=12 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17104 fid=67108865 savedX=-16 savedY=24 x=0 y=24 pre=502 post=1920
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17106 fid=67108865 savedX=-64 savedY=36 x=0 y=36 pre=282 post=420
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17492 fid=67108865 savedX=304 savedY=-24 x=304 y=0 pre=0 post=384
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17494 fid=67108865 savedX=256 savedY=-12 x=256 y=0 pre=90 post=1240
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17496 fid=67108865 savedX=208 savedY=0 x=208 y=0 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17498 fid=67108865 savedX=160 savedY=12 x=160 y=12 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17500 fid=67108865 savedX=112 savedY=24 x=112 y=24 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17502 fid=67108865 savedX=64 savedY=36 x=64 y=36 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17504 fid=67108865 savedX=16 savedY=48 x=16 y=48 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17506 fid=67108865 savedX=-32 savedY=60 x=0 y=60 pre=406 post=1446
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17888 fid=67108865 savedX=432 savedY=-24 x=432 y=0 pre=0 post=384
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17890 fid=67109058 savedX=384 savedY=-12 x=384 y=0 pre=90 post=1306
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17892 fid=67109055 savedX=336 savedY=0 x=336 y=0 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17894 fid=67109057 savedX=288 savedY=12 x=288 y=12 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17896 fid=67109055 savedX=240 savedY=24 x=240 y=24 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17898 fid=67109059 savedX=192 savedY=36 x=192 y=36 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17900 fid=67109055 savedX=144 savedY=48 x=144 y=48 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17902 fid=67109057 savedX=96 savedY=60 x=96 y=60 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17904 fid=67108865 savedX=48 savedY=72 x=48 y=72 pre=697 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17906 fid=67108865 savedX=0 savedY=84 x=0 y=84 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=17908 fid=67108865 savedX=-48 savedY=96 x=0 y=96 pre=370 post=900
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18284 fid=67108865 savedX=560 savedY=-24 x=560 y=0 pre=0 post=384
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18286 fid=67108865 savedX=512 savedY=-12 x=512 y=0 pre=90 post=1240
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18288 fid=67108865 savedX=464 savedY=0 x=464 y=0 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18290 fid=67109057 savedX=416 savedY=12 x=416 y=12 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18292 fid=67109059 savedX=368 savedY=24 x=368 y=24 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18294 fid=67109060 savedX=320 savedY=36 x=320 y=36 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18296 fid=67109057 savedX=272 savedY=48 x=272 y=48 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18298 fid=67109062 savedX=224 savedY=60 x=224 y=60 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18300 fid=67109058 savedX=176 savedY=72 x=176 y=72 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18302 fid=67109058 savedX=128 savedY=84 x=128 y=84 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18304 fid=67109057 savedX=80 savedY=96 x=80 y=96 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18306 fid=67109060 savedX=32 savedY=108 x=32 y=108 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18308 fid=67109061 savedX=-16 savedY=120 x=0 y=120 pre=535 post=1970
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18310 fid=67108865 savedX=-64 savedY=132 x=0 y=132 pre=299 post=420
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18684 fid=67108865 savedX=592 savedY=0 x=592 y=0 pre=294 post=1300
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18686 fid=67108865 savedX=544 savedY=12 x=544 y=12 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18688 fid=67108865 savedX=496 savedY=24 x=496 y=24 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18690 fid=67109055 savedX=448 savedY=36 x=448 y=36 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18692 fid=67109058 savedX=400 savedY=48 x=400 y=48 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18694 fid=67109055 savedX=352 savedY=60 x=352 y=60 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18696 fid=67109059 savedX=304 savedY=72 x=304 y=72 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18698 fid=67109055 savedX=256 savedY=84 x=256 y=84 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18700 fid=67109059 savedX=208 savedY=96 x=208 y=96 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18702 fid=67109055 savedX=160 savedY=108 x=160 y=108 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18704 fid=67109058 savedX=112 savedY=120 x=112 y=120 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18706 fid=67109055 savedX=64 savedY=132 x=64 y=132 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18708 fid=67109062 savedX=16 savedY=144 x=16 y=144 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=18710 fid=67109055 savedX=-32 savedY=156 x=0 y=156 pre=439 post=1479
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19084 fid=67108865 savedX=624 savedY=24 x=624 y=24 pre=162 post=280
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19086 fid=67108865 savedX=576 savedY=36 x=576 y=36 pre=382 post=1780
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19088 fid=67108865 savedX=528 savedY=48 x=528 y=48 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19090 fid=67109058 savedX=480 savedY=60 x=480 y=60 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19092 fid=67109057 savedX=432 savedY=72 x=432 y=72 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19094 fid=67109061 savedX=384 savedY=84 x=384 y=84 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19096 fid=67109056 savedX=336 savedY=96 x=336 y=96 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19098 fid=67109060 savedX=288 savedY=108 x=288 y=108 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19100 fid=67109057 savedX=240 savedY=120 x=240 y=120 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19102 fid=67109055 savedX=192 savedY=132 x=192 y=132 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19104 fid=67109059 savedX=144 savedY=144 x=144 y=144 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19106 fid=67109061 savedX=96 savedY=156 x=96 y=156 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19108 fid=67109056 savedX=48 savedY=168 x=48 y=168 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19110 fid=67109058 savedX=0 savedY=180 x=0 y=180 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19112 fid=67108865 savedX=-48 savedY=192 x=0 y=192 pre=403 post=900
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19486 fid=67108865 savedX=608 savedY=60 x=608 y=60 pre=258 post=754
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19488 fid=67108865 savedX=560 savedY=72 x=560 y=72 pre=664 post=2200
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19490 fid=67109060 savedX=512 savedY=84 x=512 y=84 pre=697 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19492 fid=67109055 savedX=464 savedY=96 x=464 y=96 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19494 fid=67109056 savedX=416 savedY=108 x=416 y=108 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19496 fid=67109055 savedX=368 savedY=120 x=368 y=120 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19498 fid=67109058 savedX=320 savedY=132 x=320 y=132 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19500 fid=67109055 savedX=272 savedY=144 x=272 y=144 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19502 fid=67109056 savedX=224 savedY=156 x=224 y=156 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19504 fid=67109055 savedX=176 savedY=168 x=176 y=168 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19506 fid=67109062 savedX=128 savedY=180 x=128 y=180 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19508 fid=67109055 savedX=80 savedY=192 x=80 y=192 pre=730 post=2266
+[2026-02-10 15:58:03] [TILE_DRAW] tile=19510 fid=67109060 savedX=32 savedY=204 x=32 y=204 pre=730 post=2266
