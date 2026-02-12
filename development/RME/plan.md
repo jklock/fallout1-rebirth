@@ -1,43 +1,68 @@
-# RME Integration — Plan (condensed)
+# RME — Consolidated plan
 
 Last updated: 2026-02-12
-Status: In progress — static patching complete; runtime & gameplay verification pending
+Status: In progress — static patch ✅, runtime verification partial (3/72 maps), manual gameplay not started
 
-## Executive summary
-- Static patch pipeline: 100% (1,126 files applied; checksums validated).
-- Runtime verification: ~4% (3/72 maps swept). Several flaky maps (CARAVAN, ZDESERT1, TEMPLAT1) block the full sweep.
-- Manual gameplay (macOS/iOS): 0% — required for final sign‑off.
+Purpose
+- Provide a short, executable plan to finish RME integration: reach 100% patch coverage (static + runtime) and 100% game functionality (macOS + iOS verification).
 
-Top 3 blockers
-1. Flaky maps (M‑5): CARAVAN, ZDESERT1, TEMPLAT1 — need data/packaging or engine triage.
-2. Missing/packaging assets in app bundle — verify patched files are installed by `rebi rth-patch-app`/install script.
-3. No manual gameplay or iOS simulator validation done yet.
+Current top blockers
+- Flaky maps: CARAVAN, ZDESERT1, TEMPLAT1 — these block the 72-map sweep.
+- Packaging / missing assets: some patched files present in `GOG/patchedfiles` but not copied into the app bundle; causes DB_OPEN_FAIL and render anomalies.
+- No manual QA or iOS simulator runs performed yet.
 
-## Goal
-Achieve: (A) 100% verified RME patch items (static + runtime) and (B) 100% game functionality on macOS and iOS.
+Goal (definition of done)
+- Static: `rebirth-validate-data.sh` exit 0 + checksums match (already satisfied).
+- Runtime: `rme-runtime-sweep.py` CSV contains 72 data rows; flaky maps pass 5/5 repeats.
+- Gameplay: macOS gate‑3 checklist completed; iOS gate‑4 checklist completed; DMG/IPA built and smoke-tested.
 
-## Acceptance criteria (short)
-- Static: `rebirth-validate-data.sh` exits 0 and DAT checksums match.
-- Runtime: `rme-runtime-sweep.py` produces a CSV with 72 rows; all flagged maps pass `rme-repeat-map.sh` retests.
-- Gameplay: Gate‑3 (macOS) and Gate‑4 (iOS) checklists completed with evidence screenshots/logs.
-- Packaging: DMG and IPA build and smoke tests pass.
+Priority milestones (next 2 weeks)
+1. P0 — Unblock M‑5: fix/triage CARAVAN, ZDESERT1, TEMPLAT1 and re-run 10× repeats (24–48h)
+2. P0 — Full 72‑map runtime sweep with patchlog; triage and fix items discovered (48–72h)
+3. P1 — Manual macOS gameplay smoke (main menu, new game, companions, save/load, 30m session) and capture evidence (1 day)
+4. P1 — iOS simulator build + smoke test (1–2 days)
+5. P2 — Resolve remaining art/script/proto issues and finalize Gate‑5 release packaging (2–7 days)
 
-## High-level milestones (priority)
-1. Short (0–2 days): fix CARAVAN/ZDESERT1/TEMPLAT1 triage; re-run repeats; verify packaging scripts.
-2. Week 1 (3–7 days): finish full 72‑map sweep; resolve any engine/data fixes from patchlog analysis.
-3. Weeks 2–4: complete manual macOS gameplay, iOS simulator testing, package builds, and documentation/PR.
+1‑Week plan (concrete)
+- Day 0: Reproduce CARAVAN failure, run `./scripts/patch/rme-repeat-map.sh CARAVAN 10` with `F1R_PATCHLOG=1`.
+- Day 1: If packaging issue — fix `scripts/test/test-install-game-data.sh` and re-install patched data into app; re-run CARAVAN.
+- Day 2–3: Run full runtime sweep with `F1R_PATCHLOG=1` and triage patchlogs; fix high‑priority failures.
+- Day 4: Manual macOS smoke & document Gate‑3 evidence.
+- Day 5: Start iOS simulator test and fix platform-specific issues.
 
-## Validation & primary commands
-- Static validate: `./scripts/patch/rebirth-validate-data.sh --patched GOG/patchedfiles --base GOG/unpatchedfiles`
-- Install patched data into app: `./scripts/test/test-install-game-data.sh --source GOG/patchedfiles --target "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app"`
-- Full runtime sweep: `F1R_PATCHLOG=1 python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/.../fallout1-rebirth" --out-dir development/RME/ARTIFACTS/evidence/runtime`
-- Flaky repeats: `./scripts/patch/rme-repeat-map.sh CARAVAN 10`
+4‑Week plan (end state)
+- Week 1: Complete runtime sweep + flaky-map fixes; close any engine-level blockers.
+- Week 2: Script/dialog/proto runtime verification and fixes; automate basic autorun checks.
+- Week 3: Art/prototype visual verification and fixes; finalize placeholder audit (replace `allnone.int`/`blank.frm` where needed).
+- Week 4: iOS validation, packaging (DMG/IPA), docs, and final sign‑off.
 
-## Immediate next actions (owner + ETA)
-- QA: Re-run CARAVAN repeat with patchlog (2–4 hrs).
-- Engine: Triage GNW anomalies from `patchlog_analyze.py` (4–8 hrs if code fix required).
-- Content: Confirm `GOG/patchedfiles` is fully present and packaging copies files into `.app` (1–2 hrs).
+Key acceptance tests (quick)
+- Static: `./scripts/patch/rebirth-validate-data.sh --patched GOG/patchedfiles --base GOG/unpatchedfiles` → exit 0.
+- Runtime sweep: `F1R_PATCHLOG=1 python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --out-dir development/RME/ARTIFACTS/evidence/runtime` → CSV with 72 rows.
+- Flaky map: `./scripts/patch/rme-repeat-map.sh CARAVAN 10` → 10/10 pass.
+- macOS gameplay: complete Gate‑3 checklist (screenshots + notes).
+- iOS: successful simulator install & 10‑minute play session.
+
+Owners & rough effort estimates
+- Engine dev: GNW/patchlog fixes, surf_pre/surf_post guards — Medium (1–3 days)
+- Content dev: map/proto/art fixes — Medium (2–5 days)
+- QA: full sweep + manual gameplay evidence — Medium (2–5 days)
+- Release: packaging + sign‑off — Small (1–2 days)
+
+Risks
+- Engine-level GNW rendering bug; mitigation: isolate via patchlogs and add defensive guard.
+- Case-fallback policy decision required (affects DB_OPEN_FAIL handling); mitigation: prefer data fixes and opt-in engine fallback if approved.
+
+Immediate actions (do now)
+1. F1R_PATCHLOG=1 ./scripts/patch/rme-repeat-map.sh CARAVAN 10
+2. If that fails, verify `GOG/patchedfiles/data/maps/CARAVAN.MAP` is present and run `./scripts/test/test-install-game-data.sh`
+3. Start full sweep with patchlog enabled and save results under `development/RME/ARTIFACTS/evidence/runtime`
+
+Links & evidence locations
+- Evidence root: `development/RME/ARTIFACTS/evidence/`
+- Runtime scripts: `scripts/patch/rme-runtime-sweep.py`, `scripts/patch/rme-repeat-map.sh`
+- Validation scripts: `./scripts/patch/rebirth-validate-data.sh`
 
 ---
 
-For detailed plan, gate definitions, and full validation checklist see `OUTCOME.md` and `todo.md` in this directory.
+If you want, I will convert the milestones above into GitHub issues and assign owners. Tell me to proceed.
