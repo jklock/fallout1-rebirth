@@ -130,6 +130,8 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/game/loadsave.h"
     "src/game/main.cc"
     "src/game/main.h"
+    "src/game/rme_selftest.cc"
+    "src/game/rme_selftest.h"
     "src/game/mainmenu.cc"
     "src/game/mainmenu.h"
     "src/game/map_defs.h"

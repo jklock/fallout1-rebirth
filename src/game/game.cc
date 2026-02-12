@@ -1,12 +1,7 @@
 #include "game/game.h"
 
-#include <dirent.h>
 #include <stdio.h>
 #include <string.h>
-#include <string>
-#include <strings.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 #include "game/actions.h"
 #include "game/anim.h"
@@ -40,7 +35,7 @@
 #include "game/pipboy.h"
 #include "game/proto.h"
 #include "game/queue.h"
-#include "game/rme_log.h"
+#include "game/rme_selftest.h"
 #include "game/roll.h"
 #include "game/scripts.h"
 #include "game/select.h"
@@ -55,7 +50,6 @@
 #include "int/window.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
-#include "plib/db/db.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -78,177 +72,6 @@ static void game_unload_info();
 static void game_help();
 static int game_init_databases();
 static void game_splash_screen();
-static bool rme_path_is_dir(const std::string& path)
-{
-    struct stat st {};
-    if (stat(path.c_str(), &st) != 0) {
-        return false;
-    }
-    return S_ISDIR(st.st_mode);
-}
-
-static bool rme_path_exists(const std::string& path)
-{
-    return access(path.c_str(), R_OK) == 0;
-}
-
-static bool rme_find_case_variant(const std::string& dir, const std::string& target, std::string& actual)
-{
-    DIR* d = opendir(dir.c_str());
-    if (d == nullptr) {
-        return false;
-    }
-
-    struct dirent* ent;
-    while ((ent = readdir(d)) != nullptr) {
-        if (strcasecmp(ent->d_name, target.c_str()) == 0) {
-            actual = ent->d_name;
-            closedir(d);
-            return true;
-        }
-    }
-
-    closedir(d);
-    return false;
-}
-
-static std::string rme_join_path(const std::string& base, const std::string& child)
-{
-    if (base.empty()) {
-        return child;
-    }
-    if (base.back() == '/' || base.back() == '\\') {
-        return base + child;
-    }
-    return base + '/' + child;
-}
-
-static void rme_log_inventory_list(const char* topic, const char* label, const char* pattern)
-{
-    if (!rme_log_topic_enabled(topic)) {
-        return;
-    }
-
-    char** filelist = NULL;
-    int count = db_get_file_list(pattern, &filelist, NULL, 0);
-    rme_logf(topic, "inventory %s pattern=%s count=%d", label != NULL ? label : "(null)", pattern != NULL ? pattern : "(null)", count);
-    db_free_file_list(&filelist, NULL);
-}
-
-static void rme_log_startup_inventories()
-{
-    if (!rme_log_enabled()) {
-        return;
-    }
-
-    rme_log_inventory_list("map", "maps", "MAPS\\*.MAP");
-
-    const char* proto_dirs[] = { "items", "critters", "scenery", "walls", "tiles", "misc" };
-    for (const char* dir : proto_dirs) {
-        char pattern[COMPAT_MAX_PATH];
-        snprintf(pattern, sizeof(pattern), "proto\\%s\\*.pro", dir);
-        rme_log_inventory_list("proto", dir, pattern);
-    }
-
-    rme_log_inventory_list("text", "text/english/game", "text\\english\\game\\*.msg");
-    rme_log_inventory_list("text", "text/english/dialog", "text\\english\\dialog\\*.msg");
-    rme_log_inventory_list("art", "art/intrface", "art\\intrface\\*.frm");
-
-    if (rme_log_topic_enabled("art")) {
-        dir_entry de;
-        if (db_dir_entry("art\\tiles\\grid000.frm", &de) != 0) {
-            rme_logf("art", "art missing path=%s", "art\\tiles\\grid000.frm");
-        } else {
-            rme_logf("art", "art present path=%s size=%ld", "art\\tiles\\grid000.frm", static_cast<long>(de.length));
-        }
-    }
-}
-
-static void rme_log_patch_tree(const char* label, const char* path)
-{
-    if (!rme_log_topic_enabled("db")) {
-        return;
-    }
-
-    const char* tag = label != NULL ? label : "(null)";
-
-    if (path == NULL || path[0] == '\0') {
-        rme_logf("db", "patch tree %s: none", tag);
-        return;
-    }
-
-    std::string root(path);
-    if (!root.empty() && root.back() != '/') {
-        root.push_back('/');
-    }
-
-    const bool root_exists = rme_path_is_dir(root);
-    rme_logf("db", "patch tree %s root=%s exists=%d", tag, root.c_str(), root_exists ? 1 : 0);
-
-    const char* expected_dirs[] = {
-        "art",
-        "data",
-        "data/data",
-        "sound",
-        "music",
-        "proto",
-        "text",
-        "scripts",
-        "maps",
-        "movies",
-    };
-
-    int missing_entries = 0;
-    int case_mismatches = 0;
-
-    for (const char* dirName : expected_dirs) {
-        std::string full = rme_join_path(root, dirName);
-        const bool present = rme_path_is_dir(full);
-        if (present) {
-            continue;
-        }
-
-        std::string actual;
-        if (rme_find_case_variant(root, dirName, actual)) {
-            if (strcasecmp(actual.c_str(), dirName) != 0) {
-                case_mismatches++;
-                rme_log_once(std::string("case:") + root + dirName, "db", "patch tree %s case mismatch %s->%s", tag, dirName, actual.c_str());
-            }
-        } else {
-            missing_entries++;
-            rme_logf("db", "patch tree %s missing dir %s", tag, dirName);
-        }
-    }
-
-    // Hard-coded files expected under data/data/
-    const char* hardcoded_files[] = {
-        "badwords.txt",
-        "vault13.gam",
-    };
-
-    for (const char* fileName : hardcoded_files) {
-        const std::string hardcodedPath = rme_join_path(rme_join_path(root, "data/data"), fileName);
-        if (!rme_path_exists(hardcodedPath)) {
-            std::string actual;
-            std::string parent = rme_join_path(root, "data/data");
-            if (rme_find_case_variant(parent, fileName, actual)) {
-                if (strcasecmp(actual.c_str(), fileName) != 0) {
-                    case_mismatches++;
-                    rme_log_once(std::string("case:") + hardcodedPath, "db", "patch tree %s case mismatch %s->%s", tag, fileName, actual.c_str());
-                }
-            } else {
-                missing_entries++;
-                rme_logf("db", "patch tree %s missing %s", tag, hardcodedPath.c_str());
-            }
-        }
-    }
-
-    if (missing_entries > 0 || case_mismatches > 0) {
-        rme_logf("db", "patch tree %s summary missing=%d case_mismatch=%d", tag, missing_entries, case_mismatches);
-    } else {
-        rme_logf("db", "patch tree %s summary missing=%d case_mismatch=%d", tag, 0, 0);
-    }
-}
 
 // TODO: Remove.
 // 0x4F190C
@@ -319,7 +142,14 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
         return -1;
     }
 
-    rme_log_startup_inventories();
+    // Optionally run in-process RME selftest when requested. Placed here so
+    // databases are available to the selftest. The selftest will exit the
+    // process when it completes (success => code 0; failure => non-zero).
+    {
+        const char* _rme_selftest_env = getenv("RME_SELFTEST");
+        rme_logf("selftest", "RME_SELFTEST=%s", _rme_selftest_env ? _rme_selftest_env : "(unset)");
+    }
+    rme_selftest_maybe_run();
 
     win_set_minimized_title(windowTitle);
 
@@ -330,25 +160,9 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
     video_options.scale = 1;
     video_options.exclusive = 1;
 
-    bool f1ResPresent = false;
-
     Config resolutionConfig;
     if (config_init(&resolutionConfig)) {
-        FILE* resFile = compat_fopen("f1_res.ini", "rt");
-        if (resFile != NULL) {
-            f1ResPresent = true;
-            fclose(resFile);
-        } else {
-            std::string actual;
-            if (rme_find_case_variant(".", "f1_res.ini", actual)) {
-                if (rme_log_topic_enabled("config")) {
-                    rme_log_once("case:f1_res.ini", "config", "f1_res.ini case mismatch expected=f1_res.ini actual=%s", actual.c_str());
-                }
-            }
-        }
-
-        const bool resLoaded = config_load(&resolutionConfig, "f1_res.ini", false);
-        if (resLoaded) {
+        if (config_load(&resolutionConfig, "f1_res.ini", false)) {
             int screenWidth;
             if (config_get_value(&resolutionConfig, "MAIN", "SCR_WIDTH", &screenWidth)) {
                 video_options.width = std::max(screenWidth, 640);
@@ -380,21 +194,7 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
                 video_options.height = std::max(video_options.height, 480);
             }
         }
-        if (!resLoaded && rme_log_topic_enabled("config")) {
-            rme_logf("config", "f1_res.ini load failed using defaults");
-        }
         config_exit(&resolutionConfig);
-    }
-
-    if (rme_log_topic_enabled("config")) {
-        rme_logf("config",
-            "f1_res.ini present=%d width=%d height=%d fullscreen=%d exclusive=%d scale=%d",
-            f1ResPresent ? 1 : 0,
-            video_options.width,
-            video_options.height,
-            video_options.fullscreen ? 1 : 0,
-            video_options.exclusive ? 1 : 0,
-            video_options.scale);
     }
 
     initWindow(&video_options, flags);
@@ -1459,81 +1259,48 @@ int game_quit_with_confirm()
 static int game_init_databases()
 {
     int hashing;
-    char* master_dat;
-    char* master_patches;
-    char* critter_dat;
-    char* critter_patches;
+    char* main_file_name;
+    char* patch_file_name;
 
     hashing = 0;
-    master_dat = NULL;
-    master_patches = NULL;
-    critter_dat = NULL;
-    critter_patches = NULL;
+    main_file_name = NULL;
+    patch_file_name = NULL;
 
     if (config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_HASHING_KEY, &hashing)) {
         db_enable_hash_table();
     }
 
-    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_DAT_KEY, &master_dat);
-    if (*master_dat == '\0') {
-        master_dat = NULL;
+    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_DAT_KEY, &main_file_name);
+    if (*main_file_name == '\0') {
+        main_file_name = NULL;
     }
 
-    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_PATCHES_KEY, &master_patches);
-    if (*master_patches == '\0') {
-        master_patches = NULL;
+    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_PATCHES_KEY, &patch_file_name);
+    if (*patch_file_name == '\0') {
+        patch_file_name = NULL;
     }
 
-    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_CRITTER_DAT_KEY, &critter_dat);
-    if (*critter_dat == '\0') {
-        critter_dat = NULL;
-    }
-
-    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_CRITTER_PATCHES_KEY, &critter_patches);
-    if (*critter_patches == '\0') {
-        critter_patches = NULL;
-    }
-
-    if (rme_log_topic_enabled("db")) {
-        char cwd[COMPAT_MAX_PATH];
-        if (getcwd(cwd, sizeof(cwd)) == nullptr) {
-            cwd[0] = '\0';
-        }
-        rme_logf("db",
-            "db_init start cwd=%s hashing=%d master_dat=%s master_patches=%s critter_dat=%s critter_patches=%s",
-            cwd,
-            hashing,
-            master_dat != NULL ? master_dat : "(null)",
-            master_patches != NULL ? master_patches : "(null)",
-            critter_dat != NULL ? critter_dat : "(null)",
-            critter_patches != NULL ? critter_patches : "(null)");
-    }
-
-    rme_log_patch_tree("master", master_patches);
-
-    master_db_handle = db_init(master_dat, NULL, master_patches, 1);
+    master_db_handle = db_init(main_file_name, NULL, patch_file_name, 1);
     if (master_db_handle == INVALID_DATABASE_HANDLE) {
         GNWSystemError("Could not find the master datafile. Please make sure the FALLOUT CD is in the drive and that you are running FALLOUT from the directory you installed it to.");
-        if (rme_log_topic_enabled("db")) {
-            rme_logf("db", "master db_init failed data=%s patches=%s", master_dat != NULL ? master_dat : "(null)", master_patches != NULL ? master_patches : "(null)");
-        }
         return -1;
     }
 
-    rme_log_patch_tree("critter", critter_patches);
+    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_CRITTER_DAT_KEY, &main_file_name);
+    if (*main_file_name == '\0') {
+        main_file_name = NULL;
+    }
 
-    critter_db_handle = db_init(critter_dat, NULL, critter_patches, 1);
+    config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_CRITTER_PATCHES_KEY, &patch_file_name);
+    if (*patch_file_name == '\0') {
+        patch_file_name = NULL;
+    }
+
+    critter_db_handle = db_init(main_file_name, NULL, patch_file_name, 1);
     if (critter_db_handle == INVALID_DATABASE_HANDLE) {
         db_select(master_db_handle);
         GNWSystemError("Could not find the critter datafile. Please make sure the FALLOUT CD is in the drive and that you are running FALLOUT from the directory you installed it to.");
-        if (rme_log_topic_enabled("db")) {
-            rme_logf("db", "critter db_init failed data=%s patches=%s", critter_dat != NULL ? critter_dat : "(null)", critter_patches != NULL ? critter_patches : "(null)");
-        }
         return -1;
-    }
-
-    if (rme_log_topic_enabled("db")) {
-        rme_logf("db", "db_init success master=%p critter=%p", (void*)master_db_handle, (void*)critter_db_handle);
     }
 
     db_select(master_db_handle);
