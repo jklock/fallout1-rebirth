@@ -1,6 +1,0 @@
-MAP_GLOBAL_VARS:
-//GLOBAL                                NUMBER
-
-left_bomb               := 0;   //      (0) Tells if the player dropped a bomb here.
-Player_Leave            := 0;   //      (1) nicole tells jake to show the player out
-InvasionForcesCreated   := 0;   //      (2) Have the invasion forces been created.

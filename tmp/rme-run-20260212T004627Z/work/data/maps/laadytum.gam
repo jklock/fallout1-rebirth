@@ -1,7 +1,0 @@
-MAP_GLOBAL_VARS:
-//GLOBAL                                NUMBER
-
-visited_before          := 0;   //      (0) Set to TRUE if the player has been here.
-RegulatorCount			:= 0;	//		(1) Number of Regulators on the map.
-AddedBlades				:= 0;	//		(2) Have the blades been added to the map.
-InvasionForcesCreated   := 0;   //      (3) Have the invasion forces been created.
