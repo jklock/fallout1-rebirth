@@ -4,11 +4,62 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
+# CLI flags: [--autorun-map] [--auto-fix] [--auto-fix-iterations N] [--auto-fix-apply] [--auto-fix-apply-whitelist] [--skip-build]
+AUTO_FIX=0
+AUTO_FIX_ITERATIONS=3
+AUTO_FIX_APPLY=0
+AUTO_FIX_APPLY_WHITELIST=0
+SKIP_BUILD=0
 GOG_DIR="${2:-${1:-$REPO_ROOT/GOG/patchedfiles}}"
 AUTORUN_MAP=0
-if [ "${1:-}" = "--autorun-map" ]; then
-    AUTORUN_MAP=1
-    GOG_DIR="${2:-$REPO_ROOT/GOG/patchedfiles}"
+
+# Simple parsing for the optional flags (preserve positional behavior for GOG directory)
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --autorun-map)
+            AUTORUN_MAP=1
+            shift
+            ;;
+        --auto-fix)
+            AUTO_FIX=1
+            shift
+            ;;
+        --auto-fix-iterations)
+            AUTO_FIX_ITERATIONS="$2"
+            shift 2
+            ;;
+        --auto-fix-apply)
+            AUTO_FIX_APPLY=1
+            shift
+            ;;
+        --auto-fix-apply-whitelist)
+            AUTO_FIX_APPLY_WHITELIST=1
+            shift
+            ;;
+        --skip-build)
+            SKIP_BUILD=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            exit 2
+            ;;
+        *)
+            # First non-option arg is the GOG_DIR
+            GOG_DIR="${1}"
+            shift
+            # Remaining args are ignored for now
+            break
+            ;;
+    esac
+done
+
+if [ "${AUTORUN_MAP}" -eq 1 ]; then
+    GOG_DIR="${GOG_DIR:-$REPO_ROOT/GOG/patchedfiles}"
 fi
 
 if [ ! -d "$GOG_DIR" ]; then
@@ -161,6 +212,36 @@ cp -a "$RUNDIR/artifacts" "$REPO_ROOT/development/RME/validation/run-${TS}/" || 
 
 if [ "$PASS" -ne 1 ]; then
     echo "RME patchflow run FAILED; artifacts at $RUNDIR" >&2
+
+    if [ "$AUTO_FIX" -eq 1 ]; then
+        echo "Auto-fix enabled; snapshotting original artifacts"
+        mkdir -p "$RUNDIR/artifacts/original"
+        cp -a "$RUNDIR/artifacts/." "$RUNDIR/artifacts/original/" || true
+
+        # Invoke autofix engine
+        echo "Invoking rme-autofix.py (iterations=${AUTO_FIX_ITERATIONS}, apply=${AUTO_FIX_APPLY}, apply-whitelist=${AUTO_FIX_APPLY_WHITELIST})"
+        PYTHON=python3
+        "$PYTHON" "$REPO_ROOT/scripts/test/rme-autofix.py" --workdir "$WORKDIR" --iterations "$AUTO_FIX_ITERATIONS" $( [ "$AUTO_FIX_APPLY" -eq 1 ] && echo "--apply" ) $( [ "$AUTO_FIX_APPLY_WHITELIST" -eq 1 ] && echo "--apply-whitelist" ) --verbose || true
+
+        # Collect per-iter artifacts if present
+        if [ -d "$WORKDIR/fixes" ]; then
+            mkdir -p "$RUNDIR/artifacts/fixes/proposed"
+            cp -a "$WORKDIR/fixes" "$RUNDIR/artifacts/" || true
+        fi
+
+        # Re-run parser on the latest run summary if present
+        SUMMARY="$RUNDIR/rme-run-summary.json"
+        if [ -f "$SUMMARY" ]; then
+            if jq -e '.pass == true' "$SUMMARY" >/dev/null 2>&1; then
+                echo "PASS achieved after autofix; artifacts at $RUNDIR"
+                exit 0
+            fi
+        fi
+
+        echo "Autofix completed but run still failing; see proposed fixes under $RUNDIR/artifacts/fixes/proposed" >&2
+        exit 1
+    fi
+
     exit 1
 fi
 
