@@ -37,8 +37,8 @@ for i in $(seq 1 "$REPEATS"); do
   PL_PATH="$PATCHLOG_DIR/${MAP}.iter$(printf "%02d" $i).patchlog.txt"
   RUN_LOG="$PATCHLOG_DIR/${MAP}.iter$(printf "%02d" $i).run.log"
 
-  # ensure analyzer has a file to read if the engine crashes before writing patchlog
-  : > "$PL_PATH"
+  # Do NOT pre-create an empty patchlog (it masks early crashes).
+  # Require the engine to write a real patchlog; we validate after the run and fail if it's missing/empty.
 
   # Run the executable with a sanitized environment to avoid leaking host env vars
   # Run the executable with a timeout to avoid indefinite hangs; write output to run log.
@@ -72,6 +72,16 @@ for i in $(seq 1 "$REPEATS"); do
 
   # Run analyzer and capture output next to the patchlog
   PY_OUT="${PL_PATH%.txt}_analyze.txt"
+
+  # Fail early if the engine did not produce a real patchlog (empty file masks crashes).
+  if [[ ! -s "$PL_PATH" ]]; then
+    echo "[ERROR] patchlog missing or empty for $MAP run $i; see run log: $RUN_LOG" >&2
+    echo "-- run log (head 200 lines) --" >&2
+    head -n 200 "$RUN_LOG" >&2 || true
+    echo "-- end run log head --" >&2
+    exit 4
+  fi
+
   python3 "$ROOT/scripts/dev/patchlog_analyze.py" "$PL_PATH" > "$PY_OUT" 2>&1 || true
 
   if ! grep -q "No suspicious GNW_SHOW_RECT surf_pre>0 && surf_post==0 found" "$PY_OUT"; then

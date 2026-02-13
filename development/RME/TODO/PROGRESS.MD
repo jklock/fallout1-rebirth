@@ -7,14 +7,14 @@ tasks:
   - id: P0-1
     slug: caravan-repeat
     title: Fix CARAVAN / ZDESERT1 / TEMPLAT1 flaky runs
-    status: completed
+    status: in-progress
     owner: QA+Engine
     started_at: "2026-02-13T14:34:41Z"
-    completed_at: "2026-02-13T14:35:03Z"
-    verdict: pass
+    completed_at: null
+    verdict: null
     artifacts:
       - "development/RME/ARTIFACTS/evidence/caravan-repeat/"
-    notes: "10/10 autorun completed under release binary; earlier heap/free abort no longer reproducing. If crash reappears reopen P0-1 with ASan/LLDB artifacts."
+    notes: "Harness fix applied: removed pre-created empty patchlog placeholders which were masking early crashes. Re-running CARAVAN repeats under corrected harness to surface any remaining issues; ASan/LLDB artifacts preserved for triage."
   - id: P0-2
     slug: install-game-data
     title: Ensure patched data is installed into app bundle
