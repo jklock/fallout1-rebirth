@@ -10,8 +10,8 @@ tasks:
     status: in-progress
     owner: QA+Engine
     started_at: "2026-02-13T14:34:41Z"
-    completed_at: null
-    verdict: null
+    completed_at: "2026-02-13T17:59:46Z"
+    verdict: fail
     artifacts:
       - "development/RME/ARTIFACTS/evidence/caravan-repeat/"
     notes: "Harness fix applied: removed pre-created empty patchlog placeholders which were masking early crashes. Re-running CARAVAN repeats under corrected harness to surface any remaining issues; ASan/LLDB artifacts preserved for triage."
