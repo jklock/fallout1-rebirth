@@ -26,6 +26,23 @@ if [[ ! -d "$RESOURCES_DIR" ]]; then
   exit 2
 fi
 
+# Preflight: ensure required game data and the specific map are present in the
+# app Resources. Running the engine without master.dat/critter.dat or the map
+# file leads to DB_OPEN_FAIL and masks real issues; fail early with a clear
+# message so callers install game data first (e.g. from GOG/patchedfiles).
+if [[ ! -f "$RESOURCES_DIR/master.dat" || ! -f "$RESOURCES_DIR/critter.dat" ]]; then
+  echo "[ERROR] Required game data missing in app bundle Resources: master.dat and/or critter.dat" >&2
+  echo "Install game data and retry, for example: ./scripts/test/test-install-game-data.sh --source GOG/patchedfiles --target \"$APP\"" >&2
+  exit 2
+fi
+
+MAP_FILE="$RESOURCES_DIR/data/maps/${MAP}.MAP"
+if [[ ! -f "$MAP_FILE" ]]; then
+  echo "[ERROR] Map file not found for $MAP: $MAP_FILE" >&2
+  echo "Install the patched data (GOG/patchedfiles) into the app bundle and retry." >&2
+  exit 2
+fi
+
 printf "Running %s for %s (repeats=%s)\n" "$0" "$MAP" "$REPEATS"
 
 for i in $(seq 1 "$REPEATS"); do
