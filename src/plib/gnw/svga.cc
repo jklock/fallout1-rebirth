@@ -262,21 +262,25 @@ void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, 
         preDisplayNonZero = map_count_display_non_zero(copyX, copyY, copyW, copyH);
     }
 
-    // Defensive check: avoid copying an all-zero source over an existing non-zero
-    // surface for small regions since that leads to transient zeroing anomalies.
-    // Limit to small areas to avoid scan overhead.
+    // Defensive check: avoid copying an all-zero source over an existing
+    // non-zero surface since that produces surf_pre>0 && surf_post==0 (black
+    // region). Previously this scan was limited to small areas and allowed
+    // large zero-source copies to wipe destination (root cause for CARAVAN/ZDESERT1/TEMPLAT1).
+    // Always scan the source for any non-zero pixel before skipping a copy.
     int area = copyW * copyH;
-    bool src_all_zero = false;
-    if (area <= 4096) {
-        src_all_zero = true;
-        for (int r = 0; r < copyH && src_all_zero; r++) {
-            unsigned char* p = srcPtr + r * srcPitch;
-            for (int c = 0; c < copyW; c++) {
-                if (p[c] != 0) {
-                    src_all_zero = false;
-                    break;
-                }
+    bool src_all_zero = true;
+    for (int r = 0; r < copyH; r++) {
+        unsigned char* p = srcPtr + r * srcPitch;
+        bool row_has_nonzero = false;
+        for (int c = 0; c < copyW; c++) {
+            if (p[c] != 0) {
+                row_has_nonzero = true;
+                break;
             }
+        }
+        if (row_has_nonzero) {
+            src_all_zero = false;
+            break;
         }
     }
 
