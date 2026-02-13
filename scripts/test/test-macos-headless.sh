@@ -565,6 +565,17 @@ main() {
         log_info "  cmake --build $BUILD_DIR --config $BUILD_TYPE"
         exit 1
     fi
+
+    # Ensure patched game data is present. If missing, auto-install from repo/GOG/patchedfiles.
+    if [[ ! -f "$APP_BUNDLE/Contents/Resources/master.dat" ]]; then
+        PATCHED_DIR="$PWD/GOG/patchedfiles"
+        if [[ -d "$PATCHED_DIR" && -f "$PATCHED_DIR/master.dat" ]]; then
+            log_info "master.dat missing in app bundle — auto-installing from $PATCHED_DIR"
+            "$PWD/scripts/test/test-install-game-data.sh" --source "$PATCHED_DIR" --target "$APP_BUNDLE" || true
+        else
+            log_warn "Patched game data not found at $PATCHED_DIR; tests that require game data will fail"
+        fi
+    fi
     
     # Run all tests
     test_bundle_structure

@@ -8,10 +8,11 @@ Purpose
 Agent behavior (must-follow)
 1. Non-interactive: run commands, collect logs/artifacts, update PROGRESS.MD, and exit with a validation report.
 2. Use only project-provided scripts (see `development/RME/TODO/todo.md`). Do not run raw cmake/xcodebuild or interact with system simulators outside those scripts.
-3. NEVER run forbidden git operations (no rebase, no reset --hard, no force push).
-4. Write every stdout/stderr, produced files, and structured summaries to `development/RME/ARTIFACTS/evidence/<task-slug>/`.
-5. Update `PROGRESS.MD` at the start and end of each task (timestamps in ISO-8601 UTC).
-6. After completing each P0/P1/P2 item run its validator (see "Validation" section) and record verdict under `PROGRESS.MD` and `evidence/`.
+3. DO NOT create new git branches. All automated commits must be made on `RME-DEV` unless the user explicitly authorizes branch creation. NEVER perform history-rewriting git operations (no rebase, no reset --hard, no force push).
+4. Always ensure `GOG/patchedfiles` is used as the canonical source of patched game data for any automation that runs the engine. Subagents MUST auto-install patched data into the target `.app` (via `./scripts/test/test-install-game-data.sh --source GOG/patchedfiles --target <app>`) when the bundle lacks `master.dat`/`critter.dat` or map files.
+5. Write every stdout/stderr, produced files, and structured summaries to `development/RME/ARTIFACTS/evidence/<task-slug>/`.
+6. Update `PROGRESS.MD` at the start and end of each task (timestamps in ISO-8601 UTC).
+7. After completing each P0/P1/P2 item run its validator (see "Validation" section) and record verdict under `PROGRESS.MD` and `evidence/`.
 
 Directory & artifact rules
 - Base artifacts dir: `development/RME/ARTIFACTS/evidence/`.

@@ -18,11 +18,12 @@
 
 The scripts handle simulator management, proper build configs, and cleanup. Ignoring them causes test failures and wastes time.
 
-## ⚠️ CRITICAL: Git Safety (NO Rebases / NO PRs Unless Explicitly Asked)
+## ⚠️ CRITICAL: Git Safety (NO Branches, NO Rebases, NO PRs Unless Explicitly Asked)
 
-**NEVER** perform history-rewriting git operations or create/open Pull Requests unless the user explicitly tells you to.
+**NEVER** create new local branches or perform history-rewriting git operations unless the user explicitly tells you to. All automated commits must be made on the working branch `RME-DEV` unless you receive explicit permission to create a branch.
 
 ### Forbidden unless explicitly instructed
+- Creating local or remote branches (e.g. `git checkout -b ...`, `git branch ...`) without explicit user authorization
 - `git rebase` (including `-i`) and any in-progress rebase continuation
 - `git reset --hard`, `git reset --keep`, `git commit --amend`
 - `git filter-branch`, `git filter-repo`, aggressive cleanup (`git gc`, `git reflog expire`)

@@ -214,6 +214,17 @@ verify_resources() {
         log_warn "Resources directory not found"
         return 0
     fi
+
+    # If patched game data is missing, attempt auto-install from repo/GOG/patchedfiles
+    if [[ ! -f "$resources/master.dat" ]]; then
+        local patched_dir="$PWD/GOG/patchedfiles"
+        if [[ -d "$patched_dir" && -f "$patched_dir/master.dat" ]]; then
+            log_info "master.dat missing in app bundle — auto-installing patched data from $patched_dir"
+            "$PWD/scripts/test/test-install-game-data.sh" --source "$patched_dir" --target "$APP_BUNDLE" || true
+        else
+            log_warn "Patched game data not found at $patched_dir; resource checks may fail"
+        fi
+    fi
     
     # Check for icon (optional but nice to have)
     local icon_count

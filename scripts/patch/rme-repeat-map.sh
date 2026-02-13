@@ -28,8 +28,17 @@ fi
 
 # Preflight: ensure required game data and the specific map are present in the
 # app Resources. Running the engine without master.dat/critter.dat or the map
-# file leads to DB_OPEN_FAIL and masks real issues; fail early with a clear
-# message so callers install game data first (e.g. from GOG/patchedfiles).
+# file leads to DB_OPEN_FAIL and masks real issues; try to auto-install the
+# patched files from the repo's GOG/patchedfiles and fail only if they remain
+# missing.
+PATCHED_DIR="$ROOT/GOG/patchedfiles"
+if [[ (! -f "$RESOURCES_DIR/master.dat" || ! -f "$RESOURCES_DIR/critter.dat") ]]; then
+  if [[ -d "$PATCHED_DIR" && -f "$PATCHED_DIR/master.dat" ]]; then
+    echo "[INFO] Required game data missing in app bundle — attempting auto-install from $PATCHED_DIR"
+    "$ROOT/scripts/test/test-install-game-data.sh" --source "$PATCHED_DIR" --target "$APP" || true
+  fi
+fi
+
 if [[ ! -f "$RESOURCES_DIR/master.dat" || ! -f "$RESOURCES_DIR/critter.dat" ]]; then
   echo "[ERROR] Required game data missing in app bundle Resources: master.dat and/or critter.dat" >&2
   echo "Install game data and retry, for example: ./scripts/test/test-install-game-data.sh --source GOG/patchedfiles --target \"$APP\"" >&2
@@ -37,6 +46,14 @@ if [[ ! -f "$RESOURCES_DIR/master.dat" || ! -f "$RESOURCES_DIR/critter.dat" ]]; 
 fi
 
 MAP_FILE="$RESOURCES_DIR/data/maps/${MAP}.MAP"
+if [[ ! -f "$MAP_FILE" ]]; then
+  # Try to auto-install patched data (map may be inside patchedfiles/data/maps)
+  if [[ -d "$PATCHED_DIR" && -f "$PATCHED_DIR/data/maps/${MAP}.MAP" ]]; then
+    echo "[INFO] Map file $MAP missing — auto-installing patched data from $PATCHED_DIR"
+    "$ROOT/scripts/test/test-install-game-data.sh" --source "$PATCHED_DIR" --target "$APP" || true
+  fi
+fi
+
 if [[ ! -f "$MAP_FILE" ]]; then
   echo "[ERROR] Map file not found for $MAP: $MAP_FILE" >&2
   echo "Install the patched data (GOG/patchedfiles) into the app bundle and retry." >&2

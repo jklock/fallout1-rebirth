@@ -27,6 +27,17 @@ echo ""
 echo "=== Running Pre-Commit Checks ==="
 echo ""
 
+# Enforce branch policy: automated checks must run on RME-DEV to avoid accidental
+# branch creation or commits on feature branches. This prevents agents from
+# creating or committing to other branches without explicit authorization.
+if command -v git &>/dev/null && git rev-parse --is-inside-work-tree &>/dev/null; then
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+    if [[ "$current_branch" != "RME-DEV" ]]; then
+        echo "❌ Branch policy violation: current branch is '$current_branch' — switch to 'RME-DEV' before running dev-check.sh" >&2
+        exit 1
+    fi
+fi
+
 # 1. Check clang-format
 echo ">>> Checking code formatting..."
 if command -v clang-format &> /dev/null; then

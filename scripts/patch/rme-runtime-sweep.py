@@ -305,6 +305,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     present_anom_dir = out_dir / "present-anomalies"
     present_anom_dir.mkdir(parents=True, exist_ok=True)
 
+    # Auto-install patched data from repo GOG/patchedfiles when Resources are missing
+    if (not (data_root / "master.dat").is_file()) or (not (data_root / "critter.dat").is_file()):
+        repo_root = Path(__file__).resolve().parents[1]
+        patched_dir = repo_root / "GOG" / "patchedfiles"
+        installer = repo_root / "scripts" / "test" / "test-install-game-data.sh"
+        if patched_dir.exists() and (patched_dir / "master.dat").exists():
+            print(f"[INFO] master.dat/critter.dat missing under {data_root}; attempting auto-install from {patched_dir}")
+            try:
+                subprocess.run([str(installer), "--source", str(patched_dir), "--target", str(resources_dir.parent.parent)], check=True)
+            except Exception as e:
+                print(f"[WARN] auto-install attempt failed: {e}")
+
     maps = _iter_all_map_names(data_root)
     if args.limit and args.limit > 0:
         maps = maps[: args.limit]
