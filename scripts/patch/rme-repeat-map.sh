@@ -37,6 +37,9 @@ for i in $(seq 1 "$REPEATS"); do
   PL_PATH="$PATCHLOG_DIR/${MAP}.iter$(printf "%02d" $i).patchlog.txt"
   RUN_LOG="$PATCHLOG_DIR/${MAP}.iter$(printf "%02d" $i).run.log"
 
+  # ensure analyzer has a file to read if the engine crashes before writing patchlog
+  : > "$PL_PATH"
+
   # Run the executable with a sanitized environment to avoid leaking host env vars
   # Run the executable with a timeout to avoid indefinite hangs; write output to run log.
   (

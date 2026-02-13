@@ -40,12 +40,8 @@ static bool GNW95_already_running = false;
 bool GNW_win_init_flag = false;
 
 // 0x53A238
-int GNW_wcolor[6] = {
-    0,
-    0,
-    0,
-    0,
-    0,
+int GNW_wcolor[6] = { 0, 0, 0, 0, 0, 0 };
+
 static unsigned char* screen_buffer = NULL;
 
 // 0x6AC120
@@ -125,6 +121,7 @@ int win_init(VideoOptions* video_options, int flags)
 
             if (screen_buffer != NULL) {
                 mem_free(screen_buffer);
+                screen_buffer = NULL;
             }
 
             return WINDOW_MANAGER_ERR_NO_MEMORY;
@@ -152,6 +149,7 @@ int win_init(VideoOptions* video_options, int flags)
 
         if (screen_buffer != NULL) {
             mem_free(screen_buffer);
+            screen_buffer = NULL;
         }
 
         return WINDOW_MANAGER_ERR_NO_MEMORY;
@@ -210,10 +208,12 @@ void win_exit(void)
 
             if (GNW_texture != NULL) {
                 mem_free(GNW_texture);
+                GNW_texture = NULL;
             }
 
             if (screen_buffer != NULL) {
                 mem_free(screen_buffer);
+                screen_buffer = NULL;
             }
 
             svga_exit();

@@ -2,7 +2,7 @@
 
 **Apple-Only Fork** — This project targets macOS and iOS/iPadOS exclusively.
 
-Short, actionable instructions to help an AI coding agent get productive quickly.
+**Do as the user says. Do not ask for permissions or confirmation unless explicitly requested.** If the user asks you to run a command, run it without asking. If the user asks you to write code, write it without asking. If the user asks you to explain something, explain it without asking.
 
 ## ⚠️ CRITICAL: Use Project Scripts
 
