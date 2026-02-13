@@ -71,7 +71,16 @@ for i in $(seq 1 "$REPEATS"); do
   PL_PATH="$PATCHLOG_DIR/${MAP}.iter$(printf "%02d" $i).patchlog.txt"
   RUN_LOG="$PATCHLOG_DIR/${MAP}.iter$(printf "%02d" $i).run.log"
 
-  # Do NOT pre-create an empty patchlog (it masks early crashes).
+  # Normally do NOT pre-create an empty patchlog (it masks early crashes).
+  # When running under the RME orchestrator (evidence artifacts path) or when
+  # RME_PLACEHOLDER_PATCHLOG=1 is set, create a marked placeholder so downstream
+  # analyzers always have a file to inspect. The placeholder will be detected
+  # after the run and treated as a failure so we don't mask real crashes.
+  if [[ "${OUT_DIR}" == *"/development/RME/ARTIFACTS/evidence"* || "${RME_PLACEHOLDER_PATCHLOG:-}" == "1" ]]; then
+    mkdir -p "$(dirname "$PL_PATH")"
+    echo "[PLACEHOLDER PATCHLOG] created by rme-repeat-map.sh - engine may crash before producing a real patchlog" > "$PL_PATH"
+  fi
+
   # Require the engine to write a real patchlog; we validate after the run and fail if it's missing/empty.
 
   # Run the executable with a sanitized environment to avoid leaking host env vars
@@ -107,9 +116,10 @@ for i in $(seq 1 "$REPEATS"); do
   # Run analyzer and capture output next to the patchlog
   PY_OUT="${PL_PATH%.txt}_analyze.txt"
 
-  # Fail early if the engine did not produce a real patchlog (empty file masks crashes).
-  if [[ ! -s "$PL_PATH" ]]; then
-    echo "[ERROR] patchlog missing or empty for $MAP run $i; see run log: $RUN_LOG" >&2
+  # Fail early if the engine did not produce a real patchlog (empty file masks crashes)
+  # or if the placeholder we created was not replaced by a real patchlog.
+  if [[ ! -s "$PL_PATH" || "$(head -n 1 "$PL_PATH" 2>/dev/null)" == "[PLACEHOLDER PATCHLOG"* ]]; then
+    echo "[ERROR] patchlog missing or placeholder for $MAP run $i; see run log: $RUN_LOG" >&2
     echo "-- run log (head 200 lines) --" >&2
     head -n 200 "$RUN_LOG" >&2 || true
     echo "-- end run log head --" >&2

@@ -52,10 +52,9 @@
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
 #include "plib/gnw/intrface.h"
+#include "plib/gnw/memory.h" // mem_check() - detect header/footer stomps earlier
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
-#include "plib/gnw/memory.h"  // mem_check() - detect header/footer stomps earlier
-
 
 namespace fallout {
 
@@ -297,6 +296,12 @@ static void main_exit_system()
     // Run a heap integrity check before calling into SDL shutdown so
     // memory stomps are recorded in our logs (helps triage double-free/overwrite).
     mem_check();
+
+    // Temporary mitigation: give background system/main-queue callbacks a short
+    // window to complete before SDL shutdown. This reduces shutdown races that
+    // have caused double-free/heap-corruption during termination. Keep this
+    // defensive delay small; remove when root cause is fixed.
+    SDL_Delay(100);
 
     // TODO: Find a better place for this call.
     SDL_Quit();
