@@ -54,6 +54,8 @@
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
+#include "plib/gnw/memory.h"  // mem_check() - detect header/footer stomps earlier
+
 
 namespace fallout {
 
@@ -291,6 +293,10 @@ static void main_exit_system()
     main_selfrun_exit();
 
     game_exit();
+
+    // Run a heap integrity check before calling into SDL shutdown so
+    // memory stomps are recorded in our logs (helps triage double-free/overwrite).
+    mem_check();
 
     // TODO: Find a better place for this call.
     SDL_Quit();

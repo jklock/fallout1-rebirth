@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <execinfo.h>
 
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
@@ -219,12 +220,38 @@ static void mem_check_block(void* block)
 
     header = (MemoryBlockHeader*)block;
     if (header->guard != MEMORY_BLOCK_HEADER_GUARD) {
-        debug_printf("Memory header stomped.\n");
+        debug_printf("Memory header stomped (block=%p, guard=0x%08x)\n", block, header->guard);
+
+        /* Print a small backtrace to help find the overwriter earlier in the run. */
+        {
+            void* bt[32];
+            int n = backtrace(bt, (int)(sizeof(bt) / sizeof(bt[0])));
+            char** syms = backtrace_symbols(bt, n);
+            if (syms) {
+                for (int i = 0; i < n; ++i) {
+                    debug_printf("  bt[%02d] %s\n", i, syms[i]);
+                }
+                free(syms);
+            }
+        }
     }
 
     footer = (MemoryBlockFooter*)((unsigned char*)block + header->size - sizeof(MemoryBlockFooter));
     if (footer->guard != MEMORY_BLOCK_FOOTER_GUARD) {
-        debug_printf("Memory footer stomped.\n");
+        debug_printf("Memory footer stomped (block=%p, footer_guard=0x%08x)\n", block, footer->guard);
+
+        /* Print a small backtrace to help find the overwriter earlier in the run. */
+        {
+            void* bt[32];
+            int n = backtrace(bt, (int)(sizeof(bt) / sizeof(bt[0])));
+            char** syms = backtrace_symbols(bt, n);
+            if (syms) {
+                for (int i = 0; i < n; ++i) {
+                    debug_printf("  bt[%02d] %s\n", i, syms[i]);
+                }
+                free(syms);
+            }
+        }
     }
 }
 
