@@ -371,12 +371,22 @@ static void win_free(int win)
         return;
     }
 
+    /* Defensive: clear window table/indices to avoid use-after-free if other
+       code queries GNW_find() while shutdown is in progress. */
+    int idx = window_index[w->id];
+    if (idx >= 0 && idx < MAX_WINDOW_COUNT) {
+        window[idx] = NULL;
+    }
+    window_index[w->id] = -1;
+
     if (w->buffer != NULL) {
         mem_free(w->buffer);
+        w->buffer = NULL;
     }
 
     if (w->menuBar != NULL) {
         mem_free(w->menuBar);
+        w->menuBar = NULL;
     }
 
     Button* curr = w->buttonListHead;
