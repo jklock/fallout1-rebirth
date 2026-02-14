@@ -2,6 +2,11 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# Prefer Python implementation if present (keeps backward-compatible shell wrapper).
+PY="$ROOT/scripts/patch/rme-repeat-map.py"
+if [[ -x "$PY" ]]; then
+  exec python3 "$PY" "$@"
+fi
 APP="${APP:-$ROOT/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app}"
 EXE="${EXE:-$APP/Contents/MacOS/fallout1-rebirth}"
 OUT_DIR="${OUT_DIR:-$ROOT/development/RME/validation/runtime}"
@@ -14,6 +19,11 @@ mkdir -p "$PATCHLOG_DIR" "$SCREEN_DIR" "$PRESENT_DIR"
 MAP="${1:-}"
 REPEATS="${2:-5}"
 TIMEOUT="${TIMEOUT:-60}"
+# Enforce minimum test duration per RME harness (tests must run >= 10s)
+if [[ "$TIMEOUT" -lt 10 ]]; then
+  echo "[WARN] TIMEOUT ($TIMEOUT) < 10s; bumping to 10s"
+  TIMEOUT=10
+fi
 
 if [[ -z "$MAP" ]]; then
   echo "Usage: $0 MAPNAME [REPEATS]"
@@ -86,9 +96,31 @@ for i in $(seq 1 "$REPEATS"); do
   # Run the executable with a sanitized environment to avoid leaking host env vars
   # Run the executable with a timeout to avoid indefinite hangs; write output to run log.
   (
+    # Diagnostics
+    echo "[INFO] PWD=$(pwd)"
+    echo "[INFO] APP=$APP"
+    echo "[INFO] EXE=$EXE"
+    echo "[INFO] RESOURCES_DIR=$RESOURCES_DIR"
+    echo "[INFO] PATCHLOG=$PL_PATH"
+
+    # Ensure executable exists and is runnable
+    if [[ ! -x "$EXE" ]]; then
+      echo "[ERROR] executable not found or not executable: $EXE" >&2
+      exit 2
+    fi
+
     # Run from the app Resources dir so master.dat/critter.dat are discoverable
-    cd "$RESOURCES_DIR" && env -i PATH="$PATH" F1R_AUTORUN_MAP="$MAP" F1R_AUTOSCREENSHOT=1 F1R_PATCHLOG=1 \
-      F1R_PATCHLOG_PATH="$PL_PATH" F1R_PATCHLOG_VERBOSE=1 F1R_PRESENT_ANOM_DIR="$PRESENT_DIR" \
+    cd "$RESOURCES_DIR" || exit 2
+    env -i PATH="$PATH" \
+      F1R_AUTORUN_MAP="$MAP" \
+      F1R_AUTORUN_CLICK="${F1R_AUTORUN_CLICK:-0}" \
+      F1R_AUTORUN_CLICK_DELAY="${F1R_AUTORUN_CLICK_DELAY:-7}" \
+      F1R_AUTORUN_HOLD_SECS="${F1R_AUTORUN_HOLD_SECS:-10}" \
+      F1R_AUTOSCREENSHOT=1 \
+      F1R_PATCHLOG=1 \
+      F1R_PATCHLOG_PATH="$PL_PATH" \
+      F1R_PATCHLOG_VERBOSE=1 \
+      F1R_PRESENT_ANOM_DIR="$PRESENT_DIR" \
       "$EXE" > "$RUN_LOG" 2>&1
   ) &
   pid=$!
