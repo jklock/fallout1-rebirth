@@ -153,8 +153,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             except Exception:
                 pass
 
-        pl_path = patchlog_dir / f"{map_name}.iter{ i:02 }.patchlog.txt"
-        run_log = patchlog_dir / f"{map_name}.iter{ i:02 }.run.log"
+        pl_path = patchlog_dir / f"{map_name}.iter{ i:02}.patchlog.txt"
+        run_log = patchlog_dir / f"{map_name}.iter{ i:02}.run.log"
 
         # Placeholder behaviour (same as shell script)
         create_placeholder_if_requested(pl_path, out_dir)
@@ -209,7 +209,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         # Move produced screenshot (if any)
         shot = pick_single_screenshot(resources_dir)
         if shot is not None:
-            dst = screen_dir / f"{map_name}.iter{ i:02 }.bmp"
+            dst = screen_dir / f"{map_name}.iter{ i:02}.bmp"
             try:
                 shutil.copyfile(shot, dst)
             except Exception:
@@ -249,7 +249,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 print("Artifacts are available in:")
                 print(f"  patchlog: {pl_path}")
                 print(f"  run log: {run_log}")
-                print(f"  screenshot (if any): {screen_dir / f'{map_name}.iter{ i:02 }.bmp'}")
+                print(f"  screenshot (if any): {screen_dir / f'{map_name}.iter{ i:02}.bmp'}")
                 return 3
 
         # Additional strict full-load verification (same checks as runtime sweep)
