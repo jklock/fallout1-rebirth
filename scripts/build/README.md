@@ -7,7 +7,7 @@ Build entrypoints.
 ## Files
 - `build-macos.sh`: Single macOS build entrypoint (`-test` or `-prod`).
 - `build-ios.sh`: Single iOS build entrypoint (`-test` or `-prod`), supports device/simulator/both targets.
-- `install-game-data.sh`: Install patched game data into an existing macOS app bundle.
+- `build-install-game-data.sh`: Install patched game data into an existing macOS app bundle.
 
 ## Inputs
 - Source tree in this repo.

@@ -55,12 +55,12 @@ Notes:
 - Device builds produce IPA output via CPack in `build-outputs/iOS/`.
 - `-test` embeds patched data/config into the app payload.
 
-### `scripts/build/install-game-data.sh`
+### `scripts/build/build-install-game-data.sh`
 
 Installs game data into an existing macOS app bundle.
 
 ```bash
-./scripts/build/install-game-data.sh --source /path/to/patchedfiles --target "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app"
+./scripts/build/build-install-game-data.sh --source /path/to/patchedfiles --target "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app"
 ```
 
 ## Dev Scripts

@@ -451,6 +451,17 @@ for dirpath, _, filenames in os.walk(root):
 PYCODE
 
 # -----------------------------------------------------------------------------
+# Materialize known loose map used by current validation workflows
+# -----------------------------------------------------------------------------
+log_info "Materializing loose CARAVAN.MAP from patched master.dat..."
+TMP_EVIDENCE_DIR="$(mktemp -d)"
+python3 "$ROOT_DIR/scripts/test/test-rme-extract-map.py" CARAVAN \
+    --patched-master "$OUT_DIR/master.dat" \
+    --target-map "$OUT_DIR/data/maps/CARAVAN.MAP" \
+    --evidence-dir "$TMP_EVIDENCE_DIR" >/dev/null
+rm -rf "$TMP_EVIDENCE_DIR"
+
+# -----------------------------------------------------------------------------
 # Copy configs
 # -----------------------------------------------------------------------------
 if [[ -n "$CONFIG_DIR" ]]; then

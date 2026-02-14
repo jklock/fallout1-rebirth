@@ -9,9 +9,19 @@ BUILD_DIR="${BUILD_DIR:-build-macos}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 APP_DIR="$REPO_ROOT/$BUILD_DIR/$BUILD_TYPE/$APP_NAME.app/Contents/MacOS"
 APP_BIN="$APP_DIR/fallout1-rebirth"
+APP_RESOURCES="$REPO_ROOT/$BUILD_DIR/$BUILD_TYPE/$APP_NAME.app/Contents/Resources"
 LOG_DIR="${LOG_DIR:-$REPO_ROOT/tmp/rme-log-sweep}"
 RUNTIME="${RUNTIME:-20}" # seconds per run
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+PATCHED_DATA_DIR="${PATCHED_DIR:-${GAME_DATA:-}}"
 TIMEOUT_BIN=""
+
+if [[ -z "$PATCHED_DATA_DIR" && -n "$GAMEFILES_ROOT" ]]; then
+    PATCHED_DATA_DIR="$GAMEFILES_ROOT/patchedfiles"
+fi
+if [[ -z "$PATCHED_DATA_DIR" ]]; then
+    PATCHED_DATA_DIR="$APP_RESOURCES"
+fi
 
 pick_timeout() {
     if command -v gtimeout >/dev/null 2>&1; then
@@ -26,8 +36,8 @@ pick_timeout() {
 summarize() {
     local file="$1"
     local miss casec
-    miss=$(grep -i "dat miss" "$file" | wc -l | tr -d ' ')
-    casec=$(grep -i -E "case_mismatch=[1-9]" "$file" | wc -l | tr -d ' ')
+    miss=$(grep -i -c "dat miss" "$file" || true)
+    casec=$(grep -i -E -c "case_mismatch=[1-9]" "$file" || true)
     echo "==> $(basename "$file") missing_lines=$miss case_lines=$casec"
 }
 
@@ -66,7 +76,7 @@ main() {
     cd "$REPO_ROOT"
 
     echo "[1/3] Headless sanity"
-    ./scripts/test/test-macos-headless.sh
+    GAME_DATA="$PATCHED_DATA_DIR" ./scripts/test/test-macos-headless.sh
 
     echo "[2/3] Locate app"
     if [[ ! -x "$APP_BIN" ]]; then
@@ -79,7 +89,7 @@ main() {
     echo "Using timeout: ${TIMEOUT_BIN:-none} (runtime ${RUNTIME}s)"
 
     echo "[3/3] Topic sweeps"
-    run_game "all" "1"
+    run_game "all" "all"
     run_game "fonts_text_art" "text,art"
     run_game "movies" "movie"
     run_game "map_script_proto" "map,script,proto"

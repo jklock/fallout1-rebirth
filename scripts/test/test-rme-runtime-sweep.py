@@ -334,6 +334,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     # Directory for present-anomaly BMPs captured by the engine (if enabled)
     present_anom_dir = out_dir / "present-anomalies"
     present_anom_dir.mkdir(parents=True, exist_ok=True)
+    # Directory for per-map runtime stdout/stderr logs.
+    stdout_dir = out_dir / "stdout"
+    stdout_dir.mkdir(parents=True, exist_ok=True)
 
     repo_root = Path(__file__).resolve().parents[2]
 
@@ -423,40 +426,35 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 f_log.flush()
 
             t0 = time.time()
+            map_stdout = stdout_dir / f"{map_name}.stdout.log"
             try:
                 # Log the exact launch context to the run log for debugging
                 f_log.write(f"[INFO] launch: exe={exe} cwd={out_dir} F1R_AUTORUN_MAP={env.get('F1R_AUTORUN_MAP')} F1R_AUTORUN_CLICK={env.get('F1R_AUTORUN_CLICK')}\n")
+                f_log.write(f"[INFO] stdout_log={map_stdout}\n")
                 f_log.flush()
 
                 # Run the engine with the working directory set to the sweep out-dir so `dump_screen()` writes
                 # `scrXXXXX.bmp` into a writable, predictable location that this script will pick up.
-                proc = subprocess.run(
-                    [str(exe)],
-                    env=env,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    timeout=args.timeout,
-                    check=False,
-                    text=True,
-                    cwd=str(out_dir),
-                )
-                out = proc.stdout or ""
-                if isinstance(out, bytes):
-                    out = out.decode("utf-8", errors="ignore")
-                exit_code = proc.returncode
-            except subprocess.TimeoutExpired as e:
-                out = e.stdout or ""
-                if isinstance(out, bytes):
-                    out = out.decode("utf-8", errors="ignore")
-                out += "\n[TIMEOUT]\n"
+                with map_stdout.open("w", encoding="utf-8", newline="\n") as map_out:
+                    proc = subprocess.run(
+                        [str(exe)],
+                        env=env,
+                        stdout=map_out,
+                        stderr=subprocess.STDOUT,
+                        timeout=args.timeout,
+                        check=False,
+                        text=True,
+                        cwd=str(out_dir),
+                    )
+                    exit_code = proc.returncode
+            except subprocess.TimeoutExpired:
+                try:
+                    with map_stdout.open("a", encoding="utf-8", newline="\n") as map_out:
+                        map_out.write("\n[TIMEOUT]\n")
+                except Exception:
+                    pass
                 exit_code = 124
             duration = time.time() - t0
-
-            if out:
-                f_log.write(out)
-                if not out.endswith("\n"):
-                    f_log.write("\n")
-                f_log.flush()
 
             # Look for screenshots produced by dump_screen() in the run output directory
             shot = _pick_single_screenshot(out_dir)

@@ -161,7 +161,7 @@ fi
 if [[ "$MODE" == "test" ]]; then
     resolve_game_data
     log_info "Embedding test payload from $GAME_DATA"
-    "$ROOT_DIR/scripts/build/install-game-data.sh" --source "$GAME_DATA" --target "$APP_PATH"
+    "$ROOT_DIR/scripts/build/build-install-game-data.sh" --source "$GAME_DATA" --target "$APP_PATH"
 fi
 
 echo ""

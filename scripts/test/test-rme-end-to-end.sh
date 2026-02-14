@@ -149,7 +149,7 @@ log "Install/verify patched data into app bundle resources"
 log "Run runtime MAP sweep with maximal logging"
 RME_LOG="${RME_LOG_TOPICS:-all}" \
 F1R_PATCHLOG=1 \
-F1R_PATCHLOG_VERBOSE="${F1R_PATCHLOG_VERBOSE:-1}" \
+F1R_PATCHLOG_VERBOSE="${F1R_PATCHLOG_VERBOSE:-0}" \
 python3 "$ROOT/scripts/test/test-rme-runtime-sweep.py" \
   --exe "$EXE" \
   --data-root "$PATCHED_DIR" \

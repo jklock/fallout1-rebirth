@@ -7,9 +7,9 @@
 # Does NOT apply RME patches; use the patch scripts first.
 #
 # USAGE:
-#   ./scripts/build/install-game-data.sh --source /path/to/FalloutData --target "/Applications/Fallout 1 Rebirth.app"
-#   ./scripts/build/install-game-data.sh --source /path/to/FalloutData
-#   ./scripts/build/install-game-data.sh --help
+#   ./scripts/build/build-install-game-data.sh --source /path/to/FalloutData --target "/Applications/Fallout 1 Rebirth.app"
+#   ./scripts/build/build-install-game-data.sh --source /path/to/FalloutData
+#   ./scripts/build/build-install-game-data.sh --help
 #
 # OPTIONS:
 #   --source PATH   Path to game data directory
@@ -59,7 +59,7 @@ show_help() {
 Fallout 1 Rebirth — Game Data Installer for macOS
 
 USAGE:
-    ./scripts/build/install-game-data.sh [OPTIONS]
+    ./scripts/build/build-install-game-data.sh [OPTIONS]
 
 OPTIONS:
     --source PATH   Path to directory containing game data files
@@ -78,16 +78,16 @@ REQUIRED FILES:
 
 EXAMPLES:
     # Uses GAME_DATA/FALLOUT_GAMEFILES_ROOT default source and prompts for target if needed
-    ./scripts/build/install-game-data.sh
+    ./scripts/build/build-install-game-data.sh
 
     # Specify a source folder
-    ./scripts/build/install-game-data.sh --source /path/to/FalloutData
+    ./scripts/build/build-install-game-data.sh --source /path/to/FalloutData
 
     # Install to a custom app location
-    ./scripts/build/install-game-data.sh --target ~/Desktop/Fallout\ 1\ Rebirth.app
+    ./scripts/build/build-install-game-data.sh --target ~/Desktop/Fallout\ 1\ Rebirth.app
 
     # Full custom paths
-    ./scripts/build/install-game-data.sh \
+    ./scripts/build/build-install-game-data.sh \
         --source /Volumes/Games/Fallout1 \
         --target "/Applications/Fallout 1 Rebirth.app"
 

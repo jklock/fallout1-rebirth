@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # RME GUI exercise runner (macOS)
-# Sanity-checks, launches the GUI with RME_LOG=1, drives basic keys, and captures rme.log.
+# Sanity-checks, launches the GUI with RME_LOG=all, drives basic keys, and captures rme.log.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -9,9 +9,19 @@ BUILD_DIR="${BUILD_DIR:-build-macos}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 APP_DIR="$REPO_ROOT/$BUILD_DIR/$BUILD_TYPE/$APP_NAME.app/Contents/MacOS"
 APP_BIN="$APP_DIR/fallout1-rebirth"
+APP_RESOURCES="$REPO_ROOT/$BUILD_DIR/$BUILD_TYPE/$APP_NAME.app/Contents/Resources"
 LOG_DIR="${LOG_DIR:-$REPO_ROOT/tmp/rme-log-sweep}"
 RUNTIME="${RUNTIME:-25}" # seconds to allow app to run
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+PATCHED_DATA_DIR="${PATCHED_DIR:-${GAME_DATA:-}}"
 TIMEOUT_BIN=""
+
+if [[ -z "$PATCHED_DATA_DIR" && -n "$GAMEFILES_ROOT" ]]; then
+    PATCHED_DATA_DIR="$GAMEFILES_ROOT/patchedfiles"
+fi
+if [[ -z "$PATCHED_DATA_DIR" ]]; then
+    PATCHED_DATA_DIR="$APP_RESOURCES"
+fi
 
 pick_timeout() {
     if command -v gtimeout >/dev/null 2>&1; then
@@ -26,8 +36,8 @@ pick_timeout() {
 summarize() {
     local file="$1"
     local miss casec
-    miss=$(grep -i -E "dat miss|missing" "$file" | wc -l | tr -d ' ')
-    casec=$(grep -i "case" "$file" | wc -l | tr -d ' ')
+    miss=$(grep -i -E -c "dat miss|missing" "$file" || true)
+    casec=$(grep -i -c "case" "$file" || true)
     echo "==> $(basename "$file") missing_lines=$miss case_lines=$casec"
 }
 
@@ -53,13 +63,13 @@ EOF
 }
 
 run_gui() {
-    echo "--- GUI run with RME_LOG=1 ---"
+    echo "--- GUI run with RME_LOG=all ---"
     rm -f "$APP_DIR/rme.log" "$APP_DIR/rme.log.1"
 
     if [[ -n "$TIMEOUT_BIN" ]]; then
-        (cd "$APP_DIR" && RME_LOG=1 "$TIMEOUT_BIN" "$RUNTIME" "$APP_BIN") &
+        (cd "$APP_DIR" && RME_LOG=all "$TIMEOUT_BIN" "$RUNTIME" "$APP_BIN") &
     else
-        (cd "$APP_DIR" && RME_LOG=1 "$APP_BIN") &
+        (cd "$APP_DIR" && RME_LOG=all "$APP_BIN") &
     fi
     app_pid=$!
 
@@ -85,7 +95,7 @@ main() {
     cd "$REPO_ROOT"
 
     echo "[1/3] macOS verify"
-    ./scripts/test/test-macos.sh --verify
+    GAME_DATA="$PATCHED_DATA_DIR" ./scripts/test/test-macos.sh --verify
 
     echo "[2/3] Locate app"
     if [[ ! -x "$APP_BIN" ]]; then

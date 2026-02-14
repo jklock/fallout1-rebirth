@@ -298,7 +298,7 @@ The following scripts replace CI/CD:
 |--------|---------|----------|
 | `scripts/build/build-macos.sh` | Build macOS app (`-prod` / `-test`) | Initial |
 | `scripts/build/build-ios.sh` | Build iOS app/IPA (`-prod` / `-test`, device/simulator) | Initial |
-| `scripts/build/install-game-data.sh` | Install patched game data into existing macOS app | `2026-02-14` |
+| `scripts/build/build-install-game-data.sh` | Install patched game data into existing macOS app | `2026-02-14` |
 | `scripts/test/test-ios-simulator.sh` | iOS Simulator testing | `3e5baea` |
 | `scripts/test/test-macos.sh` | macOS app testing | Initial |
 | `scripts/dev/dev-check.sh` | Pre-commit checks | Initial |
