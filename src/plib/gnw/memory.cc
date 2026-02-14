@@ -1,9 +1,9 @@
 #include "plib/gnw/memory.h"
 
+#include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <execinfo.h>
 
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"

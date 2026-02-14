@@ -235,8 +235,10 @@ int main(int argc, char* argv[])
                             resources_has_data ? 1 : 0);
                     }
                 }
-                // SDL3 returns const char* but it's still allocated memory that needs freeing
-                SDL_free((void*)basePath);
+                // SDL3 returns a cached `const char*` here; do NOT free it —
+                // SDL_filesystem maintains an internal cache and will free it at
+                // SDL_QuitFilesystem(). Freeing it here would lead to a double-free.
+                /* intentionally not freeing `basePath` */
             }
         }
     }

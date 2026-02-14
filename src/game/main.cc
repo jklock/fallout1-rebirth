@@ -10,6 +10,7 @@
 //
 // Function names and visibility scope are from in OS X binary.
 
+#include <atomic>
 #include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -92,6 +93,10 @@ static int main_selfrun_index = 0;
 
 // 0x505A7C
 static bool main_show_death_scene = false;
+
+// Set when shutdown has started to prevent re-entrant/duplicate shutdown
+// paths that can race with async callbacks (temporary defensive guard).
+static std::atomic<bool> main_shutting_down { false };
 
 // 0x614838
 static bool main_death_voiceover_done;
@@ -293,6 +298,13 @@ static void main_exit_system()
 
     game_exit();
 
+    // Ensure this function executes only once; avoids duplicate SDL_Quit
+    // and related races (defensive — will be removed when root cause fixed).
+    bool expected = false;
+    if (!main_shutting_down.compare_exchange_strong(expected, true)) {
+        return;
+    }
+
     // Run a heap integrity check before calling into SDL shutdown so
     // memory stomps are recorded in our logs (helps triage double-free/overwrite).
     mem_check();
@@ -303,8 +315,17 @@ static void main_exit_system()
     // defensive delay small; remove when root cause is fixed.
     SDL_Delay(100);
 
-    // TODO: Find a better place for this call.
-    SDL_Quit();
+    // Instead of calling SDL_Quit (which invokes SDL_QuitFilesystem and has
+    // historically caused shutdown races / double-free on some platforms),
+    // shut down only the subsystems that were initialized. This avoids
+    // triggering SDL_filesystem's cached-pointer frees during process
+    // termination while still doing an orderly shutdown of subsystems we
+    // explicitly manage. The OS will reclaim any remaining process resources
+    // on exit.
+    Uint32 subs = SDL_WasInit(0);
+    if (subs != 0) {
+        SDL_QuitSubSystem(subs);
+    }
 
 #if defined(__APPLE__) && TARGET_OS_IOS
     exit(EXIT_SUCCESS);
@@ -356,6 +377,13 @@ static int main_load_new(char* mapFileName)
 
     if (patchlog_enabled()) {
         map_log_display_pixel_stats_public(map_elevation);
+
+        /* Emit the player's map/tile so the test harness can assert the dude was placed. */
+        int _dude_tile = -1;
+        if (obj_dude != NULL) {
+            _dude_tile = obj_dude->tile;
+        }
+        patchlog_write("AUTORUN_MAP", "dude_tile=%d", _dude_tile);
     }
 
     const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");

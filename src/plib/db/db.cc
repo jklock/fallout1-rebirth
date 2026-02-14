@@ -2392,7 +2392,10 @@ static void db_exit_patches(DB_DATABASE* database)
             /* Log pointer/value before free to help triage heap/free aborts that
                appear during global shutdown (SDL_QuitFilesystem). */
             if (rme_log_topic_enabled("db")) {
-                rme_logf("db", "db_exit_patches: freeing patches_path=%p (" "%s" ")", database->patches_path, database->patches_path);
+                rme_logf("db", "db_exit_patches: freeing patches_path=%p ("
+                               "%s"
+                               ")",
+                    database->patches_path, database->patches_path);
             }
             internal_free(database->patches_path);
         }

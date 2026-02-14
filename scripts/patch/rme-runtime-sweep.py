@@ -349,23 +349,24 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             f_log.write(f"== {i}/{len(maps)} {map_name} ==\n")
             f_log.flush()
 
-            # Keep the bundle clean: remove previous screenshots before each run.
-            _delete_glob(resources_dir, "scr*.bmp")
+            # Keep the run output dir clean: remove previous screenshots before each run (engine writes screendumps to CWD).
+            _delete_glob(out_dir, "scr*.bmp")
 
             env = os.environ.copy()
             env["F1R_AUTORUN_MAP"] = map_name
             env["F1R_AUTOSCREENSHOT"] = "1"
             # Ensure the engine writes any present-anomaly BMPs into the out-dir rather than /tmp
             env["F1R_PRESENT_ANOM_DIR"] = str(present_anom_dir)
-            # If patchlog capture is enabled in the outer environment, set a unique per-map patchlog path
-            if os.environ.get("F1R_PATCHLOG") and os.environ.get("F1R_PATCHLOG") != "0":
-                env["F1R_PATCHLOG"] = "1"
-                env["F1R_PATCHLOG_PATH"] = str(patchlogs_dir / f"{map_name}.patchlog.txt")
-                if os.environ.get("F1R_PATCHLOG_VERBOSE") and os.environ.get("F1R_PATCHLOG_VERBOSE") != "0":
-                    env["F1R_PATCHLOG_VERBOSE"] = os.environ.get("F1R_PATCHLOG_VERBOSE")
+            # Always enable per-map patchlog for strict full-load verification
+            env["F1R_PATCHLOG"] = "1"
+            env["F1R_PATCHLOG_PATH"] = str(patchlogs_dir / f"{map_name}.patchlog.txt")
+            if os.environ.get("F1R_PATCHLOG_VERBOSE") and os.environ.get("F1R_PATCHLOG_VERBOSE") != "0":
+                env["F1R_PATCHLOG_VERBOSE"] = os.environ.get("F1R_PATCHLOG_VERBOSE")
 
             t0 = time.time()
             try:
+                # Run the engine with the working directory set to the sweep out-dir so `dump_screen()` writes
+                # `scrXXXXX.bmp` into a writable, predictable location that this script will pick up.
                 proc = subprocess.run(
                     [str(exe)],
                     env=env,
@@ -374,7 +375,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     timeout=args.timeout,
                     check=False,
                     text=True,
-                    cwd=str(resources_dir),
+                    cwd=str(out_dir),
                 )
                 out = proc.stdout or ""
                 if isinstance(out, bytes):
@@ -394,7 +395,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     f_log.write("\n")
                 f_log.flush()
 
-            shot = _pick_single_screenshot(resources_dir)
+            # Look for screenshots produced by dump_screen() in the run output directory
+            shot = _pick_single_screenshot(out_dir)
             shot_name = ""
             bmp_w = bmp_h = 0
             top_mean = top_black = bot_mean = bot_black = 0.0
@@ -426,7 +428,45 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 if is_suspicious:
                     suspicious.append(map_name)
 
-            if exit_code != 0:
+            # --- strict "full visible load" verification using the per-map patchlog ---
+            patchlog_file = patchlogs_dir / f"{map_name}.patchlog.txt"
+            full_load_ok = True
+            full_load_reasons = []
+            if patchlog_file.exists():
+                pl_text = patchlog_file.read_text(encoding="utf-8", errors="ignore")
+                import re
+                m = re.search(r'AUTORUN_MAP.*load_end.*rc=(\d+)', pl_text)
+                if not m or int(m.group(1)) != 0:
+                    full_load_ok = False
+                    full_load_reasons.append("map_load rc!=0 or missing")
+                m2 = re.search(r'DISPLAY_TOP_PIXELS.*non_zero_pct=(\d+)', pl_text)
+                if not m2 or int(m2.group(1)) == 0:
+                    full_load_ok = False
+                    full_load_reasons.append("display all black")
+                m3 = re.search(r'AUTORUN_MAP.*dude_tile=(-?\d+)', pl_text)
+                if not m3 or int(m3.group(1)) < 0:
+                    full_load_ok = False
+                    full_load_reasons.append("dude not placed")
+            else:
+                full_load_ok = False
+                full_load_reasons.append("patchlog missing")
+
+            if not full_load_ok:
+                f_log.write(f"[FULL_LOAD_FAIL] {map_name}: {'; '.join(full_load_reasons)}\n")
+                # preserve screenshot for debugging
+                if shot is not None and shot.exists():
+                    dst = out_dir / "screenshots" / f"{map_name}.bmp"
+                    try:
+                        shot.replace(dst)
+                    except Exception:
+                        try:
+                            dst.write_bytes(shot.read_bytes())
+                        except Exception:
+                            pass
+                exit_code = exit_code if exit_code != 0 else 3
+                failures.append(map_name)
+
+            if exit_code != 0 and map_name not in failures:
                 failures.append(map_name)
 
             w.writerow(

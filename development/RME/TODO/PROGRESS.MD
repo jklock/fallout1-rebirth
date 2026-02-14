@@ -9,23 +9,23 @@ tasks:
     title: Fix CARAVAN / ZDESERT1 / TEMPLAT1 flaky runs
     status: in-progress
     owner: QA+Engine
-    started_at: "2026-02-13T14:34:41Z"
-    completed_at: "2026-02-13T17:59:46Z"
-    verdict: fail
+    started_at: "2026-02-13T19:20:49Z"
+    completed_at: null
+    verdict: null
     artifacts:
       - "development/RME/ARTIFACTS/evidence/caravan-repeat/"
-    notes: "Harness fix applied: removed pre-created empty patchlog placeholders which were masking early crashes. Re-running CARAVAN repeats under corrected harness to surface any remaining issues; ASan/LLDB artifacts preserved for triage."
+    notes: "Re-run started at 2026-02-13T19:20:08Z — previous verdict=fail (harness fix applied; ASan artifacts preserved)."
   - id: P0-2
     slug: install-game-data
     title: Ensure patched data is installed into app bundle
-    status: completed
+    status: in-progress
     owner: Release/Build
-    started_at: "2026-02-13T02:44:23Z"
-    completed_at: "2026-02-13T02:45:44Z"
-    verdict: pass
+    started_at: "2026-02-13T19:20:08Z"
+    completed_at: null
+    verdict: null
     artifacts:
       - "development/RME/ARTIFACTS/evidence/install-game-data/"
-    notes: "Patched data installed successfully; master.dat present in app bundle."
+    notes: "Re-run started at 2026-02-13T19:20:08Z; previous result=pass."
   - id: P0-3
     slug: runtime-sweep
     title: Run full 72-map runtime sweep with patchlog

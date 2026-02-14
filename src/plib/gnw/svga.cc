@@ -647,6 +647,18 @@ void svga_exit()
     pencil_shutdown();
 #endif
 
+    // Flush pending GPU/renderer work and allow in-flight callbacks to
+    // complete before destroying renderer resources. This prevents races
+    // where system/Metal callbacks may reference SDL-owned memory during
+    // shutdown (temporary defensive measure).
+    if (gSdlRenderer != NULL) {
+        SDL_Surface* surf = SDL_RenderReadPixels(gSdlRenderer, NULL);
+        if (surf != NULL) {
+            SDL_DestroySurface(surf);
+        }
+        SDL_Delay(50); // small grace period — remove after root-cause fix
+    }
+
     destroyRenderer();
 
     if (gSdlWindow != NULL) {
