@@ -72,19 +72,21 @@ def test_autofix_dry_run_creates_proposed_diff():
 
 def test_whitelist_propose_and_blocking():
     with tempfile.TemporaryDirectory() as tmp:
+        env = os.environ.copy()
+        env['RME_STATE_DIR'] = os.path.join(tmp, 'rme-state')
         workdir = os.path.join(tmp, 'work')
         os.makedirs(workdir, exist_ok=True)
         st = {"failures": [{"kind": "message", "path": "data/text/english/game/map.msg", "error": "message_load failed"}]}
         with open(os.path.join(workdir, 'rme-selftest.json'), 'w', encoding='utf-8') as f:
             json.dump(st, f)
         # Run autofix requesting whitelist apply
-        proc = subprocess.run([SCRIPT, '--workdir', workdir, '--iterations', '1', '--apply-whitelist', '--dry-run'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        proc = subprocess.run([SCRIPT, '--workdir', workdir, '--iterations', '1', '--apply-whitelist', '--dry-run'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
         assert proc.returncode == 0
-        # Check that a proposed diff was written into development/RME/fixes-proposed
-        outdiff = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'development', 'RME', 'fixes-proposed', 'whitelist-proposed.diff')
+        # Check that a proposed diff was written into tmp RME state
+        outdiff = os.path.join(tmp, 'rme-state', 'fixes-proposed', 'whitelist-proposed.diff')
         assert os.path.isfile(os.path.normpath(outdiff))
-        # Check a blocking file was created under development/RME/todo
-        todo_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'development', 'RME', 'todo')
+        # Check a blocking file was created under tmp RME state
+        todo_dir = os.path.join(tmp, 'rme-state', 'todo')
         found = False
         for f in os.listdir(os.path.normpath(todo_dir)):
             if f.endswith('-blocking-whitelist-apply.md'):

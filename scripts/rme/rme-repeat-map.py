@@ -5,7 +5,7 @@ rme-repeat-map.py — Python replacement for `rme-repeat-map.sh`.
 Behavior matches the original shell script but mirrors `rme-runtime-sweep.py`'s
 harness expectations (launch context + patchlog verification + analyzer).
 
-Usage: ./scripts/test/rme-repeat-map.py MAP [REPEATS]
+Usage: ./scripts/rme/rme-repeat-map.py MAP [REPEATS]
 
 Environment variables honored (same semantics as the shell script):
 - APP, EXE, OUT_DIR, TIMEOUT (CLI flags take precedence)
@@ -34,7 +34,7 @@ from typing import Optional
 ROOT = Path(__file__).resolve().parents[2]
 
 DEFAULT_EXE = Path("build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth")
-DEFAULT_OUT = Path("development/RME/validation/runtime")
+DEFAULT_OUT = Path("tmp/rme/validation/runtime")
 
 PLACEHOLDER_TEXT = "[PLACEHOLDER PATCHLOG] created by rme-repeat-map.py - engine may crash before producing a real patchlog\n"
 
@@ -68,8 +68,8 @@ def run_analyzer(analyzer: Path, patchlog: Path) -> str:
     return res.stdout or ""
 
 
-def create_placeholder_if_requested(pl_path: Path, out_dir: Path) -> None:
-    if str(out_dir).find("/development/RME/ARTIFACTS/evidence") != -1 or os.environ.get("RME_PLACEHOLDER_PATCHLOG") == "1":
+def create_placeholder_if_requested(pl_path: Path) -> None:
+    if os.environ.get("RME_PLACEHOLDER_PATCHLOG") == "1":
         pl_path.parent.mkdir(parents=True, exist_ok=True)
         pl_path.write_text(PLACEHOLDER_TEXT, encoding="utf-8")
 
@@ -116,7 +116,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 2
 
     # Canonical RME requirement: always install/verify GOG/patchedfiles in the target app.
-    ensure_script = ROOT / "scripts" / "test" / "rme-ensure-patched-data.sh"
+    ensure_script = ROOT / "scripts" / "rme" / "rme-ensure-patched-data.sh"
     if not ensure_script.exists():
         print(f"[ERROR] Missing preflight helper: {ensure_script}", file=sys.stderr)
         return 2
@@ -160,7 +160,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         run_log = patchlog_dir / f"{map_name}.iter{ i:02}.run.log"
 
         # Placeholder behaviour (same as shell script)
-        create_placeholder_if_requested(pl_path, out_dir)
+        create_placeholder_if_requested(pl_path)
 
         # Match runtime-sweep behavior: inherit ambient environment and override harness vars.
         env = os.environ.copy()

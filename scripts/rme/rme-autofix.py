@@ -15,7 +15,7 @@ Behavior:
 - Load rules from `rme_autofix_rules.py` and run them to produce candidate fixes.
 - Write per-iteration artifacts under <workdir>/fixes/iter-<i>/
 - If --apply, update files in workdir (only allowed if workdir path matches tmp/rme-run- pattern)
-- For whitelist proposals: write `whitelist-additions.txt` and do not modify canonical whitelist unless --apply-whitelist *and* human approval is given. When --apply-whitelist is passed, write a diff to `development/RME/fixes-proposed/whitelist-proposed.diff` and create a blocking file `development/RME/todo/<TS>-blocking-whitelist-apply.md`.
+- For whitelist proposals: write `whitelist-additions.txt` and do not modify canonical whitelist unless --apply-whitelist *and* human approval is given. When --apply-whitelist is passed, write a diff under `${RME_STATE_DIR}/fixes-proposed/` and create a blocking file under `${RME_STATE_DIR}/todo/`.
 """
 
 from __future__ import annotations
@@ -33,8 +33,11 @@ from difflib import unified_diff
 from typing import List, Dict, Any
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-PARSER = os.path.join(REPO_ROOT, "scripts", "test", "parse-rme-log.py")
-RULES_MODULE = os.path.join(REPO_ROOT, "scripts", "test", "rme_autofix_rules.py")
+RME_STATE_DIR = os.environ.get("RME_STATE_DIR", os.path.join(REPO_ROOT, "tmp", "rme"))
+RME_VALIDATION_DIR = os.path.join(RME_STATE_DIR, "validation")
+WHITELIST_PATH = os.environ.get("RME_WHITELIST", os.path.join(RME_VALIDATION_DIR, "whitelist.txt"))
+PARSER = os.path.join(REPO_ROOT, "scripts", "rme", "parse-rme-log.py")
+RULES_MODULE = os.path.join(REPO_ROOT, "scripts", "rme", "rme_autofix_rules.py")
 
 
 def load_run_summary(workdir: str) -> Dict[str, Any]:
@@ -234,37 +237,36 @@ def main(argv):
             # If apply_whitelist is requested, create workspace diff and a blocking file instead of committing
             if apply_whitelist:
                 # Create proposed diff against canonical whitelist
-                whitelist_path = os.path.join(REPO_ROOT, "development", "RME", "validation", "whitelist.txt")
                 proposed_lines = [f"{e['pattern']}  # {e['reason']}\n" for e in whitelist_entries]
-                if os.path.isfile(whitelist_path):
-                    with open(whitelist_path, "r", encoding="utf-8") as f:
+                if os.path.isfile(WHITELIST_PATH):
+                    with open(WHITELIST_PATH, "r", encoding="utf-8") as f:
                         orig = f.read()
                 else:
                     orig = ""
                 new = orig + "\n" + "".join(proposed_lines)
-                diff = list(unified_diff(orig.splitlines(True), new.splitlines(True), fromfile=whitelist_path, tofile=whitelist_path + ".proposed"))
-                outdiff_dir = os.path.join(REPO_ROOT, "development", "RME", "fixes-proposed")
+                diff = list(unified_diff(orig.splitlines(True), new.splitlines(True), fromfile=WHITELIST_PATH, tofile=WHITELIST_PATH + ".proposed"))
+                outdiff_dir = os.path.join(RME_STATE_DIR, "fixes-proposed")
                 os.makedirs(outdiff_dir, exist_ok=True)
                 outdiff_file = os.path.join(outdiff_dir, "whitelist-proposed.diff")
                 with open(outdiff_file, "w", encoding="utf-8") as f:
                     f.writelines(diff)
                 # Create blocking file requesting human approval to merge whitelist
                 ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-                blockdir = os.path.join(REPO_ROOT, "development", "RME", "todo")
+                blockdir = os.path.join(RME_STATE_DIR, "todo")
                 os.makedirs(blockdir, exist_ok=True)
                 blockfile = os.path.join(blockdir, f"{ts}-blocking-whitelist-apply.md")
                 with open(blockfile, "w", encoding="utf-8") as bf:
                     bf.write(f"# Blocking: Propose whitelist additions\n\n")
                     bf.write("**reason:** Proposed whitelist additions from rme-autofix engine\n\n")
                     bf.write("**diff path:** %s\n\n" % (os.path.relpath(outdiff_file, REPO_ROOT)))
-                    bf.write("**action:** If approved, apply these changes to `development/RME/validation/whitelist.txt` and commit to the current branch.\n")
+                    bf.write(f"**action:** If approved, apply these changes to `{os.path.relpath(WHITELIST_PATH, REPO_ROOT)}` and commit to the current branch.\n")
                 print(f"Whitelist proposed; diff written to {outdiff_file} and blocking file {blockfile}")
 
         # If we applied patches, re-run the orchestrator run on the WORKDIR to get fresh artifacts
         if applied:
             print("Re-running app selftest with modified WORKDIR to validate fixes")
             # Invoke test-rme-patchflow.sh with --skip-build to avoid rebuilds
-            runner = os.path.join(REPO_ROOT, "scripts", "test", "test-rme-patchflow.sh")
+            runner = os.path.join(REPO_ROOT, "scripts", "rme", "test-rme-patchflow.sh")
             try:
                 proc = subprocess.run([runner, "--skip-build" , workdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
                 out = (proc.stdout or "") + "\n" + (proc.stderr or "")

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Simple integration test for RME_WORKING_DIR override
-# Usage: ./scripts/test/test-rme-working-dir.sh [path/to/GOG/patchedfiles]
+# Usage: ./scripts/rme/test-rme-working-dir.sh [path/to/GOG/patchedfiles]
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
+RME_STATE_DIR="${RME_STATE_DIR:-$REPO_ROOT/tmp/rme}"
 CANONICAL_GOG_DIR="$REPO_ROOT/GOG/patchedfiles"
 GOG_DIR="${1:-$CANONICAL_GOG_DIR}"
 
@@ -15,8 +16,8 @@ fi
 if [ ! -d "$GOG_DIR" ]; then
     echo "GOG patchedfiles directory not found at $GOG_DIR" >&2
     TS_BLOCK="$(date -u +%Y%m%dT%H%M%SZ)"
-    mkdir -p "$REPO_ROOT/development/RME/todo"
-    BLOCKFILE="$REPO_ROOT/development/RME/todo/${TS_BLOCK}-blocking-rme-working-dir.md"
+    mkdir -p "$RME_STATE_DIR/todo"
+    BLOCKFILE="$RME_STATE_DIR/todo/${TS_BLOCK}-blocking-rme-working-dir.md"
     cat >"$BLOCKFILE" <<EOF
 # Blocking: GOG patchedfiles missing for RME working-dir test
 

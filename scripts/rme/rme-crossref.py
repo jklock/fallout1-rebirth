@@ -9,7 +9,7 @@ Also produces a heuristic report for missing LST references and a short
 markdown summary.
 
 USAGE:
-  python3 scripts/patch/rme-crossref.py --rme third_party/rme --base-dir GOG/patchedfiles --out-dir GOG/rme_xref_patched
+  python3 scripts/rme/rme-crossref.py --rme third_party/rme --base-dir GOG/patchedfiles --out-dir GOG/rme_xref_patched
 """
 
 from __future__ import annotations

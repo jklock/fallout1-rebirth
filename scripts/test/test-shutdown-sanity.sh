@@ -10,7 +10,7 @@ BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 APP_BUNDLE="$BUILD_DIR/$BUILD_TYPE/Fallout 1 Rebirth.app"
 EXECUTABLE="$APP_BUNDLE/Contents/MacOS/fallout1-rebirth"
 
-OUT_DIR="development/RME/ARTIFACTS/evidence/shutdown-sanity"
+OUT_DIR="tmp/rme/artifacts/evidence/shutdown-sanity"
 mkdir -p "$OUT_DIR"
 PATCHLOG_PATH="$OUT_DIR/shutdown-sanity.patchlog.txt"
 STDOUT_LOG="$OUT_DIR/shutdown.stdout.log"

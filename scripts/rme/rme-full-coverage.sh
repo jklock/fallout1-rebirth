@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+RME_SCRIPT_DIR="$ROOT/scripts/rme"
 
 BASE_DIR="${BASE_DIR:-$ROOT/GOG/unpatchedfiles}"
 PATCHED_DIR="$ROOT/GOG/patchedfiles"
@@ -12,8 +13,8 @@ else
 fi
 CONFIG_DIR="${CONFIG_DIR:-$ROOT/gameconfig/macos}"
 
-OUT_DIR="${OUT_DIR:-$ROOT/development/RME/validation}"
-RUNTIME_OUT="${RUNTIME_OUT:-$ROOT/development/RME/validation/runtime}"
+OUT_DIR="${OUT_DIR:-$ROOT/tmp/rme/validation}"
+RUNTIME_OUT="${RUNTIME_OUT:-$ROOT/tmp/rme/validation/runtime}"
 
 APP="${APP:-$ROOT/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app}"
 EXE="${EXE:-$APP/Contents/MacOS/fallout1-rebirth}"
@@ -60,7 +61,7 @@ if [[ ! -d "$PATCHED_DIR" || "$REBUILD_PATCHED" == "1" ]]; then
 fi
 
 # Canonical source must exist and be complete before any validation/test execution.
-"$ROOT/scripts/test/rme-ensure-patched-data.sh" --quiet
+"$RME_SCRIPT_DIR/rme-ensure-patched-data.sh" --quiet
 
 log "Refresh validation evidence"
 "$ROOT/scripts/patch/rebirth-refresh-validation.sh" \
@@ -70,7 +71,7 @@ log "Refresh validation evidence"
   --out "$OUT_DIR"
 
 log "Audit script references"
-python3 "$ROOT/scripts/test/rme-audit-script-refs.py" \
+python3 "$RME_SCRIPT_DIR/rme-audit-script-refs.py" \
   --patched-dir "$PATCHED_DIR" \
   --out-dir "$OUT_DIR/raw"
 
@@ -81,13 +82,13 @@ log "Validate patched data overlay"
   --rme "$RME_DIR"
 
 log "Install/verify canonical patched data into app bundle"
-"$ROOT/scripts/test/rme-ensure-patched-data.sh" --target-app "$APP"
+"$RME_SCRIPT_DIR/rme-ensure-patched-data.sh" --target-app "$APP"
 
 log "Headless macOS smoke test"
 "$ROOT/scripts/test/test-macos-headless.sh"
 
 log "Runtime map sweep (timeout=${TIMEOUT}s)"
-python3 "$ROOT/scripts/test/rme-runtime-sweep.py" \
+python3 "$RME_SCRIPT_DIR/rme-runtime-sweep.py" \
   --exe "$EXE" \
   --out-dir "$RUNTIME_OUT" \
   --timeout "$TIMEOUT"

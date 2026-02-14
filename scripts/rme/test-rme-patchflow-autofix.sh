@@ -2,12 +2,12 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
-GOG_DIR="$REPO_ROOT/scripts/test/data/failing_run"
+GOG_DIR="$REPO_ROOT/scripts/rme/data/failing_run"
 
 # 1) Dry-run: expect proposed.diff exists
 echo "== Dry-run auto-fix (no apply) =="
-export TEST_FALLBACK_BINARY="$REPO_ROOT/scripts/test/tools/fake_fallout_runner"
-if "$REPO_ROOT/scripts/test/test-rme-patchflow.sh" --auto-fix --auto-fix-iterations 1 --skip-build "$GOG_DIR"; then
+export TEST_FALLBACK_BINARY="$REPO_ROOT/scripts/rme/tools/fake_fallout_runner"
+if "$REPO_ROOT/scripts/rme/test-rme-patchflow.sh" --auto-fix --auto-fix-iterations 1 --skip-build "$GOG_DIR"; then
     echo "Expected failure but run succeeded (dry-run)" >&2
     exit 2
 fi
@@ -29,7 +29,7 @@ echo "Dry-run: proposed.diff present as expected"
 
 # 2) Apply mode: expect final run to pass after autofix applied
 echo "== Apply auto-fix (apply mode) =="
-if ! "$REPO_ROOT/scripts/test/test-rme-patchflow.sh" --auto-fix --auto-fix-iterations 2 --auto-fix-apply --skip-build "$GOG_DIR"; then
+if ! "$REPO_ROOT/scripts/rme/test-rme-patchflow.sh" --auto-fix --auto-fix-iterations 2 --auto-fix-apply --skip-build "$GOG_DIR"; then
     echo "Auto-fix apply run failed" >&2
     # Locate last run dir and show artifacts
     LDIR=$(ls -td "$REPO_ROOT/tmp/rme-run-"* 2>/dev/null | head -n1 || true)

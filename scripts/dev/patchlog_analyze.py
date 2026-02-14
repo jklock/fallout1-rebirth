@@ -3,7 +3,7 @@
 that was previously non-zero becomes zero (surf_pre>0 && surf_post==0).
 
 Usage:
-  ./patchlog_analyze.py development/RME/validation/runtime/patchlogs/CARAVAN.MAP.patchlog.txt
+  ./patchlog_analyze.py tmp/rme/validation/runtime/patchlogs/CARAVAN.MAP.patchlog.txt
 
 Outputs suspicious events with surrounding context.
 """

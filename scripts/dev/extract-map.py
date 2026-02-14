@@ -2,8 +2,8 @@
 """Find and extract a MAP from master.dat (patched first, then unpatched).
 
 Writes:
- - development/RME/ARTIFACTS/evidence/gate-2/<map>-dat-entries.txt
- - development/RME/ARTIFACTS/evidence/gate-2/<map>-extract-info.txt (if extracted)
+ - tmp/rme/artifacts/evidence/gate-2/<map>-dat-entries.txt
+ - tmp/rme/artifacts/evidence/gate-2/<map>-extract-info.txt (if extracted)
  - GOG/patchedfiles/data/maps/<MAP>.MAP (if extracted)
 
 Usage: python3 scripts/dev/extract-map.py MAPNAME

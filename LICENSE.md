@@ -2,6 +2,10 @@
 
 Version 1.0
 
+## History
+
+This license is inheritied from the original Github upstream codebase. As a result, this license cannot be modified downstream from the upstream codebase. 
+
 ## Acceptance
 
 By using the software, you agree to all of the terms and conditions below.

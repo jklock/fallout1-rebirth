@@ -32,7 +32,7 @@ sha256_file() {
 
 show_help() {
   cat <<'USAGE'
-Usage: ./scripts/test/rme-ensure-patched-data.sh [OPTIONS]
+Usage: ./scripts/rme/rme-ensure-patched-data.sh [OPTIONS]
 
 Ensures the canonical RME test data source (GOG/patchedfiles) exists and,
 when a target app/resources path is supplied, ensures that exact data is

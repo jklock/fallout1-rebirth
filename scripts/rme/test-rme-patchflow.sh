@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Orchestrator script for running RME patchflow selftests
-# Usage: ./scripts/test/test-rme-patchflow.sh [--autorun-map] [path/to/GOG/patchedfiles]
+# Usage: ./scripts/rme/test-rme-patchflow.sh [--autorun-map] [path/to/GOG/patchedfiles]
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
+RME_STATE_DIR="${RME_STATE_DIR:-$REPO_ROOT/tmp/rme}"
 CANONICAL_GOG_DIR="$REPO_ROOT/GOG/patchedfiles"
 # CLI flags: [--autorun-map] [--auto-fix] [--auto-fix-iterations N] [--auto-fix-apply] [--auto-fix-apply-whitelist] [--skip-build]
 AUTO_FIX=0
@@ -72,8 +73,8 @@ fi
 if [ ! -d "$GOG_DIR" ]; then
     echo "GOG patchedfiles directory not found at $GOG_DIR" >&2
     TS_BLOCK="$(date -u +%Y%m%dT%H%M%SZ)"
-    mkdir -p "$REPO_ROOT/development/RME/todo"
-    BLOCKFILE="$REPO_ROOT/development/RME/todo/${TS_BLOCK}-blocking-rme-patchflow.md"
+    mkdir -p "$RME_STATE_DIR/todo"
+    BLOCKFILE="$RME_STATE_DIR/todo/${TS_BLOCK}-blocking-rme-patchflow.md"
     cat >"$BLOCKFILE" <<EOF
 # Blocking: GOG patchedfiles missing for RME patchflow orchestrator
 
@@ -180,11 +181,11 @@ for f in "${ARTIFACTS[@]}"; do
 done
 
 # If parser exists, run it to produce rme-run-summary.json
-PARSER="$REPO_ROOT/scripts/test/parse-rme-log.py"
+PARSER="$REPO_ROOT/scripts/rme/parse-rme-log.py"
 SUMMARY="$RUNDIR/rme-run-summary.json"
 if [ -x "$PARSER" ] || [ -f "$PARSER" ]; then
     echo "Running parse-rme-log.py"
-    python3 "$PARSER" --rme-log "$RMELOG" --selftest "$WORKDIR/rme-selftest.json" --whitelist "$REPO_ROOT/development/RME/validation/whitelist.txt" --max-db-open-failures 0 --max-selftest-failures 0 > "$SUMMARY" 2>"$RUNDIR/parse.err" || true
+    python3 "$PARSER" --rme-log "$RMELOG" --selftest "$WORKDIR/rme-selftest.json" --whitelist "$RME_STATE_DIR/validation/whitelist.txt" --max-db-open-failures 0 --max-selftest-failures 0 > "$SUMMARY" 2>"$RUNDIR/parse.err" || true
 else
     echo "Parser not found at $PARSER; skipping parse step"
 fi
@@ -215,9 +216,9 @@ for f in "${ARTIFACTS[@]}"; do
     fi
 done
 
-# Persist canonical copy into development area only if requested by caller
-mkdir -p "$REPO_ROOT/development/RME/validation/run-${TS}"
-cp -a "$RUNDIR/artifacts" "$REPO_ROOT/development/RME/validation/run-${TS}/" || true
+# Persist canonical copy into the RME state area for inspection
+mkdir -p "$RME_STATE_DIR/validation/run-${TS}"
+cp -a "$RUNDIR/artifacts" "$RME_STATE_DIR/validation/run-${TS}/" || true
 
 if [ "$PASS" -ne 1 ]; then
     echo "RME patchflow run FAILED; artifacts at $RUNDIR" >&2
@@ -231,7 +232,7 @@ if [ "$PASS" -ne 1 ]; then
         # Invoke autofix engine
         echo "Invoking rme-autofix.py (iterations=${AUTO_FIX_ITERATIONS}, apply=${AUTO_FIX_APPLY}, apply-whitelist=${AUTO_FIX_APPLY_WHITELIST})"
         PYTHON=python3
-        "$PYTHON" "$REPO_ROOT/scripts/test/rme-autofix.py" --workdir "$WORKDIR" --iterations "$AUTO_FIX_ITERATIONS" $( [ "$AUTO_FIX_APPLY" -eq 1 ] && echo "--apply" ) $( [ "$AUTO_FIX_APPLY_WHITELIST" -eq 1 ] && echo "--apply-whitelist" ) --verbose
+        "$PYTHON" "$REPO_ROOT/scripts/rme/rme-autofix.py" --workdir "$WORKDIR" --iterations "$AUTO_FIX_ITERATIONS" $( [ "$AUTO_FIX_APPLY" -eq 1 ] && echo "--apply" ) $( [ "$AUTO_FIX_APPLY_WHITELIST" -eq 1 ] && echo "--apply-whitelist" ) --verbose
         AUTOFIX_RC=$?
 
         # Collect per-iter artifacts if present

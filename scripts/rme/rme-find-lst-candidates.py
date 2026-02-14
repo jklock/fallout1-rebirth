@@ -52,7 +52,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Find candidate files for missing LST references")
     ap.add_argument(
         "--lst-report",
-        default="development/RME/validation/raw/08_lst_missing.md",
+        default="tmp/rme/validation/raw/08_lst_missing.md",
         help="Path to rme-lst-report.md (or copied equivalent)",
     )
     ap.add_argument(
@@ -63,7 +63,7 @@ def main() -> int:
     )
     ap.add_argument(
         "--out",
-        default="development/RME/validation/raw/lst_candidates.csv",
+        default="tmp/rme/validation/raw/lst_candidates.csv",
         help="Output CSV path",
     )
     ap.add_argument(
@@ -108,4 +108,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

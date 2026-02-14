@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fake fallback runner used for tests (kept under scripts/test/tools so it can be committed)
+# Fake fallback runner used for tests (kept under scripts/rme/tools so it can be committed)
 WD="${RME_WORKING_DIR:-}" 
 LOG_FILE="${RME_LOG_FILE:-/tmp/rme.log}"
 SELFTEST="${RME_WORKING_DIR:-}/rme-selftest.json"

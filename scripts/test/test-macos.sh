@@ -392,7 +392,7 @@ main() {
     esac
 
     # Canonical RME requirement: tests always run with GOG/patchedfiles installed.
-    "$ROOT_DIR/scripts/test/rme-ensure-patched-data.sh" --target-app "$APP_BUNDLE"
+    "$ROOT_DIR/scripts/rme/rme-ensure-patched-data.sh" --target-app "$APP_BUNDLE"
     
     # Run all verification checks
     verify_bundle_structure

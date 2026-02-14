@@ -276,7 +276,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     parser.add_argument(
         "--out-dir",
-        default="development/RME/validation/runtime",
+        default="tmp/rme/validation/runtime",
         help="Directory to write reports into",
     )
     parser.add_argument("--timeout", type=float, default=25.0, help="Per-map timeout in seconds")
@@ -336,7 +336,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     repo_root = Path(__file__).resolve().parents[2]
 
     # Canonical RME requirement: always verify/install GOG/patchedfiles in app resources.
-    ensure_script = repo_root / "scripts" / "test" / "rme-ensure-patched-data.sh"
+    ensure_script = repo_root / "scripts" / "rme" / "rme-ensure-patched-data.sh"
     if not ensure_script.exists():
         print(f"[ERROR] missing preflight helper: {ensure_script}", file=sys.stderr)
         return 2

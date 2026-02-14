@@ -3,7 +3,7 @@
 Writes a report listing missing files, mismatched hashes, ambiguous matches, and unexpected extras.
 
 Usage:
-  scripts/patch/verify-checksums.py --checks third_party/rme/checksums.txt --overlay GOG/patchedfiles --out development/RME/ARTIFACTS/evidence/gate-2/patch-validation/checksums-verify.txt
+  scripts/patch/verify-checksums.py --checks third_party/rme/checksums.txt --overlay GOG/patchedfiles --out tmp/rme/artifacts/evidence/gate-2/patch-validation/checksums-verify.txt
 """
 import argparse
 import hashlib

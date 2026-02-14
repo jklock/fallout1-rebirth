@@ -428,7 +428,7 @@ def token_from_scripts_lst_line(line: str) -> str:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Audit missing scripts and references (MAP/PRO)")
     parser.add_argument("--patched-dir", default="GOG/patchedfiles", help="Patched dir with master.dat/critter.dat and data/")
-    parser.add_argument("--out-dir", default="development/RME/validation/raw", help="Output directory")
+    parser.add_argument("--out-dir", default="tmp/rme/validation/raw", help="Output directory")
     args = parser.parse_args(argv)
 
     patched_dir = Path(args.patched_dir).resolve()
