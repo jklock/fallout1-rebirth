@@ -52,6 +52,7 @@
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
+#include "plib/gnw/mouse.h"
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/memory.h" // mem_check() - detect header/footer stomps earlier
 #include "plib/gnw/svga.h"
@@ -384,6 +385,52 @@ static int main_load_new(char* mapFileName)
             _dude_tile = obj_dude->tile;
         }
         patchlog_write("AUTORUN_MAP", "dude_tile=%d", _dude_tile);
+
+        /* Optional autorun interaction: simulate a click and record post-click tile.
+           Honor harness-controlled delays:
+             - F1R_AUTORUN_CLICK_DELAY (seconds) delays the click
+             - F1R_AUTORUN_HOLD_SECS (seconds) holds the process after interaction
+         */
+        const char* autorun_click_env = getenv("F1R_AUTORUN_CLICK");
+        if (autorun_click_env != NULL && autorun_click_env[0] != '\0' && autorun_click_env[0] != '0') {
+            /* Pre-click delay (seconds) read from harness. */
+            const char* click_delay_env = getenv("F1R_AUTORUN_CLICK_DELAY");
+            if (click_delay_env != NULL && click_delay_env[0] != '\0') {
+                int delay_secs = atoi(click_delay_env);
+                if (delay_secs > 0) {
+                    pause_for_tocks(delay_secs * 1000);
+                }
+            }
+
+            /* Simulate a left-button click at the current cursor position. */
+            mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
+            mouse_simulate_input(0, 0, 0);
+
+            /* Allow the engine a short window to process the input. */
+            pause_for_tocks(200);
+
+            int post_tile = -1;
+            if (obj_dude != NULL) {
+                post_tile = obj_dude->tile;
+            }
+            patchlog_write("AUTORUN_MAP", "post_click_dude_tile=%d", post_tile);
+
+            /* Optional post-click screenshot (set F1R_AUTOSCREENSHOT_POST=1 to enable). */
+            const char* postshot_env = getenv("F1R_AUTOSCREENSHOT_POST");
+            if (postshot_env != NULL && postshot_env[0] != '\0' && postshot_env[0] != '0') {
+                dump_screen();
+            }
+
+            /* Optional hold period after autorun interaction (seconds). This keeps
+               the process alive so harnesses can capture screenshots/ASan traces. */
+            const char* hold_env = getenv("F1R_AUTORUN_HOLD_SECS");
+            if (hold_env != NULL && hold_env[0] != '\0') {
+                int hold_secs = atoi(hold_env);
+                if (hold_secs > 0) {
+                    pause_for_tocks(hold_secs * 1000);
+                }
+            }
+        }
     }
 
     const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");

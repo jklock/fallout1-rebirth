@@ -1,7 +1,7 @@
 # RME — Consolidated plan
 
-Last updated: 2026-02-12
-Status: In progress — static patch ✅, runtime verification partial (3/72 maps), manual gameplay not started
+Last updated: 2026-02-13
+Status: In progress — static patch ✅; runtime verification: harness updated (autorun-click delayed to 7s, per-test hold 10s); re-running full sweep
 
 Purpose
 - Provide a short, executable plan to finish RME integration: reach 100% patch coverage (static + runtime) and 100% game functionality (macOS + iOS verification).
@@ -38,8 +38,8 @@ Priority milestones (next 2 weeks)
 
 Key acceptance tests (quick)
 - Static: `./scripts/patch/rebirth-validate-data.sh --patched GOG/patchedfiles --base GOG/unpatchedfiles` → exit 0.
-- Runtime sweep: `F1R_PATCHLOG=1 python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --out-dir development/RME/ARTIFACTS/evidence/runtime` → CSV with 72 rows.
-- Flaky map: `./scripts/patch/rme-repeat-map.sh CARAVAN 10` → 10/10 pass.
+- Runtime sweep: `F1R_PATCHLOG=1 python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --out-dir development/RME/ARTIFACTS/evidence/runtime --timeout 30` → CSV with 72 rows. Per‑map runs MUST use `F1R_AUTORUN_CLICK_DELAY=7` and `F1R_AUTORUN_HOLD_SECS=10` (tests >= 10s).
+- Flaky map: strict smoke `F1R_AUTORUN_CLICK=1 F1R_AUTORUN_CLICK_DELAY=7 F1R_AUTORUN_HOLD_SECS=10 ./scripts/patch/rme-repeat-map.sh CARAVAN 10` → 10/10 pass and `post_click_dude_tile` present in patchlogs.
 - macOS gameplay: complete Gate‑3 checklist (screenshots + notes).
 - iOS: successful simulator install & 10‑minute play session.
 
@@ -54,9 +54,12 @@ Risks
 - Case-fallback policy decision required (affects DB_OPEN_FAIL handling); mitigation: prefer data fixes and opt-in engine fallback if approved.
 
 Immediate actions (do now)
-1. F1R_PATCHLOG=1 ./scripts/patch/rme-repeat-map.sh CARAVAN 10
-2. If that fails, verify `GOG/patchedfiles/data/maps/CARAVAN.MAP` is present and run `./scripts/test/test-install-game-data.sh`
-3. Start full sweep with patchlog enabled and save results under `development/RME/ARTIFACTS/evidence/runtime`
+1. Clean validation runtime artifacts: `rm -rf development/RME/validation/runtime/*` and ensure `master.dat`/`critter.dat` are present in app Resources.
+2. Run strict 3× smoke for flaky maps with harness timing (click delay 7s, hold 10s):
+   `F1R_AUTORUN_CLICK=1 F1R_AUTORUN_CLICK_DELAY=7 F1R_AUTORUN_HOLD_SECS=10 ./scripts/patch/rme-repeat-map.sh CARAVAN 3`
+   Repeat for `ZDESERT1` and `TEMPLAT1` and confirm `post_click_dude_tile=` is present in each patchlog.
+3. When smoke runs pass, run full sweep (per-test minimum 10s):
+   `python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --out-dir development/RME/validation/runtime --timeout 30`
 
 Links & evidence locations
 - Evidence root: `development/RME/ARTIFACTS/evidence/`

@@ -29,14 +29,14 @@ tasks:
   - id: P0-3
     slug: runtime-sweep
     title: Run full 72-map runtime sweep with patchlog
-    status: completed
+    status: in-progress
     owner: QA
-    started_at: "2026-02-13T02:45:44Z"
-    completed_at: "2026-02-13T03:47:54Z"
-    verdict: pass
+    started_at: "2026-02-13T19:30:00Z"
+    completed_at: null
+    verdict: null
     artifacts:
       - "development/RME/ARTIFACTS/evidence/runtime/"
-    notes: "72-map sweep completed; 1 map (BRODEAD.MAP) timed out but analyzer reported no untriaged CRITICALs."
+    notes: "Re-running full sweep with harness changes: per-test minimum 10s, autorun click delay 7s, hold 10s. Will validate post_click_dude_tile in patchlogs."
   - id: P1-1
     slug: gate-3
     title: Manual macOS gameplay smoke & evidence capture (Gate-3)

@@ -84,7 +84,16 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("--timeout", type=int, default=int(os.environ.get("TIMEOUT", "60")), help="Per-run timeout (seconds)")
     args = p.parse_args(argv)
 
-    map_name = args.map
+    # Normalize map argument: accept both `CARAVAN` and `CARAVAN.MAP`.
+    map_input = args.map
+    # canonical base (no extension, uppercase) used for artifact filenames
+    map_base = map_input.upper()
+    if map_base.endswith(".MAP"):
+        map_base = map_base[:-4]
+    # engine-facing map name (with extension)
+    env_map = f"{map_base}.MAP"
+
+    map_name = map_base
     repeats = max(1, args.repeats)
     exe = Path(args.exe).resolve()
 
@@ -162,7 +171,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         # Prepare environment (sanitized)
         env = {"PATH": os.environ.get("PATH", "")}
         env.update({
-            "F1R_AUTORUN_MAP": map_name,
+            "F1R_AUTORUN_MAP": env_map,
             "F1R_AUTORUN_CLICK": os.environ.get("F1R_AUTORUN_CLICK", "0"),
             "F1R_AUTORUN_CLICK_DELAY": os.environ.get("F1R_AUTORUN_CLICK_DELAY", "7"),
             "F1R_AUTORUN_HOLD_SECS": os.environ.get("F1R_AUTORUN_HOLD_SECS", "10"),
@@ -256,20 +265,22 @@ def main(argv: Optional[list[str]] = None) -> int:
         pl_text = pl_path.read_text(encoding="utf-8", errors="ignore")
         load_ok = True
         reasons = []
-        m = re.search(r'AUTORUN_MAP.*load_end.*rc=(\-?\d+)', pl_text)
-        if not m or int(m.group(1)) != 0:
+        # Use the *last* occurrence in the patchlog so transient/earlier entries do not mask final state.
+        import re
+        load_matches = re.findall(r'AUTORUN_MAP.*load_end.*rc=(-?\d+)', pl_text)
+        if not load_matches or int(load_matches[-1]) != 0:
             load_ok = False
             reasons.append("map_load rc!=0 or missing")
-        m2 = re.search(r'DISPLAY_TOP_PIXELS.*non_zero_pct=(\d+)', pl_text)
-        if not m2 or int(m2.group(1)) == 0:
+        disp_matches = re.findall(r'DISPLAY_TOP_PIXELS.*non_zero_pct=(\d+)', pl_text)
+        if not disp_matches or int(disp_matches[-1]) == 0:
             load_ok = False
             reasons.append("display all black")
-        m3 = re.search(r'AUTORUN_MAP.*dude_tile=(-?\d+)', pl_text)
-        if not m3 or int(m3.group(1)) < 0:
+        dude_matches = re.findall(r'AUTORUN_MAP.*dude_tile=(-?\d+)', pl_text)
+        if not dude_matches or int(dude_matches[-1]) < 0:
             load_ok = False
             reasons.append("dude not placed")
-        m4 = re.search(r'AUTORUN_MAP.*post_click_dude_tile=(-?\d+)', pl_text)
-        if not m4 or int(m4.group(1)) < 0:
+        post_matches = re.findall(r'AUTORUN_MAP.*post_click_dude_tile=(-?\d+)', pl_text)
+        if not post_matches or int(post_matches[-1]) < 0:
             load_ok = False
             reasons.append("post_click missing")
 

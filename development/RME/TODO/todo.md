@@ -1,16 +1,18 @@
 # RME — Prioritized TODO (short, actionable)
 
-Last updated: 2026-02-12
+Last updated: 2026-02-14
 
 How to use
 - Do tasks top → down. Each entry includes an exact command (when applicable), acceptance criteria, owner, and estimate.
 
 P0 — Critical (blockers)
-- [ ] Fix CARAVAN / ZDESERT1 / TEMPLAT1 flaky runs
-  - Command: F1R_PATCHLOG=1 ./scripts/patch/rme-repeat-map.sh CARAVAN 10
-  - Acceptance: 10/10 PASS for each map; failing patchlog explains root cause or a data/packaging fix applied
+- [ ] Fix CARAVAN / ZDESERT1 / TEMPLAT1 flaky runs — harness parity fix applied (ready to run)
+  - Status: harness parity bug fixed — `rme-repeat-map.py` moved to `scripts/test/`; wrapper updated; `F1R_AUTORUN_MAP` now passed as engine-facing name (e.g. `CARAVAN.MAP`).
+  - Command (smoke): F1R_PATCHLOG=1 ./scripts/patch/rme-repeat-map.sh CARAVAN 3
+  - Command (full repeat): F1R_PATCHLOG=1 ./scripts/patch/rme-repeat-map.sh CARAVAN 10
+  - Acceptance: 10/10 PASS for each map; patchlog contains `post_click_dude_tile>=0` and `DISPLAY_TOP_PIXELS non_zero_pct>0`; failing patchlog documents root cause or data/packaging fix applied
   - Owner: QA + Engine
-  - Est: 4–8h
+  - Est: 4–8h (smoke: ~15–30m)
 
 - [ ] Ensure patched data is installed into app bundle (packaging fix)
   - Command: ./scripts/test/test-install-game-data.sh && verify `ls build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/master.dat`
@@ -19,8 +21,10 @@ P0 — Critical (blockers)
   - Est: 1–3h
 
 - [ ] Run full 72‑map runtime sweep with patchlog
+  - Status: pending P0 flaky-map fixes (run after CARAVAN/ZDESERT1/TEMPLAT1 smoke passes)
   - Command: F1R_PATCHLOG=1 python3 scripts/patch/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --timeout 120 --out-dir development/RME/ARTIFACTS/evidence/runtime
   - Acceptance: CSV contains 72 data rows; no untriaged CRITICAL errors in patchlogs
+  - Depends: P0 — CARAVAN / ZDESERT1 / TEMPLAT1 must pass repeat harness
   - Owner: QA
   - Est: 3–8h (triage additional)
 

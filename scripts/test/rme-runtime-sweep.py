@@ -283,15 +283,36 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--limit", type=int, default=0, help="Limit maps (0 = all)")
     args = parser.parse_args(argv)
 
+    # Enforce minimum per-test duration (required by RME harness: tests >= 10s)
+    if args.timeout < 10.0:
+        print(f"[WARN] --timeout {args.timeout}s is below the required minimum of 10s; increasing to 10s")
+        args.timeout = 10.0
+
     exe = Path(args.exe).resolve()
-    if not exe.is_file():
-        print(f"[ERROR] executable not found: {exe}", file=sys.stderr)
+
+    # Diagnostic: show the current working directory and resolved executable path
+    print(f"[INFO] cwd={os.getcwd()} resolved_exe={exe}")
+
+    if not exe.is_file() or not os.access(str(exe), os.X_OK):
+        print(f"[ERROR] executable not found or not executable: {exe}", file=sys.stderr)
         return 2
 
+    # Prefer the canonical .app Resources dir but accept common fallbacks so the
+    # script works whether the exe is inside an .app bundle or a build dir.
     resources_dir = _find_resources_dir_from_exe(exe)
     if resources_dir is None:
-        print(f"[ERROR] could not infer Resources dir from: {exe}", file=sys.stderr)
+        # Try a couple of sensible fallbacks
+        cand = exe.parent / "Resources"
+        cand2 = exe.parent.parent / "Resources"
+        if cand.exists():
+            resources_dir = cand
+        elif cand2.exists():
+            resources_dir = cand2
+
+    if resources_dir is None:
+        print(f"[ERROR] could not infer Resources dir from: {exe} (tried Contents and fallbacks)", file=sys.stderr)
         return 2
+
     resources_dir = resources_dir.resolve()
 
     data_root = Path(args.data_root).resolve() if args.data_root else resources_dir
@@ -355,6 +376,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             env = os.environ.copy()
             env["F1R_AUTORUN_MAP"] = map_name
             env["F1R_AUTOSCREENSHOT"] = "1"
+            # Simulate a click after full load so the harness exercises input/gameplay
+            env["F1R_AUTORUN_CLICK"] = "1"
+            # Delay the autorun click (seconds) - harness default is 7s; engine honors F1R_AUTORUN_CLICK_DELAY
+            env["F1R_AUTORUN_CLICK_DELAY"] = os.environ.get("F1R_AUTORUN_CLICK_DELAY", "7")
+            # Hold the process for N seconds after autorun interaction so the harness can collect artifacts
+            env["F1R_AUTORUN_HOLD_SECS"] = os.environ.get("F1R_AUTORUN_HOLD_SECS", "10")
+            # Capture a post-click screenshot (optional, enabled for autorun-interaction tests)
+            env["F1R_AUTOSCREENSHOT_POST"] = "1"
             # Ensure the engine writes any present-anomaly BMPs into the out-dir rather than /tmp
             env["F1R_PRESENT_ANOM_DIR"] = str(present_anom_dir)
             # Always enable per-map patchlog for strict full-load verification
@@ -363,8 +392,23 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if os.environ.get("F1R_PATCHLOG_VERBOSE") and os.environ.get("F1R_PATCHLOG_VERBOSE") != "0":
                 env["F1R_PATCHLOG_VERBOSE"] = os.environ.get("F1R_PATCHLOG_VERBOSE")
 
+            # Ensure the per-map subprocess timeout is long enough to accommodate the hold window
+            try:
+                hold_secs = int(env.get("F1R_AUTORUN_HOLD_SECS", "10"))
+            except Exception:
+                hold_secs = 10
+            if args.timeout < hold_secs + 2:
+                old_timeout = args.timeout
+                args.timeout = float(hold_secs + 2)
+                f_log.write(f"[WARN] increasing per-map timeout from {old_timeout}s to {args.timeout}s to accommodate F1R_AUTORUN_HOLD_SECS={hold_secs}\n")
+                f_log.flush()
+
             t0 = time.time()
             try:
+                # Log the exact launch context to the run log for debugging
+                f_log.write(f"[INFO] launch: exe={exe} cwd={out_dir} F1R_AUTORUN_MAP={env.get('F1R_AUTORUN_MAP')} F1R_AUTORUN_CLICK={env.get('F1R_AUTORUN_CLICK')}\n")
+                f_log.flush()
+
                 # Run the engine with the working directory set to the sweep out-dir so `dump_screen()` writes
                 # `scrXXXXX.bmp` into a writable, predictable location that this script will pick up.
                 proc = subprocess.run(
@@ -435,18 +479,26 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if patchlog_file.exists():
                 pl_text = patchlog_file.read_text(encoding="utf-8", errors="ignore")
                 import re
-                m = re.search(r'AUTORUN_MAP.*load_end.*rc=(\d+)', pl_text)
-                if not m or int(m.group(1)) != 0:
+                # Prefer the last occurrence of each AUTORUN_MAP/display field so
+                # transient earlier entries don't mask the final run state.
+                import re
+                load_matches = re.findall(r'AUTORUN_MAP.*load_end.*rc=(-?\d+)', pl_text)
+                if not load_matches or int(load_matches[-1]) != 0:
                     full_load_ok = False
                     full_load_reasons.append("map_load rc!=0 or missing")
-                m2 = re.search(r'DISPLAY_TOP_PIXELS.*non_zero_pct=(\d+)', pl_text)
-                if not m2 or int(m2.group(1)) == 0:
+                disp_matches = re.findall(r'DISPLAY_TOP_PIXELS.*non_zero_pct=(\d+)', pl_text)
+                if not disp_matches or int(disp_matches[-1]) == 0:
                     full_load_ok = False
                     full_load_reasons.append("display all black")
-                m3 = re.search(r'AUTORUN_MAP.*dude_tile=(-?\d+)', pl_text)
-                if not m3 or int(m3.group(1)) < 0:
+                dude_matches = re.findall(r'AUTORUN_MAP.*dude_tile=(-?\d+)', pl_text)
+                if not dude_matches or int(dude_matches[-1]) < 0:
                     full_load_ok = False
                     full_load_reasons.append("dude not placed")
+                # Confirm autorun interaction (post-click) was exercised and logged
+                post_matches = re.findall(r'AUTORUN_MAP.*post_click_dude_tile=(-?\d+)', pl_text)
+                if not post_matches or int(post_matches[-1]) < 0:
+                    full_load_ok = False
+                    full_load_reasons.append("post_click missing")
             else:
                 full_load_ok = False
                 full_load_reasons.append("patchlog missing")
