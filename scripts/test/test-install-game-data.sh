@@ -12,7 +12,7 @@
 #   ./scripts/test/test-install-game-data.sh --help
 #
 # OPTIONS:
-#   --source PATH   Path to game data directory (default: . or ~/Games/Fallout1)
+#   --source PATH   Path to game data directory (default: GOG/patchedfiles)
 #   --target PATH   Path to .app bundle (default: /Applications/Fallout 1 Rebirth.app)
 #   --help          Show this help message
 #
@@ -34,6 +34,7 @@ cd "$(dirname "$0")/../.."
 # Configuration
 # -----------------------------------------------------------------------------
 DEFAULT_TARGET="/Applications/Fallout 1 Rebirth.app"
+DEFAULT_SOURCE="$PWD/GOG/patchedfiles"
 
 # Colors for output
 RED='\033[0;31m'
@@ -61,7 +62,7 @@ USAGE:
 
 OPTIONS:
     --source PATH   Path to directory containing game data files
-                    Required for non-interactive use
+                    Defaults to GOG/patchedfiles when present
     
     --target PATH   Path to the .app bundle to install into
                     If omitted, the script will prompt or use /Applications/Fallout 1 Rebirth.app when present
@@ -75,7 +76,7 @@ REQUIRED FILES:
     - data/         Additional game data folder
 
 EXAMPLES:
-    # Interactive prompt (asks for source/target)
+    # Uses default source (GOG/patchedfiles) and prompts for target if needed
     ./scripts/test/test-install-game-data.sh
 
     # Specify a source folder
@@ -140,10 +141,13 @@ if [[ -z "$SOURCE_PATH" ]]; then
     if [[ -n "${GAME_DATA:-}" ]]; then
         SOURCE_PATH="$GAME_DATA"
         log_info "Using GAME_DATA: $SOURCE_PATH"
+    elif [[ -d "$DEFAULT_SOURCE" ]]; then
+        SOURCE_PATH="$DEFAULT_SOURCE"
+        log_info "Using default patched source: $SOURCE_PATH"
     elif [[ -t 0 ]]; then
         read -r -p "Enter path to game data folder (master.dat/critter.dat/data/): " SOURCE_PATH
     else
-        log_error "Missing --source and GAME_DATA, and no interactive prompt available."
+        log_error "Missing --source and GAME_DATA, and default source not found: $DEFAULT_SOURCE"
         exit 1
     fi
 fi

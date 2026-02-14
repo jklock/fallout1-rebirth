@@ -4,8 +4,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 BASE_DIR="${BASE_DIR:-$ROOT/GOG/unpatchedfiles}"
-PATCHED_DIR="${PATCHED_DIR:-$ROOT/GOG/patchedfiles}"
-RME_DIR="${RME_DIR:-$ROOT/third_party/rme/source}"
+PATCHED_DIR="$ROOT/GOG/patchedfiles"
+if [[ -d "$ROOT/third_party/rme" ]]; then
+  RME_DIR="${RME_DIR:-$ROOT/third_party/rme}"
+else
+  RME_DIR="${RME_DIR:-$ROOT/third_party/rme/source}"
+fi
 CONFIG_DIR="${CONFIG_DIR:-$ROOT/gameconfig/macos}"
 
 OUT_DIR="${OUT_DIR:-$ROOT/development/RME/validation}"
@@ -55,6 +59,9 @@ if [[ ! -d "$PATCHED_DIR" || "$REBUILD_PATCHED" == "1" ]]; then
   "$ROOT/scripts/patch/rebirth-patch-data.sh" "${args[@]}"
 fi
 
+# Canonical source must exist and be complete before any validation/test execution.
+"$ROOT/scripts/test/rme-ensure-patched-data.sh" --quiet
+
 log "Refresh validation evidence"
 "$ROOT/scripts/patch/rebirth-refresh-validation.sh" \
   --unpatched "$BASE_DIR" \
@@ -63,7 +70,7 @@ log "Refresh validation evidence"
   --out "$OUT_DIR"
 
 log "Audit script references"
-python3 "$ROOT/scripts/patch/rme-audit-script-refs.py" \
+python3 "$ROOT/scripts/test/rme-audit-script-refs.py" \
   --patched-dir "$PATCHED_DIR" \
   --out-dir "$OUT_DIR/raw"
 
@@ -73,16 +80,14 @@ log "Validate patched data overlay"
   --base "$BASE_DIR" \
   --rme "$RME_DIR"
 
-log "Install patched data into app bundle"
-"$ROOT/scripts/test/test-install-game-data.sh" \
-  --source "$PATCHED_DIR" \
-  --target "$APP"
+log "Install/verify canonical patched data into app bundle"
+"$ROOT/scripts/test/rme-ensure-patched-data.sh" --target-app "$APP"
 
 log "Headless macOS smoke test"
 "$ROOT/scripts/test/test-macos-headless.sh"
 
 log "Runtime map sweep (timeout=${TIMEOUT}s)"
-python3 "$ROOT/scripts/patch/rme-runtime-sweep.py" \
+python3 "$ROOT/scripts/test/rme-runtime-sweep.py" \
   --exe "$EXE" \
   --out-dir "$RUNTIME_OUT" \
   --timeout "$TIMEOUT"
@@ -94,9 +99,9 @@ fi
 
 if [[ "$RUN_IOS" == "1" ]]; then
   log "iOS headless test (optional)"
-  "$ROOT/scripts/test/test-ios-headless.sh" || true
+  GAME_DATA="$PATCHED_DIR" "$ROOT/scripts/test/test-ios-headless.sh" || true
   log "iOS simulator test (optional)"
-  "$ROOT/scripts/test/test-ios-simulator.sh" || true
+  GAME_DATA="$PATCHED_DIR" "$ROOT/scripts/test/test-ios-simulator.sh" || true
 fi
 
 log "All coverage steps complete"

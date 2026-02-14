@@ -23,7 +23,8 @@
 #
 # CONFIGURATION (environment variables):
 #   SIMULATOR_NAME  - Device name (default: "iPad Pro 13-inch (M5)")
-#   GAME_DATA       - Path to game files (master.dat, critter.dat, data/)
+#   GAME_DATA       - Optional override path to game files (defaults to GOG/patchedfiles)
+#                     Non-canonical paths are blocked unless RME_ALLOW_NON_CANONICAL_GAME_DATA=1
 #   BUILD_DIR       - Build output dir (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
 #   CLEAN           - Set to "1" to force reconfigure
@@ -31,6 +32,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
+ROOT_DIR="$PWD"
 
 # -----------------------------------------------------------------------------
 # Configuration
@@ -39,6 +41,7 @@ cd "$(dirname "$0")/../.."
 SIMULATOR_NAME="${SIMULATOR_NAME:-iPad Pro 13-inch (M5)}"
 
 GAME_DATA="${GAME_DATA:-}"
+CANONICAL_GAME_DATA="$ROOT_DIR/GOG/patchedfiles"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
@@ -65,6 +68,40 @@ log_info()  { echo -e "${BLUE}>>>${NC} $1"; }
 log_ok()    { echo -e "${GREEN}✅${NC} $1"; }
 log_warn()  { echo -e "${YELLOW}⚠️${NC}  $1"; }
 log_error() { echo -e "${RED}❌${NC} $1"; }
+
+resolve_game_data_source() {
+    if [[ ! -d "$CANONICAL_GAME_DATA" ]]; then
+        log_error "Canonical patched data directory not found: $CANONICAL_GAME_DATA"
+        exit 1
+    fi
+    if [[ ! -f "$CANONICAL_GAME_DATA/master.dat" || ! -f "$CANONICAL_GAME_DATA/critter.dat" || ! -d "$CANONICAL_GAME_DATA/data" ]]; then
+        log_error "Canonical patched data is incomplete: $CANONICAL_GAME_DATA"
+        exit 1
+    fi
+
+    if [[ -n "$GAME_DATA" ]]; then
+        local requested
+        requested="$(cd "$GAME_DATA" 2>/dev/null && pwd || true)"
+        if [[ -z "$requested" ]]; then
+            log_error "GAME_DATA path is invalid: $GAME_DATA"
+            exit 1
+        fi
+        if [[ "$requested" != "$CANONICAL_GAME_DATA" && "${RME_ALLOW_NON_CANONICAL_GAME_DATA:-0}" != "1" ]]; then
+            log_error "Non-canonical GAME_DATA is blocked for RME validation: $requested"
+            log_error "Use canonical path: $CANONICAL_GAME_DATA"
+            log_error "Set RME_ALLOW_NON_CANONICAL_GAME_DATA=1 only if you intentionally need an override."
+            exit 1
+        fi
+        if [[ "$requested" != "$CANONICAL_GAME_DATA" ]]; then
+            log_warn "Using non-canonical GAME_DATA override: $requested"
+            GAME_DATA="$requested"
+            return 0
+        fi
+    fi
+
+    GAME_DATA="$CANONICAL_GAME_DATA"
+    log_info "Using canonical game data: $GAME_DATA"
+}
 
 # Auto-detect bundle ID from built app's Info.plist
 detect_bundle_id() {
@@ -414,18 +451,20 @@ launch_app() {
 # Main
 # -----------------------------------------------------------------------------
 main() {
+    local mode="${1:-}"
+
     echo ""
     echo "=============================================="
     echo " Fallout 1 Rebirth — iOS Simulator Testing"
     echo "=============================================="
     echo " Target: $SIMULATOR_NAME"
-    echo " Game data: $GAME_DATA"
+    echo " Game data: ${GAME_DATA:-$CANONICAL_GAME_DATA}"
     echo " Build dir: $BUILD_DIR"
     echo "=============================================="
     echo ""
     
     # Parse arguments
-    case "${1:-}" in
+    case "$mode" in
         --shutdown)
             shutdown_all_simulators
             exit 0
@@ -454,6 +493,9 @@ main() {
             exit 1
             ;;
     esac
+
+    # Canonical RME requirement: all simulator tests use GOG/patchedfiles.
+    resolve_game_data_source
     
     # Step 1: Ensure only one simulator
     shutdown_all_simulators
@@ -480,7 +522,7 @@ main() {
     wait_for_simulator_ready "$SIMULATOR_UDID" 180
     
     # Step 4: Build (unless --launch)
-    if [[ "${1:-}" != "--launch" ]]; then
+    if [[ "$mode" != "--launch" ]]; then
         build_for_simulator
         
         # Detect bundle ID from built app
@@ -491,6 +533,7 @@ main() {
     else
         # For --launch, still need to detect bundle ID
         detect_bundle_id
+        copy_game_data "$SIMULATOR_UDID"
     fi
     
     # Step 5: Launch

@@ -4,7 +4,14 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
-GOG_DIR="${1:-$REPO_ROOT/GOG/patchedfiles}"
+CANONICAL_GOG_DIR="$REPO_ROOT/GOG/patchedfiles"
+GOG_DIR="${1:-$CANONICAL_GOG_DIR}"
+
+if [[ -n "${1:-}" && "$GOG_DIR" != "$CANONICAL_GOG_DIR" && "${RME_ALLOW_NON_CANONICAL_GAME_DATA:-0}" != "1" ]]; then
+    echo "Non-canonical game data path blocked for RME validation: $GOG_DIR" >&2
+    echo "Use canonical path: $CANONICAL_GOG_DIR" >&2
+    exit 2
+fi
 if [ ! -d "$GOG_DIR" ]; then
     echo "GOG patchedfiles directory not found at $GOG_DIR" >&2
     TS_BLOCK="$(date -u +%Y%m%dT%H%M%SZ)"

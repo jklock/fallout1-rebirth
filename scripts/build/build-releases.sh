@@ -65,10 +65,11 @@ rm -f "$RELEASE_MAC_DIR"/*.dmg 2>/dev/null || true
 rm -rf "$RELEASE_MAC_DIR/$APP_NAME" 2>/dev/null || true
 
 log_section "Running tests"
+"$ROOT_DIR/scripts/test/rme-ensure-patched-data.sh" --quiet
 "$ROOT_DIR/scripts/dev/dev-check.sh"
 "$ROOT_DIR/scripts/dev/dev-verify.sh"
 "$ROOT_DIR/scripts/test/test-macos.sh"
-"$ROOT_DIR/scripts/test/test-ios-headless.sh" --build
+GAME_DATA="$ROOT_DIR/GOG/patchedfiles" "$ROOT_DIR/scripts/test/test-ios-headless.sh" --build
 
 log_section "Building release artifacts"
 export BUILD_TYPE

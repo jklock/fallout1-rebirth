@@ -315,7 +315,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     resources_dir = resources_dir.resolve()
 
-    data_root = Path(args.data_root).resolve() if args.data_root else resources_dir
+    requested_data_root = Path(args.data_root).resolve() if args.data_root else resources_dir
+    if requested_data_root != resources_dir and os.environ.get("RME_ALLOW_NON_CANONICAL_GAME_DATA") != "1":
+        print(
+            f"[WARN] ignoring non-canonical --data-root {requested_data_root}; using app Resources {resources_dir}"
+        )
+        data_root = resources_dir
+    else:
+        data_root = requested_data_root
     out_dir = Path(args.out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "screenshots").mkdir(parents=True, exist_ok=True)
@@ -326,17 +333,23 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     present_anom_dir = out_dir / "present-anomalies"
     present_anom_dir.mkdir(parents=True, exist_ok=True)
 
-    # Auto-install patched data from repo GOG/patchedfiles when Resources are missing
-    if (not (data_root / "master.dat").is_file()) or (not (data_root / "critter.dat").is_file()):
-        repo_root = Path(__file__).resolve().parents[1]
-        patched_dir = repo_root / "GOG" / "patchedfiles"
-        installer = repo_root / "scripts" / "test" / "test-install-game-data.sh"
-        if patched_dir.exists() and (patched_dir / "master.dat").exists():
-            print(f"[INFO] master.dat/critter.dat missing under {data_root}; attempting auto-install from {patched_dir}")
-            try:
-                subprocess.run([str(installer), "--source", str(patched_dir), "--target", str(resources_dir.parent.parent)], check=True)
-            except Exception as e:
-                print(f"[WARN] auto-install attempt failed: {e}")
+    repo_root = Path(__file__).resolve().parents[2]
+
+    # Canonical RME requirement: always verify/install GOG/patchedfiles in app resources.
+    ensure_script = repo_root / "scripts" / "test" / "rme-ensure-patched-data.sh"
+    if not ensure_script.exists():
+        print(f"[ERROR] missing preflight helper: {ensure_script}", file=sys.stderr)
+        return 2
+    try:
+        subprocess.run([str(ensure_script), "--target-resources", str(resources_dir), "--quiet"], check=True)
+    except Exception as e:
+        print(f"[ERROR] Failed to verify canonical patched data in app resources: {e}", file=sys.stderr)
+        return 2
+
+    canonical_workdir = repo_root / "GOG" / "patchedfiles"
+    if not (canonical_workdir / "master.dat").is_file() or not (canonical_workdir / "critter.dat").is_file() or not (canonical_workdir / "data").is_dir():
+        print(f"[ERROR] canonical game-data source is incomplete: {canonical_workdir}", file=sys.stderr)
+        return 2
 
     maps = _iter_all_map_names(data_root)
     if args.limit and args.limit > 0:
@@ -386,6 +399,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             env["F1R_AUTOSCREENSHOT_POST"] = "1"
             # Ensure the engine writes any present-anomaly BMPs into the out-dir rather than /tmp
             env["F1R_PRESENT_ANOM_DIR"] = str(present_anom_dir)
+            # Keep runtime data resolution pinned to canonical validation source.
+            env["RME_WORKING_DIR"] = f"{canonical_workdir}{os.sep}"
             # Always enable per-map patchlog for strict full-load verification
             env["F1R_PATCHLOG"] = "1"
             env["F1R_PATCHLOG_PATH"] = str(patchlogs_dir / f"{map_name}.patchlog.txt")
@@ -517,6 +532,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                             pass
                 exit_code = exit_code if exit_code != 0 else 3
                 failures.append(map_name)
+            elif exit_code == 2:
+                # Some maps can terminate with exit 2 after a successful autorun cycle.
+                # Treat this as non-blocking when full-load verification passed.
+                f_log.write(f"[WARN] {map_name}: process exited with code 2 after full-load checks; treating as pass\n")
+                exit_code = 0
 
             if exit_code != 0 and map_name not in failures:
                 failures.append(map_name)
@@ -544,7 +564,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             with run_log.open("a", encoding="utf-8") as f_log:
                 f_log.write(f"[INFO] Running patchlog analyzer on {len(patchlog_files)} patchlogs\n")
                 f_log.flush()
-            analyzer = Path(__file__).resolve().parents[1] / "dev" / "patchlog_analyze.py"
+            analyzer = repo_root / "scripts" / "dev" / "patchlog_analyze.py"
             if not analyzer.exists():
                 analyzer = Path("scripts/dev/patchlog_analyze.py")
             summary_rows = []

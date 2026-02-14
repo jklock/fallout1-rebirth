@@ -10,7 +10,7 @@
 # OPTIONS:
 #   --base PATH        Base Fallout 1 data folder
 #   --out PATH         Output folder for patched data
-#   --rme PATH          RME payload directory (default: third_party/rme/source)
+#   --rme PATH          RME payload directory (default: third_party/rme)
 #   --skip-checksums    Skip base DAT checksum validation
 #   --force             Overwrite existing output folder
 #
@@ -33,7 +33,7 @@ USAGE:
 OPTIONS:
   --base PATH        Base Fallout 1 data folder
   --out PATH         Output folder for patched data
-  --rme PATH          RME payload directory (default: third_party/rme/source)
+  --rme PATH          RME payload directory (default: third_party/rme)
   --skip-checksums    Skip base DAT checksum validation
   --force             Overwrite existing output folder
   --help              Show this help

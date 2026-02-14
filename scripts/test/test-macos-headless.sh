@@ -32,6 +32,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
+ROOT_DIR="$PWD"
 
 # -----------------------------------------------------------------------------
 # Configuration
@@ -566,16 +567,8 @@ main() {
         exit 1
     fi
 
-    # Ensure patched game data is present. If missing, auto-install from repo/GOG/patchedfiles.
-    if [[ ! -f "$APP_BUNDLE/Contents/Resources/master.dat" ]]; then
-        PATCHED_DIR="$PWD/GOG/patchedfiles"
-        if [[ -d "$PATCHED_DIR" && -f "$PATCHED_DIR/master.dat" ]]; then
-            log_info "master.dat missing in app bundle — auto-installing from $PATCHED_DIR"
-            "$PWD/scripts/test/test-install-game-data.sh" --source "$PATCHED_DIR" --target "$APP_BUNDLE" || true
-        else
-            log_warn "Patched game data not found at $PATCHED_DIR; tests that require game data will fail"
-        fi
-    fi
+    # Canonical RME requirement: tests always run with GOG/patchedfiles installed.
+    "$ROOT_DIR/scripts/test/rme-ensure-patched-data.sh" --target-app "$APP_BUNDLE"
     
     # Run all tests
     test_bundle_structure

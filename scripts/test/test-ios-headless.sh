@@ -37,6 +37,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
+ROOT_DIR="$PWD"
 
 # -----------------------------------------------------------------------------
 # Configuration
@@ -46,6 +47,8 @@ BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 SIMULATOR_NAME="${SIMULATOR_NAME:-}"  # Auto-detect if empty
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
+GAME_DATA="${GAME_DATA:-}"
+CANONICAL_GAME_DATA="$ROOT_DIR/GOG/patchedfiles"
 
 # App details
 APP_NAME="fallout1-rebirth"
@@ -86,6 +89,40 @@ log_error()   { echo -e "${RED}❌${NC} $1"; }
 log_section() { echo -e "\n${CYAN}${BOLD}=== $1 ===${NC}"; }
 log_skip()    { echo -e "${YELLOW}⏭️${NC}  $1"; ((TESTS_SKIPPED++)); }
 
+resolve_game_data_source() {
+    if [[ ! -d "$CANONICAL_GAME_DATA" ]]; then
+        log_error "Canonical patched data directory not found: $CANONICAL_GAME_DATA"
+        return 1
+    fi
+    if [[ ! -f "$CANONICAL_GAME_DATA/master.dat" || ! -f "$CANONICAL_GAME_DATA/critter.dat" || ! -d "$CANONICAL_GAME_DATA/data" ]]; then
+        log_error "Canonical patched data is incomplete: $CANONICAL_GAME_DATA"
+        return 1
+    fi
+
+    if [[ -n "$GAME_DATA" ]]; then
+        local requested
+        requested="$(cd "$GAME_DATA" 2>/dev/null && pwd || true)"
+        if [[ -z "$requested" ]]; then
+            log_error "GAME_DATA path is invalid: $GAME_DATA"
+            return 1
+        fi
+        if [[ "$requested" != "$CANONICAL_GAME_DATA" && "${RME_ALLOW_NON_CANONICAL_GAME_DATA:-0}" != "1" ]]; then
+            log_error "Non-canonical GAME_DATA is blocked for RME validation: $requested"
+            log_error "Use canonical path: $CANONICAL_GAME_DATA"
+            return 1
+        fi
+        if [[ "$requested" != "$CANONICAL_GAME_DATA" ]]; then
+            log_warn "Using non-canonical GAME_DATA override: $requested"
+            GAME_DATA="$requested"
+            return 0
+        fi
+    fi
+
+    GAME_DATA="$CANONICAL_GAME_DATA"
+    log_info "Using canonical game data: $GAME_DATA"
+    return 0
+}
+
 # Run a test check
 check() {
     local description="$1"
@@ -118,6 +155,8 @@ ENVIRONMENT VARIABLES:
     BUILD_DIR       Build output directory (default: build-ios-sim)
     BUILD_TYPE      Build type (default: RelWithDebInfo)
     SIMULATOR_NAME  Simulator name (default: auto-detect iPad)
+    GAME_DATA       Optional override path (defaults to GOG/patchedfiles)
+                    Non-canonical paths require RME_ALLOW_NON_CANONICAL_GAME_DATA=1
 
 EXAMPLES:
     $0                              # Test existing build
@@ -287,6 +326,68 @@ install_app_to_simulator() {
     fi
     
     log_ok "App installed"
+    return 0
+}
+
+copy_game_data_to_simulator() {
+    local udid="$1"
+    local bundle_id="$2"
+
+    if ! resolve_game_data_source; then
+        return 1
+    fi
+
+    log_info "Copying canonical game data to simulator container..."
+
+    local container=""
+    local attempts=0
+    local max_attempts=8
+
+    while [[ -z "$container" && $attempts -lt $max_attempts ]]; do
+        container=$(xcrun simctl get_app_container "$udid" "$bundle_id" data 2>/dev/null || true)
+        if [[ -z "$container" ]]; then
+            ((attempts++))
+            if [[ $attempts -eq 1 ]]; then
+                # First launch creates Documents in some simulator states.
+                xcrun simctl launch "$udid" "$bundle_id" 2>/dev/null || true
+                sleep 2
+                xcrun simctl terminate "$udid" "$bundle_id" 2>/dev/null || true
+            else
+                sleep 1
+            fi
+        fi
+    done
+
+    if [[ -z "$container" ]]; then
+        log_error "Unable to resolve simulator data container for $bundle_id"
+        return 1
+    fi
+
+    local target_dir="$container/Documents"
+    mkdir -p "$target_dir"
+
+    cp -f "$GAME_DATA/master.dat" "$target_dir/"
+    cp -f "$GAME_DATA/critter.dat" "$target_dir/"
+    rm -rf "$target_dir/data"
+    cp -R "$GAME_DATA/data" "$target_dir/"
+
+    if [[ -f "$GAME_DATA/fallout.cfg" ]]; then
+        cp -f "$GAME_DATA/fallout.cfg" "$target_dir/"
+    else
+        cat > "$target_dir/fallout.cfg" << 'EOF'
+[system]
+master_dat=master.dat
+master_patches=data
+critter_dat=critter.dat
+critter_patches=data
+EOF
+    fi
+
+    if [[ -f "$GAME_DATA/f1_res.ini" ]]; then
+        cp -f "$GAME_DATA/f1_res.ini" "$target_dir/"
+    fi
+
+    log_ok "Game data staged in simulator container"
     return 0
 }
 
@@ -581,6 +682,16 @@ test_simulator_launch() {
     fi
     log_ok "App installed to simulator"
     ((TESTS_PASSED++))
+
+    # Canonical RME requirement: always stage GOG/patchedfiles before launch.
+    if copy_game_data_to_simulator "$SIM_UDID" "$APP_BUNDLE_ID"; then
+        log_ok "Simulator game data setup passed"
+        ((TESTS_PASSED++))
+    else
+        log_error "Simulator game data setup failed"
+        ((TESTS_FAILED++))
+        return 1
+    fi
     
     # Launch and check for crash
     if launch_app_briefly "$SIM_UDID" "$APP_BUNDLE_ID"; then

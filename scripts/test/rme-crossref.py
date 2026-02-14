@@ -9,7 +9,7 @@ Also produces a heuristic report for missing LST references and a short
 markdown summary.
 
 USAGE:
-  python3 scripts/patch/rme-crossref.py --rme third_party/rme/source --base-dir GOG/patchedfiles --out-dir GOG/rme_xref_patched
+  python3 scripts/patch/rme-crossref.py --rme third_party/rme --base-dir GOG/patchedfiles --out-dir GOG/rme_xref_patched
 """
 
 from __future__ import annotations
@@ -198,7 +198,7 @@ def _write_text(path: Path, content: str) -> None:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="RME cross-reference generator")
-    parser.add_argument("--rme", default="third_party/rme/source", help="RME payload directory")
+    parser.add_argument("--rme", default="third_party/rme", help="RME payload directory")
     parser.add_argument("--base-dir", required=True, help="Base directory containing master.dat/critter.dat")
     parser.add_argument("--out-dir", required=True, help="Output directory for reports")
     args = parser.parse_args(argv)

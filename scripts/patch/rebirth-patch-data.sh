@@ -14,7 +14,7 @@
 #
 # OPTIONAL:
 #   --config-dir PATH   Config template directory (gameconfig/macos or gameconfig/ios)
-#   --rme PATH          RME payload directory (default: third_party/rme/source)
+#   --rme PATH          RME payload directory (default: third_party/rme)
 #   --skip-checksums    Skip base DAT checksum validation
 #   --force             Overwrite existing output folder
 #
@@ -61,7 +61,7 @@ REQUIRED:
 
 OPTIONAL:
   --config-dir PATH   Config template directory (gameconfig/macos or gameconfig/ios)
-  --rme PATH          RME payload directory (default: third_party/rme/source)
+  --rme PATH          RME payload directory (default: third_party/rme)
   --skip-checksums    Skip base DAT checksum validation
   --force             Overwrite existing output folder
   --help              Show this help
@@ -145,7 +145,11 @@ if [[ "$OUT_DIR" != /* ]]; then
     OUT_DIR="$START_DIR/$OUT_DIR"
 fi
 if [[ -z "$RME_DIR" ]]; then
-    RME_DIR="$ROOT_DIR/third_party/rme/source"
+    if [[ -d "$ROOT_DIR/third_party/rme" ]]; then
+        RME_DIR="$ROOT_DIR/third_party/rme"
+    else
+        RME_DIR="$ROOT_DIR/third_party/rme/source"
+    fi
 else
     if [[ "$RME_DIR" != /* ]]; then
         if [[ "$RME_FROM_ARG" -eq 1 ]]; then

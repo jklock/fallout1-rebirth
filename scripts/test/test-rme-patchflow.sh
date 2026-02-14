@@ -4,13 +4,14 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
+CANONICAL_GOG_DIR="$REPO_ROOT/GOG/patchedfiles"
 # CLI flags: [--autorun-map] [--auto-fix] [--auto-fix-iterations N] [--auto-fix-apply] [--auto-fix-apply-whitelist] [--skip-build]
 AUTO_FIX=0
 AUTO_FIX_ITERATIONS=3
 AUTO_FIX_APPLY=0
 AUTO_FIX_APPLY_WHITELIST=0
 SKIP_BUILD=0
-GOG_DIR="${2:-${1:-$REPO_ROOT/GOG/patchedfiles}}"
+GOG_DIR="${2:-${1:-$CANONICAL_GOG_DIR}}"
 AUTORUN_MAP=0
 
 # Simple parsing for the optional flags (preserve positional behavior for GOG directory)
@@ -59,7 +60,13 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 if [ "${AUTORUN_MAP}" -eq 1 ]; then
-    GOG_DIR="${GOG_DIR:-$REPO_ROOT/GOG/patchedfiles}"
+    GOG_DIR="${GOG_DIR:-$CANONICAL_GOG_DIR}"
+fi
+
+if [[ "$GOG_DIR" != "$CANONICAL_GOG_DIR" && "${RME_ALLOW_NON_CANONICAL_GAME_DATA:-0}" != "1" ]]; then
+    echo "Non-canonical game data path blocked for RME validation: $GOG_DIR" >&2
+    echo "Use canonical path: $CANONICAL_GOG_DIR" >&2
+    exit 2
 fi
 
 if [ ! -d "$GOG_DIR" ]; then

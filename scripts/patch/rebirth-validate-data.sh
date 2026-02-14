@@ -14,7 +14,7 @@
 #
 # OPTIONAL:
 #   --base PATH       Base data folder for DAT validation (master.dat, critter.dat)
-#   --rme PATH        RME payload directory (default: third_party/rme/source)
+#   --rme PATH        RME payload directory (default: third_party/rme)
 #   --help            Show this help message
 #
 # REQUIREMENTS:
@@ -49,7 +49,7 @@ REQUIRED:
 
 OPTIONAL:
   --base PATH       Base data folder for DAT validation (master.dat, critter.dat)
-  --rme PATH        RME payload directory (default: third_party/rme/source)
+  --rme PATH        RME payload directory (default: third_party/rme)
   --help            Show this help message
 EOF
     exit 0
@@ -131,7 +131,11 @@ if [[ -n "$BASE_DIR" && "$BASE_DIR" != /* ]]; then
     BASE_DIR="$START_DIR/$BASE_DIR"
 fi
 if [[ -z "$RME_DIR" ]]; then
-    RME_DIR="$ROOT_DIR/third_party/rme/source"
+    if [[ -d "$ROOT_DIR/third_party/rme" ]]; then
+        RME_DIR="$ROOT_DIR/third_party/rme"
+    else
+        RME_DIR="$ROOT_DIR/third_party/rme/source"
+    fi
 else
     if [[ "$RME_DIR" != /* ]]; then
         if [[ "$RME_FROM_ARG" -eq 1 ]]; then

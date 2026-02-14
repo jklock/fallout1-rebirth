@@ -66,10 +66,6 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
-# Allow RME evidence artifacts to be committed (narrow exception)
-!development/RME/ARTIFACTS/evidence/
-!development/RME/ARTIFACTS/evidence/gate-2/
-!development/RME/ARTIFACTS/evidence/gate-2/*.txt
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
@@ -402,10 +398,9 @@ FodyWeavers.xsd
 /build-*
 /_deps
 
-# RME runtime artifacts (do not commit large binary run artifacts)
-development/RME/validation/runtime/patchlogs/*
-development/RME/validation/runtime/present-anomalies/*
-development/RME/validation/runtime/screenshots-individual/*
+# RME local validation artifacts (runtime/test evidence is local-only)
+development/RME/ARTIFACTS/evidence/
+development/RME/validation/
 # Local tmp for build checks
 /tmp/
 /tmp

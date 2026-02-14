@@ -52,9 +52,9 @@
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
-#include "plib/gnw/mouse.h"
 #include "plib/gnw/intrface.h"
 #include "plib/gnw/memory.h" // mem_check() - detect header/footer stomps earlier
+#include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
 

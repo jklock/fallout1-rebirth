@@ -12,7 +12,7 @@
 # DEFAULTS:
 #   --unpatched GOG/unpatchedfiles
 #   --patched   GOG/patchedfiles
-#   --rme       third_party/rme/source
+#   --rme       third_party/rme
 #   --out       development/RME/validation
 #
 # REQUIREMENTS:
@@ -25,7 +25,11 @@ cd "$(dirname "$0")/../.."
 
 UNPATCHED_DIR="GOG/unpatchedfiles"
 PATCHED_DIR="GOG/patchedfiles"
-RME_DIR="third_party/rme/source"
+if [[ -d "third_party/rme" ]]; then
+  RME_DIR="third_party/rme"
+else
+  RME_DIR="third_party/rme/source"
+fi
 OUT_DIR="development/RME/validation"
 
 log_info()  { echo -e "\033[0;34m>>>\033[0m $1"; }
@@ -43,7 +47,7 @@ USAGE:
 DEFAULTS:
   --unpatched GOG/unpatchedfiles
   --patched   GOG/patchedfiles
-  --rme       third_party/rme/source
+  --rme       third_party/rme
   --out       development/RME/validation
 EOF
   exit 0
@@ -108,8 +112,8 @@ shasum -a 256 "$PATCHED_DIR/critter.dat"   > "$OUT_DIR/critter_patched.sha256"
 echo "Checksums written" > "$OUT_DIR/checksum_notice.txt"
 
 log_info "5) RME crossref (patched/unpatched) + LST report"
-python3 scripts/patch/rme-crossref.py --rme "$RME_DIR" --base-dir "$UNPATCHED_DIR" --out-dir "GOG/rme_xref_unpatched" >/dev/null
-python3 scripts/patch/rme-crossref.py --rme "$RME_DIR" --base-dir "$PATCHED_DIR"   --out-dir "GOG/rme_xref_patched"   >/dev/null
+python3 scripts/test/rme-crossref.py --rme "$RME_DIR" --base-dir "$UNPATCHED_DIR" --out-dir "GOG/rme_xref_unpatched" >/dev/null
+python3 scripts/test/rme-crossref.py --rme "$RME_DIR" --base-dir "$PATCHED_DIR"   --out-dir "GOG/rme_xref_patched"   >/dev/null
 
 cp "GOG/rme_xref_unpatched/rme-crossref.csv" "$RAW_DIR/rme-crossref-unpatched.csv"
 cp "GOG/rme_xref_patched/rme-crossref.csv"   "$RAW_DIR/rme-crossref-patched.csv"
@@ -123,7 +127,7 @@ echo "Copied LST reports" > "$OUT_DIR/lst_copy_notice.txt"
 } > "$RAW_DIR/05_rme_crossref_copy.txt"
 
 log_info "5b) LST candidate scan (by basename)"
-python3 scripts/patch/rme-find-lst-candidates.py \
+python3 scripts/test/rme-find-lst-candidates.py \
   --lst-report "$RAW_DIR/08_lst_missing.md" \
   --search "$PATCHED_DIR" "$UNPATCHED_DIR" \
   --out "$RAW_DIR/lst_candidates.csv" \
@@ -240,7 +244,7 @@ fi
 } > "$RAW_DIR/11_validation_script.txt"
 
 log_info "12) Script reference audit (scripts.lst vs MAP/PRO)"
-python3 scripts/patch/rme-audit-script-refs.py \
+python3 scripts/test/rme-audit-script-refs.py \
   --patched-dir "$PATCHED_DIR" \
   --out-dir "$RAW_DIR" \
   > "$RAW_DIR/12_script_refs_run.log" 2>&1

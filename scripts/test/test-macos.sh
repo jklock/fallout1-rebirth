@@ -26,6 +26,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
+ROOT_DIR="$PWD"
 
 # -----------------------------------------------------------------------------
 # Configuration
@@ -215,17 +216,6 @@ verify_resources() {
         return 0
     fi
 
-    # If patched game data is missing, attempt auto-install from repo/GOG/patchedfiles
-    if [[ ! -f "$resources/master.dat" ]]; then
-        local patched_dir="$PWD/GOG/patchedfiles"
-        if [[ -d "$patched_dir" && -f "$patched_dir/master.dat" ]]; then
-            log_info "master.dat missing in app bundle — auto-installing patched data from $patched_dir"
-            "$PWD/scripts/test/test-install-game-data.sh" --source "$patched_dir" --target "$APP_BUNDLE" || true
-        else
-            log_warn "Patched game data not found at $patched_dir; resource checks may fail"
-        fi
-    fi
-    
     # Check for icon (optional but nice to have)
     local icon_count
     icon_count=$(find "$resources" -name "*.icns" 2>/dev/null | wc -l | tr -d ' ')
@@ -400,6 +390,9 @@ main() {
             exit 1
             ;;
     esac
+
+    # Canonical RME requirement: tests always run with GOG/patchedfiles installed.
+    "$ROOT_DIR/scripts/test/rme-ensure-patched-data.sh" --target-app "$APP_BUNDLE"
     
     # Run all verification checks
     verify_bundle_structure

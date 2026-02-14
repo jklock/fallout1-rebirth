@@ -1,44 +1,32 @@
-# Validation Prompt — RME TODO run
+# RME Validation Index (Domain Split)
 
-Purpose
-- Validate the results produced by the orchestrator and all subagents.
-- Confirm acceptance criteria for each TODO item and produce a final `orchestrator-summary.md` under `development/RME/ARTIFACTS/evidence/`.
+Last updated: 2026-02-14
 
-Agent behavior (validator)
-1. Read `development/RME/TODO/PROGRESS.MD` and all artifact folders referenced in `artifacts` fields.
-2. For each task in `tasks` perform the item-specific validation checks listed below.
-3. Produce a `development/RME/ARTIFACTS/evidence/orchestrator-summary.md` describing: overall verdict (pass/fail), per-task verdicts, failing evidence paths, and recommended next steps.
-4. If any P0 item is `failed` or `verdict: fail`, mark the overall run `FAILED` and list blockers.
+This file is now an index only. Validation exercises are split by domain to reduce overlap.
 
-Validation checks (exact)
-- caravan-repeat: verify each `development/RME/ARTIFACTS/evidence/caravan-repeat/<MAP>/` contains 10 patchlogs and each patchlog shows PASS. If any fail, attach the failing `*.patchlog.txt` and the `summary.md` and return `verdict: fail` for this task.
+## Domain Validation Documents
+- `development/RME/VALIDATE/domains/01-patch-integrity.md`
+- `development/RME/VALIDATE/domains/02-maps-runtime.md`
+- `development/RME/VALIDATE/domains/03-critters-proto.md`
+- `development/RME/VALIDATE/domains/04-scripts-dialog.md`
+- `development/RME/VALIDATE/domains/05-audio.md`
+- `development/RME/VALIDATE/domains/06-art-ui-fonts.md`
+- `development/RME/VALIDATE/domains/07-text-localization.md`
+- `development/RME/VALIDATE/domains/08-platform-macos.md`
+- `development/RME/VALIDATE/domains/09-platform-ios.md`
+- `development/RME/VALIDATE/domains/10-release-packaging.md`
 
-- install-game-data: verify `build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/Resources/master.dat` exists and that the install script log contains no `DB_OPEN_FAIL`. If missing or DB_OPEN_FAIL present, fail this task.
+## Domain Execution Prompts
+- `development/RME/PROMPTS/domains/README.md`
 
-- runtime-sweep: ensure CSV row count == 72. Run `python3 scripts/dev/patchlog_analyze.py development/RME/ARTIFACTS/evidence/runtime/patchlogs/*.patchlog.txt` and ensure the analyzer report contains no untriaged CRITICALs. Fail otherwise.
-
-- gate-3: confirm `development/RME/ARTIFACTS/evidence/gate-3/summary.md` lists the manual checklist results; if `manual-required` appears, mark `verdict: manual-required` and list steps left to complete.
-
-- ios-simulator: check the simulator logs and screenshots exist and the smoke run exit code == 0.
-
-- whitelist-review: ensure `git apply --check` was performed (or the diff was inspected); confirm `test-rme-patchflow.sh` (or equivalent) reports suppression of the known warnings. If not, mark `verdict: fail`.
-
-- P2 items: run the specific checks listed in `development/RME/TODO/todo.md` and any referenced `subagent_*.md` files.
-
-Output
-- File: `development/RME/ARTIFACTS/evidence/orchestrator-summary.md` (include timestamps, per-task verdicts, and links to artifacts).
-- Exit status: 0 if all P0 items pass and no untriaged CRITICALs; non-zero otherwise.
-
-Example summary format (markdown)
-- Overall verdict: PASS / FAIL
-- Run started: <ISO timestamp>
-- Run finished: <ISO timestamp>
-
-Per-task results:
-- P0-1 caravan-repeat: PASS — artifacts: `development/RME/ARTIFACTS/evidence/caravan-repeat/`
-- P0-2 install-game-data: FAIL — missing `master.dat` in app bundle; logs: `...`
-
-Next steps & recommended owners
-- If FAIL: assign to owner(s) with suggested next actions.
-
-End of validation prompt.
+## Validation Sequence
+1. patch-integrity
+2. maps-runtime
+3. critters-proto
+4. scripts-dialog
+5. audio
+6. art-ui-fonts
+7. text-localization
+8. platform-macos
+9. platform-ios
+10. release-packaging

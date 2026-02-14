@@ -4,6 +4,13 @@ Scope: commits on branch `RME-DEV` (range: `main..RME-DEV`) as of 2026-02-13 —
 
 Summary: 20 commits (high level: RME doc migration + test-harness hardening + renderer fixes + diagnostic/triage instrumentation + test-script reorganization).
 
+Update (2026-02-14):
+- Branch snapshot remains historical context; use `development/RME/PLAN/plan.md` + `development/RME/TODO/todo.md` for live execution.
+- Active runtime/testing flow is `scripts/test/*`; patching remains in `scripts/patch/*`.
+- Canonical game-data source for validation is now fixed to `GOG/patchedfiles` across active test/post-build scripts.
+- RME payload default path is `third_party/rme` (with fallback compatibility for legacy `third_party/rme/source` references).
+- Live tracking has been split into domain documents under `development/RME/{PLAN,TODO,OUTCOME,VALIDATE}/domains/`.
+
 ---
 
 ## Per-commit breakdown (newest → oldest)
@@ -271,4 +278,3 @@ Note: this is the union of files touched by the commits above. For brevity each 
 ---
 
 Generated: 2026-02-13 (commit snapshot)
-

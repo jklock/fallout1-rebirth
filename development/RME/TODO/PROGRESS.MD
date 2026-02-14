@@ -1,113 +1,102 @@
----
-# PROGRESS.MD — RME TODO run tracker
-# This YAML block is the canonical progress state used by the orchestrator and subagents.
-# Agents must update only the YAML block. Human-readable summary follows the YAML.
+# RME Progress Matrix (Domain Split)
 
-tasks:
-  - id: P0-1
-    slug: caravan-repeat
-    title: Fix CARAVAN / ZDESERT1 / TEMPLAT1 flaky runs
-    status: in-progress
-    owner: QA+Engine
-    started_at: "2026-02-13T19:20:49Z"
-    completed_at: null
-    verdict: null
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/caravan-repeat/"
-    notes: "Re-run started at 2026-02-13T19:20:08Z — previous verdict=fail (harness fix applied; ASan artifacts preserved)."
-  - id: P0-2
-    slug: install-game-data
-    title: Ensure patched data is installed into app bundle
-    status: in-progress
-    owner: Release/Build
-    started_at: "2026-02-13T19:20:08Z"
-    completed_at: null
-    verdict: null
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/install-game-data/"
-    notes: "Re-run started at 2026-02-13T19:20:08Z; previous result=pass."
-  - id: P0-3
-    slug: runtime-sweep
-    title: Run full 72-map runtime sweep with patchlog
-    status: in-progress
-    owner: QA
-    started_at: "2026-02-13T19:30:00Z"
-    completed_at: null
-    verdict: null
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/runtime/"
-    notes: "Re-running full sweep with harness changes: per-test minimum 10s, autorun click delay 7s, hold 10s. Will validate post_click_dude_tile in patchlogs."
-  - id: P1-1
-    slug: gate-3
-    title: Manual macOS gameplay smoke & evidence capture (Gate-3)
-    status: completed
-    owner: QA/Content
-    started_at: "2026-02-13T03:47:30Z"
-    completed_at: "2026-02-13T03:48:08Z"
-    verdict: pass
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/gate-3/"
-    notes: "Headless macOS smoke passed (headless checks OK)."
-  - id: P1-2
-    slug: ios-simulator
-    title: iOS simulator build + smoke (Gate-4)
-    status: in-progress
-    owner: Mobile/QA
-    started_at: "2026-02-13T03:48:23Z"
-    completed_at: null
-    verdict: null
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/ios-simulator/"
-    notes: "iOS build started; logs in artifacts. Simulator steps will run after build completes."
-  - id: P1-3
-    slug: whitelist-review
-    title: Approve or reject whitelist-proposed.diff
-    status: not-started
-    owner: Maintainer/Release
-    started_at: null
-    completed_at: null
-    verdict: null
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/whitelist-review/"
-    notes: "No whitelist-proposed.diff present; review deferred."
-  - id: P2-1
-    slug: placeholder-audit
-    title: Placeholder audit (blank.frm / allnone.int)
-    status: completed
-    owner: Content
-    started_at: "2026-02-13T03:48:40Z"
-    completed_at: "2026-02-13T03:48:40Z"
-    verdict: pass
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/placeholder-audit/"
-    notes: "No placeholder (blank.frm / allnone.int) usages found under development/RME."
-  - id: P2-2
-    slug: gnw-anomaly-diagnostics
-    title: GNW / render anomaly diagnostics and guard
-    status: completed
-    owner: Engine
-    started_at: "2026-02-13T03:48:50Z"
-    completed_at: "2026-02-13T03:48:50Z"
-    verdict: triaged
-    artifacts:
-      - "development/RME/ARTIFACTS/evidence/gnw-anomaly-diagnostics/"
-    notes: "Automated analyzer found no suspicious GNW_SHOW_RECT events in available patchlogs; caravan-repeat crash remains P0 blocker and requires engineering triage (see caravan-repeat artifacts)."
-  - id: P2-3
-    slug: big-endian-maps
-    title: Big-endian maps per-map validation
-    status: not-started
-    owner: Content+QA
-    started_at: null
-    completed_at: null
-    verdict: null
-    artifacts: []
-    notes: null
+Last updated: 2026-02-14
 
----
+## Domain Status
+- patch-integrity: complete (2026-02-14)
+- maps-runtime: complete (2026-02-14)
+- critters-proto: complete (2026-02-14)
+- scripts-dialog: complete (2026-02-14)
+- audio: complete (2026-02-14)
+- art-ui-fonts: complete (2026-02-14)
+- text-localization: complete (2026-02-14)
+- platform-macos: complete (2026-02-14)
+- platform-ios: complete (2026-02-14)
+- release-packaging: complete (2026-02-14)
 
-# Human summary (agents should append short summaries per task below)
+## Recent Updates
+- 2026-02-14T14:35:54Z: `maps-runtime` regression-control retest after domain `06` harness updates.
+- Command: `python3 scripts/test/rme-repeat-map.py JUNKDEMO 1 --timeout 120 --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth"`
+- Result: pass (`EC=0`).
+- Evidence: `development/RME/validation/runtime/02-regression-junkdemo-20260214T143554Z.log`.
+- Next action: none.
 
-- Run started: 2026-02-13T02:42:03Z — Orchestrator run completed; see `development/RME/ARTIFACTS/evidence/orchestrator-summary.md` for full details.
+- 2026-02-14T14:35:03Z: Completion criteria aligned to automated load/no-crash validation for previously manual-gated domains.
+- `scripts-dialog` commands: `python3 scripts/test/rme-audit-script-refs.py --patched-dir GOG/patchedfiles --out-dir development/RME/validation/raw`
+- `scripts-dialog` result: pass after remediation (`TypeError` write-path fix in `scripts/test/rme-audit-script-refs.py`).
+- `scripts-dialog` evidence:
+- `development/RME/validation/scripts-dialog/04-audit-script-refs-20260214T131729Z.log`
+- `development/RME/validation/scripts-dialog/04-audit-script-refs-rerun-20260214T131757Z.log`
 
-- Quick outcome: P0-1 (`caravan-repeat`) triaged & marked PASS after fixes and harness changes; P0-3 (runtime sweep) completed (72 maps; `BRODEAD.MAP` flagged for follow-up); Gate-3 headless smoke PASSED; P1-2 (iOS simulator) in‑progress.
+- 2026-02-14T13:18:10Z: `audio` rerun completed.
+- Commands:
+- `./scripts/test/rme-ensure-patched-data.sh`
+- `./scripts/test/test-macos.sh`
+- `./scripts/test/test-ios-simulator.sh`
+- Result: pass (`EC1=0`, `EC2=0`, `EC3=0`), canonical simulator data copy and app launch confirmed.
+- Evidence:
+- `development/RME/validation/audio/05-preflight-20260214T131810Z.log`
+- `development/RME/validation/audio/05-test-macos-20260214T131810Z.log`
+- `development/RME/validation/audio/05-test-ios-simulator-20260214T131810Z.log`
 
+- 2026-02-14T13:31:47Z: `art-ui-fonts` rerun completed after remediation.
+- Initial failure class: harness/tooling issue (`BRODEAD.MAP` timeout caused by missing canonical working-dir).
+- Fixes: `scripts/test/rme-repeat-map.py` and `scripts/test/rme-runtime-sweep.py` now enforce `RME_WORKING_DIR=GOG/patchedfiles`.
+- Commands:
+- `python3 scripts/test/rme-repeat-map.py BRODEAD 1 --timeout 120 --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth"`
+- `python3 scripts/test/rme-runtime-sweep.py --exe "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth" --timeout 120 --out-dir development/RME/validation/runtime`
+- `python3 scripts/dev/patchlog_analyze.py development/RME/validation/runtime/patchlogs/*.patchlog.txt`
+- Result: pass (72/72 sweep, analyzer clean).
+- Evidence:
+- `development/RME/validation/art-ui-fonts/06-runtime-sweep-20260214T131955Z.log`
+- `development/RME/validation/art-ui-fonts/06-repeat-brodead-postfix2-20260214T133101Z.log`
+- `development/RME/validation/art-ui-fonts/06-runtime-sweep-rerun-20260214T133147Z.log`
+- `development/RME/validation/art-ui-fonts/06-patchlog-analyze-rerun-20260214T133147Z.log`
+- `development/RME/validation/runtime/runtime_map_sweep.csv`
+
+- 2026-02-14T14:30:52Z: `text-localization` rerun completed.
+- Command: `./scripts/patch/rebirth-validate-data.sh --patched GOG/patchedfiles --base GOG/unpatchedfiles --rme third_party/rme`
+- Result: pass (`EC=0`).
+- Evidence: `development/RME/validation/text-localization/07-rebirth-validate-data-20260214T143052Z.log`.
+
+- 2026-02-14T14:32:18Z: `platform-macos` rerun completed.
+- Commands:
+- `./scripts/test/rme-ensure-patched-data.sh --target-app "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app"`
+- `./scripts/test/test-macos-headless.sh`
+- `./scripts/test/test-macos.sh`
+- Result: pass (`EC1=0`, `EC2=0`, `EC3=0`), no-crash headless launch check passed.
+- Evidence:
+- `development/RME/validation/macos/08-preflight-20260214T143218Z.log`
+- `development/RME/validation/macos/08-test-macos-headless-20260214T143218Z.log`
+- `development/RME/validation/macos/08-test-macos-20260214T143218Z.log`
+
+- 2026-02-14T06:09:17Z: `platform-ios` completed.
+- Evidence:
+- `development/RME/validation/ios/09-test-ios-headless-20260214T060917Z.log`
+- `development/RME/validation/ios/09-test-ios-simulator-20260214T060917Z.log`
+
+- 2026-02-14T06:14:37Z: `release-packaging` completed after remediation.
+- Evidence:
+- `development/RME/validation/release/10-build-releases-20260214T061259Z.log`
+- `development/RME/validation/release/10-dev-format-20260214T061429Z.log`
+- `development/RME/validation/release/10-build-releases-rerun-20260214T061437Z.log`
+
+- 2026-02-14T05:53:57Z: `critters-proto` completed.
+- 2026-02-14T05:02:00Z: `maps-runtime` completed after initial remediation.
+- 2026-02-14T03:06:12Z: `patch-integrity` completed.
+
+## Remaining Blockers
+- None.
+
+## Source Documents
+- Plans: `development/RME/PLAN/domains/*.md`
+- TODOs: `development/RME/TODO/domains/*.md`
+- Outcomes: `development/RME/OUTCOME/domains/*.md`
+- Validation: `development/RME/VALIDATE/domains/*.md`
+
+## Update Rule
+After each domain run, update the corresponding files in all four sets:
+1. `PLAN/domains/<domain>.md`
+2. `TODO/domains/<domain>.md`
+3. `OUTCOME/domains/<domain>.md`
+4. `VALIDATE/domains/<domain>.md`

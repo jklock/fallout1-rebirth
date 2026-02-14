@@ -723,7 +723,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         f"- MD: {md_path.name}",
         "",
     ]
-    md_path.write_text("\n".join(md_lines), encoding="utf-8", newline="\n")
+    # Keep compatibility with Python builds that do not support Path.write_text(newline=...).
+    md_path.write_text("\n".join(md_lines) + "\n", encoding="utf-8")
 
     print(f"[OK] Wrote: {csv_path}")
     print(f"[OK] Wrote: {md_path}")
