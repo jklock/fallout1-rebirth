@@ -39,8 +39,7 @@ Configuration is loaded from f1_res.ini (see gameconfig/ios/f1_res.ini).
   - Applied in `mouse_click_in()` for touch calibration.
 - `CLICK_OFFSET_MOUSE_X`, `CLICK_OFFSET_MOUSE_Y`
   - Applied in `mouse_click_in()` when `dxinput_is_using_mouse()` is true on iOS.
-- `ALT_MOUSE_INPUT`, `EXTRA_WIN_MSG_CHECKS`, `SCROLLWHEEL_FOCUS_PRIMARY_MENU`
-  - Present in config; currently treated as legacy/compatibility keys in the iOS config.
+- No other `f1_res.ini` mouse keys are consumed by current runtime code.
 
 ## Platform-Specific Behavior
 - iOS disables SDL synthetic touch-to-mouse events (set in src/plib/gnw/winmain.cc), so touch input only flows through the gesture system.

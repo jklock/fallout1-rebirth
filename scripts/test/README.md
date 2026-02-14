@@ -26,6 +26,7 @@ All test and validation scripts live in this directory and follow `test-*` namin
 - `test-rme-autofix.py`, `test-rme-autofix-rules.py`, `test-rme-autofix-unit.py`
 - `test-rme-parse-log.py`, `test-rme-parse-log-unit.py`
 - `test-rme-gui-drive.sh`, `test-rme-log-sweep.sh`
+- `test-rme-config-surface.py`
 - `test-verify-checksums.py`
 
 ## RME Suite

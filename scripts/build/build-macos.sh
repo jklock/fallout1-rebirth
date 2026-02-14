@@ -44,6 +44,7 @@ case "$LOGGING_FLAG_UPPER" in
         exit 2
         ;;
 esac
+RME_LOGGING_CMAKE_UPPER="$(printf '%s' "$RME_LOGGING_CMAKE" | tr '[:lower:]' '[:upper:]')"
 
 usage() {
     cat <<USAGE
@@ -132,7 +133,8 @@ if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
     NEEDS_CONFIG=1
 else
     cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$BUILD_DIR/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
-    if [[ "${cached_flag^^}" != "${RME_LOGGING_CMAKE^^}" ]]; then
+    cached_flag_upper="$(printf '%s' "$cached_flag" | tr '[:lower:]' '[:upper:]')"
+    if [[ "$cached_flag_upper" != "$RME_LOGGING_CMAKE_UPPER" ]]; then
         NEEDS_CONFIG=1
     fi
 fi

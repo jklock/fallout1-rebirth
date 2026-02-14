@@ -104,6 +104,9 @@ require_cmd() {
 require_cmd python3
 require_cmd xdelta3
 
+log "Audit runtime config surface and platform defaults"
+python3 "$ROOT/scripts/test/test-rme-config-surface.py"
+
 if [[ ! -x "$EXE" ]]; then
     echo "[ERROR] App executable not found: $EXE" >&2
     echo "[ERROR] Build the app first with: ./scripts/build/build-macos.sh" >&2

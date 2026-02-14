@@ -168,7 +168,7 @@ Apple Pencil is **fully supported** as of version 1.0:
 - `src/platform/ios/pencil.h` and `pencil.mm` provide native iOS detection
 - Pencil-specific input path in `src/plib/gnw/mouse.cc` using `UITouch.type`
 - Distinguishes pencil from finger via iOS-specific APIs (SDL2 cannot detect this natively)
-- Configurable behaviors via `f1_res.ini` `[PENCIL]` section
+- Runtime toggle via `fallout.cfg` `[input]` key `pencil_right_click`
 - Gesture support: tap, drag, long-press, double-tap (body), squeeze (Pro)
 
 See [setup_guide.md](../docs/setup_guide.md) for Apple Pencil configuration options.

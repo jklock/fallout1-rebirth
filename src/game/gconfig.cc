@@ -145,6 +145,19 @@ bool gconfig_init(bool isMapper, int argc, char** argv)
     // whatever was loaded from `fallout.cfg`.
     config_cmd_line_parse(&game_config, argc, argv);
 
+    // Backfill legacy preference key names to active runtime keys.
+    // Older templates saved `player_speed` and `combat_looks`; current runtime
+    // reads/writes `player_speedup` and `running_burning_guy`.
+    int value = 0;
+    if (!config_get_value(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_PLAYER_SPEEDUP_KEY, &value)
+        && config_get_value(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_PLAYER_SPEED_KEY, &value)) {
+        config_set_value(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_PLAYER_SPEEDUP_KEY, value);
+    }
+    if (!config_get_value(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_RUNNING_BURNING_GUY_KEY, &value)
+        && config_get_value(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_COMBAT_LOOKS_KEY, &value)) {
+        config_set_value(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_RUNNING_BURNING_GUY_KEY, value);
+    }
+
     rme_log_sync_config(&game_config);
 
     if (rme_log_topic_enabled("config")) {

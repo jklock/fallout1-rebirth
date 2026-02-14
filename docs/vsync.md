@@ -1,185 +1,31 @@
-# VSync and Display Settings
+# VSync and Frame Pacing
 
-This document explains VSync and display settings for Fallout 1 Rebirth.
+This document describes the current runtime behavior for VSync and frame pacing.
 
-## Overview
+## Current Behavior
 
-VSync (vertical synchronization) is **enabled by default** in Fallout 1 Rebirth. This provides:
+- SDL renderer VSync is enabled at renderer initialization (`src/plib/gnw/svga.cc`).
+- The shared `FpsLimiter` object exists and is used by many game loops.
+- Current runtime does **not** parse `VSYNC`/`FPS_LIMIT` keys from `f1_res.ini`.
 
-- **Eliminates screen tearing** — No visual artifacts from frame buffer misalignment
-- **Matches frame rate to display refresh rate** — Smooth, consistent frame delivery
-- **ProMotion support** — Automatically adapts to 120Hz iPads for buttery-smooth gameplay
+## Where It Is Set
 
-VSync synchronizes the game's rendering with your display's refresh cycle, ensuring each frame is displayed completely before the next one begins.
-
-## How It Works
-
-### SDL3 Renderer
-
-The game creates the SDL3 renderer and enables VSync via `SDL_SetRenderVSync()`:
+Renderer setup enables VSync:
 
 ```c
-gSdlRenderer = SDL_CreateRenderer(gSdlWindow, NULL);
-SDL_SetRenderVSync(gSdlRenderer, 1);  // Enable VSync
+SDL_SetRenderVSync(gSdlRenderer, 1);
 ```
 
-### Display Refresh Rate Detection
+## Configuration Reality
 
-At startup, the game logs the detected display refresh rate:
+`f1_res.ini` currently controls:
 
-```
-Display refresh rate: 120 Hz
-VSync: enabled
-```
+- `[MAIN]`: `SCR_WIDTH`, `SCR_HEIGHT`, `WINDOWED`, `EXCLUSIVE`, `SCALE_2X`
+- `[INPUT]`: `CLICK_OFFSET_X`, `CLICK_OFFSET_Y`, `CLICK_OFFSET_MOUSE_X`, `CLICK_OFFSET_MOUSE_Y`
 
-This information helps verify proper configuration.
+There is no runtime parser for a `[DISPLAY]` section today.
 
-### FpsLimiter Integration
+## Notes
 
-The `FpsLimiter` class provides additional frame timing control:
-
-- With VSync **on**, the FPS limiter is mostly redundant since the GPU driver handles timing
-- With VSync **off**, the FPS limiter prevents excessive frame rates and CPU/GPU usage
-- The limiter can also cap frames below the display refresh rate for battery savings
-
-## Configuration
-
-Display settings are configured in the `[DISPLAY]` section of `f1_res.ini`:
-
-```ini
-[DISPLAY]
-VSYNC=1          ; 0=off, 1=on (default)
-FPS_LIMIT=-1     ; -1=match display, 0=unlimited, 60/120=fixed
-```
-
-### VSYNC Options
-
-| Value | Effect |
-|-------|--------|
-| `0` | Disabled — May cause screen tearing, but lowest input latency |
-| `1` | Enabled (default) — Smooth visuals, synced to display |
-
-### FPS_LIMIT Options
-
-| Value | Effect |
-|-------|--------|
-| `-1` | Match display refresh rate (default) — 60Hz or 120Hz depending on device |
-| `0` | Unlimited — No frame cap (use with VSync off for benchmarking) |
-| `60` | Lock to 60fps — Original game speed, good for battery savings |
-| `120` | Lock to 120fps — Smooth on ProMotion displays |
-
-### Recommended Configurations
-
-**Default (best quality):**
-```ini
-VSYNC=1
-FPS_LIMIT=-1
-```
-
-**Battery saver (120Hz devices):**
-```ini
-VSYNC=1
-FPS_LIMIT=60
-```
-
-**Lowest latency (competitive):**
-```ini
-VSYNC=0
-FPS_LIMIT=0
-```
-
-## Battery Considerations
-
-Frame rate directly impacts power consumption:
-
-| Configuration | Battery Impact | Notes |
-|--------------|----------------|-------|
-| 60Hz display | Baseline | Standard refresh rate |
-| 120Hz ProMotion | Higher usage | More frames = more work |
-| VSync + FPS_LIMIT=60 | Lower usage | Caps at 60fps even on 120Hz displays |
-
-### Tips for Extended Play
-
-1. **On 120Hz iPads**: Set `FPS_LIMIT=60` to significantly reduce battery drain
-2. **Fallout was designed for 60fps**: Running at 120fps is optional and purely cosmetic
-3. **VSync overhead is minimal**: Keep it enabled for visual quality
-
-## Troubleshooting
-
-### Screen Tearing
-**Symptom:** Horizontal lines or "torn" images during scrolling
-
-**Solution:** Ensure VSync is enabled:
-```ini
-VSYNC=1
-```
-
-### High Battery Drain
-**Symptom:** Device gets hot, battery depletes quickly
-
-**Solution:** Cap frame rate to 60fps:
-```ini
-FPS_LIMIT=60
-```
-
-### Animation Issues
-**Symptom:** Animations stutter or feel inconsistent
-
-**Solution:** Return to default settings:
-```ini
-VSYNC=1
-FPS_LIMIT=-1
-```
-
-### Game Feels Sluggish
-**Symptom:** Input feels delayed or unresponsive
-
-**Solution:** This may be VSync input latency. If it bothers you:
-```ini
-VSYNC=0
-FPS_LIMIT=60
-```
-
-Note: You may notice minor screen tearing with VSync disabled.
-
-## Technical Details
-
-### Implementation Files
-
-| File | Purpose |
-|------|---------|
-| `src/plib/gnw/svga.cc` | SDL3 renderer creation, VSync via `SDL_SetRenderVSync()` |
-| `src/fps_limiter.cc` | Frame timing and rate limiting logic |
-| `src/fps_limiter.h` | FpsLimiter class interface |
-
-### Development History
-
-For implementation details and design decisions, see:
-
-```
-development/VSYNC/
-```
-
-This directory contains the VSync implementation history, testing notes, and ProMotion optimization details.
-
-### Related Configuration
-
-VSync settings work alongside other display options:
-
-- **Resolution settings** — `SCREENWIDTH` / `SCREENHEIGHT` in `[MAIN]`
-- **Fullscreen mode** — `FULLSCREEN` in `[MAIN]`
-- **Scaling mode** — Handled by SDL3's renderer scaling
-
----
-
-## Proof of Work
-
-- **Timestamp**: February 5, 2026
-- **Files verified**:
-  - `src/plib/gnw/svga.cc` - Confirmed SDL3 usage with `SDL_SetRenderVSync()` on line 372
-  - `src/fps_limiter.cc` - Confirmed FpsLimiter implementation exists
-  - `third_party/sdl3/CMakeLists.txt` - Confirmed SDL3 3.2.4 dependency
-- **Updates made**:
-  - Changed SDL2 → SDL3 throughout document
-  - Updated renderer creation code example to match actual SDL3 implementation
-  - Updated implementation details (`SDL_SetRenderVSync()` vs `SDL_RENDERER_PRESENTVSYNC`)
+- If you need configurable frame pacing in the future, it requires code changes to parse and apply user settings at runtime.
+- For complete configuration coverage, see `docs/configuration.md`.

@@ -60,3 +60,60 @@ Scenario: Fresh-user full workflow from clean build + fresh patch output in `new
   - `scripts/test/test-rme-gui-drive.sh`: corrected GUI run topic value (`RME_LOG=all`)
   - re-ran both scripts successfully against `newpatchedfiles`; confirmed non-empty `all.log`, `db_config.log`, and `gui.log` outputs
   - note: runtime/GUI runs mutate `fallout.cfg`; strict 1:1 payload parity was validated and recorded before runtime execution
+
+---
+
+## Config Surface + Packaging Pass (2026-02-14)
+
+### Scope
+- [x] Optimize `f1_res.ini` and `fallout.cfg` templates for macOS and iOS.
+- [x] Ensure every exposed template option is runtime-consumed.
+- [x] Fix runtime config key mismatches so settings are respected.
+- [x] Re-run full end-to-end validation against rebuilt `newpatchedfiles`.
+- [x] Run GUI-drive validation.
+- [x] Build iOS device IPA.
+- [x] Sweep docs + test references and add config-surface audit test.
+
+### Key Remediations
+- Added runtime key backfill in `src/game/gconfig.cc`:
+  - `preferences.player_speed` -> `preferences.player_speedup`
+  - `preferences.combat_looks` -> `preferences.running_burning_guy`
+- Fixed save path key mismatch in `src/game/options.cc`:
+  - now saves `running_burning_guy` to `GAME_CONFIG_RUNNING_BURNING_GUY_KEY`
+- Replaced both platform config templates with runtime-consumed key surface only:
+  - `gameconfig/macos/f1_res.ini`, `gameconfig/ios/f1_res.ini`
+  - `gameconfig/macos/fallout.cfg`, `gameconfig/ios/fallout.cfg`
+  - legacy alias templates synced: `gameconfig/*/fallout.ini`
+- Added config audit test:
+  - `scripts/test/test-rme-config-surface.py`
+  - wired into `scripts/test/test-rme-end-to-end.sh` and `scripts/test/test-rme-validate-ci.sh`
+- Fixed Bash 3.2 portability in build scripts (`^^` expansion -> portable `tr`):
+  - `scripts/build/build-macos.sh`
+  - `scripts/build/build-ios.sh`
+
+### Platform Defaults Locked
+- macOS (`f1_res.ini`): `SCR_WIDTH=1280`, `SCR_HEIGHT=960`, `SCALE_2X=1`, `WINDOWED=1`, `EXCLUSIVE=1`
+- iOS (`f1_res.ini`): `SCR_WIDTH=1280`, `SCR_HEIGHT=960`, `SCALE_2X=1`, `WINDOWED=0`, `EXCLUSIVE=1`
+- Effective logical surface for both: `640x480`
+
+### Validation Evidence (this pass)
+- Config audit:
+  - `python3 scripts/test/test-rme-config-surface.py` -> PASS
+- Full E2E:
+  - `scripts/test/test-rme-end-to-end.sh --base .../unpatchedfiles --patched .../newpatchedfiles --rebuild-patched --force-patch --out tmp/rme/final-e2e-config-pass`
+  - Outputs:
+    - `tmp/rme/final-e2e-config-pass/validation`
+    - `tmp/rme/final-e2e-config-pass/asset-sweep`
+    - `tmp/rme/final-e2e-config-pass/runtime`
+    - `tmp/rme/final-e2e-config-pass/log-sweep`
+  - Runtime CSV: `72` maps, `nonzero_exit=0`, `full_load_fail=0`, `suspicious=0`
+  - Asset sweep: `overlay_failures=[]`
+- GUI sweep:
+  - `scripts/test/test-rme-gui-drive.sh` (with `PATCHED_DIR=.../newpatchedfiles`) -> PASS
+  - Log: `tmp/rme/final-e2e-config-pass/gui-drive/gui.log`
+- iOS IPA build:
+  - `./scripts/build/build-ios.sh -prod --device` -> PASS
+  - IPA: `build-outputs/iOS/fallout1-rebirth.ipa`
+
+### Timestamp
+- 2026-02-14 22:52:06 UTC

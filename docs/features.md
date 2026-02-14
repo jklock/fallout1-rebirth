@@ -63,7 +63,7 @@ The most significant architectural change is the removal of all non-Apple platfo
 Platform cleanup:
 - Remove all Windows-specific code (mutex, file APIs, headers)
 - Remove Android-specific code (path handling, SDL hints)
-- Delete unused fallout.ini file (replaced by fallout.cfg)
+- Delete then-unused fallout.ini in that cleanup revision
 - Simplify to Apple-only implementation throughout codebase
 14 files changed, 84 insertions(+), 341 deletions(-)
 ```
@@ -144,20 +144,12 @@ SDL_CreateRenderer(window, -1,
 Features added:
 - VSync enabled by default via `SDL_RENDERER_PRESENTVSYNC`
 - Display refresh rate logging at startup for debugging
-- Configurable FpsLimiter with `setFps()`, `setEnabled()`, `getFps()`, `isEnabled()`
-- `[DISPLAY]` section in f1_res.ini with `VSYNC` and `FPS_LIMIT` options
-- ProMotion 120Hz support for compatible iPads
-
-**Configuration** (`f1_res.ini`):
-```ini
-[DISPLAY]
-VSYNC=1          ; 0=off, 1=on (default)
-FPS_LIMIT=-1     ; -1=match display, 0=unlimited, 60/120=fixed
-```
+- Runtime `FpsLimiter` plumbing (`setFps()`, `setEnabled()`, `getFps()`, `isEnabled()`)
+- No runtime `f1_res.ini` `[DISPLAY]` parser in current code (VSync is enabled by renderer setup)
 
 ### ProMotion Support
 
-iPads with ProMotion (120Hz) displays automatically benefit from higher refresh rates when VSync is enabled. The game detects and adapts to the display's native refresh rate.
+iPads with ProMotion displays use the same renderer path; effective frame pacing is still constrained by runtime limiter usage in game loops.
 
 ### 2X Integer Scaling
 
@@ -499,28 +491,39 @@ Directory structure:
 gameconfig/
 ├── ios/
 │   ├── fallout.cfg      # iOS game settings
-│   └── fallout.ini      # iOS display settings (rename to f1_res.ini)
+│   ├── f1_res.ini       # iOS display/input settings
+│   └── fallout.ini      # legacy alias template (same contents as f1_res.ini)
 └── macos/
     ├── fallout.cfg      # macOS game settings
-    └── fallout.ini      # macOS display settings (rename to f1_res.ini)
+    ├── f1_res.ini       # macOS display/input settings
+    └── fallout.ini      # legacy alias template (same contents as f1_res.ini)
 ```
 
-### New Configuration Sections
+### Runtime-Consumed Config Surface
 
 **Commit `c4b3515`** (2026-02-02):
 
-`[DISPLAY]` section in f1_res.ini:
+`f1_res.ini` consumed keys:
 ```ini
-[DISPLAY]
-VSYNC=1            ; Enable VSync (default)
-FPS_LIMIT=-1       ; Match display refresh rate
+[MAIN]
+SCR_WIDTH
+SCR_HEIGHT
+WINDOWED
+EXCLUSIVE
+SCALE_2X
+
+[INPUT]
+CLICK_OFFSET_X
+CLICK_OFFSET_Y
+CLICK_OFFSET_MOUSE_X
+CLICK_OFFSET_MOUSE_Y
 ```
 
 **Commit `4c72775`** (2026-02-02):
 
-`[PENCIL]` section in fallout.cfg:
+`fallout.cfg` iOS input key:
 ```ini
-[PENCIL]
+[input]
 pencil_right_click=0    ; 0=disabled (default), 1=enabled
 ```
 

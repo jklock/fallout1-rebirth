@@ -30,11 +30,10 @@ Apple Pencil is supported on iOS via native UIKit hooks. The pencil is detected 
 
 ## Settings and Defaults
 - `pencil_right_click` (fallout.cfg / game_config)
-  - Default is 1 (enabled) in src/game/gconfig.cc.
+  - Engine default is 1 (enabled) in `src/game/gconfig.cc`.
+  - Shipped iOS template sets `pencil_right_click=0` for precision-first default behavior.
   - When enabled, pencil body gestures trigger a right-click at the current cursor position.
  - Screen-contact behavior is unaffected by this toggle: Pencil pans always start a drag, and releases follow the gesture `kEnded` path even if the cursor hides while dragging, because button state is processed while hidden [src/plib/gnw/mouse.cc#L748-L858](src/plib/gnw/mouse.cc#L748-L858).
-
-Note: The PENCIL section in dist/ios/f1_res.ini includes options like click radius and long-press actions, but these values are not currently read by the runtime code.
 
 ## Rationale
 - Pencil detection via UIKit is required because SDL does not distinguish Apple Pencil from finger touches.

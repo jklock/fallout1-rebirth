@@ -10,6 +10,8 @@ if [[ $# -gt 0 ]]; then
     RME_FIXTURE_DIR="$1"
 fi
 
+python3 "$REPO_ROOT/scripts/test/test-rme-config-surface.py"
+
 echo "Running quick headless RME dry-run using failing fixture"
 export TEST_FALLBACK_BINARY="$REPO_ROOT/scripts/test/rme-fixture-tools/fake_fallout_runner"
 $REPO_ROOT/scripts/test/test-rme-patchflow.sh --auto-fix --auto-fix-iterations 1 "$RME_FIXTURE_DIR" || true

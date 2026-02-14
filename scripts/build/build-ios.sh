@@ -56,6 +56,7 @@ case "$LOGGING_FLAG_UPPER" in
         exit 2
         ;;
 esac
+RME_LOGGING_CMAKE_UPPER="$(printf '%s' "$RME_LOGGING_CMAKE" | tr '[:lower:]' '[:upper:]')"
 
 usage() {
     cat <<USAGE
@@ -205,7 +206,8 @@ configure_and_build_device() {
     else
         cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
         cached_platform="$(grep '^PLATFORM:STRING=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
-        if [[ "${cached_flag^^}" != "${RME_LOGGING_CMAKE^^}" || "$cached_platform" != "OS64" ]]; then
+        cached_flag_upper="$(printf '%s' "$cached_flag" | tr '[:lower:]' '[:upper:]')"
+        if [[ "$cached_flag_upper" != "$RME_LOGGING_CMAKE_UPPER" || "$cached_platform" != "OS64" ]]; then
             needs_config=1
         fi
     fi
@@ -284,7 +286,8 @@ configure_and_build_simulator() {
     else
         cached_platform="$(grep '^PLATFORM:STRING=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
         cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
-        if [[ "$cached_platform" != "$sim_platform" || "${cached_flag^^}" != "${RME_LOGGING_CMAKE^^}" ]]; then
+        cached_flag_upper="$(printf '%s' "$cached_flag" | tr '[:lower:]' '[:upper:]')"
+        if [[ "$cached_platform" != "$sim_platform" || "$cached_flag_upper" != "$RME_LOGGING_CMAKE_UPPER" ]]; then
             needs_config=1
         fi
     fi

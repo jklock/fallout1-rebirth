@@ -548,7 +548,7 @@ If you have a Magic Keyboard or external keyboard/trackpad, Fallout 1 Rebirth fu
    ```ini
    [sound]
    sounds=1
-   [system]
+   [sound]
    music=1
    ```
 3. Check your system volume
@@ -607,72 +607,53 @@ If you have a Magic Keyboard or external keyboard/trackpad, Fallout 1 Rebirth fu
 | Setting | Section | Description | Values |
 |---------|---------|-------------|--------|
 | WINDOWED | [MAIN] | Window mode | 0=Fullscreen, 1=Windowed |
-| SCR_WIDTH | [MAIN] | Screen width | 0=Auto, or pixels |
-| SCR_HEIGHT | [MAIN] | Screen height | 0=Auto, or pixels |
+| EXCLUSIVE | [MAIN] | Fullscreen exclusivity hint | 0=Non-exclusive, 1=Exclusive |
+| SCR_WIDTH | [MAIN] | Requested output width | Pixels (effective logical minimum: 640) |
+| SCR_HEIGHT | [MAIN] | Requested output height | Pixels (effective logical minimum: 480) |
 | SCALE_2X | [MAIN] | Graphics scaling | 0=Off, 1=On |
-| VSYNC | [DISPLAY] | Vertical sync | 0=Off, 1=On (default) |
-| FPS_LIMIT | [DISPLAY] | Frame rate limit | -1=Match display, 0=Unlimited, or FPS value |
+| CLICK_OFFSET_X | [INPUT] | Touch click X calibration | Signed pixels |
+| CLICK_OFFSET_Y | [INPUT] | Touch click Y calibration | Signed pixels |
+| CLICK_OFFSET_MOUSE_X | [INPUT] | Mouse/trackpad click X calibration | Signed pixels |
+| CLICK_OFFSET_MOUSE_Y | [INPUT] | Mouse/trackpad click Y calibration | Signed pixels |
 
-**VSync Settings (Recommended Defaults):**
+**Recommended defaults:**
 ```ini
-[DISPLAY]
-; VSync enabled by default for smooth scrolling and reduced tearing
-; ProMotion displays (iPad Pro 120Hz, MacBook Pro 120Hz) automatically supported
-VSYNC=1
-; FPS_LIMIT=-1 matches the display refresh rate (60Hz, 120Hz ProMotion, etc.)
-FPS_LIMIT=-1
+[MAIN]
+SCR_WIDTH=1280
+SCR_HEIGHT=960
+SCALE_2X=1
 ```
 
-> **Note:** VSync is **enabled by default** in Fallout 1 Rebirth for smooth gameplay. On ProMotion displays (iPad Pro 120Hz, newer MacBook Pro), the game automatically adapts to the display's variable refresh rate, providing silky-smooth scrolling and animations.
+> **Note:** Runtime parsing currently only consumes `[MAIN]` and `[INPUT]` keys in `f1_res.ini`.
 
 #### fallout.cfg (Game Settings)
 
 | Section | Setting | Description |
 |---------|---------|-------------|
-| [system] | music | Enable music (0/1) |
-| [system] | music_volume | Music volume (0-100) |
+| [sound] | music | Enable music (0/1) |
+| [sound] | music_volume | Music volume (0-32767) |
 | [sound] | sounds | Enable sound effects (0/1) |
-| [sound] | sndfx_volume | Sound volume (0-100) |
-| [preferences] | combat_speed | Combat animation speed (1-10) |
+| [sound] | sndfx_volume | Sound volume (0-32767) |
+| [preferences] | combat_speed | Combat animation speed (0-5) |
 | [preferences] | violence_level | Gore level (0-3) |
 
 **Apple Pencil Settings (iOS/iPadOS):**
 
-> **🖊️ Note:** Apple Pencil support is **fully implemented** as of version 1.0. Configure via `f1_res.ini`.
+> **🖊️ Note:** Configure Apple Pencil right-click behavior in `fallout.cfg`, not `f1_res.ini`.
 
-Apple Pencil provides precise pointing and natural gestures when configured properly. The `[PENCIL]` section in `f1_res.ini` provides extensive customization options:
+Apple Pencil provides precise pointing and natural gestures when configured properly. Runtime toggle:
 
 ```ini
-[PENCIL]
-; Enable Apple Pencil-specific handling (1=enabled, 0=disabled)
-; When disabled, Apple Pencil is treated identically to finger touch
-ENABLE_PENCIL=1
-
-; Click radius in pixels (at 640x480 base resolution)
-; Taps within this distance of the cursor trigger a click
-; Taps outside this radius only move the cursor (no click)
-CLICK_RADIUS=40
-
-; Long press gesture action (hold for 500ms)
-; 0 = Disabled
-; 1 = Left-click + drag
-; 2 = Right-click (examine items, context menus)
-LONG_PRESS_ACTION=2
-
-; Double-tap on pencil body (2nd gen and Pro)
-; 0 = Disabled
-; 1 = Left-click  
-; 2 = Right-click
-DOUBLE_TAP_ACTION=2
+[input]
+pencil_right_click=0   ; 0=disabled (recommended), 1=enabled
 ```
 
 **Pencil Behavior:**
 - **Tap near cursor**: Left-click at current position
 - **Tap away from cursor**: Move cursor to tap position (no click)
 - **Drag from cursor**: Click + drag (for inventory, map scrolling)
-- **Long-press**: Configurable action (default: right-click for examine)
-- **Body double-tap**: Quick right-click (2nd gen Pencil and Pencil Pro)
-- **Squeeze gesture**: Right-click (Pencil Pro only)
+- **Long-press**: Right-click only when `pencil_right_click=1`
+- **Body double-tap/squeeze**: Right-click only when `pencil_right_click=1`
 
 ---
 
@@ -696,7 +677,7 @@ Fallout 1 Rebirth includes several important bug fixes and improvements over the
 | Feature | Description |
 |---------|-------------|
 | **VSync** | Enabled by default for tear-free rendering |
-| **ProMotion Support** | Automatically adapts to 120Hz displays on iPad Pro and MacBook Pro |
+| **Frame Pacing** | Runtime loops use shared FPS limiter + renderer VSync |
 | **Touch Precision** | Cursor appears exactly where touched (fixed coordinate mapping) |
 | **Background Refresh** | Screen properly updates when returning from background on iOS/macOS |
 

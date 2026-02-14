@@ -150,6 +150,7 @@ Example:
 - `scripts/test/test-rebirth-validate-data.sh`
 - `scripts/test/test-rebirth-refresh-validation.sh`
 - `scripts/test/test-rebirth-toggle-logging.sh`
+- `scripts/test/test-rme-config-surface.py`
 
 Notes:
 

@@ -582,24 +582,19 @@ CLICK_OFFSET_X=0
 
 ; CLICK_OFFSET_Y: Vertical click position adjustment in game pixels
 ; Positive = shift clicks DOWN, Negative = shift clicks UP
-; Default: 0 (macOS), -12 (iOS - compensates for touch offset)
-CLICK_OFFSET_Y=-12
+; Default: 0 (macOS), 0 (iOS)
+CLICK_OFFSET_Y=0
 
-; ALT_MOUSE_INPUT: Alternate mouse input path
-; 0 = Standard (recommended)
-; 1 = Alternate (use if mouse/trackpad issues)
-ALT_MOUSE_INPUT=0
-
-; SCROLLWHEEL_FOCUS_PRIMARY_MENU: Focus scroll wheel on primary menu list
-; 1 = Enabled (recommended)
-SCROLLWHEEL_FOCUS_PRIMARY_MENU=1
+; CLICK_OFFSET_MOUSE_X/Y: Mouse/trackpad-specific calibration
+CLICK_OFFSET_MOUSE_X=0
+CLICK_OFFSET_MOUSE_Y=0
 ```
 
 ### Click Offset Calibration
 
 The `CLICK_OFFSET_X` and `CLICK_OFFSET_Y` settings allow calibrating where clicks register relative to the cursor tip. This is loaded during `GNW_mouse_init()` and applied in the `mouse_click_in()` function.
 
-**Why iOS needs offset**: Touch input on iOS can have a slight vertical offset where touches register below where the cursor tip appears. The default `-12` pixel adjustment compensates for this.
+**Why iOS may need offset**: device/setup-specific touch alignment can vary, so offsets are available for calibration when needed.
 
 **How to calibrate**:
 1. If clicks seem to miss their target consistently in one direction, adjust the offset
