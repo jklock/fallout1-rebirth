@@ -1,39 +1,41 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Fallout 1 Rebirth — macOS Build Script
+# Fallout 1 Rebirth - macOS Build Script
 # =============================================================================
-# Builds the macOS app bundle using Xcode generator.
+# Single macOS build entrypoint with explicit build intent.
+#
+# MODES:
+#   -prod   Build release-style app (no embedded game data/config)
+#   -test   Build app and embed patched data/config for immediate testing
 #
 # USAGE:
-#   ./scripts/build/build-macos.sh              # Standard build
-#   BUILD_TYPE=Debug ./scripts/build/build-macos.sh  # Debug build
+#   ./scripts/build/build-macos.sh -prod
+#   ./scripts/build/build-macos.sh -test --game-data /path/to/patchedfiles
 #
-# CONFIGURATION (environment variables):
-#   BUILD_DIR   - Build output directory (default: "build-macos")
-#   BUILD_TYPE  - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
-#   JOBS        - Parallel jobs (default: physical CPU count)
-#   CLEAN       - Set to "1" to force reconfigure
-#   F1R_DISABLE_RME_LOGGING - Set to 1/ON to compile out Rebirth diagnostic logging
+# ENVIRONMENT:
+#   BUILD_DIR, BUILD_TYPE, JOBS, CLEAN
+#   F1R_DISABLE_RME_LOGGING, GAME_DATA, FALLOUT_GAMEFILES_ROOT
 # =============================================================================
 set -euo pipefail
 
-cd "$(dirname "$0")/../.."
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT_DIR"
 
 if [[ -f ".f1r-build.env" ]]; then
     # shellcheck disable=SC1091
     source ".f1r-build.env"
 fi
 
-# -----------------------------------------------------------------------------
-# Configuration
-# -----------------------------------------------------------------------------
+MODE="prod"
 BUILD_DIR="${BUILD_DIR:-build-macos}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 CLEAN="${CLEAN:-0}"
+GAME_DATA="${GAME_DATA:-}"
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+
 LOGGING_FLAG_RAW="${F1R_DISABLE_RME_LOGGING:-0}"
 LOGGING_FLAG_UPPER="$(printf '%s' "$LOGGING_FLAG_RAW" | tr '[:lower:]' '[:upper:]')"
-
 case "$LOGGING_FLAG_UPPER" in
     1|ON|TRUE|YES) RME_LOGGING_CMAKE="ON" ;;
     0|OFF|FALSE|NO|"") RME_LOGGING_CMAKE="OFF" ;;
@@ -43,101 +45,137 @@ case "$LOGGING_FLAG_UPPER" in
         ;;
 esac
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+usage() {
+    cat <<USAGE
+Fallout 1 Rebirth - macOS Build
 
-# -----------------------------------------------------------------------------
-# Helper functions
-# -----------------------------------------------------------------------------
-log_info()  { echo -e "${BLUE}>>>${NC} $1"; }
-log_ok()    { echo -e "${GREEN}✅${NC} $1"; }
-log_warn()  { echo -e "${YELLOW}⚠️${NC}  $1"; }
-log_error() { echo -e "${RED}❌${NC} $1"; }
+USAGE:
+  ./scripts/build/build-macos.sh MODE [OPTIONS]
 
-echo ""
-echo "=============================================="
-echo " Fallout 1 Rebirth — macOS Build"
-echo "=============================================="
-echo " Build directory: $BUILD_DIR"
-echo " Build type:      $BUILD_TYPE"
-echo " Parallel jobs:   $JOBS"
-echo " RME logging:     $RME_LOGGING_CMAKE (compile option)"
-echo "=============================================="
-echo ""
+MODE:
+  -prod                Build release-style app with no embedded game data
+  -test                Build app and embed patched data/config in Resources
 
-# Clean if requested
+OPTIONS:
+  --game-data PATH     Patched data source (master.dat, critter.dat, data/)
+                       Required in -test mode unless GAME_DATA or FALLOUT_GAMEFILES_ROOT is set.
+  --help               Show this help
+
+EXAMPLES:
+  ./scripts/build/build-macos.sh -prod
+  ./scripts/build/build-macos.sh -test --game-data /path/to/patchedfiles
+USAGE
+}
+
+log_info()  { echo ">>> $1"; }
+log_ok()    { echo "PASS: $1"; }
+log_warn()  { echo "WARN: $1"; }
+log_error() { echo "FAIL: $1"; }
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -prod|--prod)
+            MODE="prod"
+            shift
+            ;;
+        -test|--test)
+            MODE="test"
+            shift
+            ;;
+        --game-data)
+            GAME_DATA="$2"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            log_error "Unknown option: $1"
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+resolve_game_data() {
+    if [[ -z "$GAME_DATA" && -n "$GAMEFILES_ROOT" ]]; then
+        GAME_DATA="$GAMEFILES_ROOT/patchedfiles"
+    fi
+
+    if [[ -z "$GAME_DATA" ]]; then
+        log_error "-test mode requires --game-data or GAME_DATA/FALLOUT_GAMEFILES_ROOT"
+        exit 2
+    fi
+
+    if [[ "$GAME_DATA" != /* ]]; then
+        GAME_DATA="$ROOT_DIR/$GAME_DATA"
+    fi
+    GAME_DATA="$(cd "$GAME_DATA" 2>/dev/null && pwd)" || {
+        log_error "Invalid game data path: $GAME_DATA"
+        exit 2
+    }
+
+    if [[ ! -f "$GAME_DATA/master.dat" || ! -f "$GAME_DATA/critter.dat" || ! -d "$GAME_DATA/data" ]]; then
+        log_error "Game data is incomplete at $GAME_DATA (need master.dat, critter.dat, data/)"
+        exit 2
+    fi
+}
+
 if [[ "$CLEAN" == "1" && -d "$BUILD_DIR" ]]; then
-    log_warn "CLEAN=1 set, removing $BUILD_DIR..."
+    log_warn "CLEAN=1 set, removing $BUILD_DIR"
     rm -rf "$BUILD_DIR"
 fi
 
-# Configure (if missing or if logging mode changed)
 NEEDS_CONFIG=0
 if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
     NEEDS_CONFIG=1
 else
     cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$BUILD_DIR/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
-    cached_flag_upper="$(printf '%s' "${cached_flag:-}" | tr '[:lower:]' '[:upper:]')"
-    desired_flag_upper="$(printf '%s' "$RME_LOGGING_CMAKE" | tr '[:lower:]' '[:upper:]')"
-    if [[ "$cached_flag_upper" != "$desired_flag_upper" ]]; then
-        log_info "CMake option changed: F1R_DISABLE_RME_LOGGING=${cached_flag:-unset} -> $RME_LOGGING_CMAKE"
+    if [[ "${cached_flag^^}" != "${RME_LOGGING_CMAKE^^}" ]]; then
         NEEDS_CONFIG=1
     fi
 fi
 
 if [[ "$NEEDS_CONFIG" == "1" ]]; then
-    log_info "Configuring CMake with Xcode generator..."
+    log_info "Configuring macOS build"
     cmake -B "$BUILD_DIR" \
         -G Xcode \
         -D F1R_DISABLE_RME_LOGGING="$RME_LOGGING_CMAKE" \
-        -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
-        || { log_error "CMake configuration failed"; exit 1; }
-    log_ok "Configuration complete"
+        -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
 else
-    log_info "Using existing CMake configuration"
+    log_info "Using existing macOS CMake configuration"
 fi
 
-# Build
-log_info "Building ($BUILD_TYPE, $JOBS parallel jobs)..."
-if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS"; then
-    log_error "Build failed"
-    exit 1
-fi
+log_info "Building macOS target ($BUILD_TYPE)"
+cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS"
 
-# -----------------------------------------------------------------------------
-# Verification
-# -----------------------------------------------------------------------------
 APP_PATH="$BUILD_DIR/$BUILD_TYPE/Fallout 1 Rebirth.app"
 EXECUTABLE="$APP_PATH/Contents/MacOS/fallout1-rebirth"
 
-if [[ -d "$APP_PATH" && -x "$EXECUTABLE" ]]; then
-    echo ""
-    log_ok "Build successful!"
-    echo ""
-    echo "  App bundle: $APP_PATH"
-    echo "  Executable: $EXECUTABLE"
-    echo "  Size:       $(du -sh "$APP_PATH" | cut -f1)"
-    echo ""
-    # Show architecture info
-    log_info "Binary architecture:"
-    file "$EXECUTABLE" | sed 's/.*: /    /'
-    echo ""
-    echo "To run (requires game data in same directory or configured path):"
-    echo "  open \"$APP_PATH\""
-    echo ""
-    echo "To create DMG for distribution:"
-    echo "  cd $BUILD_DIR && cpack -C $BUILD_TYPE"
-else
-    echo ""
-    log_error "Build verification failed!"
-    if [[ ! -d "$APP_PATH" ]]; then
-        log_error "App bundle not found: $APP_PATH"
-    elif [[ ! -x "$EXECUTABLE" ]]; then
-        log_error "Executable not found or not executable: $EXECUTABLE"
-    fi
+if [[ ! -d "$APP_PATH" || ! -x "$EXECUTABLE" ]]; then
+    log_error "Build output missing or invalid: $APP_PATH"
     exit 1
 fi
+
+if [[ "$MODE" == "test" ]]; then
+    resolve_game_data
+    log_info "Embedding test payload from $GAME_DATA"
+    "$ROOT_DIR/scripts/build/install-game-data.sh" --source "$GAME_DATA" --target "$APP_PATH"
+fi
+
+echo ""
+echo "=============================================="
+echo " Fallout 1 Rebirth - macOS Build"
+echo "=============================================="
+echo " Mode:       $MODE"
+echo " Build dir:  $BUILD_DIR"
+echo " Build type: $BUILD_TYPE"
+echo " App:        $APP_PATH"
+echo " Size:       $(du -sh "$APP_PATH" | cut -f1)"
+if [[ "$MODE" == "test" ]]; then
+    echo " Test data:  $GAME_DATA"
+fi
+echo "=============================================="
+
+log_ok "macOS build completed"

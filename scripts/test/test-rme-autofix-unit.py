@@ -5,6 +5,7 @@ Unit tests for rme-autofix rules and basic dry-run behavior.
 import json
 import os
 import subprocess
+import sys
 import tempfile
 
 SCRIPT = os.path.join(os.path.dirname(__file__), 'test-rme-autofix.py')
@@ -64,7 +65,7 @@ def test_autofix_dry_run_creates_proposed_diff():
         with open(os.path.join(workdir, 'data', 'text', 'english', 'map.msg'), 'w', encoding='utf-8') as f:
             f.write('dummy')
 
-        proc = subprocess.run([SCRIPT, '--workdir', workdir, '--iterations', '1', '--dry-run'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        proc = subprocess.run([sys.executable, SCRIPT, '--workdir', workdir, '--iterations', '1', '--dry-run'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         assert proc.returncode == 0
         prop = os.path.join(workdir, 'fixes', 'iter-1', 'proposed.diff')
         assert os.path.isfile(prop)
@@ -80,7 +81,7 @@ def test_whitelist_propose_and_blocking():
         with open(os.path.join(workdir, 'rme-selftest.json'), 'w', encoding='utf-8') as f:
             json.dump(st, f)
         # Run autofix requesting whitelist apply
-        proc = subprocess.run([SCRIPT, '--workdir', workdir, '--iterations', '1', '--apply-whitelist', '--dry-run'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+        proc = subprocess.run([sys.executable, SCRIPT, '--workdir', workdir, '--iterations', '1', '--apply-whitelist', '--dry-run'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
         assert proc.returncode == 0
         # Check that a proposed diff was written into tmp RME state
         outdiff = os.path.join(tmp, 'rme-state', 'fixes-proposed', 'whitelist-proposed.diff')
@@ -93,6 +94,14 @@ def test_whitelist_propose_and_blocking():
                 found = True
                 break
         assert found
+
+def main():
+    test_ensure_fallout_cfg_language()
     test_relocate_text_for_message_load()
     test_autofix_dry_run_creates_proposed_diff()
+    test_whitelist_propose_and_blocking()
     print('test-rme-autofix.py unit tests: OK')
+
+
+if __name__ == "__main__":
+    main()

@@ -15,8 +15,7 @@
 #   - App bundle is read-only at runtime; game data goes in data container
 #
 # USAGE:
-#   ./scripts/test/test-ios-simulator.sh              # Build + install + launch
-#   ./scripts/test/test-ios-simulator.sh --build-only # Just build
+#   ./scripts/test/test-ios-simulator.sh              # Install + launch existing build
 #   ./scripts/test/test-ios-simulator.sh --launch     # Launch existing install
 #   ./scripts/test/test-ios-simulator.sh --shutdown   # Shutdown all simulators
 #   ./scripts/test/test-ios-simulator.sh --list       # List available iPad sims
@@ -27,7 +26,6 @@
 #   FALLOUT_GAMEFILES_ROOT - Optional root containing patchedfiles/
 #   BUILD_DIR       - Build output dir (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
-#   CLEAN           - Set to "1" to force reconfigure
 # =============================================================================
 set -euo pipefail
 
@@ -44,9 +42,6 @@ GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
-JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
-CLEAN="${CLEAN:-0}"
-TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
 
 # iOS Simulator output directory suffix
 SIM_SUFFIX="iphonesimulator"
@@ -100,7 +95,7 @@ detect_bundle_id() {
     
     if [[ ! -f "$plist" ]]; then
         log_error "Info.plist not found: $plist"
-        log_info "Build the app first with: ./scripts/test/test-ios-simulator.sh --build-only"
+        log_info "Build first with: ./scripts/build/build-ios.sh -prod --simulator"
         exit 1
     fi
     
@@ -214,61 +209,6 @@ list_ipad_simulators() {
     echo "  SIMULATOR_NAME='iPad Air (5th generation)' ./scripts/test/test-ios-simulator.sh"
 }
 
-# Build for simulator
-build_for_simulator() {
-    log_info "Building for iOS Simulator (arm64)..."
-    
-    if [[ ! -f "$TOOLCHAIN" ]]; then
-        log_error "iOS toolchain not found: $TOOLCHAIN"
-        log_info "Ensure you're running from the project root"
-        exit 1
-    fi
-    
-    # Clean if requested
-    if [[ "$CLEAN" == "1" && -d "$BUILD_DIR" ]]; then
-        log_warn "CLEAN=1 set, removing $BUILD_DIR..."
-        rm -rf "$BUILD_DIR"
-    fi
-    
-    # Configure if needed
-    if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
-        log_info "Configuring CMake for Simulator..."
-        if ! cmake -B "$BUILD_DIR" \
-            -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
-            -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
-            -D ENABLE_BITCODE=0 \
-            -D PLATFORM=SIMULATORARM64 \
-            -D DEPLOYMENT_TARGET=26.0 \
-            -G Xcode \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO; then
-            log_error "CMake configuration failed"
-            exit 1
-        fi
-        log_ok "Configuration complete"
-    else
-        log_info "Using existing CMake configuration"
-    fi
-    
-    # Build
-    log_info "Compiling ($BUILD_TYPE, $JOBS parallel jobs)..."
-    if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS" -- \
-        EXCLUDED_ARCHS=""; then
-        log_error "Build failed"
-        exit 1
-    fi
-    
-    # Verify executable exists
-    local app_path="$BUILD_DIR/$BUILD_TYPE-$SIM_SUFFIX/fallout1-rebirth.app"
-    if [[ -f "$app_path/fallout1-rebirth" ]]; then
-        log_ok "Build complete: $app_path"
-        file "$app_path/fallout1-rebirth"
-    else
-        log_error "Build failed: executable not found"
-        exit 1
-    fi
-}
-
 # Install app to simulator (with retries)
 install_to_simulator() {
     local udid="$1"
@@ -278,7 +218,7 @@ install_to_simulator() {
     
     if [[ ! -d "$app_path" ]]; then
         log_error "App bundle not found: $app_path"
-        log_info "Run with --build-only first, or without arguments to build and install"
+        log_info "Build first with: ./scripts/build/build-ios.sh -prod --simulator"
         exit 1
     fi
     
@@ -463,10 +403,6 @@ main() {
             list_ipad_simulators
             exit 0
             ;;
-        --build-only)
-            build_for_simulator
-            exit 0
-            ;;
         --launch)
             # Just launch existing install
             ;;
@@ -475,7 +411,7 @@ main() {
             exit 0
             ;;
         "")
-            # Full flow: build + install + launch
+            # Full flow: install + launch using existing build
             ;;
         *)
             log_error "Unknown option: $1"
@@ -511,18 +447,13 @@ main() {
     # Wait for simulator to be fully ready
     wait_for_simulator_ready "$SIMULATOR_UDID" 180
     
-    # Step 4: Build (unless --launch)
+    # Step 4: Validate existing build and install (unless --launch).
+    detect_bundle_id
     if [[ "$mode" != "--launch" ]]; then
-        build_for_simulator
-        
-        # Detect bundle ID from built app
-        detect_bundle_id
-        
         install_to_simulator "$SIMULATOR_UDID"
         copy_game_data "$SIMULATOR_UDID"
     else
-        # For --launch, still need to detect bundle ID
-        detect_bundle_id
+        # For --launch, still stage game data in container.
         copy_game_data "$SIMULATOR_UDID"
     fi
     

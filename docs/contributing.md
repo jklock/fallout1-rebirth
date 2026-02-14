@@ -67,12 +67,13 @@ git checkout -b feature/your-feature-name
 
 ```bash
 # Build for macOS
-./scripts/build/build-macos.sh
+./scripts/build/build-macos.sh -prod
 
 # Run pre-commit checks
 ./scripts/dev/dev-check.sh
 
 # Test on iPad Simulator
+./scripts/build/build-ios.sh -prod --simulator
 ./scripts/test/test-ios-simulator.sh
 ```
 
@@ -187,8 +188,9 @@ Run these before every submission:
 # 2. Pre-commit checks (formatting + static analysis)
 ./scripts/dev/dev-check.sh
 
-# 3. Build verification
-./scripts/dev/dev-verify.sh
+# 3. Build + verify existing artifact
+./scripts/build/build-macos.sh -prod
+./scripts/dev/dev-verify.sh --build-dir build-macos
 ```
 
 All checks must pass before submitting a pull request.
@@ -197,9 +199,9 @@ All checks must pass before submitting a pull request.
 
 | Change Type | Required Testing |
 |-------------|------------------|
-| Build system | `./scripts/build/build-macos.sh` + `./scripts/build/build-ios.sh` |
+| Build system | `./scripts/build/build-macos.sh -prod` + `./scripts/build/build-ios.sh -prod --device` |
 | macOS-only code | `./scripts/test/test-macos.sh` |
-| iOS-only code | `./scripts/test/test-ios-headless.sh --build` |
+| iOS-only code | `./scripts/build/build-ios.sh -prod --simulator` + `./scripts/test/test-ios-headless.sh` |
 | Core engine | Both macOS and iOS tests |
 | UI changes | Manual testing on both platforms |
 
@@ -218,7 +220,7 @@ If adding new `.cc` or `.h` files:
 
 2. Verify build:
    ```bash
-   ./scripts/build/build-macos.sh
+   ./scripts/build/build-macos.sh -prod
    ```
 
 ### Commit Messages
@@ -272,16 +274,16 @@ Run these scripts before submitting:
 # Format + lint checks
 ./scripts/dev/dev-check.sh
 
-# Full verification (build + static analysis)
-./scripts/dev/dev-verify.sh
+# Verify an existing build artifact
+./scripts/dev/dev-verify.sh --build-dir build-macos
 ```
 
 | Check | Requirement |
 |-------|-------------|
 | Static analysis (cppcheck) | No errors |
 | Code formatting | No differences |
-| iOS build | Compiles successfully |
-| macOS build | Compiles successfully |
+| iOS build | Build script succeeds (`./scripts/build/build-ios.sh -prod --device` or `--simulator`) |
+| macOS build | Build script succeeds (`./scripts/build/build-macos.sh -prod`) |
 
 All checks must pass locally before submitting a pull request.
 
@@ -305,8 +307,8 @@ All checks must pass locally before submitting a pull request.
 
 Releases are built and distributed locally:
 
-- **macOS**: `./scripts/build/build-macos-dmg.sh` creates a DMG installer
-- **iOS**: `./scripts/build/build-ios.sh` followed by `cd build-ios && cpack -C RelWithDebInfo` creates an IPA
+- **macOS**: `./scripts/build/build-macos.sh -prod` creates the app bundle (DMG packaging is manual)
+- **iOS**: `./scripts/build/build-ios.sh -prod --device` creates the IPA artifact
 - Artifacts are uploaded to [GitHub Releases](https://github.com/ORIGINAL_OWNER/fallout1-rebirth/releases)
 
 Contributors do not need to create releases—maintainers handle this for each version.
@@ -355,10 +357,15 @@ Be respectful and constructive in all interactions. We welcome contributors of a
 
 ## Proof of Work
 
-- **Timestamp**: February 5, 2026
+- **Timestamp**: February 14, 2026
 - **Files verified**:
   - `scripts/dev/dev-check.sh` - Confirmed pre-commit check script exists
   - `scripts/dev/dev-verify.sh` - Confirmed verification script exists
   - `scripts/dev/dev-format.sh` - Confirmed formatting script exists
+  - `scripts/build/build-macos.sh` - Confirmed consolidated `-prod` / `-test` build workflow
+  - `scripts/build/build-ios.sh` - Confirmed consolidated device/simulator workflow
   - `.clang-format` - Confirmed WebKit-based style configuration
-- **Updates made**: No updates needed - content verified accurate. Contribution guidelines, code style requirements, and PR process are all current.
+- **Updates made**:
+  - Updated contribution workflow to use explicit `-prod` build commands before verification/testing.
+  - Clarified that `dev-verify.sh` validates existing build artifacts.
+  - Updated release workflow to reflect manual macOS DMG packaging and unified iOS build entrypoint.

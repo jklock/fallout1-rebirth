@@ -2,14 +2,12 @@
 
 Last updated (UTC): 2026-02-14
 
-Build and packaging entrypoints.
+Build entrypoints.
 
 ## Files
-- `build-macos.sh`: Build macOS app bundle.
-- `build-macos-dmg.sh`: Package macOS DMG.
-- `build-ios.sh`: Build iOS app.
-- `build-ios-ipa.sh`: Package iOS IPA.
-- `build-releases.sh`: End-to-end local release build flow.
+- `build-macos.sh`: Single macOS build entrypoint (`-test` or `-prod`).
+- `build-ios.sh`: Single iOS build entrypoint (`-test` or `-prod`), supports device/simulator/both targets.
+- `install-game-data.sh`: Install patched game data into an existing macOS app bundle.
 
 ## Inputs
 - Source tree in this repo.
@@ -19,9 +17,8 @@ Build and packaging entrypoints.
 
 ## Outputs
 - `build-*` directories.
-- `build-outputs/` artifacts.
-- `releases/` copied release artifacts.
+- `build-outputs/iOS/*.ipa` artifacts.
 
 ## Logging Build Flag
 - `F1R_DISABLE_RME_LOGGING=1` compiles out Rebirth diagnostic logging hooks.
-- Set this via env or `scripts/patch/rebirth-toggle-logging.sh`.
+- Set this via env or `scripts/test/test-rebirth-toggle-logging.sh`.

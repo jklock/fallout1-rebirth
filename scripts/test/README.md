@@ -7,7 +7,12 @@ All test and validation scripts live in this directory and follow `test-*` namin
 ## Core Platform Tests
 - `test-macos.sh`, `test-macos-headless.sh`
 - `test-ios-simulator.sh`, `test-ios-headless.sh`
-- `test-install-game-data.sh`, `test-shutdown-sanity.sh`
+- `test-shutdown-sanity.sh`
+
+## Rebirth Data Validation Tests
+- `test-rebirth-refresh-validation.sh`
+- `test-rebirth-validate-data.sh`
+- `test-rebirth-toggle-logging.sh`
 
 ## RME Validation Tests
 - `test-rme-ensure-patched-data.sh`
@@ -23,15 +28,23 @@ All test and validation scripts live in this directory and follow `test-*` namin
 - `test-rme-gui-drive.sh`, `test-rme-log-sweep.sh`
 - `test-verify-checksums.py`
 
+## RME Suite
+- `rme/suite.py` is the primary user-facing RME entrypoint.
+- Use `python3 scripts/test/rme/suite.py all` for the full default suite flow.
+
 Fixture-driven integration scripts accept override paths via env/args (for example `DATA_DIR` or `RME_FIXTURE_DIR`).
 
 ## Fixtures
-- `rme-data/`: controlled fixture payloads.
-- `rme-tools/`: helper binaries/scripts for integration testing.
-- `tmp_wd/`: retained sample workdir snapshot used by autofix-path tests.
+- `rme-fixtures/`: controlled fixture payloads.
+- `rme-fixture-tools/`: helper binaries/scripts for integration testing.
+- `rme-sample-workdir/`: retained sample workdir snapshot used by autofix-path tests.
 
 ## Path Configuration
 - Do not assume repo-local gamefiles.
 - Provide data via `GAME_DATA`/flags or `FALLOUT_GAMEFILES_ROOT`.
 - Output paths are configurable through script flags and env vars.
 - Scratch/test roots are configurable (`RME_RUN_ROOT`, `RME_STATE_DIR`, `OUT_DIR`, `LOG_DIR`).
+
+## Build Policy
+- Test scripts in `scripts/test/` validate existing artifacts only.
+- Build required artifacts with `scripts/build/*.sh` before running tests.

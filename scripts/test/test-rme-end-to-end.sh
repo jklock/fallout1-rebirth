@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # End-to-end RME validation run:
-# - rebuild/apply patches when needed
+# - apply patches when needed
 # - validate patch artifacts
 # - sweep all asset domains (maps/audio/critters/proto/scripts/text/art)
 # - run full runtime MAP sweep with max logging enabled
@@ -37,7 +37,6 @@ EXE="${EXE:-$APP/Contents/MacOS/fallout1-rebirth}"
 
 TIMEOUT="${TIMEOUT:-60}"
 RUN_IOS="${RUN_IOS:-0}"
-SKIP_BUILD="${SKIP_BUILD:-0}"
 REBUILD_PATCHED="${REBUILD_PATCHED:-0}"
 FORCE_PATCH="${FORCE_PATCH:-0}"
 SKIP_CHECKSUMS="${SKIP_CHECKSUMS:-0}"
@@ -53,10 +52,9 @@ Options:
   --config-dir <dir>  Config template directory
   --out <dir>         Output root for reports/logs
   --timeout <sec>     Per-map runtime timeout for map sweep (default: ${TIMEOUT})
-  --skip-build        Skip build-macos step
   --rebuild-patched   Force patch-data rebuild before validation
-  --force-patch       Pass --force to rebirth-patch-data.sh
-  --skip-checksums    Pass --skip-checksums to rebirth-patch-data.sh
+  --force-patch       Pass --force to patch-rebirth-data.sh
+  --skip-checksums    Pass --skip-checksums to patch-rebirth-data.sh
   --run-ios           Also run iOS headless/simulator tests (best effort)
   --help              Show this message
 EOF
@@ -70,7 +68,6 @@ while [[ $# -gt 0 ]]; do
         --config-dir) CONFIG_DIR="$2"; shift 2 ;;
         --out) OUT_DIR="$2"; shift 2 ;;
         --timeout) TIMEOUT="$2"; shift 2 ;;
-        --skip-build) SKIP_BUILD=1; shift ;;
         --rebuild-patched) REBUILD_PATCHED=1; shift ;;
         --force-patch) FORCE_PATCH=1; shift ;;
         --skip-checksums) SKIP_CHECKSUMS=1; shift ;;
@@ -107,11 +104,10 @@ require_cmd() {
 require_cmd python3
 require_cmd xdelta3
 
-if [[ "$SKIP_BUILD" -eq 0 ]]; then
-    log "Build macOS app"
-    "$ROOT/scripts/build/build-macos.sh"
-else
-    log "Skipping build step (--skip-build)"
+if [[ ! -x "$EXE" ]]; then
+    echo "[ERROR] App executable not found: $EXE" >&2
+    echo "[ERROR] Build the app first with: ./scripts/build/build-macos.sh" >&2
+    exit 2
 fi
 
 if [[ ! -d "$PATCHED_DIR" || "$REBUILD_PATCHED" == "1" ]]; then
@@ -123,21 +119,21 @@ if [[ ! -d "$PATCHED_DIR" || "$REBUILD_PATCHED" == "1" ]]; then
     if [[ "$FORCE_PATCH" == "1" ]]; then
         args+=(--force)
     fi
-    "$ROOT/scripts/patch/rebirth-patch-data.sh" "${args[@]}"
+    "$ROOT/scripts/patch/patch-rebirth-data.sh" "${args[@]}"
 fi
 
 log "Ensure patched payload completeness"
 "$ROOT/scripts/test/test-rme-ensure-patched-data.sh" --patched-dir "$PATCHED_DIR" --quiet
 
 log "Refresh deterministic validation evidence"
-"$ROOT/scripts/patch/rebirth-refresh-validation.sh" \
+"$ROOT/scripts/test/test-rebirth-refresh-validation.sh" \
   --unpatched "$BASE_DIR" \
   --patched "$PATCHED_DIR" \
   --rme "$RME_DIR" \
   --out "$VALIDATION_DIR"
 
 log "Validate patched output against payload/xdelta"
-"$ROOT/scripts/patch/rebirth-validate-data.sh" \
+"$ROOT/scripts/test/test-rebirth-validate-data.sh" \
   --patched "$PATCHED_DIR" \
   --base "$BASE_DIR" \
   --rme "$RME_DIR"

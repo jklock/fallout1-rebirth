@@ -292,10 +292,10 @@ def main(argv):
         # If we applied patches, re-run the orchestrator run on the WORKDIR to get fresh artifacts
         if applied:
             print("Re-running app selftest with modified WORKDIR to validate fixes")
-            # Invoke test-rme-patchflow.sh with --skip-build to avoid rebuilds
+            # Invoke test-rme-patchflow.sh (it no longer performs build steps).
             runner = os.path.join(REPO_ROOT, "scripts", "test", "test-rme-patchflow.sh")
             try:
-                proc = subprocess.run([runner, "--skip-build" , workdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+                proc = subprocess.run([runner, workdir], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
                 out = (proc.stdout or "") + "\n" + (proc.stderr or "")
             except Exception as e:
                 print(f"Runner invocation failed: {e}", file=sys.stderr)

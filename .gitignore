@@ -416,12 +416,12 @@ critter.dat
 # Project documentation and research (internal use)
 development/archive/
 
-# Development files (AI agent notes - toggle with scripts/dev/dev-toggle-dev-files.sh)
-#**/JOURNAL.md
-#src/README.md
-#.github/copilot-instructions.md
-#.github/skills/
-#scripts/dev/dev-toggle-dev-files.sh
+# Development files (AI agent notes - toggle with scripts/hideall.sh)
+**/JOURNAL.md
+src/README.md
+.github/copilot-instructions.md
+.github/skills/
+scripts/hideall.sh
 
 # macOS
 .DS_Store

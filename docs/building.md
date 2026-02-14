@@ -1,236 +1,123 @@
 # Building from Source
 
-Build instructions for Fallout 1 Rebirth on all supported platforms (macOS and iOS/iPadOS).
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [macOS Build](#macos-build)
-- [iOS Device Build](#ios-device-build)
-- [iOS Simulator Build](#ios-simulator-build)
-- [Build Configuration Options](#build-configuration-options)
-- [Packaging](#packaging)
-- [Distribution Workflow](#distribution-workflow)
-- [Troubleshooting](#troubleshooting)
-
----
+Build instructions for Fallout 1 Rebirth on macOS and iOS.
 
 ## Prerequisites
-
-### Required Software
 
 | Software | Version | Installation |
 |----------|---------|--------------|
 | Xcode | 14.0+ | Mac App Store |
-| Command Line Tools | - | `xcode-select --install` |
-| CMake | 3.13+ | `brew install cmake` or download from cmake.org |
+| Command Line Tools | current | `xcode-select --install` |
+| CMake | 3.13+ | `brew install cmake` |
 
-### Optional (for development)
+Optional:
 
-| Software | Purpose | Installation |
-|----------|---------|--------------|
-| clang-format | Code formatting | `brew install clang-format` |
-| cppcheck | Static analysis | `brew install cppcheck` |
+| Software | Purpose |
+|----------|---------|
+| clang-format | code formatting |
+| cppcheck | static analysis |
 
-### Verify Installation
+## Quick Start
 
-```bash
-# Check Xcode
-xcode-select -p
-# Should output: /Applications/Xcode.app/Contents/Developer
-
-# Check CMake
-cmake --version
-# Should output: cmake version 3.x.x
-
-# Check clang-format (optional)
-clang-format --version
-```
-
----
-
-## macOS Build
-
-### Method 1: Using Build Script (Recommended) ✅
-
-**Always use the build script for standard builds.** It handles configuration, parallelization, and output paths correctly:
+### macOS build
 
 ```bash
-./scripts/build/build-macos.sh
+# Production-style app (no embedded game data)
+./scripts/build/build-macos.sh -prod
+
+# Test-ready app (embed patched data/config into app)
+./scripts/build/build-macos.sh -test --game-data /path/to/patchedfiles
 ```
 
-The app bundle will be created at:
-```
+Output:
+
+```text
 build-macos/RelWithDebInfo/Fallout 1 Rebirth.app
 ```
 
-#### Build Script Options
+### iOS build
 
 ```bash
-# Debug build
-BUILD_TYPE=Debug ./scripts/build/build-macos.sh
+# Device IPA (production-style)
+./scripts/build/build-ios.sh -prod --device
 
-# Release build
-BUILD_TYPE=Release ./scripts/build/build-macos.sh
+# Simulator app only (production-style)
+./scripts/build/build-ios.sh -prod --simulator
 
-# Force clean rebuild
-CLEAN=1 ./scripts/build/build-macos.sh
-
-# Custom build directory
-BUILD_DIR=my-build ./scripts/build/build-macos.sh
-
-# Limit parallel jobs
-JOBS=4 ./scripts/build/build-macos.sh
+# Test-ready device + simulator artifacts (embed patched data/config)
+./scripts/build/build-ios.sh -test --both --game-data /path/to/patchedfiles
 ```
 
-### Method 2: Xcode Generator (GUI Development)
+Outputs:
 
-Use this method for Xcode IDE integration:
+```text
+build-ios/<CONFIG>-iphoneos/fallout1-rebirth.app
+build-ios-sim/<CONFIG>-iphonesimulator/fallout1-rebirth.app
+build-outputs/iOS/*.ipa
+```
+
+## Build Script Options
+
+### `scripts/build/build-macos.sh`
 
 ```bash
-# Configure with Xcode generator
+BUILD_TYPE=Debug ./scripts/build/build-macos.sh -prod
+BUILD_TYPE=Release ./scripts/build/build-macos.sh -prod
+BUILD_DIR=my-macos-build ./scripts/build/build-macos.sh -prod
+JOBS=4 ./scripts/build/build-macos.sh -prod
+CLEAN=1 ./scripts/build/build-macos.sh -prod
+```
+
+### `scripts/build/build-ios.sh`
+
+```bash
+BUILD_TYPE=Debug ./scripts/build/build-ios.sh -prod --device
+BUILD_DIR_DEVICE=my-ios-device BUILD_DIR_SIM=my-ios-sim ./scripts/build/build-ios.sh -prod --both
+JOBS=4 ./scripts/build/build-ios.sh -prod --simulator
+CLEAN=1 ./scripts/build/build-ios.sh -prod --device
+```
+
+## Test Artifact Mode (`-test`)
+
+`-test` builds embed patched game data/config into the app payload so the app can be launched immediately for validation.
+
+Requirements:
+
+- Provide `--game-data /path/to/patchedfiles`, or
+- Set `GAME_DATA`, or
+- Set `FALLOUT_GAMEFILES_ROOT` (uses `patchedfiles` under that root)
+
+Minimum required files in the data source:
+
+- `master.dat`
+- `critter.dat`
+- `data/`
+
+## Manual CMake Build (fallback)
+
+Use this only if you need direct CMake control.
+
+### macOS
+
+```bash
 cmake -B build-macos -G Xcode \
   -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
-
-# Build from command line
-cmake --build build-macos --config RelWithDebInfo \
-  -j $(sysctl -n hw.physicalcpu)
-
-# Or open in Xcode
-open build-macos/fallout1-rebirth.xcodeproj
+cmake --build build-macos --config RelWithDebInfo -j "$(sysctl -n hw.physicalcpu)"
 ```
 
-### Method 3: Makefiles (Faster Iteration)
-
-For faster incremental builds during development:
+### iOS device
 
 ```bash
-# Configure
-cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-
-# Build
-cmake --build build -j $(sysctl -n hw.physicalcpu)
-
-# Run
-./build/fallout1-rebirth
-```
-
-### Running the macOS Build
-
-1. Copy the app bundle to your Fallout data directory:
-   ```bash
-   cp -r "build-macos/RelWithDebInfo/Fallout 1 Rebirth.app" /path/to/fallout/
-   ```
-
-2. Ensure game data files are present:
-   ```
-   /path/to/fallout/
-   ├── Fallout 1 Rebirth.app
-   ├── master.dat
-   ├── critter.dat
-   └── data/
-   ```
-
-3. Run the app:
-   ```bash
-   open "/path/to/fallout/Fallout 1 Rebirth.app"
-   ```
-
----
-
-## iOS Device Build
-
-### Using Build Script (Recommended) ✅
-
-**Always use the build script for standard builds:**
-
-```bash
-./scripts/build/build-ios.sh
-```
-
-The app bundle will be created at:
-```
-build-ios/RelWithDebInfo/fallout1-rebirth.app
-```
-
-#### Build Script Options
-
-```bash
-# Debug build
-BUILD_TYPE=Debug ./scripts/build/build-ios.sh
-
-# Force clean rebuild
-CLEAN=1 ./scripts/build/build-ios.sh
-
-# Custom build directory
-BUILD_DIR=my-ios-build ./scripts/build/build-ios.sh
-```
-
-### Manual Build Commands
-
-```bash
-# Configure
 cmake -B build-ios \
   -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
   -D ENABLE_BITCODE=0 \
   -D PLATFORM=OS64 \
   -G Xcode \
   -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
-
-# Build
-cmake --build build-ios --config RelWithDebInfo \
-  -j $(sysctl -n hw.physicalcpu)
+cmake --build build-ios --config RelWithDebInfo -j "$(sysctl -n hw.physicalcpu)"
 ```
 
-### Code Signing
-
-For deployment to physical devices, you need to sign the app:
-
-1. Open the Xcode project:
-   ```bash
-   open build-ios/fallout1-rebirth.xcodeproj
-   ```
-
-2. Select your development team in Signing & Capabilities
-
-3. Build and deploy from Xcode
-
-Alternatively, use Xcode command line signing:
-
-```bash
-cmake -B build-ios \
-  -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
-  -D ENABLE_BITCODE=0 \
-  -D PLATFORM=OS64 \
-  -G Xcode \
-  -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='Apple Development' \
-  -D CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM='YOUR_TEAM_ID'
-```
-
----
-
-## iOS Simulator Build
-
-### Using Test Script (Recommended)
-
-The simulator test script handles building, installing, and launching:
-
-```bash
-# Full cycle: build, install, and launch
-./scripts/test/test-ios-simulator.sh
-
-# Build only (no simulator interaction)
-./scripts/test/test-ios-simulator.sh --build-only
-
-# List available iPad simulators
-./scripts/test/test-ios-simulator.sh --list
-```
-
-See [testing.md](testing.md) for complete simulator testing documentation.
-
-### Manual Simulator Build
-
-For Apple Silicon Macs:
+### iOS simulator (Apple Silicon)
 
 ```bash
 cmake -B build-ios-sim \
@@ -239,256 +126,52 @@ cmake -B build-ios-sim \
   -D PLATFORM=SIMULATORARM64 \
   -G Xcode \
   -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
-
-cmake --build build-ios-sim --config RelWithDebInfo \
-  -j $(sysctl -n hw.physicalcpu)
+cmake --build build-ios-sim --config RelWithDebInfo -j "$(sysctl -n hw.physicalcpu)"
 ```
-
-For Intel Macs:
-
-```bash
-cmake -B build-ios-sim \
-  -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
-  -D ENABLE_BITCODE=0 \
-  -D PLATFORM=SIMULATOR64 \
-  -G Xcode \
-  -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
-
-cmake --build build-ios-sim --config RelWithDebInfo \
-  -j $(sysctl -n hw.physicalcpu)
-```
-
----
-
-## Build Configuration Options
-
-### CMake Options
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `CMAKE_BUILD_TYPE` | RelWithDebInfo | Build type (Debug, Release, RelWithDebInfo) |
-| `ASAN` | OFF | Enable Address Sanitizer |
-| `UBSAN` | OFF | Enable Undefined Behavior Sanitizer |
-
-### Build Types
-
-| Type | Optimization | Debug Info | Use Case |
-|------|--------------|------------|----------|
-| `Debug` | None | Full | Development/debugging |
-| `Release` | Full | None | Distribution |
-| `RelWithDebInfo` | Full | Partial | Testing/profiling |
-
-### Sanitizers
-
-Enable sanitizers for debugging:
-
-```bash
-# Address Sanitizer (detects memory errors)
-cmake -B build -DCMAKE_BUILD_TYPE=Debug -DASAN=ON
-
-# Undefined Behavior Sanitizer
-cmake -B build -DCMAKE_BUILD_TYPE=Debug -DUBSAN=ON
-
-# Both
-cmake -B build -DCMAKE_BUILD_TYPE=Debug -DASAN=ON -DUBSAN=ON
-```
-
-Note: Sanitizers significantly slow down execution but catch many bugs.
-
----
 
 ## Packaging
 
-> **Important**: Distribution packages contain the game **engine only**. Game data files (`master.dat`, `critter.dat`, `data/`) are NOT bundled. Users must provide their own legally-obtained game files.
+This repository no longer provides a dedicated DMG script.
 
-### macOS DMG (Recommended) ✅
+- iOS IPA packaging is handled by `scripts/build/build-ios.sh` (device target).
+- macOS DMG packaging is manual (maintainer-managed).
 
-Use the packaging script to create a distributable disk image:
-
-```bash
-./scripts/build/build-macos-dmg.sh
-```
-
-This script:
-- Builds the app if needed
-- Creates a styled DMG installer
-- Outputs to `build-outputs/macOS/`
-
-**Requirements**: Install `create-dmg` via `brew install create-dmg`
-
-#### Manual DMG Creation
-
-If you need more control:
+Example manual macOS package from an existing build directory:
 
 ```bash
-# Build first
-cmake -B build-macos -G Xcode \
-  -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
-cmake --build build-macos --config RelWithDebInfo
-
-# Create DMG
 cd build-macos
 cpack -C RelWithDebInfo
 ```
 
-Output: `build-macos/fallout1-rebirth.dmg`
-
-### iOS IPA (Recommended) ✅
-
-Use the packaging script to create a distributable iOS package:
-
-```bash
-./scripts/build/build-ios-ipa.sh
-```
-
-This script:
-- Builds the app using `scripts/build/build-ios.sh`
-- Runs CPack to create the IPA
-- Outputs to `build-outputs/iOS/`
-
-#### Manual IPA Creation
-
-If you need more control:
-
-```bash
-# Build first
-cmake -B build-ios \
-  -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
-  -D ENABLE_BITCODE=0 \
-  -D PLATFORM=OS64 \
-  -G Xcode \
-  -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
-cmake --build build-ios --config RelWithDebInfo
-
-# Create IPA
-cd build-ios
-cpack -C RelWithDebInfo
-```
-
-Output: `build-ios/fallout1-rebirth.ipa`
-
----
-
 ## Distribution Workflow
 
-This project uses **local builds only** with manual GitHub Releases uploads. There is no automated CI/CD pipeline.
-
-### Creating a Release
-
-1. **Build the distribution packages locally:**
-   ```bash
-   # macOS DMG
-   ./scripts/build/build-macos-dmg.sh
-   
-   # iOS IPA
-   ./scripts/build/build-ios-ipa.sh
-   ```
-
-2. **Verify the outputs:**
-   ```bash
-   ls -la build-outputs/macOS/   # Contains .dmg
-   ls -la build-outputs/iOS/     # Contains .ipa
-   ```
-
-3. **Upload to GitHub Releases:**
-   - Go to the repository's Releases page
-   - Create a new release with an appropriate version tag
-   - Upload the DMG and IPA files from `build-outputs/`
-   - Add release notes describing changes
-
-### Why No CI/CD?
-
-- **Code signing complexity**: iOS/macOS builds require Apple Developer credentials
-- **Asset licensing**: Game data cannot be included in public builds
-- **Simplicity**: Local builds give developers full control over the process
-
-### Version Tags
-
-When creating releases, use semantic versioning:
-- `v1.0.0` — Major releases
-- `v1.1.0` — Feature additions
-- `v1.1.1` — Bug fixes
-
----
+1. Build local artifacts:
+   - `./scripts/build/build-macos.sh -prod`
+   - `./scripts/build/build-ios.sh -prod --device`
+2. Verify artifacts:
+   - `./scripts/dev/dev-verify.sh --build-dir build-macos`
+   - `./scripts/test/test-ios-headless.sh`
+3. Package macOS artifact manually (optional) and upload outputs to GitHub Releases.
 
 ## Troubleshooting
 
-### Common Issues
+### Missing Xcode toolchain
 
-#### CMake cannot find Xcode
-
-**Error**: `No CMAKE_CXX_COMPILER could be found`
-
-**Solution**:
 ```bash
-# Ensure Xcode is selected
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-
-# Accept Xcode license
 sudo xcodebuild -license accept
 ```
 
-#### Missing iOS SDK
+### iOS SDK unavailable
 
-**Error**: `The iOS SDK could not be found`
+Install simulator runtimes and SDK components from Xcode Settings > Platforms.
 
-**Solution**:
-```bash
-# Install iOS simulators and SDKs via Xcode
-# Xcode -> Preferences -> Platforms -> + iOS
-```
+### App fails on launch
 
-#### Build fails with "file not found"
+- Confirm `master.dat`, `critter.dat`, and `data/` are present.
+- For `-test` mode, confirm `--game-data` points at patched payload.
 
-**Error**: Missing header or source file
+### Build/test separation
 
-**Solution**: Ensure all source files are listed in `CMakeLists.txt` under `target_sources`.
-
-#### App crashes on launch
-
-**Solutions**:
-1. Verify game data files are present (`master.dat`, `critter.dat`, `data/`)
-2. Check file name case (must match `fallout.cfg` settings)
-3. Enable ASAN to detect memory issues: `-DASAN=ON`
-
-#### iOS Simulator won't boot
-
-**Solutions**:
-```bash
-# Shutdown all simulators first
-xcrun simctl shutdown all
-
-# Check available simulators
-xcrun simctl list devices available
-
-# If disk full, delete old simulators
-xcrun simctl delete unavailable
-```
-
-#### "Code Signing" errors
-
-**Solution**: For local development, disable code signing:
-```bash
--D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
-```
-
-For distribution, set up proper signing via Xcode.
-
-### Getting Help
-
-1. Check the [ISSUES.md](../ISSUES.md) file for known issues
-2. Review build output for specific error messages
-3. Open an issue on GitHub with:
-   - Your macOS/Xcode version
-   - Complete build command used
-   - Full error output
----
-
-## Proof of Work
-
-- **Timestamp**: February 5, 2026
-- **Files verified**:
-  - `CMakeLists.txt` - Confirmed build configuration, iOS deployment target 15.0
-  - `scripts/` directory - Confirmed all build scripts exist
-  - `third_party/sdl3/CMakeLists.txt` - Confirmed SDL3 3.2.4 dependency
-- **Updates made**: No updates needed - content verified accurate. Build instructions, script references, and packaging workflow are all current.
+- Build scripts (`scripts/build/*`) create artifacts.
+- Test scripts (`scripts/test/*`) validate existing artifacts and do not compile binaries.

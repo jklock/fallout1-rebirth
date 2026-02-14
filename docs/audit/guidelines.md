@@ -52,14 +52,14 @@ Provide a repeatable audit process to verify code quality, patch integrity, buil
   - `CMakeLists.txt`
   - build scripts in `scripts/build/`
   - docs in `docs/building.md`
-- Verify packaging scripts (`build-macos-dmg.sh`, `build-ios-ipa.sh`) are coherent and referenced paths exist.
+- Verify build entrypoints (`build-macos.sh`, `build-ios.sh`) and packaging paths are coherent and referenced paths exist.
 
 ### D. Patch Flow and Data Validation
 
 - Verify patch scripts run with expected arguments:
-  - `rebirth-patch-data.sh`
-  - `rebirth-validate-data.sh`
-  - `rebirth-refresh-validation.sh`
+  - `patch-rebirth-data.sh`
+  - `test-rebirth-validate-data.sh`
+  - `test-rebirth-refresh-validation.sh`
 - Run checksum/overlay validation commands when patched data is available.
 - Confirm patchflow helper scripts and autofix scripts parse and execute.
 

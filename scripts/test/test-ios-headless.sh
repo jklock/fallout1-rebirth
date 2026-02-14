@@ -14,8 +14,7 @@
 #   - No lingering simulator processes
 #
 # USAGE:
-#   ./scripts/test/test-ios-headless.sh              # Full test cycle
-#   ./scripts/test/test-ios-headless.sh --build      # Build first, then test
+#   ./scripts/test/test-ios-headless.sh              # Full test cycle on existing build
 #   ./scripts/test/test-ios-headless.sh --skip-sim   # Skip simulator tests
 #   ./scripts/test/test-ios-headless.sh --help       # Show usage
 #
@@ -23,7 +22,6 @@
 #   BUILD_DIR       - Build output directory (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
 #   SIMULATOR_NAME  - Simulator device name (default: auto-detect iPad)
-#   JOBS            - Parallel jobs (default: physical CPU count)
 #
 # EXIT CODES:
 #   0 - All tests passed
@@ -45,8 +43,6 @@ ROOT_DIR="$PWD"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 SIMULATOR_NAME="${SIMULATOR_NAME:-}"  # Auto-detect if empty
-JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
-TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
 GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 
@@ -138,7 +134,6 @@ Usage: $0 [OPTIONS]
 Headless validation tests for the iOS Simulator app bundle.
 
 OPTIONS:
-    --build       Build the app before running tests
     --skip-sim    Skip simulator launch tests (bundle validation only)
     --help        Show this help message
 
@@ -151,7 +146,6 @@ ENVIRONMENT VARIABLES:
 
 EXAMPLES:
     $0                              # Test existing build
-    $0 --build                      # Build and test
     $0 --skip-sim                   # Bundle tests only
     SIMULATOR_NAME='iPad Air' $0    # Use specific simulator
 EOF
@@ -442,54 +436,6 @@ uninstall_app_from_simulator() {
 }
 
 # -----------------------------------------------------------------------------
-# Build function
-# -----------------------------------------------------------------------------
-build_for_simulator() {
-    log_section "Building for iOS Simulator"
-    
-    if [[ ! -f "$TOOLCHAIN" ]]; then
-        log_error "iOS toolchain not found: $TOOLCHAIN"
-        exit 1
-    fi
-    
-    # Detect simulator architecture
-    local platform="SIMULATORARM64"
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        platform="SIMULATOR64"
-    fi
-    
-    # Configure if needed
-    if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
-        log_info "Configuring CMake for Simulator ($platform)..."
-        if ! cmake -B "$BUILD_DIR" \
-            -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
-            -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
-            -D ENABLE_BITCODE=0 \
-            -D PLATFORM="$platform" \
-            -D DEPLOYMENT_TARGET=15.0 \
-            -G Xcode \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO; then
-            log_error "CMake configuration failed"
-            exit 1
-        fi
-        log_ok "Configuration complete"
-    else
-        log_info "Using existing CMake configuration"
-    fi
-    
-    # Build
-    log_info "Compiling ($BUILD_TYPE, $JOBS parallel jobs)..."
-    if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS" -- \
-        EXCLUDED_ARCHS=""; then
-        log_error "Build failed"
-        exit 1
-    fi
-    
-    log_ok "Build completed"
-}
-
-# -----------------------------------------------------------------------------
 # Test: Bundle Structure
 # -----------------------------------------------------------------------------
 test_bundle_structure() {
@@ -746,16 +692,11 @@ print_summary() {
 # Main
 # -----------------------------------------------------------------------------
 main() {
-    local do_build=false
     local skip_sim=false
     
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --build)
-                do_build=true
-                shift
-                ;;
             --skip-sim)
                 skip_sim=true
                 shift
@@ -777,16 +718,11 @@ main() {
     echo -e "${NC}"
     
     log_info "Testing: $APP_BUNDLE"
-    
-    # Build if requested
-    if [[ "$do_build" == true ]]; then
-        build_for_simulator
-    fi
-    
+
     # Check if app exists
     if [[ ! -d "$APP_BUNDLE" ]]; then
         log_error "App bundle not found: $APP_BUNDLE"
-        log_info "Run with --build to build first, or set BUILD_DIR"
+        log_info "Build first with: ./scripts/build/build-ios.sh -prod --simulator"
         exit 1
     fi
     

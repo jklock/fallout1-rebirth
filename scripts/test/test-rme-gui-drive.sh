@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # RME GUI exercise runner (macOS)
-# Builds, sanity-checks, launches the GUI with RME_LOG=1, drives basic keys, and captures rme.log.
+# Sanity-checks, launches the GUI with RME_LOG=1, drives basic keys, and captures rme.log.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -84,25 +84,23 @@ run_gui() {
 main() {
     cd "$REPO_ROOT"
 
-    echo "[1/5] Build macOS"
-    ./scripts/build/build-macos.sh
-
-    echo "[2/5] macOS verify"
+    echo "[1/3] macOS verify"
     ./scripts/test/test-macos.sh --verify
 
-    echo "[3/5] Locate app"
+    echo "[2/3] Locate app"
     if [[ ! -x "$APP_BIN" ]]; then
         echo "App binary not found at $APP_BIN" >&2
+        echo "Build first with: ./scripts/build/build-macos.sh" >&2
         exit 1
     fi
 
     pick_timeout
     echo "Using timeout: ${TIMEOUT_BIN:-none} (runtime ${RUNTIME}s)"
 
-    echo "[4/5] GUI exercise"
+    echo "[3/3] GUI exercise"
     run_gui
 
-    echo "[5/5] Logs stored in $LOG_DIR"
+    echo "Logs stored in $LOG_DIR"
 }
 
 main "$@"

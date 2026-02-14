@@ -16,7 +16,6 @@ AUTO_FIX=0
 AUTO_FIX_ITERATIONS=3
 AUTO_FIX_APPLY=0
 AUTO_FIX_APPLY_WHITELIST=0
-SKIP_BUILD=0
 DATA_DIR="$DEFAULT_DATA_DIR"
 AUTORUN_MAP_NAME=""
 APP_TIMEOUT_SECS="${APP_TIMEOUT_SECS:-120}"
@@ -50,7 +49,7 @@ while [[ "$#" -gt 0 ]]; do
             shift
             ;;
         --skip-build)
-            SKIP_BUILD=1
+            echo "Warning: --skip-build is deprecated; tests never build." >&2
             shift
             ;;
         --data-dir)
@@ -117,15 +116,6 @@ if [ ! -f "$WORKDIR/f1_res.ini" ]; then
     fi
 fi
 
-# Build the app (low parallelism to avoid system pressure)
-if [[ "$SKIP_BUILD" -eq 0 ]]; then
-    echo "Building macOS app (low parallelism)"
-    # Use build-macos.sh which invokes xcodebuild
-    "$REPO_ROOT/scripts/build/build-macos.sh" --build-only
-else
-    echo "Skipping build step (--skip-build)"
-fi
-
 # Locate binary inside app bundle or fallback. Test harness may set TEST_FALLBACK_BINARY to point to a fake binary for integration tests.
 BINARY=""
 if [ -n "${TEST_FALLBACK_BINARY:-}" ] && [ -x "${TEST_FALLBACK_BINARY}" ]; then
@@ -141,7 +131,8 @@ elif [ -x "$REPO_ROOT/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/
 fi
 
 if [ -z "$BINARY" ]; then
-    echo "Could not find built binary after build; expected inside app bundle or build/RelWithDebInfo" >&2
+    echo "Could not find an existing build binary; expected inside app bundle or build/RelWithDebInfo" >&2
+    echo "Build first with: ./scripts/build/build-macos.sh" >&2
     exit 3
 fi
 
@@ -152,7 +143,7 @@ RMELOG="$RUNDIR/rme.log"
 
 echo "Running app (timeout 120s, ulimit 2GB where supported)"
 # set memory limit (KB) to ~2GB
-ulimit -v 2097152 || true
+ulimit -v 2097152 >/dev/null 2>&1 || true
 
 ENVVARS=(
     RME_WORKING_DIR="$WORKDIR"

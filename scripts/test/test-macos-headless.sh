@@ -16,14 +16,12 @@
 #   - Dynamic library dependency verification
 #
 # USAGE:
-#   ./scripts/test/test-macos-headless.sh              # Run all tests
-#   ./scripts/test/test-macos-headless.sh --build      # Build first, then test
+#   ./scripts/test/test-macos-headless.sh              # Run tests against existing build
 #   ./scripts/test/test-macos-headless.sh --help       # Show usage
 #
 # CONFIGURATION (environment variables):
 #   BUILD_DIR   - Build output directory (default: "build-macos")
 #   BUILD_TYPE  - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
-#   JOBS        - Parallel jobs (default: physical CPU count)
 #
 # EXIT CODES:
 #   0 - All tests passed
@@ -39,7 +37,6 @@ ROOT_DIR="$PWD"
 # -----------------------------------------------------------------------------
 BUILD_DIR="${BUILD_DIR:-build-macos}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
-JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 
 # Expected app bundle name
 APP_NAME="Fallout 1 Rebirth"
@@ -98,7 +95,6 @@ Usage: $0 [OPTIONS]
 Headless validation tests for the macOS app bundle.
 
 OPTIONS:
-    --build     Build the app before running tests
     --help      Show this help message
 
 ENVIRONMENT VARIABLES:
@@ -107,40 +103,9 @@ ENVIRONMENT VARIABLES:
 
 EXAMPLES:
     $0                           # Test existing build
-    $0 --build                   # Build and test
     BUILD_DIR=mybuild $0         # Test custom build directory
 EOF
     exit 0
-}
-
-# -----------------------------------------------------------------------------
-# Build function (optional)
-# -----------------------------------------------------------------------------
-build_app() {
-    log_section "Building macOS App"
-    
-    # Configure if needed
-    if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
-        log_info "Configuring CMake with Xcode generator..."
-        if ! cmake -B "$BUILD_DIR" \
-            -G Xcode \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''; then
-            log_error "CMake configuration failed"
-            exit 1
-        fi
-        log_ok "Configuration complete"
-    else
-        log_info "Using existing CMake configuration"
-    fi
-    
-    # Build
-    log_info "Building ($BUILD_TYPE, $JOBS parallel jobs)..."
-    if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS"; then
-        log_error "Build failed"
-        exit 1
-    fi
-    
-    log_ok "Build completed successfully"
 }
 
 # -----------------------------------------------------------------------------
@@ -526,15 +491,9 @@ print_summary() {
 # Main
 # -----------------------------------------------------------------------------
 main() {
-    local do_build=false
-    
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --build)
-                do_build=true
-                shift
-                ;;
             --help|-h)
                 show_help
                 ;;
@@ -552,18 +511,11 @@ main() {
     echo -e "${NC}"
     
     log_info "Testing: $APP_BUNDLE"
-    
-    # Build if requested
-    if [[ "$do_build" == true ]]; then
-        build_app
-    fi
-    
+
     # Check if app exists
     if [[ ! -d "$APP_BUNDLE" ]]; then
         log_error "App bundle not found: $APP_BUNDLE"
-        log_info "Run with --build to build first, or build manually:"
-        log_info "  cmake -B $BUILD_DIR -G Xcode"
-        log_info "  cmake --build $BUILD_DIR --config $BUILD_TYPE"
+        log_info "Build first with: ./scripts/build/build-macos.sh"
         exit 1
     fi
 

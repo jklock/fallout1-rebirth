@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Fake fallback runner used for tests (kept under scripts/test/rme-fixture-tools so it can be committed)
+WD="${RME_WORKING_DIR:-}" 
+LOG_FILE="${RME_LOG_FILE:-${RME_WORKING_DIR:-.}/rme.log}"
+SELFTEST="${RME_WORKING_DIR:-.}/rme-selftest.json"
+
+mkdir -p "${RME_WORKING_DIR:-.}"
+
+TARGET_PATH="$RME_WORKING_DIR/data/text/english/game/map.msg"
+
+if [ -f "$TARGET_PATH" ]; then
+    # Everything present -> successful selftest
+    cat > "$LOG_FILE" <<EOF
+$(date -u +%Y-%m-%dT%H:%M:%SZ) selftest PASS All checks
+EOF
+    cat > "$SELFTEST" <<'JSON'
+{"failures": []}
+JSON
+    exit 0
+else
+    # Missing expected game subdir file -> failing selftest
+    mkdir -p "$(dirname "$TARGET_PATH")"
+    cat > "$LOG_FILE" <<EOF
+$(date -u +%Y-%m-%dT%H:%M:%SZ) db db_fopen dat miss path=data/text/english/game/map.msg
+$(date -u +%Y-%m-%dT%H:%M:%SZ) message message_load failed path=data/text/english/game/map.msg
+EOF
+    cat > "$SELFTEST" <<'JSON'
+{"failures": [{"kind": "message", "path": "data/text/english/game/map.msg", "error": "message_load failed"}]}
+JSON
+    exit 1
+fi

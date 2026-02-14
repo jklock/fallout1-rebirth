@@ -284,8 +284,7 @@ Configuration options:
 
 Major build system change:
 - **Removed CI/CD workflows** (`.github/workflows/ci-build.yml`, `release.yml`)
-- Removed deprecated `package-macos-dmg-with-game-data.sh`
-- Simplified `scripts/build/build-macos-dmg.sh` (removed `--bundle` flag)
+- Removed deprecated packaging wrappers and release wrapper scripts
 - All builds are now local-only
 - Upload to GitHub Releases manually
 
@@ -297,22 +296,21 @@ The following scripts replace CI/CD:
 
 | Script | Purpose | Added In |
 |--------|---------|----------|
-| `scripts/build/build-macos.sh` | Build macOS app | Initial |
-| `scripts/build/build-ios.sh` | Build iOS IPA | Initial |
-| `scripts/build/build-macos-dmg.sh` | Package macOS DMG | `3f9e3ce` |
-| `scripts/build/build-ios-ipa.sh` | Package iOS IPA | `3f9e3ce` |
+| `scripts/build/build-macos.sh` | Build macOS app (`-prod` / `-test`) | Initial |
+| `scripts/build/build-ios.sh` | Build iOS app/IPA (`-prod` / `-test`, device/simulator) | Initial |
+| `scripts/build/install-game-data.sh` | Install patched game data into existing macOS app | `2026-02-14` |
 | `scripts/test/test-ios-simulator.sh` | iOS Simulator testing | `3e5baea` |
 | `scripts/test/test-macos.sh` | macOS app testing | Initial |
 | `scripts/dev/dev-check.sh` | Pre-commit checks | Initial |
-| `scripts/dev/dev-verify.sh` | Full build verification | Initial |
+| `scripts/dev/dev-verify.sh` | Existing-build verification | Initial |
 | `scripts/dev/dev-format.sh` | Code formatting | Initial |
 | `scripts/dev/dev-clean.sh` | Clean build artifacts | Initial |
 
 **Commit `3e5baea`** (2026-01-31): *Add iOS simulator testing script*
 ```bash
 # Usage
-./scripts/test/test-ios-simulator.sh              # Full flow: build + install + launch
-./scripts/test/test-ios-simulator.sh --build-only # Just build
+./scripts/build/build-ios.sh -prod --simulator            # Build simulator artifact
+./scripts/test/test-ios-simulator.sh              # Install + launch existing build
 ./scripts/test/test-ios-simulator.sh --launch     # Launch existing install
 ./scripts/test/test-ios-simulator.sh --shutdown   # Shutdown all simulators
 ./scripts/test/test-ios-simulator.sh --list       # Show available iPad sims
@@ -700,7 +698,7 @@ The fork maintains compatibility with the original Fallout 1 game data while pro
 
 ## Proof of Work
 
-- **Timestamp**: February 5, 2026
+- **Timestamp**: February 14, 2026
 - **Files verified**:
   - `CMakeLists.txt` - Confirmed iOS deployment target 15.0, macOS 11.0
   - `third_party/sdl3/CMakeLists.txt` - Confirmed SDL3 3.2.4
@@ -708,3 +706,4 @@ The fork maintains compatibility with the original Fallout 1 game data while pro
   - `scripts/` directory - Confirmed all referenced scripts exist
 - **Updates made**:
   - Updated iOS deployment target from 14.0 to 15.0 to match CMakeLists.txt
+  - Updated build-system script table to reflect consolidated `build-macos.sh` and `build-ios.sh` workflows and removal of deleted packaging wrappers.

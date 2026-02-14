@@ -39,14 +39,17 @@ if [[ -z "$PATCHED_DIR" || -z "$UNPATCHED_DIR" ]]; then
   exit 2
 fi
 
-log "Build macOS app"
-"$ROOT/scripts/build/build-macos.sh"
+if [[ ! -x "$EXE" ]]; then
+  echo "[ERROR] App executable not found: $EXE" >&2
+  echo "[ERROR] Build the app first with: ./scripts/build/build-macos.sh" >&2
+  exit 2
+fi
 
 log "Ensure patched data is installed"
 "$RME_SCRIPT_DIR/test-rme-ensure-patched-data.sh" --patched-dir "$PATCHED_DIR" --target-app "$APP"
 
 log "Validate patched data overlay"
-"$ROOT/scripts/patch/rebirth-validate-data.sh" --patched "$PATCHED_DIR" --base "$UNPATCHED_DIR" --rme "$RME_DIR"
+"$ROOT/scripts/test/test-rebirth-validate-data.sh" --patched "$PATCHED_DIR" --base "$UNPATCHED_DIR" --rme "$RME_DIR"
 
 log "Headless smoke test"
 "$ROOT/scripts/test/test-macos-headless.sh"

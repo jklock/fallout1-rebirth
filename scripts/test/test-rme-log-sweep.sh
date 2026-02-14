@@ -65,22 +65,20 @@ run_game() {
 main() {
     cd "$REPO_ROOT"
 
-    echo "[1/4] Build macOS"
-    ./scripts/build/build-macos.sh
-
-    echo "[2/4] Headless sanity"
+    echo "[1/3] Headless sanity"
     ./scripts/test/test-macos-headless.sh
 
-    echo "[3/4] Locate app"
+    echo "[2/3] Locate app"
     if [[ ! -x "$APP_BIN" ]]; then
         echo "App binary not found at $APP_BIN" >&2
+        echo "Build first with: ./scripts/build/build-macos.sh" >&2
         exit 1
     fi
 
     pick_timeout
     echo "Using timeout: ${TIMEOUT_BIN:-none} (runtime ${RUNTIME}s)"
 
-    echo "[4/4] Topic sweeps"
+    echo "[3/3] Topic sweeps"
     run_game "all" "1"
     run_game "fonts_text_art" "text,art"
     run_game "movies" "movie"

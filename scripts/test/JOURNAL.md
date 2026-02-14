@@ -17,3 +17,9 @@ Last updated (UTC): 2026-02-14
 - Added docs for `tmp_wd/` retained autofix fixture snapshot content.
 - Added user-overridable fixture/data-dir inputs for `test-rme-patchflow-autofix.sh` and `test-rme-validate-ci.sh`.
 - Added baseline `README.md`/`JOURNAL.md` files to nested fixture subdirectories under `scripts/test/` to keep directory-level docs complete.
+- Added `test-rebirth-refresh-validation.sh`, `test-rebirth-validate-data.sh`, and `test-rebirth-toggle-logging.sh` under `scripts/test/` (reclassified from patch domain).
+- Added Python RME suite runner at `scripts/test/rme/suite.py` for one-command execution.
+- Renamed fixture/support directories for clarity:
+  - `rme-data` -> `rme-fixtures`
+  - `rme-tools` -> `rme-fixture-tools`
+  - `tmp_wd` -> `rme-sample-workdir`

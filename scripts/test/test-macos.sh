@@ -2,19 +2,17 @@
 # =============================================================================
 # Fallout 1 Rebirth — macOS Test Script
 # =============================================================================
-# Builds and verifies the macOS app bundle structure and integrity.
+# Verifies an existing macOS app bundle structure and integrity.
 # Does NOT launch the game (no automated gameplay testing).
 #
 # USAGE:
-#   ./scripts/test/test-macos.sh              # Full build + verification
-#   ./scripts/test/test-macos.sh --verify     # Verify existing build only
+#   ./scripts/test/test-macos.sh              # Verify existing build
+#   ./scripts/test/test-macos.sh --verify     # Alias of default behavior
 #   ./scripts/test/test-macos.sh --help       # Show usage
 #
 # CONFIGURATION (environment variables):
 #   BUILD_DIR   - Build output directory (default: "build-macos")
 #   BUILD_TYPE  - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
-#   JOBS        - Parallel jobs (default: physical CPU count)
-#   CLEAN       - Set to "1" to force reconfigure
 #
 # VERIFICATION CHECKS:
 #   - App bundle exists and has correct structure
@@ -33,8 +31,6 @@ ROOT_DIR="$PWD"
 # -----------------------------------------------------------------------------
 BUILD_DIR="${BUILD_DIR:-build-macos}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
-JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
-CLEAN="${CLEAN:-0}"
 
 # Expected app bundle name
 APP_NAME="Fallout 1 Rebirth"
@@ -77,42 +73,6 @@ check() {
         ((TESTS_FAILED++))
         return 1
     fi
-}
-
-# -----------------------------------------------------------------------------
-# Build function
-# -----------------------------------------------------------------------------
-build_macos() {
-    log_section "Building macOS App"
-    
-    # Clean if requested
-    if [[ "$CLEAN" == "1" && -d "$BUILD_DIR" ]]; then
-        log_warn "CLEAN=1 set, removing $BUILD_DIR..."
-        rm -rf "$BUILD_DIR"
-    fi
-    
-    # Configure if needed
-    if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
-        log_info "Configuring CMake with Xcode generator..."
-        if ! cmake -B "$BUILD_DIR" \
-            -G Xcode \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''; then
-            log_error "CMake configuration failed"
-            exit 1
-        fi
-        log_ok "Configuration complete"
-    else
-        log_info "Using existing CMake configuration"
-    fi
-    
-    # Build
-    log_info "Building ($BUILD_TYPE, $JOBS parallel jobs)..."
-    if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS"; then
-        log_error "Build failed"
-        exit 1
-    fi
-    
-    log_ok "Build completed successfully"
 }
 
 # -----------------------------------------------------------------------------
@@ -374,15 +334,11 @@ main() {
     
     # Parse arguments
     case "${1:-}" in
-        --verify)
-            log_info "Verify-only mode (skipping build)"
+        --verify|"")
+            log_info "Verify-only mode"
             ;;
         --help|-h)
             usage
-            ;;
-        "")
-            # Default: build + verify
-            build_macos
             ;;
         *)
             log_error "Unknown option: $1"
@@ -390,6 +346,12 @@ main() {
             exit 1
             ;;
     esac
+
+    if [[ ! -d "$APP_BUNDLE" ]]; then
+        log_error "App bundle not found: $APP_BUNDLE"
+        log_info "Build first with: ./scripts/build/build-macos.sh"
+        exit 1
+    fi
 
     # Ensure patched data is installed in the app bundle before verification.
     "$ROOT_DIR/scripts/test/test-rme-ensure-patched-data.sh" --target-app "$APP_BUNDLE"

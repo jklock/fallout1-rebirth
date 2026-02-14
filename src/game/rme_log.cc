@@ -19,11 +19,7 @@ static void rme_format_time(char* buf, size_t bufsize)
 {
     std::time_t t = std::time(nullptr);
     std::tm tm;
-#if defined(_WIN32)
-    gmtime_s(&tm, &t);
-#else
     gmtime_r(&t, &tm);
-#endif
     std::snprintf(buf, bufsize, "%04d-%02d-%02dT%02d:%02d:%02dZ",
         tm.tm_year + 1900,
         tm.tm_mon + 1,

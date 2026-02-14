@@ -2,10 +2,11 @@
 import json
 import os
 import subprocess
+import sys
 import tempfile
 
-# Simple functional test for parse-rme-log.py
-SCRIPT = os.path.join(os.path.dirname(__file__), 'parse-rme-log.py')
+# Simple functional test for test-rme-parse-log.py
+SCRIPT = os.path.join(os.path.dirname(__file__), 'test-rme-parse-log.py')
 
 # Create a small selftest JSON with one failure
 selftest = {
@@ -21,7 +22,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
         json.dump(selftest, f)
 
     # No rme.log (missing db errors) -> should fail because selftest failure exists and default thresholds 0
-    proc = subprocess.run([SCRIPT, '--selftest', st_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    proc = subprocess.run([sys.executable, SCRIPT, '--selftest', st_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out = json.loads(proc.stdout)
     assert out['pass'] is False
     assert out['selftest_failures_total'] == 1
@@ -31,7 +32,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     with open(wl_path, 'w', encoding='utf-8') as f:
         f.write('message:data/text/english/game/map.msg\n')
 
-    proc = subprocess.run([SCRIPT, '--selftest', st_path, '--whitelist', wl_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    proc = subprocess.run([sys.executable, SCRIPT, '--selftest', st_path, '--whitelist', wl_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out = json.loads(proc.stdout)
     assert out['pass'] is True
 

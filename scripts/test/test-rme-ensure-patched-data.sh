@@ -151,7 +151,7 @@ fi
 
 if [[ "$need_install" == "1" ]]; then
   log "Installing patched data into app ($reason)"
-  "$ROOT_DIR/scripts/test/test-install-game-data.sh" --source "$PATCHED_DIR" --target "$TARGET_APP"
+  "$ROOT_DIR/scripts/build/install-game-data.sh" --source "$PATCHED_DIR" --target "$TARGET_APP"
 fi
 
 if [[ ! -f "$TARGET_RESOURCES/master.dat" || ! -f "$TARGET_RESOURCES/critter.dat" || ! -d "$TARGET_RESOURCES/data" ]]; then

@@ -1,46 +1,53 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Fallout 1 Rebirth — iOS Build Script
+# Fallout 1 Rebirth - iOS Build Script
 # =============================================================================
-# Builds for physical iOS/iPadOS devices (arm64).
-# For simulator builds, use: ./scripts/test/test-ios-simulator.sh --build-only
+# Single iOS build entrypoint with explicit build intent.
+#
+# MODES:
+#   -prod   Build release-style artifacts (no embedded game data/config)
+#   -test   Build test artifacts with patched game data/config embedded
+#
+# TARGETS:
+#   --device      Build device app + IPA
+#   --simulator   Build simulator app
+#   --both        Build device and simulator artifacts
 #
 # USAGE:
-#   ./scripts/build/build-ios.sh                     # Standard build
-#   BUILD_TYPE=Debug ./scripts/build/build-ios.sh    # Debug build
+#   ./scripts/build/build-ios.sh -prod
+#   ./scripts/build/build-ios.sh -test --both --game-data /path/to/patchedfiles
 #
-# CONFIGURATION (environment variables):
-#   BUILD_DIR   - Build output directory (default: "build-ios")
-#   BUILD_TYPE  - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
-#   JOBS        - Parallel jobs (default: physical CPU count)
-#   CLEAN       - Set to "1" to force reconfigure
-#   F1R_DISABLE_RME_LOGGING - Set to 1/ON to compile out Rebirth diagnostic logging
-#
-# NOTES:
-#   - Requires Xcode with iOS SDK
-#   - Code signing is disabled (for local development)
-#   - For distribution, sign via Xcode or use proper signing identity
+# ENVIRONMENT:
+#   BUILD_TYPE, JOBS, CLEAN, BUILD_DIR_DEVICE, BUILD_DIR_SIM
+#   F1R_DISABLE_RME_LOGGING, FALLOUT_GAMEFILES_ROOT, GAME_DATA
 # =============================================================================
 set -euo pipefail
 
-cd "$(dirname "$0")/../.."
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT_DIR"
 
 if [[ -f ".f1r-build.env" ]]; then
     # shellcheck disable=SC1091
     source ".f1r-build.env"
 fi
 
-# -----------------------------------------------------------------------------
-# Configuration
-# -----------------------------------------------------------------------------
-BUILD_DIR="${BUILD_DIR:-build-ios}"
+MODE="prod"
+TARGET="device"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 CLEAN="${CLEAN:-0}"
+BUILD_DIR_DEVICE="${BUILD_DIR_DEVICE:-build-ios}"
+BUILD_DIR_SIM="${BUILD_DIR_SIM:-build-ios-sim}"
 TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
+DEPLOYMENT_TARGET_DEVICE="${DEPLOYMENT_TARGET_DEVICE:-26.0}"
+DEPLOYMENT_TARGET_SIM="${DEPLOYMENT_TARGET_SIM:-26.0}"
+OUTPUT_DIR="$ROOT_DIR/build-outputs/iOS"
+GAME_DATA="${GAME_DATA:-}"
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+APP_NAME="fallout1-rebirth"
+
 LOGGING_FLAG_RAW="${F1R_DISABLE_RME_LOGGING:-0}"
 LOGGING_FLAG_UPPER="$(printf '%s' "$LOGGING_FLAG_RAW" | tr '[:lower:]' '[:upper:]')"
-
 case "$LOGGING_FLAG_UPPER" in
     1|ON|TRUE|YES) RME_LOGGING_CMAKE="ON" ;;
     0|OFF|FALSE|NO|"") RME_LOGGING_CMAKE="OFF" ;;
@@ -50,122 +57,305 @@ case "$LOGGING_FLAG_UPPER" in
         ;;
 esac
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+usage() {
+    cat <<USAGE
+Fallout 1 Rebirth - iOS Build
 
-# -----------------------------------------------------------------------------
-# Helper functions
-# -----------------------------------------------------------------------------
-log_info()  { echo -e "${BLUE}>>>${NC} $1"; }
-log_ok()    { echo -e "${GREEN}✅${NC} $1"; }
-log_warn()  { echo -e "${YELLOW}⚠️${NC}  $1"; }
-log_error() { echo -e "${RED}❌${NC} $1"; }
+USAGE:
+  ./scripts/build/build-ios.sh MODE [TARGET] [OPTIONS]
 
-echo ""
-echo "=============================================="
-echo " Fallout 1 Rebirth — iOS Build"
-echo "=============================================="
-echo " Build directory: $BUILD_DIR"
-echo " Build type:      $BUILD_TYPE"
-echo " Parallel jobs:   $JOBS"
-echo " Target:          iOS Device (arm64)"
-echo " RME logging:     $RME_LOGGING_CMAKE (compile option)"
-echo "=============================================="
-echo ""
+MODE:
+  -prod                Build release artifact(s) with no embedded game data/config
+  -test                Build test artifact(s) with patched data/config embedded
 
-# Verify toolchain exists
+TARGET:
+  --device             Build device app + IPA (default)
+  --simulator          Build simulator app only
+  --both               Build both device + simulator artifacts
+
+OPTIONS:
+  --game-data PATH     Patched data source (master.dat, critter.dat, data/)
+                       Required in -test mode unless GAME_DATA or FALLOUT_GAMEFILES_ROOT is set.
+  --help               Show this help
+
+EXAMPLES:
+  ./scripts/build/build-ios.sh -prod
+  ./scripts/build/build-ios.sh -test --device --game-data /path/to/patchedfiles
+  ./scripts/build/build-ios.sh -test --both
+USAGE
+}
+
+log_info()  { echo ">>> $1"; }
+log_ok()    { echo "PASS: $1"; }
+log_warn()  { echo "WARN: $1"; }
+log_error() { echo "FAIL: $1"; }
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -prod|--prod)
+            MODE="prod"
+            shift
+            ;;
+        -test|--test)
+            MODE="test"
+            shift
+            ;;
+        --device)
+            TARGET="device"
+            shift
+            ;;
+        --simulator)
+            TARGET="simulator"
+            shift
+            ;;
+        --both)
+            TARGET="both"
+            shift
+            ;;
+        --game-data)
+            GAME_DATA="$2"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            log_error "Unknown option: $1"
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
 if [[ ! -f "$TOOLCHAIN" ]]; then
     log_error "iOS toolchain not found: $TOOLCHAIN"
-    log_info "Ensure you're running from the project root"
     exit 1
 fi
 
-# Clean if requested
-if [[ "$CLEAN" == "1" && -d "$BUILD_DIR" ]]; then
-    log_warn "CLEAN=1 set, removing $BUILD_DIR..."
-    rm -rf "$BUILD_DIR"
-fi
-
-# Configure (if missing or if logging mode changed)
-NEEDS_CONFIG=0
-if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
-    NEEDS_CONFIG=1
-else
-    cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$BUILD_DIR/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
-    cached_flag_upper="$(printf '%s' "${cached_flag:-}" | tr '[:lower:]' '[:upper:]')"
-    desired_flag_upper="$(printf '%s' "$RME_LOGGING_CMAKE" | tr '[:lower:]' '[:upper:]')"
-    if [[ "$cached_flag_upper" != "$desired_flag_upper" ]]; then
-        log_info "CMake option changed: F1R_DISABLE_RME_LOGGING=${cached_flag:-unset} -> $RME_LOGGING_CMAKE"
-        NEEDS_CONFIG=1
+resolve_game_data() {
+    if [[ -z "$GAME_DATA" && -n "$GAMEFILES_ROOT" ]]; then
+        GAME_DATA="$GAMEFILES_ROOT/patchedfiles"
     fi
-fi
 
-if [[ "$NEEDS_CONFIG" == "1" ]]; then
-    log_info "Configuring CMake for iOS..."
-    cmake -B "$BUILD_DIR" \
-        -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
-        -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
-        -D F1R_DISABLE_RME_LOGGING="$RME_LOGGING_CMAKE" \
-        -D ENABLE_BITCODE=0 \
-        -D PLATFORM=OS64 \
-        -D DEPLOYMENT_TARGET=26.0 \
-        -G Xcode \
-        -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
-        || { log_error "CMake configuration failed"; exit 1; }
-    log_ok "Configuration complete"
-else
-    log_info "Using existing CMake configuration"
-fi
+    if [[ -z "$GAME_DATA" ]]; then
+        log_error "-test mode requires --game-data or GAME_DATA/FALLOUT_GAMEFILES_ROOT"
+        exit 2
+    fi
 
-# Build
-log_info "Building ($BUILD_TYPE, $JOBS parallel jobs)..."
-if ! cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" -j "$JOBS"; then
-    log_error "Build failed"
-    exit 1
-fi
+    if [[ "$GAME_DATA" != /* ]]; then
+        GAME_DATA="$ROOT_DIR/$GAME_DATA"
+    fi
+    GAME_DATA="$(cd "$GAME_DATA" 2>/dev/null && pwd)" || {
+        log_error "Invalid game data path: $GAME_DATA"
+        exit 2
+    }
 
-# -----------------------------------------------------------------------------
-# Verification
-# -----------------------------------------------------------------------------
-APP_PATH="$BUILD_DIR/$BUILD_TYPE-iphoneos/fallout1-rebirth.app"
-EXECUTABLE="$APP_PATH/fallout1-rebirth"
+    if [[ ! -f "$GAME_DATA/master.dat" || ! -f "$GAME_DATA/critter.dat" || ! -d "$GAME_DATA/data" ]]; then
+        log_error "Game data is incomplete at $GAME_DATA (need master.dat, critter.dat, data/)"
+        exit 2
+    fi
+}
 
-if [[ -d "$APP_PATH" && -x "$EXECUTABLE" ]]; then
-    echo ""
-    log_ok "iOS build successful!"
-    echo ""
-    echo "  App bundle: $APP_PATH"
-    echo "  Size:       $(du -sh "$APP_PATH" | cut -f1)"
-    echo ""
-    # Show architecture info
-    log_info "Binary architecture:"
-    file "$EXECUTABLE" | sed 's/.*: /    /'
-    echo ""
-    echo "To create IPA for distribution:"
-    echo "  cd $BUILD_DIR && cpack -C $BUILD_TYPE"
-    echo ""
-    echo "For simulator testing, use instead:"
-    echo "  ./scripts/test/test-ios-simulator.sh"
-else
-    echo ""
-    log_ok "iOS build complete!"
-    echo ""
-    log_info "Checking for build output..."
-    # Xcode may place builds in different locations
-    if [[ -d "$BUILD_DIR/$BUILD_TYPE-iphoneos" ]]; then
-        echo "  Found: $BUILD_DIR/$BUILD_TYPE-iphoneos/"
-        ls -la "$BUILD_DIR/$BUILD_TYPE-iphoneos/" 2>/dev/null | head -5
-    elif [[ -d "$BUILD_DIR/build/$BUILD_TYPE-iphoneos" ]]; then
-        echo "  Found: $BUILD_DIR/build/$BUILD_TYPE-iphoneos/"
-        ls -la "$BUILD_DIR/build/$BUILD_TYPE-iphoneos/" 2>/dev/null | head -5
+stage_test_payload_ios() {
+    local app_path="$1"
+
+    if [[ ! -d "$app_path" ]]; then
+        log_error "Cannot stage test payload; app not found: $app_path"
+        exit 1
+    fi
+
+    log_info "Staging test payload into $app_path"
+
+    cp -f "$GAME_DATA/master.dat" "$app_path/"
+    cp -f "$GAME_DATA/critter.dat" "$app_path/"
+    rm -rf "$app_path/data"
+    cp -R "$GAME_DATA/data" "$app_path/"
+
+    if [[ -f "$GAME_DATA/fallout.cfg" ]]; then
+        cp -f "$GAME_DATA/fallout.cfg" "$app_path/"
     else
-        log_warn "Could not locate app bundle - check $BUILD_DIR for output"
+        cat > "$app_path/fallout.cfg" <<'CFG'
+[system]
+master_dat=master.dat
+master_patches=data
+critter_dat=critter.dat
+critter_patches=data
+CFG
     fi
-    echo ""
-    echo "To create IPA:"
-    echo "  cd $BUILD_DIR && cpack -C $BUILD_TYPE"
+
+    if [[ -f "$GAME_DATA/f1_res.ini" ]]; then
+        cp -f "$GAME_DATA/f1_res.ini" "$app_path/"
+    fi
+
+    log_ok "Embedded patched data/config into app payload"
+}
+
+configure_and_build_device() {
+    local build_dir="$BUILD_DIR_DEVICE"
+
+    if [[ "$CLEAN" == "1" && -d "$build_dir" ]]; then
+        log_warn "CLEAN=1 set, removing $build_dir"
+        rm -rf "$build_dir"
+    fi
+
+    local needs_config=0
+    if [[ ! -f "$build_dir/CMakeCache.txt" ]]; then
+        needs_config=1
+    else
+        cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
+        cached_platform="$(grep '^PLATFORM:STRING=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
+        if [[ "${cached_flag^^}" != "${RME_LOGGING_CMAKE^^}" || "$cached_platform" != "OS64" ]]; then
+            needs_config=1
+        fi
+    fi
+
+    if [[ "$needs_config" == "1" ]]; then
+        log_info "Configuring iOS device build"
+        cmake -B "$build_dir" \
+            -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
+            -D F1R_DISABLE_RME_LOGGING="$RME_LOGGING_CMAKE" \
+            -D ENABLE_BITCODE=0 \
+            -D PLATFORM=OS64 \
+            -D DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET_DEVICE" \
+            -G Xcode \
+            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
+            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO
+    else
+        log_info "Using existing iOS device CMake configuration"
+    fi
+
+    log_info "Building iOS device target ($BUILD_TYPE)"
+    cmake --build "$build_dir" --config "$BUILD_TYPE" -j "$JOBS"
+
+    local app_path="$build_dir/$BUILD_TYPE-iphoneos/$APP_NAME.app"
+    local exe_path="$app_path/$APP_NAME"
+
+    if [[ ! -d "$app_path" || ! -x "$exe_path" ]]; then
+        log_error "Device app build output missing: $app_path"
+        exit 1
+    fi
+
+    if [[ "$MODE" == "test" ]]; then
+        stage_test_payload_ios "$app_path"
+    fi
+
+    log_info "Packaging IPA with CPack"
+    (
+        cd "$build_dir"
+        cpack -C "$BUILD_TYPE"
+    )
+
+    ipa_path="$(ls -t "$build_dir"/*.ipa 2>/dev/null | head -1 || true)"
+    if [[ -z "$ipa_path" ]]; then
+        log_error "No IPA produced in $build_dir"
+        exit 1
+    fi
+
+    mkdir -p "$OUTPUT_DIR"
+    local ipa_name
+    ipa_name="$(basename "$ipa_path")"
+    if [[ "$MODE" == "test" && "$ipa_name" != *"-test.ipa" ]]; then
+        ipa_name="${ipa_name%.ipa}-test.ipa"
+    fi
+    cp -f "$ipa_path" "$OUTPUT_DIR/$ipa_name"
+
+    log_ok "Device IPA ready: $OUTPUT_DIR/$ipa_name"
+}
+
+configure_and_build_simulator() {
+    local build_dir="$BUILD_DIR_SIM"
+    local sim_platform
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        sim_platform="SIMULATOR64"
+    else
+        sim_platform="SIMULATORARM64"
+    fi
+
+    if [[ "$CLEAN" == "1" && -d "$build_dir" ]]; then
+        log_warn "CLEAN=1 set, removing $build_dir"
+        rm -rf "$build_dir"
+    fi
+
+    local needs_config=0
+    if [[ ! -f "$build_dir/CMakeCache.txt" ]]; then
+        needs_config=1
+    else
+        cached_platform="$(grep '^PLATFORM:STRING=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
+        cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
+        if [[ "$cached_platform" != "$sim_platform" || "${cached_flag^^}" != "${RME_LOGGING_CMAKE^^}" ]]; then
+            needs_config=1
+        fi
+    fi
+
+    if [[ "$needs_config" == "1" ]]; then
+        log_info "Configuring iOS simulator build ($sim_platform)"
+        cmake -B "$build_dir" \
+            -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
+            -D F1R_DISABLE_RME_LOGGING="$RME_LOGGING_CMAKE" \
+            -D ENABLE_BITCODE=0 \
+            -D PLATFORM="$sim_platform" \
+            -D DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET_SIM" \
+            -G Xcode \
+            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
+            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO
+    else
+        log_info "Using existing iOS simulator CMake configuration"
+    fi
+
+    log_info "Building iOS simulator target ($BUILD_TYPE)"
+    cmake --build "$build_dir" --config "$BUILD_TYPE" -j "$JOBS" -- EXCLUDED_ARCHS=""
+
+    local app_path="$build_dir/$BUILD_TYPE-iphonesimulator/$APP_NAME.app"
+    local exe_path="$app_path/$APP_NAME"
+    if [[ ! -d "$app_path" || ! -x "$exe_path" ]]; then
+        log_error "Simulator app build output missing: $app_path"
+        exit 1
+    fi
+
+    if [[ "$MODE" == "test" ]]; then
+        stage_test_payload_ios "$app_path"
+    fi
+
+    log_ok "Simulator app ready: $app_path"
+}
+
+echo ""
+echo "=============================================="
+echo " Fallout 1 Rebirth - iOS Build"
+echo "=============================================="
+echo " Mode:            $MODE"
+echo " Target:          $TARGET"
+echo " Build type:      $BUILD_TYPE"
+echo " Device build:    $BUILD_DIR_DEVICE"
+echo " Simulator build: $BUILD_DIR_SIM"
+echo "=============================================="
+
+if [[ "$MODE" == "test" ]]; then
+    resolve_game_data
+    echo " Test data:       $GAME_DATA"
 fi
+
+echo ""
+
+case "$TARGET" in
+    device)
+        configure_and_build_device
+        ;;
+    simulator)
+        configure_and_build_simulator
+        ;;
+    both)
+        configure_and_build_device
+        configure_and_build_simulator
+        ;;
+    *)
+        log_error "Invalid target: $TARGET"
+        exit 2
+        ;;
+esac
+
+echo ""
+log_ok "iOS build completed"

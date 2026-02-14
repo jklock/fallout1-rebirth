@@ -41,10 +41,6 @@ mkdir -p "$WORKDIR"
 echo "Copying patched data -> $WORKDIR (rsync -a)"
 rsync -a --delete "$DATA_DIR/" "$WORKDIR/"
 
-# Build the app (build-macos script should put binary at build/fallout1-rebirth or build-macos path)
-echo "Building app (this may take a bit)"
-$REPO_ROOT/scripts/build/build-macos.sh --build-only
-
 # Attempt to locate binary
 BINARY=""
 # Prefer build/fallout1-rebirth
@@ -60,7 +56,8 @@ elif [ -x "$REPO_ROOT/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app/Contents/
 fi
 
 if [ -z "$BINARY" ]; then
-    echo "Could not find built binary after build; expected at build/fallout1-rebirth or build-macos/RelWithDebInfo/fallout1-rebirth or build-macos/.app/Contents/MacOS/fallout1-rebirth" >&2
+    echo "Could not find an existing build binary. Expected at build/fallout1-rebirth or build-macos/RelWithDebInfo/fallout1-rebirth or build-macos/.app/Contents/MacOS/fallout1-rebirth" >&2
+    echo "Build first with: ./scripts/build/build-macos.sh" >&2
     exit 3
 fi
 
