@@ -13,6 +13,9 @@
 #   3. CMake configuration validation
 #   4. Platform-specific code audit
 #
+# CONFIGURATION:
+#   DEV_CHECK_TMP_DIR - Temp CMake configure directory (default: ./tmp/fallout1-rebirth-check)
+#
 # REQUIREMENTS:
 #   - clang-format (brew install clang-format)
 #   - cppcheck (brew install cppcheck)
@@ -72,7 +75,7 @@ fi
 # 3. Check CMakeLists.txt syntax
 echo ""
 echo ">>> Checking CMake configuration..."
-TMP_CHECK_DIR="$PWD/tmp/fallout1-rebirth-check"
+TMP_CHECK_DIR="${DEV_CHECK_TMP_DIR:-$PWD/tmp/fallout1-rebirth-check}"
 if cmake -B "$TMP_CHECK_DIR" -D CMAKE_BUILD_TYPE=Debug > /dev/null 2>&1; then
     echo "✅ CMake configuration OK"
     rm -rf "$TMP_CHECK_DIR"

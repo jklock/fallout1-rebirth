@@ -34,6 +34,10 @@ void rme_logf(const char* topic, const char* fmt, ...);
 
 namespace fallout {
 
+// F1R AUDIT NOTE:
+// Added startup working-directory override and bundle probe diagnostics so
+// patched external data roots can be validated deterministically on macOS/iOS.
+
 // 0x53A290
 bool GNW95_isActive = false;
 

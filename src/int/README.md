@@ -2,7 +2,7 @@
 
 Script interpreter for Fallout's SSL scripting language.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 ## Core Components
 

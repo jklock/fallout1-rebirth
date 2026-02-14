@@ -28,6 +28,7 @@ set(CMAKE_CXX_EXTENSIONS NO)
 
 option(ASAN "Enable address sanitizer" OFF)
 option(UBSAN "Enable undefined behaviour sanitizer" OFF)
+option(F1R_DISABLE_RME_LOGGING "Compile out Rebirth-specific diagnostic logging hooks (release/audit packaging)" OFF)
 
 add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE)
 
@@ -38,6 +39,9 @@ endif()
 if(UBSAN)
     target_compile_options(${EXECUTABLE_NAME} PUBLIC "-fsanitize=undefined")
     target_link_options(${EXECUTABLE_NAME} PUBLIC "-fsanitize=undefined")
+endif()
+if(F1R_DISABLE_RME_LOGGING)
+    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE F1R_DISABLE_RME_LOGGING=1)
 endif()
 
 # Suppress warnings

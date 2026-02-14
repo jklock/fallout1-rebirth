@@ -55,7 +55,8 @@ void rme_log_init_from_env(void)
         file = "rme.log";
     }
 
-    // Open for write to create a fresh log for each run
+    // Community audit note: write mode keeps each validation run deterministic
+    // (no stale lines from previous executions).
     rme_log_fp = std::fopen(file, "w");
     if (rme_log_fp != nullptr) {
         // line buffering

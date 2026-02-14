@@ -67,7 +67,7 @@ Key completions:
 | `src/plib/` | Platform & UI layer (graphics/input/dialogs via SDL) |
 | `src/platform/` | Platform-specific abstractions |
 | `os/ios/`, `os/macos/` | Platform resources (Info.plist, icons, storyboards) |
-| `third_party/` | Dependencies (SDL2, adecode, fpattern) via FetchContent |
+| `third_party/` | Dependencies (SDL3, adecode, fpattern) via FetchContent |
 | `dist/` | Distribution files for packaging |
 | `docs/` | Project documentation |
 | `development/` | Internal development docs and research |
@@ -123,6 +123,11 @@ cd build-ios && cpack -C RelWithDebInfo  # creates .ipa
 | `./scripts/dev/dev-check.sh` | Pre-commit checks (format + lint) |
 | `./scripts/dev/dev-format.sh` | Format code with clang-format |
 | `./scripts/dev/dev-clean.sh` | Clean all build artifacts |
+| `./scripts/dev/dev-toggle-dev-files.sh` | Toggle development-only ignore rules |
+| `./scripts/patch/rebirth-toggle-logging.sh` | Toggle compile-time diagnostics logging mode |
+| `./scripts/test/test-rme-end-to-end.sh` | Final full-domain RME validation run |
+| `./scripts/test/test-rme-extract-map.py` | Extract MAP entries from DATs for diagnostics |
+| `./scripts/test/test-rme-patchlog-analyze.py` | Analyze runtime patchlog anomalies |
 
 ## Local Development (No CI)
 
@@ -173,9 +178,14 @@ These files are bundled with the app during packaging (DMG for macOS, IPA for iO
 - **Naming**: Lowercase + underscores for files; header guards `FALLOUT_<PATH>_H_`; namespace `fallout`.
 - **Logging**: Use `debug_printf(...)`, `dbg_error(...)`, `GNWSystemError(...)` for runtime errors.
 
+### Documentation Sync Rule
+- If a directory contains `JOURNAL.md`, read it before editing files in that directory.
+- After every file change in that directory, update its `JOURNAL.md` with date, what changed, and why.
+- Keep `README.md` and `JOURNAL.md` aligned with the actual file set in that directory.
+
 ## Dependencies
 
-- **SDL2**: Bundled via `third_party/sdl2` using FetchContent (release-2.30.10)
+- **SDL3**: Bundled via `third_party/sdl3` using FetchContent (release-3.4.0)
 - **adecode**: Audio decoding library in `third_party/adecode`
 - **fpattern**: File pattern matching in `third_party/fpattern`
 
@@ -196,6 +206,9 @@ All dependencies are pinned via FetchContent GIT_TAG. Update tags when upgrading
 - Asset filename case matters on case-sensitive file systems
 - Config keys in `fallout.cfg`: `master_dat`, `critter_dat`
 - Obtain game data from your Fallout 1 copy
+- Repo-local game-data folders are not used; provide external paths via `FALLOUT_GAMEFILES_ROOT` or `GAME_DATA`
+- Canonical patched data path: `$FALLOUT_GAMEFILES_ROOT/patchedfiles`
+- Canonical unpatched data path: `$FALLOUT_GAMEFILES_ROOT/unpatchedfiles`
 
 ## Testing
 

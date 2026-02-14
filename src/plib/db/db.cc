@@ -23,6 +23,11 @@
 
 namespace fallout {
 
+// F1R AUDIT NOTE:
+// Added DB open-failure diagnostics and patch/context logging so validation
+// tooling can distinguish expected soft misses (.SAV/.GAM probes) from real
+// data regressions in patched distributions.
+
 #define DB_DATABASE_LIST_CAPACITY 10
 #define DB_DATABASE_FILE_LIST_CAPACITY 32
 #define DB_HASH_TABLE_SIZE 4095
@@ -190,8 +195,6 @@ DB_DATABASE* db_init(const char* datafile, const char* datafile_path, const char
 {
     DB_DATABASE* database;
     std::string datafile_dir;
-
-    patchlog_context(patches_path, datafile_path);
 
     patchlog_context(patches_path, datafile_path);
 

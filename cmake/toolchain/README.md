@@ -2,7 +2,7 @@
 
 CMake toolchain files for cross-compilation to Apple platforms.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 ## Contents
 

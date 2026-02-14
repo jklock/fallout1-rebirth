@@ -24,6 +24,10 @@
 
 namespace fallout {
 
+// F1R AUDIT NOTE:
+// Added defensive window-manager teardown behavior to avoid stale window slot
+// reuse during shutdown, which previously manifested as intermittent exits.
+
 #define MAX_WINDOW_COUNT 50
 
 static void win_free(int win);

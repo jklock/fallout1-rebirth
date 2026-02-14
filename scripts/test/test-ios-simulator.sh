@@ -23,8 +23,8 @@
 #
 # CONFIGURATION (environment variables):
 #   SIMULATOR_NAME  - Device name (default: "iPad Pro 13-inch (M5)")
-#   GAME_DATA       - Optional override path to game files (defaults to GOG/patchedfiles)
-#                     Non-canonical paths are blocked unless RME_ALLOW_NON_CANONICAL_GAME_DATA=1
+#   GAME_DATA       - Path to game files (master.dat, critter.dat, data/)
+#   FALLOUT_GAMEFILES_ROOT - Optional root containing patchedfiles/
 #   BUILD_DIR       - Build output dir (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
 #   CLEAN           - Set to "1" to force reconfigure
@@ -41,7 +41,7 @@ ROOT_DIR="$PWD"
 SIMULATOR_NAME="${SIMULATOR_NAME:-iPad Pro 13-inch (M5)}"
 
 GAME_DATA="${GAME_DATA:-}"
-CANONICAL_GAME_DATA="$ROOT_DIR/GOG/patchedfiles"
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
@@ -70,37 +70,27 @@ log_warn()  { echo -e "${YELLOW}⚠️${NC}  $1"; }
 log_error() { echo -e "${RED}❌${NC} $1"; }
 
 resolve_game_data_source() {
-    if [[ ! -d "$CANONICAL_GAME_DATA" ]]; then
-        log_error "Canonical patched data directory not found: $CANONICAL_GAME_DATA"
-        exit 1
+    local requested="${GAME_DATA:-}"
+    if [[ -z "$requested" && -n "$GAMEFILES_ROOT" ]]; then
+        requested="$GAMEFILES_ROOT/patchedfiles"
     fi
-    if [[ ! -f "$CANONICAL_GAME_DATA/master.dat" || ! -f "$CANONICAL_GAME_DATA/critter.dat" || ! -d "$CANONICAL_GAME_DATA/data" ]]; then
-        log_error "Canonical patched data is incomplete: $CANONICAL_GAME_DATA"
+    if [[ -z "$requested" ]]; then
+        log_error "GAME_DATA is not set. Provide GAME_DATA or FALLOUT_GAMEFILES_ROOT."
         exit 1
     fi
 
-    if [[ -n "$GAME_DATA" ]]; then
-        local requested
-        requested="$(cd "$GAME_DATA" 2>/dev/null && pwd || true)"
-        if [[ -z "$requested" ]]; then
-            log_error "GAME_DATA path is invalid: $GAME_DATA"
-            exit 1
-        fi
-        if [[ "$requested" != "$CANONICAL_GAME_DATA" && "${RME_ALLOW_NON_CANONICAL_GAME_DATA:-0}" != "1" ]]; then
-            log_error "Non-canonical GAME_DATA is blocked for RME validation: $requested"
-            log_error "Use canonical path: $CANONICAL_GAME_DATA"
-            log_error "Set RME_ALLOW_NON_CANONICAL_GAME_DATA=1 only if you intentionally need an override."
-            exit 1
-        fi
-        if [[ "$requested" != "$CANONICAL_GAME_DATA" ]]; then
-            log_warn "Using non-canonical GAME_DATA override: $requested"
-            GAME_DATA="$requested"
-            return 0
-        fi
+    requested="$(cd "$requested" 2>/dev/null && pwd || true)"
+    if [[ -z "$requested" ]]; then
+        log_error "GAME_DATA path is invalid: $GAME_DATA"
+        exit 1
+    fi
+    if [[ ! -f "$requested/master.dat" || ! -f "$requested/critter.dat" || ! -d "$requested/data" ]]; then
+        log_error "Game data is incomplete at: $requested (need master.dat, critter.dat, data/)"
+        exit 1
     fi
 
-    GAME_DATA="$CANONICAL_GAME_DATA"
-    log_info "Using canonical game data: $GAME_DATA"
+    GAME_DATA="$requested"
+    log_info "Using game data: $GAME_DATA"
 }
 
 # Auto-detect bundle ID from built app's Info.plist
@@ -458,7 +448,7 @@ main() {
     echo " Fallout 1 Rebirth — iOS Simulator Testing"
     echo "=============================================="
     echo " Target: $SIMULATOR_NAME"
-    echo " Game data: ${GAME_DATA:-$CANONICAL_GAME_DATA}"
+    echo " Game data: ${GAME_DATA:-${GAMEFILES_ROOT:+$GAMEFILES_ROOT/patchedfiles}}"
     echo " Build dir: $BUILD_DIR"
     echo "=============================================="
     echo ""
@@ -494,7 +484,7 @@ main() {
             ;;
     esac
 
-    # Canonical RME requirement: all simulator tests use GOG/patchedfiles.
+    # Resolve and validate game-data source before install/launch.
     resolve_game_data_source
     
     # Step 1: Ensure only one simulator

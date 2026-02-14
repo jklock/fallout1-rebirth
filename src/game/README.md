@@ -2,7 +2,7 @@
 
 Core game logic and mechanics for Fallout 1.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 ## Entry Points
 

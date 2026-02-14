@@ -13,10 +13,16 @@
 #   BUILD_TYPE  - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
 #   JOBS        - Parallel jobs (default: physical CPU count)
 #   CLEAN       - Set to "1" to force reconfigure
+#   F1R_DISABLE_RME_LOGGING - Set to 1/ON to compile out Rebirth diagnostic logging
 # =============================================================================
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
+
+if [[ -f ".f1r-build.env" ]]; then
+    # shellcheck disable=SC1091
+    source ".f1r-build.env"
+fi
 
 # -----------------------------------------------------------------------------
 # Configuration
@@ -25,6 +31,17 @@ BUILD_DIR="${BUILD_DIR:-build-macos}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 CLEAN="${CLEAN:-0}"
+LOGGING_FLAG_RAW="${F1R_DISABLE_RME_LOGGING:-0}"
+LOGGING_FLAG_UPPER="$(printf '%s' "$LOGGING_FLAG_RAW" | tr '[:lower:]' '[:upper:]')"
+
+case "$LOGGING_FLAG_UPPER" in
+    1|ON|TRUE|YES) RME_LOGGING_CMAKE="ON" ;;
+    0|OFF|FALSE|NO|"") RME_LOGGING_CMAKE="OFF" ;;
+    *)
+        echo "Invalid F1R_DISABLE_RME_LOGGING value: $LOGGING_FLAG_RAW (expected 0/1/ON/OFF)" >&2
+        exit 2
+        ;;
+esac
 
 # Colors for output
 RED='\033[0;31m'
@@ -48,6 +65,7 @@ echo "=============================================="
 echo " Build directory: $BUILD_DIR"
 echo " Build type:      $BUILD_TYPE"
 echo " Parallel jobs:   $JOBS"
+echo " RME logging:     $RME_LOGGING_CMAKE (compile option)"
 echo "=============================================="
 echo ""
 
@@ -57,11 +75,25 @@ if [[ "$CLEAN" == "1" && -d "$BUILD_DIR" ]]; then
     rm -rf "$BUILD_DIR"
 fi
 
-# Configure (only if not already configured)
+# Configure (if missing or if logging mode changed)
+NEEDS_CONFIG=0
 if [[ ! -f "$BUILD_DIR/CMakeCache.txt" ]]; then
+    NEEDS_CONFIG=1
+else
+    cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$BUILD_DIR/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
+    cached_flag_upper="$(printf '%s' "${cached_flag:-}" | tr '[:lower:]' '[:upper:]')"
+    desired_flag_upper="$(printf '%s' "$RME_LOGGING_CMAKE" | tr '[:lower:]' '[:upper:]')"
+    if [[ "$cached_flag_upper" != "$desired_flag_upper" ]]; then
+        log_info "CMake option changed: F1R_DISABLE_RME_LOGGING=${cached_flag:-unset} -> $RME_LOGGING_CMAKE"
+        NEEDS_CONFIG=1
+    fi
+fi
+
+if [[ "$NEEDS_CONFIG" == "1" ]]; then
     log_info "Configuring CMake with Xcode generator..."
     cmake -B "$BUILD_DIR" \
         -G Xcode \
+        -D F1R_DISABLE_RME_LOGGING="$RME_LOGGING_CMAKE" \
         -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
         || { log_error "CMake configuration failed"; exit 1; }
     log_ok "Configuration complete"

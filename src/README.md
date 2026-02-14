@@ -2,7 +2,7 @@
 
 Main source directory for Fallout 1 Rebirth.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 ## Structure
 

@@ -74,9 +74,10 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 
 ### Validation
 ```bash
-./scripts/check.sh    # Pre-commit checks
-./scripts/test.sh     # Build verification + static analysis
-./scripts/format.sh   # Code formatting
+./scripts/dev/dev-check.sh    # Pre-commit checks
+./scripts/dev/dev-verify.sh   # Build verification + static analysis
+./scripts/dev/dev-format.sh   # Code formatting
+./scripts/test/test-rme-end-to-end.sh  # Final full-domain RME validation
 ```
 
 ## Architecture Quick Reference
@@ -88,7 +89,7 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 | `src/plib/` | Graphics, input, dialogs (SDL) |
 | `src/platform/` | Platform abstraction |
 | `os/ios/`, `os/macos/` | Platform-specific code |
-| `third_party/` | SDL2, dependencies |
+| `third_party/` | SDL3, dependencies |
 
 ### Key Files
 | File | Purpose |
@@ -103,7 +104,7 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 ### New Source File
 1. Create `.cc` and `.h` in appropriate `src/` subdirectory
 2. Add to `CMakeLists.txt` under `target_sources`
-3. Run `./scripts/check.sh` before committing
+3. Run `./scripts/dev/dev-check.sh` before committing
 
 ### New Script Opcode
 1. Implement handler in `src/int/support/intextra.cc`
@@ -119,6 +120,22 @@ cmake --build build -j $(sysctl -n hw.physicalcpu)
 - Files `master.dat`, `critter.dat`, `data/` are **NOT included** in repo
 - Obtain from your Fallout 1 copy
 - For simulator: game data goes in app's **data container**, not app bundle
+- Repo-local game-data folders are not used; provide external paths via `FALLOUT_GAMEFILES_ROOT` or `GAME_DATA`
+- Canonical patched data source: `$FALLOUT_GAMEFILES_ROOT/patchedfiles`
+- Canonical unpatched data source: `$FALLOUT_GAMEFILES_ROOT/unpatchedfiles`
 
 ## Project Documentation
-See `FCE/` directory for phase guides and implementation plans.
+Primary project docs:
+- `README.md`
+- `docs/`
+- `scripts/README.md`
+
+Developer diagnostics:
+- `scripts/test/test-rme-extract-map.py`
+- `scripts/test/test-rme-patchlog-analyze.py`
+- `scripts/patch/rebirth-toggle-logging.sh`
+
+## Documentation Sync Rule
+- Before editing files in any directory that has `JOURNAL.md`, read that journal first.
+- After every file change in that directory, update that directory's `JOURNAL.md` with date, scope, and reason for the change.
+- Keep `README.md` and `JOURNAL.md` consistent with the current file set in that directory.

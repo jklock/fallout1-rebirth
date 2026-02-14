@@ -21,6 +21,7 @@
 # CONFIGURATION:
 #   BUILD_DIR  - Build output directory (default: "build")
 #   GAME_DATA  - Path to game files (optional; can also be set via --game-data)
+#   DEV_VERIFY_IOS_TMP_DIR - Temp iOS configure dir (default: ./tmp/ios-test)
 # =============================================================================
 set -euo pipefail
 
@@ -203,7 +204,7 @@ echo "✅ Found $CC_COUNT .cc files and $H_COUNT .h files"
 # 6. CMake configuration test
 echo ""
 echo ">>> Test 6: CMake iOS Configuration"
-TMP_IOS_TEST_DIR="$PWD/tmp/ios-test"
+TMP_IOS_TEST_DIR="${DEV_VERIFY_IOS_TMP_DIR:-$PWD/tmp/ios-test}"
 if cmake -B "$TMP_IOS_TEST_DIR" \
     -D CMAKE_TOOLCHAIN_FILE=cmake/toolchain/ios.toolchain.cmake \
     -D ENABLE_BITCODE=0 \
@@ -234,7 +235,7 @@ if [[ $ERRORS -eq 0 ]]; then
         echo "  cd \"$GAME_DATA\" && \"$BINARY\""
     fi
     echo ""
-    echo "See: FCE/TODO/PHASE_4_TESTING_POLISH.md for full test matrix"
+    echo "See: docs/testing.md for the current test matrix"
     exit 0
 else
     echo "❌ $ERRORS test(s) failed"

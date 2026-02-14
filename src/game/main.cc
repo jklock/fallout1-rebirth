@@ -60,6 +60,12 @@
 
 namespace fallout {
 
+// F1R AUDIT NOTE:
+// - Added autorun map bootstrap and deterministic return codes for scripted
+//   full-coverage validation runs (maps/runtime harness).
+// - Added shutdown guards and memory-check diagnostics to reduce re-entrant
+//   teardown crashes and improve triage signal for community debugging.
+
 #define DEATH_WINDOW_WIDTH 640
 #define DEATH_WINDOW_HEIGHT 480
 

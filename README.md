@@ -4,7 +4,7 @@
 
 # Fallout 1 Rebirth
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 **Play Fallout 1 on your Mac or iPad** — the classic 1997 RPG, rebuilt for Apple platforms.
 
@@ -133,6 +133,13 @@ Want to build from source or contribute? See:
 - [Building from source](docs/building.md)
 - [Contributing guidelines](docs/contributing.md)
 - [Architecture overview](docs/architecture.md)
+
+Developer game-data policy:
+- Keep game files outside this repository.
+- Use `FALLOUT_GAMEFILES_ROOT` with:
+  - `$FALLOUT_GAMEFILES_ROOT/unpatchedfiles`
+  - `$FALLOUT_GAMEFILES_ROOT/patchedfiles`
+- Or provide `GAME_DATA` directly for scripts that operate on patched data.
 
 ---
 

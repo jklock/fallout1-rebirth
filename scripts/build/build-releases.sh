@@ -15,6 +15,8 @@
 # CONFIGURATION (environment variables):
 #   RELEASE_VERSION - Release folder under releases/ (default: "V1")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
+#   GAME_DATA       - Patched game-data directory (master.dat, critter.dat, data/)
+#   FALLOUT_GAMEFILES_ROOT - Optional root containing patchedfiles/ and unpatchedfiles/
 # =============================================================================
 set -euo pipefail
 
@@ -23,6 +25,12 @@ cd "$ROOT_DIR"
 
 RELEASE_VERSION="${RELEASE_VERSION:-V1}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+GAME_DATA="${GAME_DATA:-}"
+
+if [[ -z "$GAME_DATA" && -n "$GAMEFILES_ROOT" ]]; then
+    GAME_DATA="$GAMEFILES_ROOT/patchedfiles"
+fi
 
 RELEASES_DIR="$ROOT_DIR/releases"
 RELEASE_IOS_DIR="$RELEASES_DIR/iOS/$RELEASE_VERSION"
@@ -65,11 +73,16 @@ rm -f "$RELEASE_MAC_DIR"/*.dmg 2>/dev/null || true
 rm -rf "$RELEASE_MAC_DIR/$APP_NAME" 2>/dev/null || true
 
 log_section "Running tests"
-"$ROOT_DIR/scripts/rme/rme-ensure-patched-data.sh" --quiet
+if [[ -z "$GAME_DATA" ]]; then
+    log_error "GAME_DATA is not set. Provide GAME_DATA or FALLOUT_GAMEFILES_ROOT."
+    exit 2
+fi
+
+"$ROOT_DIR/scripts/test/test-rme-ensure-patched-data.sh" --patched-dir "$GAME_DATA" --quiet
 "$ROOT_DIR/scripts/dev/dev-check.sh"
 "$ROOT_DIR/scripts/dev/dev-verify.sh"
 "$ROOT_DIR/scripts/test/test-macos.sh"
-GAME_DATA="$ROOT_DIR/GOG/patchedfiles" "$ROOT_DIR/scripts/test/test-ios-headless.sh" --build
+GAME_DATA="$GAME_DATA" "$ROOT_DIR/scripts/test/test-ios-headless.sh" --build
 
 log_section "Building release artifacts"
 export BUILD_TYPE

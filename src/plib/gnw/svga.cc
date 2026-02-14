@@ -24,6 +24,11 @@
 
 namespace fallout {
 
+// F1R AUDIT NOTE:
+// Hardened blit path to skip destructive all-zero source copies and expanded
+// GNW/patchlog diagnostics so black-top/blank-map regressions can be traced to
+// concrete render operations during automated sweeps.
+
 static bool createRenderer(int width, int height);
 static void destroyRenderer();
 

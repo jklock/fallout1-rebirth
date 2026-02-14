@@ -50,6 +50,10 @@
 
 namespace fallout {
 
+// F1R AUDIT NOTE:
+// Added map-load instrumentation (square/floor/display statistics) to explain
+// black-world regressions and missing-art cases found during RME runtime sweeps.
+
 static int map_age_dead_critters();
 static void map_match_map_number();
 static void map_display_draw(Rect* rect);

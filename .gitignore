@@ -407,7 +407,7 @@ development/RME/validation/
 tmp/
 
 # Game data (must not be committed - copyrighted)
-game-data/
+#game-data/
 master.dat
 tmp/
 critter.dat
@@ -416,26 +416,21 @@ critter.dat
 # Project documentation and research (internal use)
 development/archive/
 
-# Development files (AI agent notes - toggle with scripts/hideall.sh)
-**/JOURNAL.md
-src/README.md
-.github/copilot-instructions.md
-.github/skills/
-scripts/hideall.sh
+# Development files (AI agent notes - toggle with scripts/dev/dev-toggle-dev-files.sh)
+#**/JOURNAL.md
+#src/README.md
+#.github/copilot-instructions.md
+#.github/skills/
+#scripts/dev/dev-toggle-dev-files.sh
 
 # macOS
 .DS_Store
 *.dmg
+.f1r-build.env
 
 # Distribution builds (generated)
 /dist/*.dmg
 /dist/*.ipa
 
 # Ignore local game data backups
-game-data/
-GOG/
-# Allow committed patched map artifacts needed for RME evidence
-!GOG/patchedfiles/
-!GOG/patchedfiles/data/
-!GOG/patchedfiles/data/maps/
-!GOG/patchedfiles/data/maps/*.MAP
+#game-data/

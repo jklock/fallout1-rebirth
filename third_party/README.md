@@ -2,7 +2,7 @@
 
 Third-party dependencies managed via CMake FetchContent.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 Each subdirectory contains a CMakeLists.txt that fetches the dependency from its upstream repository at a pinned commit or tag.
 

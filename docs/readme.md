@@ -2,7 +2,7 @@
 
 Documentation for Fallout 1 Rebirth — an Apple-only fork of Fallout 1 Community Edition for macOS and iOS/iPadOS.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 ## Documentation Index
 
@@ -19,6 +19,9 @@ Last updated: 2026-02-07
 | [setup_guide.md](setup_guide.md) | Step-by-step setup guide for end users |
 | [testing.md](testing.md) | Testing procedures and scripts |
 | [vsync.md](vsync.md) | VSync and display settings |
+
+RME final validation entrypoint:
+- `scripts/test/test-rme-end-to-end.sh`
 
 ## Quick Links
 

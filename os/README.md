@@ -2,7 +2,7 @@
 
 Operating system integration files for app packaging.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 Contains platform-specific resources required for building distributable applications.
 

@@ -3,15 +3,15 @@
 # Fallout 1 Rebirth — RME Validation Refresh
 # =============================================================================
 # Regenerates validation evidence under tmp/rme/validation by default
-# using the current GOG/unpatchedfiles and GOG/patchedfiles directories.
+# using user-provided unpatched/patched game-data directories.
 #
 # USAGE:
 #   ./scripts/patch/rebirth-refresh-validation.sh
 #     [--unpatched <dir>] [--patched <dir>] [--rme <dir>] [--out <dir>]
 #
 # DEFAULTS:
-#   --unpatched GOG/unpatchedfiles
-#   --patched   GOG/patchedfiles
+#   --unpatched <dir>
+#   --patched   <dir>
 #   --rme       third_party/rme
 #   --out       tmp/rme/validation
 #
@@ -23,8 +23,9 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 
-UNPATCHED_DIR="GOG/unpatchedfiles"
-PATCHED_DIR="GOG/patchedfiles"
+UNPATCHED_DIR="${UNPATCHED_DIR:-}"
+PATCHED_DIR="${PATCHED_DIR:-}"
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 if [[ -d "third_party/rme" ]]; then
   RME_DIR="third_party/rme"
 else
@@ -45,8 +46,8 @@ USAGE:
     [--unpatched <dir>] [--patched <dir>] [--rme <dir>] [--out <dir>]
 
 DEFAULTS:
-  --unpatched GOG/unpatchedfiles
-  --patched   GOG/patchedfiles
+  --unpatched <required, or inferred from FALLOUT_GAMEFILES_ROOT>
+  --patched   <required, or inferred from FALLOUT_GAMEFILES_ROOT>
   --rme       third_party/rme
   --out       tmp/rme/validation
 EOF
@@ -64,15 +65,27 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ -z "$UNPATCHED_DIR" && -n "$GAMEFILES_ROOT" ]]; then
+  UNPATCHED_DIR="$GAMEFILES_ROOT/unpatchedfiles"
+fi
+if [[ -z "$PATCHED_DIR" && -n "$GAMEFILES_ROOT" ]]; then
+  PATCHED_DIR="$GAMEFILES_ROOT/patchedfiles"
+fi
+
 if [[ ! -d "$UNPATCHED_DIR" || ! -d "$PATCHED_DIR" ]]; then
   log_error "Missing unpatched/patched directories."
   log_error "unpatched=$UNPATCHED_DIR patched=$PATCHED_DIR"
+  log_error "Set --unpatched/--patched explicitly or export FALLOUT_GAMEFILES_ROOT."
   exit 1
 fi
 
 mkdir -p "$OUT_DIR/raw"
 
 RAW_DIR="$OUT_DIR/raw"
+TMP_CROSSREF_DIR="$OUT_DIR/tmp_crossref"
+UNPATCHED_XREF_DIR="$TMP_CROSSREF_DIR/unpatched"
+PATCHED_XREF_DIR="$TMP_CROSSREF_DIR/patched"
+mkdir -p "$UNPATCHED_XREF_DIR" "$PATCHED_XREF_DIR"
 
 log_info "1) Quick tree diff (diff -qr)"
 {
@@ -112,12 +125,12 @@ shasum -a 256 "$PATCHED_DIR/critter.dat"   > "$OUT_DIR/critter_patched.sha256"
 echo "Checksums written" > "$OUT_DIR/checksum_notice.txt"
 
 log_info "5) RME crossref (patched/unpatched) + LST report"
-python3 scripts/rme/rme-crossref.py --rme "$RME_DIR" --base-dir "$UNPATCHED_DIR" --out-dir "GOG/rme_xref_unpatched" >/dev/null
-python3 scripts/rme/rme-crossref.py --rme "$RME_DIR" --base-dir "$PATCHED_DIR"   --out-dir "GOG/rme_xref_patched"   >/dev/null
+python3 scripts/test/test-rme-crossref.py --rme "$RME_DIR" --base-dir "$UNPATCHED_DIR" --out-dir "$UNPATCHED_XREF_DIR" >/dev/null
+python3 scripts/test/test-rme-crossref.py --rme "$RME_DIR" --base-dir "$PATCHED_DIR"   --out-dir "$PATCHED_XREF_DIR"   >/dev/null
 
-cp "GOG/rme_xref_unpatched/rme-crossref.csv" "$RAW_DIR/rme-crossref-unpatched.csv"
-cp "GOG/rme_xref_patched/rme-crossref.csv"   "$RAW_DIR/rme-crossref-patched.csv"
-cp "GOG/rme_xref_patched/rme-lst-report.md"  "$RAW_DIR/08_lst_missing.md"
+cp "$UNPATCHED_XREF_DIR/rme-crossref.csv" "$RAW_DIR/rme-crossref-unpatched.csv"
+cp "$PATCHED_XREF_DIR/rme-crossref.csv"   "$RAW_DIR/rme-crossref-patched.csv"
+cp "$PATCHED_XREF_DIR/rme-lst-report.md"  "$RAW_DIR/08_lst_missing.md"
 echo "Copied LST reports" > "$OUT_DIR/lst_copy_notice.txt"
 
 {
@@ -127,7 +140,7 @@ echo "Copied LST reports" > "$OUT_DIR/lst_copy_notice.txt"
 } > "$RAW_DIR/05_rme_crossref_copy.txt"
 
 log_info "5b) LST candidate scan (by basename)"
-python3 scripts/rme/rme-find-lst-candidates.py \
+python3 scripts/test/test-rme-find-lst-candidates.py \
   --lst-report "$RAW_DIR/08_lst_missing.md" \
   --search "$PATCHED_DIR" "$UNPATCHED_DIR" \
   --out "$RAW_DIR/lst_candidates.csv" \
@@ -244,7 +257,7 @@ fi
 } > "$RAW_DIR/11_validation_script.txt"
 
 log_info "12) Script reference audit (scripts.lst vs MAP/PRO)"
-python3 scripts/rme/rme-audit-script-refs.py \
+python3 scripts/test/test-rme-audit-script-refs.py \
   --patched-dir "$PATCHED_DIR" \
   --out-dir "$RAW_DIR" \
   > "$RAW_DIR/12_script_refs_run.log" 2>&1

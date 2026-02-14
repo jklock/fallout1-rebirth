@@ -4,7 +4,7 @@ Platform abstraction library providing low-level services.
 
 Originally from Interplay's internal library, now implemented using SDL3.
 
-Last updated: 2026-02-07
+Last updated: 2026-02-14
 
 ## Subdirectories
 

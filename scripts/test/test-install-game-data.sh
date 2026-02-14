@@ -12,7 +12,7 @@
 #   ./scripts/test/test-install-game-data.sh --help
 #
 # OPTIONS:
-#   --source PATH   Path to game data directory (default: GOG/patchedfiles)
+#   --source PATH   Path to game data directory
 #   --target PATH   Path to .app bundle (default: /Applications/Fallout 1 Rebirth.app)
 #   --help          Show this help message
 #
@@ -34,7 +34,8 @@ cd "$(dirname "$0")/../.."
 # Configuration
 # -----------------------------------------------------------------------------
 DEFAULT_TARGET="/Applications/Fallout 1 Rebirth.app"
-DEFAULT_SOURCE="$PWD/GOG/patchedfiles"
+GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+DEFAULT_SOURCE="${GAMEFILES_ROOT:+$GAMEFILES_ROOT/patchedfiles}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -62,7 +63,7 @@ USAGE:
 
 OPTIONS:
     --source PATH   Path to directory containing game data files
-                    Defaults to GOG/patchedfiles when present
+                    Defaults to GAME_DATA or FALLOUT_GAMEFILES_ROOT/patchedfiles when set
     
     --target PATH   Path to the .app bundle to install into
                     If omitted, the script will prompt or use /Applications/Fallout 1 Rebirth.app when present
@@ -76,7 +77,7 @@ REQUIRED FILES:
     - data/         Additional game data folder
 
 EXAMPLES:
-    # Uses default source (GOG/patchedfiles) and prompts for target if needed
+    # Uses GAME_DATA/FALLOUT_GAMEFILES_ROOT default source and prompts for target if needed
     ./scripts/test/test-install-game-data.sh
 
     # Specify a source folder
@@ -141,13 +142,13 @@ if [[ -z "$SOURCE_PATH" ]]; then
     if [[ -n "${GAME_DATA:-}" ]]; then
         SOURCE_PATH="$GAME_DATA"
         log_info "Using GAME_DATA: $SOURCE_PATH"
-    elif [[ -d "$DEFAULT_SOURCE" ]]; then
+    elif [[ -n "$DEFAULT_SOURCE" && -d "$DEFAULT_SOURCE" ]]; then
         SOURCE_PATH="$DEFAULT_SOURCE"
-        log_info "Using default patched source: $SOURCE_PATH"
+        log_info "Using default patched source from FALLOUT_GAMEFILES_ROOT: $SOURCE_PATH"
     elif [[ -t 0 ]]; then
         read -r -p "Enter path to game data folder (master.dat/critter.dat/data/): " SOURCE_PATH
     else
-        log_error "Missing --source and GAME_DATA, and default source not found: $DEFAULT_SOURCE"
+        log_error "Missing --source and GAME_DATA, and no usable FALLOUT_GAMEFILES_ROOT default was found."
         exit 1
     fi
 fi

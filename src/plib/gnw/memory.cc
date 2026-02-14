@@ -10,6 +10,10 @@
 
 namespace fallout {
 
+// F1R AUDIT NOTE:
+// Added backtrace capture on guard corruption to make memory stomp root-cause
+// analysis reproducible for crash reports from validation and community runs.
+
 // A special value that denotes a beginning of a memory block data.
 #define MEMORY_BLOCK_HEADER_GUARD 0xFEEDFACE
 

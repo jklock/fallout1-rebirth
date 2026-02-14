@@ -567,8 +567,8 @@ main() {
         exit 1
     fi
 
-    # Canonical RME requirement: tests always run with GOG/patchedfiles installed.
-    "$ROOT_DIR/scripts/rme/rme-ensure-patched-data.sh" --target-app "$APP_BUNDLE"
+    # Ensure patched data is installed in the app bundle before tests.
+    "$ROOT_DIR/scripts/test/test-rme-ensure-patched-data.sh" --target-app "$APP_BUNDLE"
     
     # Run all tests
     test_bundle_structure
