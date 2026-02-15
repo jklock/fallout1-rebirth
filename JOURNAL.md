@@ -48,6 +48,7 @@ Root of the Apple-only Fallout 1 Rebirth repository (macOS + iOS/iPadOS).
   - `releases/prod/macOS/Fallout 1 Rebirth.app`
   - `releases/prod/iOS/fallout1-rebirth.ipa`
 - Updated docs/audit evidence set with new coverage, packaging, and proof snapshots.
+- Added compile-time option `F1R_PATCHLOG_DEFAULT_ON` to produce an instrumented iOS build with patchlog + verbose touch traces enabled by default; instrumented IPA produced at `build-ios/fallout1-rebirth.ipa` and committed (3689fd5). Files changed: `CMakeLists.txt`, `src/plib/db/patchlog.cc`. Purpose: simplify physical-device input validation and deterministic evidence capture.
 
 ## Notes for Agents
 
