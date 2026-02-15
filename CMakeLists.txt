@@ -30,6 +30,14 @@ option(ASAN "Enable address sanitizer" OFF)
 option(UBSAN "Enable undefined behaviour sanitizer" OFF)
 option(F1R_DISABLE_RME_LOGGING "Compile out Rebirth-specific diagnostic logging hooks (release/audit packaging)" OFF)
 
+# Instrumented builds: enable patchlog by default (compile-time opt-in)
+option(F1R_PATCHLOG_DEFAULT_ON "Enable patchlog by default for instrumented builds" OFF)
+# When enabled, also enable verbose patchlog by default for easier diagnostics
+if(F1R_PATCHLOG_DEFAULT_ON)
+    # Use a global compile-definition so the option can be passed at configure time
+    add_compile_definitions(F1R_PATCHLOG_DEFAULT_ON=1 F1R_PATCHLOG_DEFAULT_VERBOSE=1)
+endif()
+
 add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE)
 
 if(ASAN)
