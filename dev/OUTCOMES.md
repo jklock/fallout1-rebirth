@@ -1,0 +1,36 @@
+# Dev Outcomes - Required End State
+
+## Outcome A - Input Reliability
+- No transient cursor jumps.
+- No stale-position click behavior.
+- No dead-input sessions after startup.
+- Finger, pencil, and trackpad all map consistently to mouse semantics.
+
+Measured by:
+- automated input scenario suite
+- repeated simulator/headless runs
+- unattended loop full-green pass
+
+## Outcome B - Config Compatibility
+- Every key from unpatched baseline manifests has functional runtime behavior.
+- No baseline key is silently ignored.
+- Templates and shipped configs expose supported keys only from compatibility map.
+
+Measured by:
+- per-key parse/apply/behavior tests
+- compatibility matrix marked fully wired
+- unattended config suite full-green pass
+
+## Outcome C - Unattended Operation
+- One command runs both tracks repeatedly until 100% pass.
+- Logs and state artifacts are persisted for each round.
+- Non-zero exit if max rounds reached before full green.
+
+Measured by:
+- `dev/run-unattended-until-100.sh` round summary and exit status
+
+## "Done" Definition
+Done means all three outcomes are true in the same execution window:
+1. Input suite: 100%
+2. Config suite: 100%
+3. Combined unattended round: 100%

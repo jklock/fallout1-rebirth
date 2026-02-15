@@ -111,7 +111,9 @@ int main(int argc, char* argv[])
             "Missing Game Files",
             "Could not find the master datafile. Install master.dat, critter.dat, and the data folder in Files > Fallout 1 Rebirth > Documents.",
             NULL);
-        return EXIT_FAILURE;
+        // On iOS, returning from SDL_main can keep the UIKit shell alive.
+        // Terminate explicitly once the user dismisses the preflight error.
+        exit(EXIT_FAILURE);
     }
 #endif
 
