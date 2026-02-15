@@ -26,7 +26,7 @@ Only the keys below are consumed by current runtime code (`src/game/game.cc`, `s
 |---|---|---|
 | `SCR_WIDTH` | int | Requested output width (minimum effective logical width is clamped to 640) |
 | `SCR_HEIGHT` | int | Requested output height (minimum effective logical height is clamped to 480) |
-| `WINDOWED` | bool/int | `1` windowed, `0` fullscreen (iOS forces fullscreen in renderer) |
+| `WINDOWED` | bool/int | `1` windowed, `0` fullscreen |
 | `EXCLUSIVE` | bool/int | Fullscreen exclusivity hint when fullscreen is used |
 | `SCALE_2X` | int | `0` = scale 1x, `1` = scale 2x (`video_scale = SCALE_2X + 1`) |
 
@@ -51,7 +51,7 @@ Only the keys below are consumed by current runtime code (`src/game/game.cc`, `s
 ### Platform Behavior
 
 - **macOS**: `WINDOWED` is honored (`1` default in template).
-- **iOS/iPadOS**: Renderer forces fullscreen regardless of `WINDOWED`, but key is still parsed.
+- **iOS/iPadOS**: `WINDOWED` is honored. Default template uses `WINDOWED=0` (fullscreen), while `WINDOWED=1` is suitable for iPadOS windowed scenes (Stage Manager).
 
 ### Recommended Defaults
 

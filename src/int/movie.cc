@@ -34,7 +34,7 @@ typedef struct MovieSubtitleListNode {
 
 static void* movieMalloc(size_t size);
 static void movieFree(void* ptr);
-static bool movieRead(int fileHandle, void* buf, int count);
+static bool movieRead(void* handle, void* buf, int count);
 static void movie_MVE_ShowFrame(SDL_Surface* a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
 static void movieShowFrame(SDL_Surface* a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
 static int movieScaleSubRect(int win, unsigned char* data, int width, int height, int pitch);
@@ -53,6 +53,7 @@ static void doSubtitle();
 static int movieStart(int win, char* filePath, int (*a3)());
 static bool localMovieCallback();
 static int stepMovie();
+static Uint8 movieFindDarkestPaletteIndex(SDL_Surface* indexedSurface);
 
 // 0x505B30
 static int GNWWin = -1;
@@ -246,6 +247,34 @@ static bool movieRead(void* handle, void* buf, int count)
     return db_fread(buf, 1, count, reinterpret_cast<DB_FILE*>(handle)) == count;
 }
 
+static Uint8 movieFindDarkestPaletteIndex(SDL_Surface* indexedSurface)
+{
+    if (indexedSurface == NULL) {
+        return 0;
+    }
+
+    SDL_Palette* palette = SDL_GetSurfacePalette(indexedSurface);
+    if (palette == NULL || palette->ncolors <= 0) {
+        return 0;
+    }
+
+    int darkestIndex = 0;
+    int darkestScore = 0x7fffffff;
+    for (int index = 0; index < palette->ncolors; index++) {
+        const SDL_Color& color = palette->colors[index];
+        int score = color.r + color.g + color.b;
+        if (score < darkestScore) {
+            darkestScore = score;
+            darkestIndex = index;
+            if (score == 0) {
+                break;
+            }
+        }
+    }
+
+    return static_cast<Uint8>(darkestIndex);
+}
+
 // 0x478464
 static void movie_MVE_ShowFrame(SDL_Surface* surface, int srcWidth, int srcHeight, int srcX, int srcY, int destWidth, int destHeight, int a8, int a9)
 {
@@ -312,6 +341,17 @@ static void movie_MVE_ShowFrame(SDL_Surface* surface, int srcWidth, int srcHeigh
             SDL_UnlockSurface(surface);
         }
     }
+
+    SDL_Rect clearRect;
+    clearRect.x = winRect.ulx;
+    clearRect.y = winRect.uly;
+    clearRect.w = winRect.lrx - winRect.ulx + 1;
+    clearRect.h = winRect.lry - winRect.uly + 1;
+
+    // Clear the movie window before each frame so stale loading/menu pixels
+    // cannot leak around centered movie frames.
+    Uint8 clearColorIndex = movieFindDarkestPaletteIndex(gSdlSurface);
+    SDL_FillSurfaceRect(gSdlSurface, &clearRect, clearColorIndex);
 
     SDL_SetSurfacePalette(surface, SDL_GetSurfacePalette(gSdlSurface));
     SDL_BlitSurface(surface, &srcRect, gSdlSurface, &destRect);
@@ -834,6 +874,11 @@ static int movieStart(int win, char* filePath, int (*a3)())
     if ((movieFlags & MOVIE_EXTENDED_FLAG_0x10) != 0) {
         openSubtitle(filePath);
     }
+
+    // Start every movie from a clean window so stale menu/loading pixels do
+    // not flash before the first decoded frame is presented.
+    win_fill(GNWWin, 0, 0, win_width(GNWWin), win_height(GNWWin), 0);
+    win_draw(GNWWin);
 
     if ((movieFlags & MOVIE_EXTENDED_FLAG_0x04) != 0) {
         debug_printf("Direct ");

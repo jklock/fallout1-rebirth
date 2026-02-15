@@ -208,10 +208,61 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     return true;
 #endif
 
-    float rel_x, rel_y;
-    SDL_MouseButtonFlags buttons = SDL_GetRelativeMouseState(&rel_x, &rel_y);
-    mouseState->x = (int)rel_x;
-    mouseState->y = (int)rel_y;
+    SDL_MouseButtonFlags buttons = 0;
+    if (gSdlWindow != NULL && SDL_GetWindowRelativeMouseMode(gSdlWindow)) {
+        float rel_x, rel_y;
+        buttons = SDL_GetRelativeMouseState(&rel_x, &rel_y);
+        mouseState->x = (int)rel_x;
+        mouseState->y = (int)rel_y;
+    } else {
+        float window_x = 0.0f;
+        float window_y = 0.0f;
+        buttons = SDL_GetMouseState(&window_x, &window_y);
+
+        float render_x = window_x;
+        float render_y = window_y;
+        bool converted = false;
+        if (gSdlRenderer != NULL) {
+            converted = SDL_RenderCoordinatesFromWindow(gSdlRenderer, window_x, window_y, &render_x, &render_y);
+        }
+
+        if (!converted && gSdlWindow != NULL) {
+            int window_w = 0;
+            int window_h = 0;
+            int window_pw = 0;
+            int window_ph = 0;
+            SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+            SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+
+            float scale_x = (window_w > 0) ? (float)window_pw / (float)window_w : 1.0f;
+            float scale_y = (window_h > 0) ? (float)window_ph / (float)window_h : 1.0f;
+            render_x = window_x * scale_x;
+            render_y = window_y * scale_y;
+        }
+
+        int mapped_x = (int)render_x;
+        int mapped_y = (int)render_y;
+        int screen_w = screenGetWidth();
+        int screen_h = screenGetHeight();
+        if (screen_w <= 0) {
+            screen_w = 1;
+        }
+        if (screen_h <= 0) {
+            screen_h = 1;
+        }
+
+        if (mapped_x < 0) mapped_x = 0;
+        if (mapped_y < 0) mapped_y = 0;
+        if (mapped_x >= screen_w) mapped_x = screen_w - 1;
+        if (mapped_y >= screen_h) mapped_y = screen_h - 1;
+
+        int game_x = 0;
+        int game_y = 0;
+        mouse_get_position(&game_x, &game_y);
+        mouseState->x = mapped_x - game_x;
+        mouseState->y = mapped_y - game_y;
+    }
+
     mouseState->buttons[0] = (buttons & SDL_BUTTON_LMASK) != 0;
     mouseState->buttons[1] = (buttons & SDL_BUTTON_RMASK) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
@@ -252,13 +303,39 @@ bool dxinput_mouse_init()
 #if defined(__APPLE__) && TARGET_OS_IOS
     return true;
 #else
-    return SDL_SetWindowRelativeMouseMode(gSdlWindow, true);
+    if (gSdlWindow == NULL) {
+        return false;
+    }
+
+    // Windowed mode should not trap the cursor. In fullscreen we still enable
+    // relative mode for consistent cursor movement.
+    const bool fullscreen = (SDL_GetWindowFlags(gSdlWindow) & SDL_WINDOW_FULLSCREEN) != 0;
+
+    if (!SDL_SetWindowMouseGrab(gSdlWindow, fullscreen)) {
+        SDL_Log("dxinput_mouse_init: SDL_SetWindowMouseGrab(%d) failed: %s",
+            fullscreen ? 1 : 0, SDL_GetError());
+    }
+
+    if (!SDL_SetWindowRelativeMouseMode(gSdlWindow, fullscreen)) {
+        SDL_Log("dxinput_mouse_init: SDL_SetWindowRelativeMouseMode(%d) failed: %s",
+            fullscreen ? 1 : 0, SDL_GetError());
+        return false;
+    }
+
+    SDL_Log("dxinput_mouse_init: fullscreen=%d relative_mode=%d", fullscreen ? 1 : 0, fullscreen ? 1 : 0);
+    return true;
 #endif
 }
 
 // 0x4E078C
 void dxinput_mouse_exit()
 {
+#if !defined(__APPLE__) || !TARGET_OS_IOS
+    if (gSdlWindow != NULL) {
+        SDL_SetWindowRelativeMouseMode(gSdlWindow, false);
+        SDL_SetWindowMouseGrab(gSdlWindow, false);
+    }
+#endif
 }
 
 // 0x4E07B8

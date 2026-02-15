@@ -11,6 +11,7 @@
 // Function names and visibility scope are from in OS X binary.
 
 #include <atomic>
+#include <errno.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -148,6 +149,25 @@ int gnw_main(int argc, char** argv)
         }
 
         return load_rc == 0 ? 0 : 3;
+    }
+
+    const char* autorun_movie = getenv("F1R_AUTORUN_MOVIE");
+    if (autorun_movie != NULL && autorun_movie[0] != '\0' && autorun_movie[0] != '0') {
+        errno = 0;
+        char* end = NULL;
+        long movie_index = strtol(autorun_movie, &end, 10);
+        if (errno != 0 || end == autorun_movie || *end != '\0' || movie_index < 0 || movie_index >= MOVIE_COUNT) {
+            main_exit_system();
+            autorun_mutex_destroy();
+            return 4;
+        }
+
+        int movie_flags = GAME_MOVIE_FADE_IN | GAME_MOVIE_PAUSE_MUSIC;
+        int movie_rc = gmovie_play(static_cast<int>(movie_index), movie_flags);
+
+        main_exit_system();
+        autorun_mutex_destroy();
+        return movie_rc == 0 ? 0 : 5;
     }
 
     gmovie_play(MOVIE_IPLOGO, GAME_MOVIE_FADE_IN);

@@ -484,6 +484,13 @@ bool svga_init(VideoOptions* video_options)
     SDL_Log("svga_init: starting with %dx%d (scale=%d)",
         video_options->width, video_options->height, video_options->scale);
 
+    const int outputWidth = video_options->windowWidth > 0
+        ? video_options->windowWidth
+        : video_options->width * video_options->scale;
+    const int outputHeight = video_options->windowHeight > 0
+        ? video_options->windowHeight
+        : video_options->height * video_options->scale;
+
 #if __APPLE__ && TARGET_OS_IOS
     SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
 #endif
@@ -517,28 +524,40 @@ bool svga_init(VideoOptions* video_options)
 // This hides the status bar on iPadOS, which otherwise interferes
 // with the cursor in the top margin of the screen.
 #if __APPLE__ && TARGET_OS_IOS
-    windowFlags |= SDL_WINDOW_BORDERLESS;
-    // On iOS, always use fullscreen to fill the entire screen
-    windowFlags |= SDL_WINDOW_FULLSCREEN;
+    if (video_options->fullscreen) {
+        // Fullscreen on iOS hides chrome and fills the screen.
+        windowFlags |= SDL_WINDOW_BORDERLESS;
+        windowFlags |= SDL_WINDOW_FULLSCREEN;
+    } else {
+        // iPadOS Stage Manager / windowed scenes can dynamically resize this.
+        windowFlags |= SDL_WINDOW_RESIZABLE;
+    }
 #else
+    if (!video_options->fullscreen) {
+        windowFlags |= SDL_WINDOW_RESIZABLE;
+    }
     if (video_options->fullscreen) {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
     }
 #endif
 
     SDL_Log("svga_init: creating window %dx%d flags=0x%x",
-        video_options->width * video_options->scale,
-        video_options->height * video_options->scale,
+        outputWidth,
+        outputHeight,
         (unsigned int)windowFlags);
 
 #if __APPLE__ && TARGET_OS_IOS
-    // On iOS, create window with 0x0 dimensions to let fullscreen determine size
-    // This ensures the window fills the entire screen regardless of device
-    gSdlWindow = SDL_CreateWindow(GNW95_title, 0, 0, windowFlags);
+    if (video_options->fullscreen) {
+        // Let fullscreen determine scene size.
+        gSdlWindow = SDL_CreateWindow(GNW95_title, 0, 0, windowFlags);
+    } else {
+        // Respect configured output size when not fullscreen.
+        gSdlWindow = SDL_CreateWindow(GNW95_title, outputWidth, outputHeight, windowFlags);
+    }
 #else
     gSdlWindow = SDL_CreateWindow(GNW95_title,
-        video_options->width * video_options->scale,
-        video_options->height * video_options->scale,
+        outputWidth,
+        outputHeight,
         windowFlags);
 #endif
     if (gSdlWindow == NULL) {
@@ -711,9 +730,8 @@ static bool createRenderer(int width, int height)
     }
 
 #if !(__APPLE__ && TARGET_OS_IOS)
-    // On iOS, we use custom destination rect instead of logical presentation
-    // to have better control over fullscreen scaling.
-    if (!SDL_SetRenderLogicalPresentation(gSdlRenderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
+    // macOS should always fill the active window/fullscreen drawable area.
+    if (!SDL_SetRenderLogicalPresentation(gSdlRenderer, width, height, SDL_LOGICAL_PRESENTATION_STRETCH)) {
         SDL_Log("createRenderer: SDL_SetRenderLogicalPresentation failed: %s", SDL_GetError());
         if (!gHeadlessVideo) {
             return false;

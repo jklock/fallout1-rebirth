@@ -17,6 +17,8 @@ typedef void(ScreenBlitFunc)(unsigned char* srcBuf, unsigned int srcW, unsigned 
 typedef struct VideoOptions {
     int width;
     int height;
+    int windowWidth;
+    int windowHeight;
     bool fullscreen;
     int scale;
     bool exclusive;

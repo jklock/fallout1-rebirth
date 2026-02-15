@@ -1,7 +1,12 @@
 #include "game/game.h"
 
+#include <algorithm>
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <unistd.h>
 
 #include "game/actions.h"
 #include "game/anim.h"
@@ -157,21 +162,62 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
     VideoOptions video_options;
     video_options.width = 640;
     video_options.height = 480;
+    video_options.windowWidth = 640;
+    video_options.windowHeight = 480;
     video_options.fullscreen = true;
     video_options.scale = 1;
     video_options.exclusive = 1;
+    int requestedWidth = video_options.width;
+    int requestedHeight = video_options.height;
+    bool resolutionConfigLoaded = false;
+    std::string resolutionConfigPath;
 
     Config resolutionConfig;
     if (config_init(&resolutionConfig)) {
-        if (config_load(&resolutionConfig, "f1_res.ini", false)) {
+        auto tryLoadResolutionConfig = [&](const char* path) {
+            if (path == nullptr || path[0] == '\0') {
+                return false;
+            }
+
+            if (config_load(&resolutionConfig, path, false)) {
+                resolutionConfigPath = path;
+                return true;
+            }
+
+            return false;
+        };
+
+        bool loaded = tryLoadResolutionConfig("f1_res.ini");
+
+        if (!loaded && argc > 0 && argv != nullptr && argv[0] != nullptr) {
+            char resolvedArgvPath[PATH_MAX];
+            const char* executablePath = argv[0];
+            if (realpath(argv[0], resolvedArgvPath) != nullptr) {
+                executablePath = resolvedArgvPath;
+            }
+
+            std::string executableDir(executablePath);
+            size_t separatorPos = executableDir.find_last_of("/\\");
+            if (separatorPos != std::string::npos) {
+                executableDir = executableDir.substr(0, separatorPos + 1);
+                loaded = tryLoadResolutionConfig((executableDir + "../Resources/f1_res.ini").c_str());
+
+                if (!loaded) {
+                    loaded = tryLoadResolutionConfig((executableDir + "f1_res.ini").c_str());
+                }
+            }
+        }
+
+        if (loaded) {
+            resolutionConfigLoaded = true;
             int screenWidth;
             if (config_get_value(&resolutionConfig, "MAIN", "SCR_WIDTH", &screenWidth)) {
-                video_options.width = std::max(screenWidth, 640);
+                requestedWidth = std::max(screenWidth, 640);
             }
 
             int screenHeight;
             if (config_get_value(&resolutionConfig, "MAIN", "SCR_HEIGHT", &screenHeight)) {
-                video_options.height = std::max(screenHeight, 480);
+                requestedHeight = std::max(screenHeight, 480);
             }
 
             bool windowed;
@@ -186,16 +232,42 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
 
             int scaleValue;
             if (config_get_value(&resolutionConfig, "MAIN", "SCALE_2X", &scaleValue)) {
-                video_options.scale = scaleValue + 1;
-                video_options.width /= video_options.scale;
-                video_options.height /= video_options.scale;
-
-                // Keep logical surface large enough for 640px-wide interface assets.
-                video_options.width = std::max(video_options.width, 640);
-                video_options.height = std::max(video_options.height, 480);
+                video_options.scale = std::clamp(scaleValue, 0, 1) + 1;
             }
         }
         config_exit(&resolutionConfig);
+    }
+
+    int logicalWidth = requestedWidth;
+    int logicalHeight = requestedHeight;
+
+    if (video_options.scale > 1) {
+        logicalWidth = requestedWidth / video_options.scale;
+        logicalHeight = requestedHeight / video_options.scale;
+    }
+
+    // Keep logical surface large enough for 640x480 interface assets.
+    video_options.width = std::max(logicalWidth, 640);
+    video_options.height = std::max(logicalHeight, 480);
+    video_options.windowWidth = requestedWidth;
+    video_options.windowHeight = requestedHeight;
+
+    if (rme_log_topic_enabled("config")) {
+        const bool f1ResExists = access("f1_res.ini", R_OK) == 0;
+        rme_logf("config",
+            "f1_res.ini cwd_exists=%d loaded=%d path=%s requested=%dx%d logical=%dx%d scale=%d output=%dx%d fullscreen=%d exclusive=%d",
+            f1ResExists ? 1 : 0,
+            resolutionConfigLoaded ? 1 : 0,
+            resolutionConfigPath.empty() ? "(none)" : resolutionConfigPath.c_str(),
+            requestedWidth,
+            requestedHeight,
+            video_options.width,
+            video_options.height,
+            video_options.scale,
+            video_options.windowWidth,
+            video_options.windowHeight,
+            video_options.fullscreen ? 1 : 0,
+            video_options.exclusive);
     }
 
     initWindow(&video_options, flags);
@@ -1349,6 +1421,16 @@ static void game_splash_screen()
     }
 
     palette_set_to(black_palette);
+    // Ensure the entire backbuffer is truly black before centering splash art.
+    if (gSdlSurface != NULL) {
+        SDL_FillSurfaceRect(gSdlSurface, NULL, 0);
+    }
+    if (gSdlTextureSurface != NULL) {
+        Uint32 rgbBlack = SDL_MapSurfaceRGB(gSdlTextureSurface, 0, 0, 0);
+        SDL_FillSurfaceRect(gSdlTextureSurface, NULL, rgbBlack);
+        renderPresent();
+    }
+
     db_fseek(stream, 10, SEEK_SET);
     db_fread(palette, 1, 768, stream);
     db_fread(data, 1, SPLASH_WIDTH * SPLASH_HEIGHT, stream);

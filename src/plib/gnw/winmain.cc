@@ -31,6 +31,9 @@ void rme_logf(const char* topic, const char* fmt, ...);
 #if __APPLE__ && TARGET_OS_IOS
 #include "platform/ios/paths.h"
 #endif
+#if __APPLE__ && TARGET_OS_OSX
+#include <mach-o/dyld.h>
+#endif
 
 namespace fallout {
 
@@ -116,116 +119,186 @@ int main(int argc, char* argv[])
             if (rme_log_topic_enabled("config")) {
                 rme_logf("config", "SDL base path=%s", basePath != NULL ? basePath : "(null)");
             }
-            if (basePath != NULL) {
-                std::string workingDir(basePath);
-                std::string macosPath;
-                std::string resourcesPath;
-                bool haveAppRoot = false;
+            std::string workingDir;
+            std::string appRoot;
+            std::string macosPath;
+            std::string resourcesPath;
+            bool haveAppRoot = false;
 
-                const char resourcesMarker[] = "/Contents/Resources/";
-                const char macosMarker[] = "/Contents/MacOS/";
-                const char* resources = strstr(basePath, resourcesMarker);
-                const char* macos = strstr(basePath, macosMarker);
+            auto withTrailingSlash = [](std::string path) {
+                if (!path.empty() && path.back() != '/') {
+                    path.push_back('/');
+                }
+                return path;
+            };
 
-                if (resources != NULL || macos != NULL) {
-                    std::string appRoot;
+            auto extractAppRoot = [&](const std::string& rawPath) -> bool {
+                if (rawPath.empty()) {
+                    return false;
+                }
 
-                    if (resources != NULL) {
-                        appRoot.assign(basePath, resources - basePath);
-                    } else {
-                        appRoot.assign(basePath, macos - basePath);
-                    }
+                const char* markers[] = {
+                    "/Contents/MacOS/",
+                    "/Contents/MacOS",
+                    "/Contents/Resources/",
+                    "/Contents/Resources",
+                };
 
-                    macosPath = appRoot + "/Contents/MacOS/";
-                    resourcesPath = appRoot + "/Contents/Resources/";
-                    haveAppRoot = true;
-
-                    auto pathExists = [](const std::string& path) {
-                        return access(path.c_str(), R_OK) == 0;
-                    };
-
-                    auto findWithExtension = [](const std::string& dir, const char* ext) {
-                        DIR* d = opendir(dir.c_str());
-                        if (d == NULL) {
-                            return std::string();
-                        }
-
-                        std::string found;
-                        struct dirent* ent;
-                        const size_t extLen = strlen(ext);
-                        while ((ent = readdir(d)) != NULL) {
-                            if (ent->d_name[0] == '.') {
-                                continue;
-                            }
-
-                            std::string name(ent->d_name);
-                            if (name.size() >= extLen && name.rfind(ext) == name.size() - extLen) {
-                                found = name;
-                                break;
-                            }
-                        }
-
-                        closedir(d);
-                        return found;
-                    };
-
-                    std::string parentDir;
-                    size_t sep = appRoot.find_last_of('/');
-                    if (sep != std::string::npos) {
-                        parentDir = appRoot.substr(0, sep + 1);
-                    }
-
-                    const std::string candidates[] = { macosPath, resourcesPath, parentDir };
-                    for (const auto& candidate : candidates) {
-                        if (!candidate.empty() && hasGameFiles(candidate)) {
-                            workingDir = candidate;
-                            break;
-                        }
-                    }
-
-                    if (rme_log_topic_enabled("config")) {
-                        for (const auto& candidate : candidates) {
-                            if (candidate.empty()) {
-                                continue;
-                            }
-
-                            const bool cfg_present = access((candidate + "fallout.cfg").c_str(), R_OK) == 0;
-                            const bool master_present = access((candidate + "master.dat").c_str(), R_OK) == 0;
-                            const bool critter_present = access((candidate + "critter.dat").c_str(), R_OK) == 0;
-                            const bool data_present = access((candidate + "data").c_str(), R_OK) == 0;
-
-                            rme_logf("config",
-                                "startup candidate=%s cfg=%d master.dat=%d critter.dat=%d data_dir=%d",
-                                candidate.c_str(),
-                                cfg_present ? 1 : 0,
-                                master_present ? 1 : 0,
-                                critter_present ? 1 : 0,
-                                data_present ? 1 : 0);
-                        }
-
-                        const bool info_plist = access((appRoot + "/Contents/Info.plist").c_str(), R_OK) == 0;
-                        const bool macos_dir = access(macosPath.c_str(), R_OK) == 0;
-                        const bool resources_dir = access(resourcesPath.c_str(), R_OK) == 0;
-                        const bool macos_data = pathExists(macosPath + "data");
-                        const bool resources_data = pathExists(resourcesPath + "data");
-                        std::string icns = findWithExtension(resourcesPath, ".icns");
-                        std::string storyboard = findWithExtension(resourcesPath, ".storyboardc");
-                        if (storyboard.empty()) {
-                            storyboard = findWithExtension(resourcesPath, ".storyboard");
-                        }
-                        rme_logf("config",
-                            "bundle probe appRoot=%s info_plist=%d macos_dir=%d resources_dir=%d macos_data=%d resources_data=%d icns=%s storyboard=%s",
-                            appRoot.c_str(),
-                            info_plist ? 1 : 0,
-                            macos_dir ? 1 : 0,
-                            resources_dir ? 1 : 0,
-                            macos_data ? 1 : 0,
-                            resources_data ? 1 : 0,
-                            icns.empty() ? "(none)" : icns.c_str(),
-                            storyboard.empty() ? "(none)" : storyboard.c_str());
+                size_t markerPos = std::string::npos;
+                for (const char* marker : markers) {
+                    size_t pos = rawPath.find(marker);
+                    if (pos != std::string::npos) {
+                        markerPos = pos;
+                        break;
                     }
                 }
 
+                if (markerPos == std::string::npos) {
+                    return false;
+                }
+
+                appRoot = rawPath.substr(0, markerPos);
+                if (appRoot.empty()) {
+                    return false;
+                }
+
+                macosPath = appRoot + "/Contents/MacOS/";
+                resourcesPath = appRoot + "/Contents/Resources/";
+                haveAppRoot = true;
+                return true;
+            };
+
+            if (basePath != NULL) {
+                workingDir = withTrailingSlash(basePath);
+                extractAppRoot(workingDir);
+            }
+
+            // SDL base path can resolve to /Applications/ in some launch modes.
+            // Fall back to the actual executable path to recover the app root.
+            if (!haveAppRoot) {
+                uint32_t exePathSize = PATH_MAX;
+                char exePath[PATH_MAX];
+                if (_NSGetExecutablePath(exePath, &exePathSize) == 0) {
+                    char resolvedExePath[PATH_MAX];
+                    const char* probe = exePath;
+                    if (realpath(exePath, resolvedExePath) != NULL) {
+                        probe = resolvedExePath;
+                    }
+                    extractAppRoot(probe);
+                    if (rme_log_topic_enabled("config")) {
+                        rme_logf("config", "bundle probe executable path=%s", probe);
+                    }
+                }
+            }
+
+            if (!haveAppRoot && argc > 0 && argv != NULL && argv[0] != NULL) {
+                char resolvedArgvPath[PATH_MAX];
+                const char* probe = argv[0];
+                if (realpath(argv[0], resolvedArgvPath) != NULL) {
+                    probe = resolvedArgvPath;
+                }
+                extractAppRoot(probe);
+                if (rme_log_topic_enabled("config")) {
+                    rme_logf("config", "bundle probe argv0 path=%s", probe);
+                }
+            }
+
+            auto pathExists = [](const std::string& path) {
+                return access(path.c_str(), R_OK) == 0;
+            };
+
+            auto findWithExtension = [](const std::string& dir, const char* ext) {
+                DIR* d = opendir(dir.c_str());
+                if (d == NULL) {
+                    return std::string();
+                }
+
+                std::string found;
+                struct dirent* ent;
+                const size_t extLen = strlen(ext);
+                while ((ent = readdir(d)) != NULL) {
+                    if (ent->d_name[0] == '.') {
+                        continue;
+                    }
+
+                    std::string name(ent->d_name);
+                    if (name.size() >= extLen && name.rfind(ext) == name.size() - extLen) {
+                        found = name;
+                        break;
+                    }
+                }
+
+                closedir(d);
+                return found;
+            };
+
+            if (haveAppRoot) {
+                std::string parentDir;
+                size_t sep = appRoot.find_last_of('/');
+                if (sep != std::string::npos) {
+                    parentDir = appRoot.substr(0, sep + 1);
+                }
+
+                const std::string candidates[] = { macosPath, resourcesPath, parentDir };
+                for (const auto& candidate : candidates) {
+                    if (!candidate.empty() && hasGameFiles(candidate)) {
+                        workingDir = candidate;
+                        break;
+                    }
+                }
+
+                if (!workingDir.empty() && !hasGameFiles(workingDir)) {
+                    // Prefer app bundle Resources when present so fallout.cfg/f1_res.ini
+                    // and game payload copied there are visible at startup.
+                    if (pathExists(resourcesPath)) {
+                        workingDir = resourcesPath;
+                    }
+                }
+
+                if (rme_log_topic_enabled("config")) {
+                    for (const auto& candidate : candidates) {
+                        if (candidate.empty()) {
+                            continue;
+                        }
+
+                        const bool cfg_present = access((candidate + "fallout.cfg").c_str(), R_OK) == 0;
+                        const bool master_present = access((candidate + "master.dat").c_str(), R_OK) == 0;
+                        const bool critter_present = access((candidate + "critter.dat").c_str(), R_OK) == 0;
+                        const bool data_present = access((candidate + "data").c_str(), R_OK) == 0;
+
+                        rme_logf("config",
+                            "startup candidate=%s cfg=%d master.dat=%d critter.dat=%d data_dir=%d",
+                            candidate.c_str(),
+                            cfg_present ? 1 : 0,
+                            master_present ? 1 : 0,
+                            critter_present ? 1 : 0,
+                            data_present ? 1 : 0);
+                    }
+
+                    const bool info_plist = access((appRoot + "/Contents/Info.plist").c_str(), R_OK) == 0;
+                    const bool macos_dir = access(macosPath.c_str(), R_OK) == 0;
+                    const bool resources_dir = access(resourcesPath.c_str(), R_OK) == 0;
+                    const bool macos_data = pathExists(macosPath + "data");
+                    const bool resources_data = pathExists(resourcesPath + "data");
+                    std::string icns = findWithExtension(resourcesPath, ".icns");
+                    std::string storyboard = findWithExtension(resourcesPath, ".storyboardc");
+                    if (storyboard.empty()) {
+                        storyboard = findWithExtension(resourcesPath, ".storyboard");
+                    }
+                    rme_logf("config",
+                        "bundle probe appRoot=%s info_plist=%d macos_dir=%d resources_dir=%d macos_data=%d resources_data=%d icns=%s storyboard=%s",
+                        appRoot.c_str(),
+                        info_plist ? 1 : 0,
+                        macos_dir ? 1 : 0,
+                        resources_dir ? 1 : 0,
+                        macos_data ? 1 : 0,
+                        resources_data ? 1 : 0,
+                        icns.empty() ? "(none)" : icns.c_str(),
+                        storyboard.empty() ? "(none)" : storyboard.c_str());
+                }
+            }
+
+            if (!workingDir.empty()) {
                 chdir(workingDir.c_str());
                 if (rme_log_topic_enabled("config")) {
                     const bool chosen_has_data = access((workingDir + "data").c_str(), R_OK) == 0;
@@ -239,11 +312,11 @@ int main(int argc, char* argv[])
                             resources_has_data ? 1 : 0);
                     }
                 }
-                // SDL3 returns a cached `const char*` here; do NOT free it —
-                // SDL_filesystem maintains an internal cache and will free it at
-                // SDL_QuitFilesystem(). Freeing it here would lead to a double-free.
-                /* intentionally not freeing `basePath` */
             }
+            // SDL3 returns a cached `const char*` here; do NOT free it —
+            // SDL_filesystem maintains an internal cache and will free it at
+            // SDL_QuitFilesystem(). Freeing it here would lead to a double-free.
+            /* intentionally not freeing `basePath` */
         }
     }
 #endif

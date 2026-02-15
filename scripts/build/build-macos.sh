@@ -33,6 +33,7 @@ JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 CLEAN="${CLEAN:-0}"
 GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+RELEASE_DIR="${RELEASE_DIR:-$ROOT_DIR/releases/prod/macOS}"
 
 LOGGING_FLAG_RAW="${F1R_DISABLE_RME_LOGGING:-0}"
 LOGGING_FLAG_UPPER="$(printf '%s' "$LOGGING_FLAG_RAW" | tr '[:lower:]' '[:upper:]')"
@@ -164,6 +165,15 @@ if [[ "$MODE" == "test" ]]; then
     resolve_game_data
     log_info "Embedding test payload from $GAME_DATA"
     "$ROOT_DIR/scripts/build/build-install-game-data.sh" --source "$GAME_DATA" --target "$APP_PATH"
+fi
+
+if [[ "$MODE" == "prod" ]]; then
+    release_app="$RELEASE_DIR/$(basename "$APP_PATH")"
+    log_info "Staging production app bundle to $release_app"
+    mkdir -p "$RELEASE_DIR"
+    rm -rf "$release_app"
+    ditto "$APP_PATH" "$release_app"
+    log_ok "Staged production app bundle: $release_app"
 fi
 
 echo ""

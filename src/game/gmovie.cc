@@ -1,6 +1,7 @@
 #include "game/gmovie.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "game/cycle.h"
@@ -187,6 +188,37 @@ int gmovie_play(int game_movie, int game_movie_flags)
         mouse_show();
     }
 
+    bool autoScreenshotEnabled = false;
+    int autoScreenshotDelayMs = 750;
+    bool autoStopAfterScreenshot = true;
+    bool autorunMovieMode = false;
+
+    const char* autoScreenshotEnv = getenv("F1R_AUTOSCREENSHOT");
+    if (autoScreenshotEnv != NULL && autoScreenshotEnv[0] != '\0' && strcmp(autoScreenshotEnv, "0") != 0) {
+        autoScreenshotEnabled = true;
+    }
+
+    const char* autorunMovieEnv = getenv("F1R_AUTORUN_MOVIE");
+    if (autorunMovieEnv != NULL && autorunMovieEnv[0] != '\0' && strcmp(autorunMovieEnv, "0") != 0) {
+        autorunMovieMode = true;
+    }
+
+    const char* autoScreenshotDelayEnv = getenv("F1R_AUTOSCREENSHOT_DELAY_MS");
+    if (autoScreenshotDelayEnv != NULL && autoScreenshotDelayEnv[0] != '\0') {
+        int parsed = atoi(autoScreenshotDelayEnv);
+        if (parsed >= 0) {
+            autoScreenshotDelayMs = parsed;
+        }
+    }
+
+    const char* autoStopEnv = getenv("F1R_AUTOSTOP_AFTER_SHOT");
+    if (autoStopEnv != NULL && autoStopEnv[0] != '\0') {
+        autoStopAfterScreenshot = strcmp(autoStopEnv, "0") != 0;
+    }
+
+    unsigned int movieStartTicks = get_time();
+    bool screenshotTaken = false;
+
     while (mouse_get_buttons() != 0) {
         mouse_info();
     }
@@ -201,8 +233,20 @@ int gmovie_play(int game_movie, int game_movie_flags)
     int v11 = 0;
     int buttons;
     do {
-        if (!moviePlaying() || game_user_wants_to_quit || get_input() != -1) {
+        int inputCode = get_input();
+        if (!moviePlaying() || game_user_wants_to_quit || (!autorunMovieMode && inputCode != -1)) {
             break;
+        }
+
+        if (autoScreenshotEnabled && !screenshotTaken) {
+            unsigned int now = get_time();
+            if (elapsed_tocks(now, movieStartTicks) >= static_cast<unsigned int>(autoScreenshotDelayMs)) {
+                dump_screen();
+                screenshotTaken = true;
+                if (autoStopAfterScreenshot) {
+                    movieStop();
+                }
+            }
         }
 
         Gesture gesture;
