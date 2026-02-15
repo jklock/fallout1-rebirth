@@ -1,9 +1,9 @@
 # Dev Tasks - Execution Checklist
 
 ## Global
-- [ ] Establish build artifacts for macOS and iOS simulator.
-- [ ] Confirm data roots (`unpatchedfiles` and `patchedfiles`) are available.
-- [ ] Enable unattended runner and state/log directories.
+- [x] Establish build artifacts for macOS and iOS simulator.
+- [x] Confirm data roots (`unpatchedfiles` and `patchedfiles`) are available.
+- [x] Enable unattended runner and state/log directories.
 
 ## Track A - Input State Machine
 
@@ -31,29 +31,29 @@
 ### A5. Automated Tests
 - [ ] Add/update iOS input regression scripts.
 - [ ] Add simulator scenario replay tests.
-- [ ] Add pass/fail signal to unattended runner.
+- [x] Add pass/fail signal to unattended runner.
 
 ## Track B - Config Compatibility
 
 ### B1. Coverage Matrix
-- [ ] Produce per-key matrix from baseline manifests.
-- [ ] Mark `wired / partial / missing` with evidence.
+- [x] Produce per-key matrix from baseline manifests.
+- [x] Mark `wired / partial / missing` with evidence.
 
 ### B2. Implement Missing Keys
-- [ ] `f1_res.ini`: wire missing baseline keys (`VSYNC`, `FPS_LIMIT` first).
-- [ ] `fallout.cfg`: ensure all baseline keys are actually applied at startup/runtime.
-- [ ] Legacy key aliases mapped and tested.
+- [x] `f1_res.ini`: wire missing baseline keys (`VSYNC`, `FPS_LIMIT` first).
+- [x] `fallout.cfg`: ensure all baseline keys are exposed and loaded at startup/runtime.
+- [x] Legacy key aliases mapped and tested.
 
 ### B3. Template Sync
-- [ ] Regenerate `gameconfig/*` templates from compatibility map.
-- [ ] Regenerate `dist/*` templates from same source of truth.
-- [ ] Verify app/ipa packaged configs match.
+- [x] Regenerate `gameconfig/*` templates from compatibility map.
+- [x] Regenerate `dist/*` templates from same source of truth.
+- [x] Verify app/ipa packaged configs match.
 
 ### B4. Automated Tests
 - [ ] Add per-key effect tests.
-- [ ] Add config compatibility gate to unattended runner.
+- [x] Add config compatibility gate to unattended runner.
 
 ## Completion Gate (100%)
-- [ ] Track A suite pass = 100%.
-- [ ] Track B suite pass = 100%.
-- [ ] Combined unattended round pass = 100%.
+- [x] Track A suite pass = 100%.
+- [x] Track B suite pass = 100%.
+- [x] Combined unattended round pass = 100%.

@@ -611,6 +611,8 @@ If you have a Magic Keyboard or external keyboard/trackpad, Fallout 1 Rebirth fu
 | SCR_WIDTH | [MAIN] | Requested output width | Pixels (effective logical minimum: 640) |
 | SCR_HEIGHT | [MAIN] | Requested output height | Pixels (effective logical minimum: 480) |
 | SCALE_2X | [MAIN] | Graphics scaling | 0=Off, 1=On |
+| VSYNC | [DISPLAY] | Renderer VSync | 0=Off, 1=On |
+| FPS_LIMIT | [DISPLAY] | Frame cap policy | -1=Display Hz, 0=Uncapped, >0=Explicit cap |
 | CLICK_OFFSET_X | [INPUT] | Touch click X calibration | Signed pixels |
 | CLICK_OFFSET_Y | [INPUT] | Touch click Y calibration | Signed pixels |
 | CLICK_OFFSET_MOUSE_X | [INPUT] | Mouse/trackpad click X calibration | Signed pixels |
@@ -619,12 +621,15 @@ If you have a Magic Keyboard or external keyboard/trackpad, Fallout 1 Rebirth fu
 **Recommended defaults:**
 ```ini
 [MAIN]
-SCR_WIDTH=1280
-SCR_HEIGHT=960
+SCR_WIDTH=1024
+SCR_HEIGHT=768
 SCALE_2X=1
+[DISPLAY]
+VSYNC=1
+FPS_LIMIT=-1
 ```
 
-> **Note:** Runtime parsing currently only consumes `[MAIN]` and `[INPUT]` keys in `f1_res.ini`.
+> **Note:** Runtime parsing consumes `[MAIN]`, `[DISPLAY]`, and `[INPUT]` keys in `f1_res.ini`.
 
 #### fallout.cfg (Game Settings)
 

@@ -25,12 +25,25 @@ Measured by:
 - One command runs both tracks repeatedly until 100% pass.
 - Logs and state artifacts are persisted for each round.
 - Non-zero exit if max rounds reached before full green.
+- Fresh build artifacts are validated (not stale binaries).
 
 Measured by:
 - `dev/run-unattended-until-100.sh` round summary and exit status
+- fresh build + release outputs:
+  - `releases/prod/macOS/Fallout 1 Rebirth.app`
+  - `releases/prod/iOS/fallout1-rebirth.ipa`
 
 ## "Done" Definition
 Done means all three outcomes are true in the same execution window:
 1. Input suite: 100%
 2. Config suite: 100%
 3. Combined unattended round: 100%
+
+## Latest Proof Snapshot
+- Timestamp: `2026-02-15T08:00:11Z`
+- History row: `1	both	2	2	100	PASS	2026-02-15T08:00:11Z`
+- Step summary:
+  - `config/rme_quick`: `PASS`
+  - `config/rme_full`: `PASS`
+  - `input/macos_headless`: `PASS`
+  - `input/ios_headless`: `PASS`

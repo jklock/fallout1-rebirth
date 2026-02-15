@@ -104,6 +104,15 @@ require_cmd() {
 require_cmd python3
 require_cmd xdelta3
 
+sync_platform_configs() {
+    if [[ ! -f "$CONFIG_DIR/fallout.cfg" || ! -f "$CONFIG_DIR/f1_res.ini" ]]; then
+        echo "[ERROR] Config dir missing fallout.cfg or f1_res.ini: $CONFIG_DIR" >&2
+        exit 2
+    fi
+    cp "$CONFIG_DIR/fallout.cfg" "$PATCHED_DIR/fallout.cfg"
+    cp "$CONFIG_DIR/f1_res.ini" "$PATCHED_DIR/f1_res.ini"
+}
+
 log "Audit runtime config surface and platform defaults"
 python3 "$ROOT/scripts/test/test-rme-config-surface.py"
 
@@ -124,6 +133,9 @@ if [[ ! -d "$PATCHED_DIR" || "$REBUILD_PATCHED" == "1" ]]; then
     fi
     "$ROOT/scripts/patch/patch-rebirth-data.sh" "${args[@]}"
 fi
+
+log "Sync platform config templates into patched payload"
+sync_platform_configs
 
 log "Ensure patched payload completeness"
 "$ROOT/scripts/test/test-rme-ensure-patched-data.sh" --patched-dir "$PATCHED_DIR" --quiet

@@ -167,6 +167,8 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
     video_options.fullscreen = true;
     video_options.scale = 1;
     video_options.exclusive = 1;
+    int displayVsync = 1;
+    int displayFpsLimit = -1;
     int requestedWidth = video_options.width;
     int requestedHeight = video_options.height;
     bool resolutionConfigLoaded = false;
@@ -234,9 +236,22 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
             if (config_get_value(&resolutionConfig, "MAIN", "SCALE_2X", &scaleValue)) {
                 video_options.scale = std::clamp(scaleValue, 0, 1) + 1;
             }
+
+            int vsyncValue;
+            if (config_get_value(&resolutionConfig, "DISPLAY", "VSYNC", &vsyncValue)) {
+                displayVsync = vsyncValue != 0 ? 1 : 0;
+            }
+
+            int fpsLimitValue;
+            if (config_get_value(&resolutionConfig, "DISPLAY", "FPS_LIMIT", &fpsLimitValue)) {
+                displayFpsLimit = std::max(-1, fpsLimitValue);
+            }
         }
         config_exit(&resolutionConfig);
     }
+
+    svga_set_vsync(displayVsync != 0);
+    svga_set_fps_limit(displayFpsLimit);
 
     int logicalWidth = requestedWidth;
     int logicalHeight = requestedHeight;
@@ -255,7 +270,7 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
     if (rme_log_topic_enabled("config")) {
         const bool f1ResExists = access("f1_res.ini", R_OK) == 0;
         rme_logf("config",
-            "f1_res.ini cwd_exists=%d loaded=%d path=%s requested=%dx%d logical=%dx%d scale=%d output=%dx%d fullscreen=%d exclusive=%d",
+            "f1_res.ini cwd_exists=%d loaded=%d path=%s requested=%dx%d logical=%dx%d scale=%d output=%dx%d fullscreen=%d exclusive=%d vsync=%d fps_limit=%d",
             f1ResExists ? 1 : 0,
             resolutionConfigLoaded ? 1 : 0,
             resolutionConfigPath.empty() ? "(none)" : resolutionConfigPath.c_str(),
@@ -267,7 +282,9 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
             video_options.windowWidth,
             video_options.windowHeight,
             video_options.fullscreen ? 1 : 0,
-            video_options.exclusive);
+            video_options.exclusive,
+            displayVsync,
+            displayFpsLimit);
     }
 
     initWindow(&video_options, flags);

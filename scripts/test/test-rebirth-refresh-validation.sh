@@ -183,7 +183,8 @@ master_added = sorted(p_master - u_master, key=lambda s: s.upper())
 critter_added = sorted(p_critter - u_critter, key=lambda s: s.upper())
 
 def write_list(path: Path, items):
-    path.write_text("\n".join(items) + ("\n" if items else ""), encoding="utf-8", newline="\n")
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write("\n".join(items) + ("\n" if items else ""))
 
 write_list(out_dir / "unpatched_master_files.txt", sorted(u_master, key=lambda s: s.upper()))
 write_list(out_dir / "unpatched_critter_files.txt", sorted(u_critter, key=lambda s: s.upper()))
@@ -204,7 +205,8 @@ def write_counts(path: Path, counts: Counter):
     lines = []
     for ext, n in counts.most_common():
         lines.append(f"{n:4d} {ext}")
-    path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8", newline="\n")
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write("\n".join(lines) + ("\n" if lines else ""))
 
 write_counts(out_dir / "master_added_ext_counts.txt", ext_counts(master_added))
 write_counts(out_dir / "critter_added_ext_counts.txt", ext_counts(critter_added))
@@ -221,7 +223,8 @@ counts_txt.append(f"unpatched: critter.dat override count= {count_source(u, 'cri
 counts_txt.append(f"patched: new files (base_source=none)= {count_source(p, 'none')}")
 counts_txt.append(f"patched: master.dat override count= {count_source(p, 'master.dat')}")
 counts_txt.append(f"patched: critter.dat override count= {count_source(p, 'critter.dat')}")
-(raw_dir / "06_rme_crossref_counts.txt").write_text("\n".join(counts_txt) + "\n", encoding="utf-8", newline="\n")
+with (raw_dir / "06_rme_crossref_counts.txt").open("w", encoding="utf-8", newline="\n") as handle:
+    handle.write("\n".join(counts_txt) + "\n")
 
 PYCODE
 

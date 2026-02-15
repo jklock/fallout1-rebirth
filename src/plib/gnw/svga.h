@@ -29,6 +29,8 @@ int screenGetWidth();
 int screenGetHeight();
 bool handleWindowSizeChanged();
 void renderPresent();
+void svga_set_vsync(bool enabled);
+void svga_set_fps_limit(int fps_limit);
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>

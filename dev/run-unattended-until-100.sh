@@ -94,6 +94,11 @@ run_step() {
   fi
 
   set +e
+  BASE_DIR="$BASE_DIR" \
+  UNPATCHED_DIR="$BASE_DIR" \
+  PATCHED_DIR="$PATCHED_DIR" \
+  GAME_DATA="$PATCHED_DIR" \
+  FALLOUT_GAMEFILES_ROOT="${GAMEFILES_ROOT:-}" \
   bash -lc "$cmd" >"$step_log" 2>&1
   rc=$?
   set -e
@@ -234,4 +239,3 @@ while true; do
   echo "Sleeping ${SLEEP_BETWEEN_ROUNDS}s before next round..."
   sleep "$SLEEP_BETWEEN_ROUNDS"
 done
-

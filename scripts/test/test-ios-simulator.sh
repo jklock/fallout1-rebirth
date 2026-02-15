@@ -42,6 +42,7 @@ GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 BUILD_DIR="${BUILD_DIR:-build-ios-sim}"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
+IOS_CONFIG_DIR="$ROOT_DIR/gameconfig/ios"
 
 # iOS Simulator output directory suffix
 SIM_SUFFIX="iphonesimulator"
@@ -306,8 +307,10 @@ copy_game_data() {
     fi
     
     # Copy or create fallout.cfg
-    if [[ -f "$GAME_DATA/fallout.cfg" ]]; then
-        cp -v "$GAME_DATA/fallout.cfg" "$target_dir/"
+    if [[ -f "$IOS_CONFIG_DIR/fallout.cfg" ]]; then
+        cp -v "$IOS_CONFIG_DIR/fallout.cfg" "$target_dir/fallout.cfg"
+    elif [[ -f "$GAME_DATA/fallout.cfg" ]]; then
+        cp -v "$GAME_DATA/fallout.cfg" "$target_dir/fallout.cfg"
     else
         # Create minimal config pointing to the right paths
         log_info "Creating fallout.cfg..."
@@ -321,8 +324,10 @@ EOF
     fi
     
     # Copy f1_res.ini (display and input settings)
-    if [[ -f "$GAME_DATA/f1_res.ini" ]]; then
-        cp -v "$GAME_DATA/f1_res.ini" "$target_dir/"
+    if [[ -f "$IOS_CONFIG_DIR/f1_res.ini" ]]; then
+        cp -v "$IOS_CONFIG_DIR/f1_res.ini" "$target_dir/f1_res.ini"
+    elif [[ -f "$GAME_DATA/f1_res.ini" ]]; then
+        cp -v "$GAME_DATA/f1_res.ini" "$target_dir/f1_res.ini"
     fi
     
     log_ok "Game data copied to Documents folder"

@@ -132,6 +132,8 @@ static void iOS_updateDestRect()
 
 // TODO: Remove once migration to update-render cycle is completed.
 FpsLimiter sharedFpsLimiter;
+static bool gRenderVsync = true;
+static int gRenderFpsLimit = -1;
 
 // 0x4CB310
 void GNW95_SetPaletteEntries(unsigned char* palette, int start, int count)
@@ -705,6 +707,16 @@ int screenGetHeight()
     return rectGetHeight(&scr_size);
 }
 
+void svga_set_vsync(bool enabled)
+{
+    gRenderVsync = enabled;
+}
+
+void svga_set_fps_limit(int fps_limit)
+{
+    gRenderFpsLimit = fps_limit;
+}
+
 static bool createRenderer(int width, int height)
 {
     SDL_Log("createRenderer: creating renderer for %dx%d", width, height);
@@ -716,8 +728,9 @@ static bool createRenderer(int width, int height)
     }
     SDL_Log("createRenderer: renderer created");
 
-    // Enable VSync
-    SDL_SetRenderVSync(gSdlRenderer, 1);
+    if (!SDL_SetRenderVSync(gSdlRenderer, gRenderVsync ? 1 : 0)) {
+        SDL_Log("createRenderer: SDL_SetRenderVSync failed: %s", SDL_GetError());
+    }
 
     // Log display refresh rate for diagnostic purposes
     SDL_DisplayID displayID = SDL_GetDisplayForWindow(gSdlWindow);
@@ -728,6 +741,31 @@ static bool createRenderer(int width, int height)
     } else {
         SDL_Log("Could not query display mode: %s", SDL_GetError());
     }
+
+    // FPS limit policy:
+    // -1 => display refresh
+    //  0 => uncapped (disable limiter)
+    // >0 => explicit cap
+    unsigned int refreshHz = 60;
+    if (mode != NULL && mode->refresh_rate > 1.0f) {
+        refreshHz = static_cast<unsigned int>(mode->refresh_rate + 0.5f);
+    }
+    if (gRenderFpsLimit == 0) {
+        sharedFpsLimiter.setEnabled(false);
+    } else {
+        sharedFpsLimiter.setEnabled(true);
+        unsigned int targetHz = refreshHz;
+        if (gRenderFpsLimit > 0) {
+            targetHz = static_cast<unsigned int>(gRenderFpsLimit);
+        }
+        sharedFpsLimiter.setFps(targetHz);
+    }
+
+    SDL_Log("createRenderer: vsync=%d fps_limit=%d effective_fps=%u limiter_enabled=%d",
+        gRenderVsync ? 1 : 0,
+        gRenderFpsLimit,
+        sharedFpsLimiter.getFps(),
+        sharedFpsLimiter.isEnabled() ? 1 : 0);
 
 #if !(__APPLE__ && TARGET_OS_IOS)
     // macOS should always fill the active window/fullscreen drawable area.

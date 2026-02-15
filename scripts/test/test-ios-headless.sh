@@ -45,6 +45,7 @@ BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 SIMULATOR_NAME="${SIMULATOR_NAME:-}"  # Auto-detect if empty
 GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+IOS_CONFIG_DIR="$ROOT_DIR/gameconfig/ios"
 
 # App details
 APP_NAME="fallout1-rebirth"
@@ -356,8 +357,10 @@ copy_game_data_to_simulator() {
     rm -rf "$target_dir/data"
     cp -R "$GAME_DATA/data" "$target_dir/"
 
-    if [[ -f "$GAME_DATA/fallout.cfg" ]]; then
-        cp -f "$GAME_DATA/fallout.cfg" "$target_dir/"
+    if [[ -f "$IOS_CONFIG_DIR/fallout.cfg" ]]; then
+        cp -f "$IOS_CONFIG_DIR/fallout.cfg" "$target_dir/fallout.cfg"
+    elif [[ -f "$GAME_DATA/fallout.cfg" ]]; then
+        cp -f "$GAME_DATA/fallout.cfg" "$target_dir/fallout.cfg"
     else
         cat > "$target_dir/fallout.cfg" << 'EOF'
 [system]
@@ -368,8 +371,10 @@ critter_patches=data
 EOF
     fi
 
-    if [[ -f "$GAME_DATA/f1_res.ini" ]]; then
-        cp -f "$GAME_DATA/f1_res.ini" "$target_dir/"
+    if [[ -f "$IOS_CONFIG_DIR/f1_res.ini" ]]; then
+        cp -f "$IOS_CONFIG_DIR/f1_res.ini" "$target_dir/f1_res.ini"
+    elif [[ -f "$GAME_DATA/f1_res.ini" ]]; then
+        cp -f "$GAME_DATA/f1_res.ini" "$target_dir/f1_res.ini"
     fi
 
     log_ok "Game data staged in simulator container"

@@ -1,31 +1,24 @@
 # VSync and Frame Pacing
 
-This document describes the current runtime behavior for VSync and frame pacing.
+Runtime now reads and applies display timing keys from `f1_res.ini`:
 
-## Current Behavior
+- `[DISPLAY] VSYNC`
+- `[DISPLAY] FPS_LIMIT`
 
-- SDL renderer VSync is enabled at renderer initialization (`src/plib/gnw/svga.cc`).
-- The shared `FpsLimiter` object exists and is used by many game loops.
-- Current runtime does **not** parse `VSYNC`/`FPS_LIMIT` keys from `f1_res.ini`.
+## Behavior
 
-## Where It Is Set
+- `VSYNC=1`: enables renderer VSync.
+- `VSYNC=0`: disables renderer VSync.
+- `FPS_LIMIT=-1`: uses current display refresh rate.
+- `FPS_LIMIT=0`: uncapped (disables shared FPS limiter).
+- `FPS_LIMIT>0`: explicit cap in Hz.
 
-Renderer setup enables VSync:
+## Runtime Path
 
-```c
-SDL_SetRenderVSync(gSdlRenderer, 1);
-```
-
-## Configuration Reality
-
-`f1_res.ini` currently controls:
-
-- `[MAIN]`: `SCR_WIDTH`, `SCR_HEIGHT`, `WINDOWED`, `EXCLUSIVE`, `SCALE_2X`
-- `[INPUT]`: `CLICK_OFFSET_X`, `CLICK_OFFSET_Y`, `CLICK_OFFSET_MOUSE_X`, `CLICK_OFFSET_MOUSE_Y`
-
-There is no runtime parser for a `[DISPLAY]` section today.
+- Parse: `src/game/game.cc` (`f1_res.ini` load).
+- Apply: `src/plib/gnw/svga.cc` (`svga_set_vsync`, `svga_set_fps_limit`, renderer init).
 
 ## Notes
 
-- If you need configurable frame pacing in the future, it requires code changes to parse and apply user settings at runtime.
-- For complete configuration coverage, see `docs/configuration.md`.
+- The shared `FpsLimiter` is used by many UI/game loops.
+- See `docs/configuration.md` for full config key coverage.

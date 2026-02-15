@@ -145,7 +145,7 @@ Features added:
 - VSync enabled by default via `SDL_RENDERER_PRESENTVSYNC`
 - Display refresh rate logging at startup for debugging
 - Runtime `FpsLimiter` plumbing (`setFps()`, `setEnabled()`, `getFps()`, `isEnabled()`)
-- No runtime `f1_res.ini` `[DISPLAY]` parser in current code (VSync is enabled by renderer setup)
+- Runtime `f1_res.ini` `[DISPLAY]` parser (`VSYNC`, `FPS_LIMIT`) applies display timing policy at startup
 
 ### ProMotion Support
 

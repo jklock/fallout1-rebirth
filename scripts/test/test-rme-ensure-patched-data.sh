@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PATCHED_DIR="${PATCHED_DIR:-${GAME_DATA:-}}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
+MAC_CONFIG_DIR="${MAC_CONFIG_DIR:-$ROOT_DIR/gameconfig/macos}"
 
 TARGET_APP=""
 TARGET_RESOURCES=""
@@ -163,6 +164,13 @@ verify_critter_hash="$(sha256_file "$TARGET_RESOURCES/critter.dat")"
 
 if [[ "$src_master_hash" != "$verify_master_hash" || "$src_critter_hash" != "$verify_critter_hash" ]]; then
   fail "Target resources DAT hashes do not match patched source after install"
+fi
+
+if [[ -f "$MAC_CONFIG_DIR/fallout.cfg" ]]; then
+  cp "$MAC_CONFIG_DIR/fallout.cfg" "$TARGET_RESOURCES/fallout.cfg"
+fi
+if [[ -f "$MAC_CONFIG_DIR/f1_res.ini" ]]; then
+  cp "$MAC_CONFIG_DIR/f1_res.ini" "$TARGET_RESOURCES/f1_res.ini"
 fi
 
 log "Patched data is installed and verified"

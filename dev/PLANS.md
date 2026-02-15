@@ -70,5 +70,24 @@ All keys from unpatched baseline files must be functional and validated.
 - Program exits success only on first full-green round.
 
 ## Command Entrypoint
-- `dev/run-unattended-until-100.sh`
+- `bash dev/run-unattended-until-100.sh --track both --max-rounds 0 --runtime-timeout 45`
 
+## Current Execution Defaults
+- `FALLOUT_GAMEFILES_ROOT=/Volumes/Storage/GitHub/fallout1-rebirth-gamefiles`
+- Config track:
+  - `scripts/test/rme/suite.py quick`
+  - `scripts/test/rme/suite.py full` (72-map runtime sweep)
+- Input track:
+  - `scripts/test/test-macos-headless.sh`
+  - `scripts/test/test-ios-headless.sh`
+
+## Latest Automated Validation
+- Runner command:
+  - `bash dev/run-unattended-until-100.sh --track both --max-rounds 1 --sleep 1 --runtime-timeout 45 --base /Volumes/Storage/GitHub/fallout1-rebirth-gamefiles/unpatchedfiles --patched /Volumes/Storage/GitHub/fallout1-rebirth-gamefiles/patchedfiles`
+- Final status:
+  - `dev/state/latest-summary.tsv`: `rme_quick=PASS`, `rme_full=PASS`, `macos_headless=PASS`, `ios_headless=PASS`
+  - `dev/state/history.tsv` latest row: `1	both	2	2	100	PASS	2026-02-15T08:00:11Z`
+
+## Hardening Notes
+- Unattended runner now injects `BASE_DIR`, `UNPATCHED_DIR`, `PATCHED_DIR`, and `GAME_DATA` into every step to avoid input-track data resolution drift.
+- iOS staging scripts now prioritize `gameconfig/ios` templates over stale `patchedfiles` config so platform defaults remain deterministic.

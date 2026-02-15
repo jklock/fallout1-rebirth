@@ -45,6 +45,7 @@ OUTPUT_DIR="$ROOT_DIR/build-outputs/iOS"
 GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 APP_NAME="fallout1-rebirth"
+IOS_CONFIG_DIR="$ROOT_DIR/gameconfig/ios"
 
 LOGGING_FLAG_RAW="${F1R_DISABLE_RME_LOGGING:-0}"
 LOGGING_FLAG_UPPER="$(printf '%s' "$LOGGING_FLAG_RAW" | tr '[:lower:]' '[:upper:]')"
@@ -173,8 +174,10 @@ stage_test_payload_ios() {
     rm -rf "$app_path/data"
     cp -R "$GAME_DATA/data" "$app_path/"
 
-    if [[ -f "$GAME_DATA/fallout.cfg" ]]; then
-        cp -f "$GAME_DATA/fallout.cfg" "$app_path/"
+    if [[ -f "$IOS_CONFIG_DIR/fallout.cfg" ]]; then
+        cp -f "$IOS_CONFIG_DIR/fallout.cfg" "$app_path/fallout.cfg"
+    elif [[ -f "$GAME_DATA/fallout.cfg" ]]; then
+        cp -f "$GAME_DATA/fallout.cfg" "$app_path/fallout.cfg"
     else
         cat > "$app_path/fallout.cfg" <<'CFG'
 [system]
@@ -185,8 +188,10 @@ critter_patches=data
 CFG
     fi
 
-    if [[ -f "$GAME_DATA/f1_res.ini" ]]; then
-        cp -f "$GAME_DATA/f1_res.ini" "$app_path/"
+    if [[ -f "$IOS_CONFIG_DIR/f1_res.ini" ]]; then
+        cp -f "$IOS_CONFIG_DIR/f1_res.ini" "$app_path/f1_res.ini"
+    elif [[ -f "$GAME_DATA/f1_res.ini" ]]; then
+        cp -f "$GAME_DATA/f1_res.ini" "$app_path/f1_res.ini"
     fi
 
     log_ok "Embedded patched data/config into app payload"

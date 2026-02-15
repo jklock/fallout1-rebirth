@@ -1,3 +1,4 @@
-1	config	rme_quick	FAIL(1)	/Volumes/Storage/GitHub/fallout1-rebirth/dev/state/logs/round-1-config-rme_quick.log
-1	config	rme_full	FAIL(1)	/Volumes/Storage/GitHub/fallout1-rebirth/dev/state/logs/round-1-config-rme_full.log
+1	config	rme_quick	PASS	/Volumes/Storage/GitHub/fallout1-rebirth/dev/state/logs/round-1-config-rme_quick.log
+1	config	rme_full	PASS	/Volumes/Storage/GitHub/fallout1-rebirth/dev/state/logs/round-1-config-rme_full.log
 1	input	macos_headless	PASS	/Volumes/Storage/GitHub/fallout1-rebirth/dev/state/logs/round-1-input-macos_headless.log
+1	input	ios_headless	PASS	/Volumes/Storage/GitHub/fallout1-rebirth/dev/state/logs/round-1-input-ios_headless.log
