@@ -614,6 +614,17 @@ int tile_set_center(int tile, int flags)
         tile_refresh_display();
     }
 
+    bool showTileNum = false;
+    if (configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_TILE_NUM_KEY, &showTileNum)
+        && showTileNum) {
+        debug_printf("TILE_CENTER: tile=%d grid=(%d,%d) off=(%d,%d)\n",
+            tile_center_tile,
+            tile_x,
+            tile_y,
+            tile_offx,
+            tile_offy);
+    }
+
     return 0;
 }
 

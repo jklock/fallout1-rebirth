@@ -1,6 +1,6 @@
 # scripts/test
 
-Last updated (UTC): 2026-02-14
+Last updated (UTC): 2026-02-15
 
 All test and validation scripts live in this directory and follow `test-*` naming.
 
@@ -27,6 +27,8 @@ All test and validation scripts live in this directory and follow `test-*` namin
 - `test-rme-parse-log.py`, `test-rme-parse-log-unit.py`
 - `test-rme-gui-drive.sh`, `test-rme-log-sweep.sh`
 - `test-rme-config-surface.py`
+- `test-rme-config-compat.py`, `test-rme-config-compat.sh` (per-key parse/apply/runtime-effect gate for baseline config keys)
+- `test-rme-config-packaging.py`, `test-rme-config-packaging.sh` (template + packaged artifact config alignment gate)
 - `test-verify-checksums.py`
 
 ## RME Suite

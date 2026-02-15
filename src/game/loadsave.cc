@@ -1,6 +1,7 @@
 #include "game/loadsave.h"
 
 #include <assert.h>
+#include <filesystem>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -154,6 +155,7 @@ static int RestoreSave();
 static int LoadObjDudeCid(DB_FILE* stream);
 static int SaveObjDudeCid(DB_FILE* stream);
 static int EraseSave();
+static long long loadsave_query_available_space_bytes();
 
 // 0x46D930
 static const int lsgrphs[LOAD_SAVE_FRM_COUNT] = {
@@ -802,6 +804,28 @@ int SaveGame(int mode)
     }
 
     return rc;
+}
+
+static long long loadsave_query_available_space_bytes()
+{
+    char targetPath[COMPAT_MAX_PATH];
+    if (patches != NULL && patches[0] != '\0') {
+        strncpy(targetPath, patches, sizeof(targetPath) - 1);
+        targetPath[sizeof(targetPath) - 1] = '\0';
+    } else {
+        strcpy(targetPath, ".");
+    }
+
+    compat_windows_path_to_native(targetPath);
+    compat_resolve_path(targetPath);
+
+    std::error_code ec;
+    std::filesystem::space_info info = std::filesystem::space(std::filesystem::path(targetPath), ec);
+    if (ec) {
+        return -1;
+    }
+
+    return static_cast<long long>(info.available);
 }
 
 // 0x46E6C8
@@ -1511,6 +1535,37 @@ static int SaveSlot()
 
     gsound_background_pause();
 
+    bool showLoadInfo = false;
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_LOAD_INFO_KEY, &showLoadInfo);
+
+    int minFreeSpaceKb = 0;
+    config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_FREE_SPACE_KEY, &minFreeSpaceKb);
+    long long availableBytes = loadsave_query_available_space_bytes();
+    if (showLoadInfo) {
+        rme_logf("save",
+            "SaveSlot preflight slot=%d required_free_kb=%d available_kb=%lld",
+            slot_cursor + 1,
+            minFreeSpaceKb,
+            availableBytes >= 0 ? availableBytes / 1024 : -1);
+    }
+
+    if (minFreeSpaceKb > 0 && availableBytes >= 0) {
+        long long requiredBytes = static_cast<long long>(minFreeSpaceKb) * 1024;
+        if (availableBytes < requiredBytes) {
+            debug_printf("\nLOADSAVE: ** Not enough free space to save (required=%d KB, available=%lld KB) **\n",
+                minFreeSpaceKb,
+                availableBytes / 1024);
+            if (rme_log_topic_enabled("save")) {
+                rme_logf("save",
+                    "SaveSlot blocked required_free_kb=%d available_kb=%lld",
+                    minFreeSpaceKb,
+                    availableBytes / 1024);
+            }
+            gsound_background_unpause();
+            return -1;
+        }
+    }
+
     snprintf(gmpath, sizeof(gmpath), "%s\\%s", patches, "SAVEGAME");
     compat_mkdir(gmpath);
 
@@ -1603,6 +1658,12 @@ int isLoadingGame()
 static int LoadSlot(int slot)
 {
     gmouse_set_cursor(MOUSE_CURSOR_WAIT_PLANET);
+
+    bool showLoadInfo = false;
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_LOAD_INFO_KEY, &showLoadInfo);
+    if (showLoadInfo) {
+        rme_logf("save", "LoadSlot begin slot=%d", slot + 1);
+    }
 
     if (isInCombat()) {
         intface_end_window_close(false);

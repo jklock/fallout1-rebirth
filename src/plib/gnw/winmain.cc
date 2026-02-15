@@ -1,19 +1,25 @@
 #include "plib/gnw/winmain.h"
 
+#include <algorithm>
 #include <dirent.h>
 #include <errno.h>
+#include <iterator>
 #include <limits.h>
+#include <sstream>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <string>
+#include <vector>
 #include <unistd.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#include "game/gconfig.h"
 #include "game/main.h"
 #include "game/rme_log.h"
+#include "plib/gnw/kb.h"
 // Forward declarations as a safety for build systems/compilers that may not
 // pick up the header for early boot translation units.
 #ifdef __cplusplus
@@ -48,6 +54,447 @@ bool GNW95_isActive = false;
 // 0x6B0760
 char GNW95_title[256];
 
+namespace {
+
+struct ProbeKeySpec {
+    const char* section;
+    const char* key;
+    const char* appliedSection;
+    const char* appliedKey;
+};
+
+static const ProbeKeySpec kFalloutCfgProbeKeys[] = {
+    { "debug", "mode", "debug", "mode" },
+    { "debug", "output_map_data_info", "debug", "output_map_data_info" },
+    { "debug", "show_load_info", "debug", "show_load_info" },
+    { "debug", "show_script_messages", "debug", "show_script_messages" },
+    { "debug", "show_tile_num", "debug", "show_tile_num" },
+    { "input", "map_scroll_delay", "input", "map_scroll_delay" },
+    { "input", "pencil_right_click", "input", "pencil_right_click" },
+    { "preferences", "brightness", "preferences", "brightness" },
+    { "preferences", "combat_difficulty", "preferences", "combat_difficulty" },
+    { "preferences", "combat_messages", "preferences", "combat_messages" },
+    { "preferences", "combat_speed", "preferences", "combat_speed" },
+    { "preferences", "combat_taunts", "preferences", "combat_taunts" },
+    { "preferences", "game_difficulty", "preferences", "game_difficulty" },
+    { "preferences", "item_highlight", "preferences", "item_highlight" },
+    { "preferences", "language_filter", "preferences", "language_filter" },
+    { "preferences", "mouse_sensitivity", "preferences", "mouse_sensitivity" },
+    { "preferences", "player_speed", "preferences", "player_speed" },
+    { "preferences", "player_speedup", "preferences", "player_speedup" },
+    { "preferences", "running", "preferences", "running" },
+    { "preferences", "running_burning_guy", "preferences", "running_burning_guy" },
+    { "preferences", "subtitles", "preferences", "subtitles" },
+    { "preferences", "target_highlight", "preferences", "target_highlight" },
+    { "preferences", "text_base_delay", "preferences", "text_base_delay" },
+    { "preferences", "text_line_delay", "preferences", "text_line_delay" },
+    { "preferences", "violence_level", "preferences", "violence_level" },
+    { "sound", "cache_size", "sound", "cache_size" },
+    { "sound", "device", "sound", "device" },
+    { "sound", "dma", "sound", "dma" },
+    { "sound", "initialize", "sound", "initialize" },
+    { "sound", "irq", "sound", "irq" },
+    { "sound", "master_volume", "sound", "master_volume" },
+    { "sound", "music", "sound", "music" },
+    { "sound", "music_path1", "sound", "music_path1" },
+    { "sound", "music_path2", "sound", "music_path2" },
+    { "sound", "music_volume", "sound", "music_volume" },
+    { "sound", "port", "sound", "port" },
+    { "sound", "sndfx_volume", "sound", "sndfx_volume" },
+    { "sound", "sounds", "sound", "sounds" },
+    { "sound", "speech", "sound", "speech" },
+    { "sound", "speech_volume", "sound", "speech_volume" },
+    { "system", "art_cache_size", "system", "art_cache_size" },
+    { "system", "color_cycling", "system", "color_cycling" },
+    { "system", "critter_dat", "system", "critter_dat" },
+    { "system", "critter_patches", "system", "critter_patches" },
+    { "system", "cycle_speed_factor", "system", "cycle_speed_factor" },
+    { "system", "executable", "system", "executable" },
+    { "system", "free_space", "system", "free_space" },
+    { "system", "hashing", "system", "hashing" },
+    { "system", "interrupt_walk", "system", "interrupt_walk" },
+    { "system", "language", "system", "language" },
+    { "system", "master_dat", "system", "master_dat" },
+    { "system", "master_patches", "system", "master_patches" },
+    { "system", "scroll_lock", "system", "scroll_lock" },
+    { "system", "splash", "system", "splash" },
+    { "system", "times_run", "system", "times_run" },
+};
+
+static const ProbeKeySpec kF1ResProbeKeys[] = {
+    { "DISPLAY", "FPS_LIMIT", "DISPLAY", "FPS_LIMIT" },
+    { "DISPLAY", "VSYNC", "DISPLAY", "VSYNC" },
+    { "MAIN", "SCALE_2X", "MAIN", "SCALE_2X" },
+    { "MAIN", "SCR_HEIGHT", "MAIN", "SCR_HEIGHT" },
+    { "MAIN", "SCR_WIDTH", "MAIN", "SCR_WIDTH" },
+    { "MAIN", "WINDOWED", "MAIN", "WINDOWED" },
+};
+
+static std::string escape_json(const std::string& value)
+{
+    std::string escaped;
+    escaped.reserve(value.size());
+    for (char ch : value) {
+        switch (ch) {
+        case '\\':
+            escaped += "\\\\";
+            break;
+        case '"':
+            escaped += "\\\"";
+            break;
+        case '\n':
+            escaped += "\\n";
+            break;
+        case '\r':
+            escaped += "\\r";
+            break;
+        case '\t':
+            escaped += "\\t";
+            break;
+        default:
+            escaped.push_back(ch);
+            break;
+        }
+    }
+    return escaped;
+}
+
+static bool probe_get_config_string(Config* config, const char* section, const char* key, std::string& out)
+{
+    char* value = nullptr;
+    if (!config_get_string(config, section, key, &value) || value == nullptr) {
+        out.clear();
+        return false;
+    }
+
+    out = value;
+    return true;
+}
+
+static std::string probe_string_for_int(int value)
+{
+    return std::to_string(value);
+}
+
+static int run_config_compat_probe(int argc, char* argv[])
+{
+    const char* probeEnv = getenv("RME_CONFIG_COMPAT_PROBE");
+    if (probeEnv == nullptr || probeEnv[0] == '\0' || probeEnv[0] == '0') {
+        return -1;
+    }
+
+    Config rawFalloutConfig;
+    Config rawF1ResConfig;
+    if (!config_init(&rawFalloutConfig) || !config_init(&rawF1ResConfig)) {
+        return 2;
+    }
+
+    const bool rawFalloutLoaded = config_load(&rawFalloutConfig, GAME_CONFIG_FILE_NAME, false);
+
+    if (!gconfig_init(false, argc, argv)) {
+        config_exit(&rawFalloutConfig);
+        config_exit(&rawF1ResConfig);
+        return 2;
+    }
+
+    std::string f1ResPath;
+    auto tryLoadResolutionConfig = [&](const char* path) {
+        if (path == nullptr || path[0] == '\0') {
+            return false;
+        }
+        if (config_load(&rawF1ResConfig, path, false)) {
+            f1ResPath = path;
+            return true;
+        }
+        return false;
+    };
+
+    bool rawF1Loaded = tryLoadResolutionConfig("f1_res.ini");
+    if (!rawF1Loaded && argc > 0 && argv != nullptr && argv[0] != nullptr) {
+        char resolvedArgvPath[PATH_MAX];
+        const char* executablePath = argv[0];
+        if (realpath(argv[0], resolvedArgvPath) != nullptr) {
+            executablePath = resolvedArgvPath;
+        }
+
+        std::string executableDir(executablePath);
+        size_t separatorPos = executableDir.find_last_of("/\\");
+        if (separatorPos != std::string::npos) {
+            executableDir = executableDir.substr(0, separatorPos + 1);
+            rawF1Loaded = tryLoadResolutionConfig((executableDir + "../Resources/f1_res.ini").c_str());
+            if (!rawF1Loaded) {
+                rawF1Loaded = tryLoadResolutionConfig((executableDir + "f1_res.ini").c_str());
+            }
+        }
+    }
+
+    int requestedWidth = 640;
+    int requestedHeight = 480;
+    int scale = 1;
+    int exclusive = 1;
+    int vsync = 1;
+    int fpsLimit = -1;
+    bool fullscreen = true;
+
+    if (rawF1Loaded) {
+        int screenWidth = 0;
+        if (config_get_value(&rawF1ResConfig, "MAIN", "SCR_WIDTH", &screenWidth)) {
+            requestedWidth = std::max(screenWidth, 640);
+        }
+
+        int screenHeight = 0;
+        if (config_get_value(&rawF1ResConfig, "MAIN", "SCR_HEIGHT", &screenHeight)) {
+            requestedHeight = std::max(screenHeight, 480);
+        }
+
+        bool windowed = false;
+        if (configGetBool(&rawF1ResConfig, "MAIN", "WINDOWED", &windowed)) {
+            fullscreen = !windowed;
+        }
+
+        bool exclusiveMode = true;
+        if (configGetBool(&rawF1ResConfig, "MAIN", "EXCLUSIVE", &exclusiveMode)) {
+            exclusive = exclusiveMode ? 1 : 0;
+        }
+
+        int scaleValue = 0;
+        if (config_get_value(&rawF1ResConfig, "MAIN", "SCALE_2X", &scaleValue)) {
+            scale = std::clamp(scaleValue, 0, 1) + 1;
+        }
+
+        int vsyncValue = 0;
+        if (config_get_value(&rawF1ResConfig, "DISPLAY", "VSYNC", &vsyncValue)) {
+            vsync = vsyncValue != 0 ? 1 : 0;
+        }
+
+        int fpsLimitValue = -1;
+        if (config_get_value(&rawF1ResConfig, "DISPLAY", "FPS_LIMIT", &fpsLimitValue)) {
+            fpsLimit = std::max(-1, fpsLimitValue);
+        }
+    }
+
+    int logicalWidth = requestedWidth;
+    int logicalHeight = requestedHeight;
+    if (scale > 1) {
+        logicalWidth = requestedWidth / scale;
+        logicalHeight = requestedHeight / scale;
+    }
+    logicalWidth = std::max(logicalWidth, 640);
+    logicalHeight = std::max(logicalHeight, 480);
+
+    int legacyDevice = -1;
+    int legacyPort = -1;
+    int legacyIrq = -1;
+    int legacyDma = -1;
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_DEVICE_KEY, &legacyDevice);
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_PORT_KEY, &legacyPort);
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_IRQ_KEY, &legacyIrq);
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_DMA_KEY, &legacyDma);
+
+    int soundInitNumBuffers = 24;
+    if (legacyPort > 0) {
+        soundInitNumBuffers = std::clamp(legacyPort, 4, 128);
+    }
+
+    int soundInitDataSize = 0x8000;
+    if (legacyIrq > 0) {
+        soundInitDataSize = std::clamp(legacyIrq, 4096, 131072);
+    }
+
+    int soundInitSampleRate = 22050;
+    if (legacyDma > 0) {
+        soundInitSampleRate = std::clamp(legacyDma, 8000, 96000);
+    }
+
+    int hashingValue = 0;
+    config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_HASHING_KEY, &hashingValue);
+    bool showLoadInfo = false;
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_LOAD_INFO_KEY, &showLoadInfo);
+    bool outputMapDataInfo = false;
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_OUTPUT_MAP_DATA_INFO_KEY, &outputMapDataInfo);
+    bool showTileNum = false;
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_TILE_NUM_KEY, &showTileNum);
+    int timesRun = 0;
+    config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_TIMES_RUN_KEY, &timesRun);
+
+    auto makeKeyId = [](const char* section, const char* key) {
+        return std::string(section) + "::" + std::string(key);
+    };
+
+    std::ostringstream out;
+    out << "{\n";
+    out << "  \"fallout_cfg\": {\n";
+    out << "    \"loaded\": " << (rawFalloutLoaded ? 1 : 0) << ",\n";
+    out << "    \"keys\": [\n";
+    for (size_t index = 0; index < std::size(kFalloutCfgProbeKeys); index++) {
+        const ProbeKeySpec& spec = kFalloutCfgProbeKeys[index];
+        const std::string keyId = makeKeyId(spec.section, spec.key);
+
+        std::string parsedValue;
+        std::string appliedValue;
+        const bool parsed = probe_get_config_string(&rawFalloutConfig, spec.section, spec.key, parsedValue);
+        const bool applied = probe_get_config_string(&game_config, spec.appliedSection, spec.appliedKey, appliedValue);
+
+        std::string effectName = keyId;
+        std::string effectValue = applied ? appliedValue : "";
+
+        if (keyId == "preferences::player_speed") {
+            std::string canonical;
+            if (probe_get_config_string(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_PLAYER_SPEEDUP_KEY, canonical)) {
+                effectName = "preferences::player_speedup";
+                effectValue = canonical;
+            }
+        } else if (keyId == "system::hashing") {
+            effectName = "db::hash_table_enabled";
+            effectValue = hashingValue != 0 ? "1" : "0";
+        } else if (keyId == "system::scroll_lock") {
+            effectName = "input::scroll_lock_state";
+            effectValue = kb_get_scroll_lock_state() ? "1" : "0";
+        } else if (keyId == "system::times_run") {
+            effectName = "system::times_run_runtime";
+            effectValue = probe_string_for_int(timesRun);
+        } else if (keyId == "sound::device") {
+            effectName = "sound::detect_device";
+            effectValue = probe_string_for_int(legacyDevice);
+        } else if (keyId == "sound::port") {
+            effectName = "sound::init_num_buffers";
+            effectValue = probe_string_for_int(soundInitNumBuffers);
+        } else if (keyId == "sound::irq") {
+            effectName = "sound::init_data_size";
+            effectValue = probe_string_for_int(soundInitDataSize);
+        } else if (keyId == "sound::dma") {
+            effectName = "sound::init_sample_rate";
+            effectValue = probe_string_for_int(soundInitSampleRate);
+        } else if (keyId == "debug::show_load_info") {
+            effectName = "debug::show_load_info_runtime";
+            effectValue = showLoadInfo ? "1" : "0";
+        } else if (keyId == "debug::output_map_data_info") {
+            effectName = "debug::output_map_data_info_runtime";
+            effectValue = outputMapDataInfo ? "1" : "0";
+        } else if (keyId == "debug::show_tile_num") {
+            effectName = "debug::show_tile_num_runtime";
+            effectValue = showTileNum ? "1" : "0";
+        }
+
+        out << "      {\"section\":\"" << escape_json(spec.section)
+            << "\",\"key\":\"" << escape_json(spec.key)
+            << "\",\"parsed\":" << (parsed ? 1 : 0)
+            << ",\"parsed_value\":\"" << escape_json(parsed ? parsedValue : "")
+            << "\",\"applied\":" << (applied ? 1 : 0)
+            << ",\"applied_value\":\"" << escape_json(applied ? appliedValue : "")
+            << "\",\"effect\":\"" << escape_json(effectName)
+            << "\",\"effect_value\":\"" << escape_json(effectValue)
+            << "\"}";
+        if (index + 1 < std::size(kFalloutCfgProbeKeys)) {
+            out << ",";
+        }
+        out << "\n";
+    }
+    out << "    ]\n";
+    out << "  },\n";
+
+    out << "  \"f1_res_ini\": {\n";
+    out << "    \"loaded\": " << (rawF1Loaded ? 1 : 0) << ",\n";
+    out << "    \"path\": \"" << escape_json(f1ResPath) << "\",\n";
+    out << "    \"keys\": [\n";
+    for (size_t index = 0; index < std::size(kF1ResProbeKeys); index++) {
+        const ProbeKeySpec& spec = kF1ResProbeKeys[index];
+        const std::string keyId = makeKeyId(spec.section, spec.key);
+
+        std::string parsedValue;
+        bool parsed = probe_get_config_string(&rawF1ResConfig, spec.section, spec.key, parsedValue);
+
+        std::string appliedValue;
+        std::string effectName = keyId;
+        std::string effectValue;
+
+        if (keyId == "MAIN::SCR_WIDTH") {
+            appliedValue = probe_string_for_int(requestedWidth);
+            effectName = "video::window_width";
+            effectValue = probe_string_for_int(requestedWidth);
+        } else if (keyId == "MAIN::SCR_HEIGHT") {
+            appliedValue = probe_string_for_int(requestedHeight);
+            effectName = "video::window_height";
+            effectValue = probe_string_for_int(requestedHeight);
+        } else if (keyId == "MAIN::WINDOWED") {
+            appliedValue = fullscreen ? "0" : "1";
+            effectName = "video::fullscreen";
+            effectValue = fullscreen ? "1" : "0";
+        } else if (keyId == "MAIN::SCALE_2X") {
+            appliedValue = probe_string_for_int(scale - 1);
+            effectName = "video::scale";
+            effectValue = probe_string_for_int(scale);
+        } else if (keyId == "DISPLAY::VSYNC") {
+            appliedValue = probe_string_for_int(vsync);
+            effectName = "video::vsync";
+            effectValue = probe_string_for_int(vsync);
+        } else if (keyId == "DISPLAY::FPS_LIMIT") {
+            appliedValue = probe_string_for_int(fpsLimit);
+            effectName = "video::fps_limit";
+            effectValue = probe_string_for_int(fpsLimit);
+        } else {
+            appliedValue.clear();
+            effectValue.clear();
+        }
+
+        out << "      {\"section\":\"" << escape_json(spec.section)
+            << "\",\"key\":\"" << escape_json(spec.key)
+            << "\",\"parsed\":" << (parsed ? 1 : 0)
+            << ",\"parsed_value\":\"" << escape_json(parsed ? parsedValue : "")
+            << "\",\"applied\":1"
+            << ",\"applied_value\":\"" << escape_json(appliedValue)
+            << "\",\"effect\":\"" << escape_json(effectName)
+            << "\",\"effect_value\":\"" << escape_json(effectValue)
+            << "\"}";
+        if (index + 1 < std::size(kF1ResProbeKeys)) {
+            out << ",";
+        }
+        out << "\n";
+    }
+    out << "    ],\n";
+    out << "    \"video\": {"
+        << "\"requested_width\":" << requestedWidth
+        << ",\"requested_height\":" << requestedHeight
+        << ",\"logical_width\":" << logicalWidth
+        << ",\"logical_height\":" << logicalHeight
+        << ",\"scale\":" << scale
+        << ",\"fullscreen\":" << (fullscreen ? 1 : 0)
+        << ",\"exclusive\":" << exclusive
+        << ",\"vsync\":" << vsync
+        << ",\"fps_limit\":" << fpsLimit
+        << "}\n";
+    out << "  }\n";
+    out << "}\n";
+
+    const char* outPath = getenv("RME_CONFIG_COMPAT_PROBE_OUT");
+    if (outPath == nullptr || outPath[0] == '\0') {
+        outPath = "rme-config-compat-probe.json";
+    }
+
+    FILE* stream = fopen(outPath, "w");
+    if (stream == nullptr) {
+        gconfig_exit(false);
+        config_exit(&rawFalloutConfig);
+        config_exit(&rawF1ResConfig);
+        return 2;
+    }
+
+    std::string payload = out.str();
+    fwrite(payload.data(), 1, payload.size(), stream);
+    fclose(stream);
+
+    if (rme_log_topic_enabled("config")) {
+        rme_logf("config", "config compatibility probe wrote %s", outPath);
+    }
+
+    gconfig_exit(false);
+    config_exit(&rawFalloutConfig);
+    config_exit(&rawF1ResConfig);
+    return 0;
+}
+
+} // namespace
+
 int main(int argc, char* argv[])
 {
     int rc;
@@ -81,6 +528,11 @@ int main(int argc, char* argv[])
             }
             exit(master_present && critter_present ? 0 : 1);
         }
+    }
+
+    rc = run_config_compat_probe(argc, argv);
+    if (rc >= 0) {
+        return rc;
     }
 #if __APPLE__ && TARGET_OS_IOS
     // Use dedicated touch gesture handling; avoid synthetic touch->mouse events

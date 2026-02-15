@@ -415,6 +415,10 @@ find src -type f -name '*.cc' -o -name '*.h' | \
 
 # Test macOS build
 ./scripts/test/test-macos.sh
+
+# Config compatibility gates
+./scripts/test/test-rme-config-compat.sh
+./scripts/test/test-rme-config-packaging.sh
 ```
 
 ### Verification Results
@@ -436,6 +440,9 @@ Builds are created locally and uploaded to GitHub Releases:
 
 # Create iOS IPA
 ./scripts/build/build-ios.sh -prod --device
+
+# Stage iOS release artifact path used in this repo
+cp build-outputs/iOS/fallout1-rebirth.ipa releases/prod/iOS/fallout1-rebirth.ipa
 ```
 
 Then upload artifacts to GitHub Releases manually.
@@ -453,7 +460,7 @@ Since there's no automated CI, **you are responsible** for ensuring:
 
 ## Proof of Work
 
-- **Timestamp**: February 14, 2026
+- **Timestamp**: February 15, 2026
 - **Files verified**:
   - `scripts/test/test-ios-simulator.sh` - Confirmed script exists and matches documentation
   - `scripts/test/test-macos.sh` - Confirmed script exists
@@ -465,3 +472,4 @@ Since there's no automated CI, **you are responsible** for ensuring:
   - Updated quick-start and local verification flows to require explicit build commands before tests.
   - Updated `dev-verify.sh` coverage description to match existing-artifact verification behavior.
   - Updated release section to remove deleted packaging wrappers and use unified build entrypoints.
+  - Added config compatibility and config packaging alignment gates to the verification checklist.

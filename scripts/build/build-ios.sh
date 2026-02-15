@@ -173,10 +173,22 @@ stage_test_payload_ios() {
     cp -f "$GAME_DATA/critter.dat" "$app_path/"
     rm -rf "$app_path/data"
     cp -R "$GAME_DATA/data" "$app_path/"
+    stage_ios_configs "$app_path"
+
+    log_ok "Embedded patched data/config into app payload"
+}
+
+stage_ios_configs() {
+    local app_path="$1"
+
+    if [[ ! -d "$app_path" ]]; then
+        log_error "Cannot stage configs; app not found: $app_path"
+        exit 1
+    fi
 
     if [[ -f "$IOS_CONFIG_DIR/fallout.cfg" ]]; then
         cp -f "$IOS_CONFIG_DIR/fallout.cfg" "$app_path/fallout.cfg"
-    elif [[ -f "$GAME_DATA/fallout.cfg" ]]; then
+    elif [[ -n "$GAME_DATA" && -f "$GAME_DATA/fallout.cfg" ]]; then
         cp -f "$GAME_DATA/fallout.cfg" "$app_path/fallout.cfg"
     else
         cat > "$app_path/fallout.cfg" <<'CFG'
@@ -190,11 +202,9 @@ CFG
 
     if [[ -f "$IOS_CONFIG_DIR/f1_res.ini" ]]; then
         cp -f "$IOS_CONFIG_DIR/f1_res.ini" "$app_path/f1_res.ini"
-    elif [[ -f "$GAME_DATA/f1_res.ini" ]]; then
+    elif [[ -n "$GAME_DATA" && -f "$GAME_DATA/f1_res.ini" ]]; then
         cp -f "$GAME_DATA/f1_res.ini" "$app_path/f1_res.ini"
     fi
-
-    log_ok "Embedded patched data/config into app payload"
 }
 
 configure_and_build_device() {
@@ -246,6 +256,8 @@ configure_and_build_device() {
 
     if [[ "$MODE" == "test" ]]; then
         stage_test_payload_ios "$app_path"
+    else
+        stage_ios_configs "$app_path"
     fi
 
     log_info "Packaging IPA with CPack"
@@ -325,6 +337,8 @@ configure_and_build_simulator() {
 
     if [[ "$MODE" == "test" ]]; then
         stage_test_payload_ios "$app_path"
+    else
+        stage_ios_configs "$app_path"
     fi
 
     log_ok "Simulator app ready: $app_path"

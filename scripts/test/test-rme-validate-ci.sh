@@ -11,6 +11,8 @@ if [[ $# -gt 0 ]]; then
 fi
 
 python3 "$REPO_ROOT/scripts/test/test-rme-config-surface.py"
+"$REPO_ROOT/scripts/test/test-rme-config-compat.sh"
+python3 "$REPO_ROOT/scripts/test/test-rme-config-packaging.py"
 
 echo "Running quick headless RME dry-run using failing fixture"
 export TEST_FALLBACK_BINARY="$REPO_ROOT/scripts/test/rme-fixture-tools/fake_fallout_runner"

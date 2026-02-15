@@ -1,6 +1,6 @@
 # scripts/build
 
-Last updated (UTC): 2026-02-14
+Last updated (UTC): 2026-02-15
 
 Build entrypoints.
 
@@ -18,6 +18,12 @@ Build entrypoints.
 ## Outputs
 - `build-*` directories.
 - `build-outputs/iOS/*.ipa` artifacts.
+- `releases/prod/macOS/Fallout 1 Rebirth.app` when using `build-macos.sh -prod`.
+
+Notes:
+- `build-ios.sh` stages platform config templates (`fallout.cfg`, `f1_res.ini`) into app payloads for both `-prod` and `-test`.
+- To stage iOS release artifact in this repo layout, copy:
+  - `build-outputs/iOS/fallout1-rebirth.ipa` -> `releases/prod/iOS/fallout1-rebirth.ipa`
 
 ## Logging Build Flag
 - `F1R_DISABLE_RME_LOGGING=1` compiles out Rebirth diagnostic logging hooks.

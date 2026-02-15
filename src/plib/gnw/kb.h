@@ -361,6 +361,8 @@ int kb_get_layout();
 int kb_ascii_to_scan(int ascii);
 unsigned int kb_elapsed_time();
 void kb_reset_elapsed_time();
+void kb_set_scroll_lock_state(bool enabled);
+bool kb_get_scroll_lock_state();
 void kb_simulate_key(KeyboardData* data);
 
 } // namespace fallout

@@ -2,7 +2,7 @@
 
 Documentation for Fallout 1 Rebirth — an Apple-only fork of Fallout 1 Community Edition for macOS and iOS/iPadOS.
 
-Last updated: 2026-02-14
+Last updated: 2026-02-15
 
 ## Documentation Index
 
@@ -19,6 +19,9 @@ Last updated: 2026-02-14
 | [setup_guide.md](setup_guide.md) | Step-by-step setup guide for end users |
 | [testing.md](testing.md) | Testing procedures and scripts |
 | [vsync.md](vsync.md) | VSync and display settings |
+| [audit/results.md](audit/results.md) | Current audit pass/fail evidence log |
+| [audit/config-key-coverage-matrix-2026-02-15.md](audit/config-key-coverage-matrix-2026-02-15.md) | Baseline per-key compatibility matrix (`61/61 PASS`) |
+| [audit/config-packaging-alignment-2026-02-15.md](audit/config-packaging-alignment-2026-02-15.md) | Template + packaged config alignment evidence |
 
 RME final validation entrypoint:
 - `scripts/test/test-rme-end-to-end.sh`
@@ -56,6 +59,7 @@ Fallout 1 Rebirth is a working re-implementation of Fallout with:
 ### Key Features
 
 - **VSync enabled by default** for smooth display
+- **Baseline config compatibility complete** (`fallout.cfg` + `f1_res.ini`: `61/61 PASS`)
 - **Touch input** with gesture recognition and coordinate conversion
 - **Apple Pencil support** with gesture recognition and precise positioning
 - **f1_res.ini configuration system** for display and resolution settings
@@ -101,9 +105,13 @@ Game assets are NOT included and must be obtained from a legal copy of Fallout.
 
 ## Proof of Work
 
-- **Timestamp**: 2026-02-07
+- **Timestamp**: 2026-02-15
 - **Files verified**:
-  - `CMakeLists.txt` - Confirmed iOS deployment target 15.0, macOS 11.0
-  - All linked documentation files exist and are accessible
+  - `docs/audit/config-key-coverage-matrix-2026-02-15.md`
+  - `docs/audit/results.md`
+  - `docs/audit/config-packaging-alignment-2026-02-15.md`
+  - `dev/state/latest-summary.tsv`
+  - `dev/state/history.tsv`
 - **Updates made**:
-- Added input.md and sdl3.md to the documentation index and refreshed timestamps
+- Added audit evidence references for compatibility, packaging alignment, and unattended proof
+- Refreshed documentation index timestamp and compatibility status summary

@@ -63,6 +63,8 @@ Canonical baseline manifests:
 Automated validation gate:
 
 - `scripts/test/test-rme-config-surface.py`
+- `scripts/test/test-rme-config-compat.sh`
+- `scripts/test/test-rme-config-packaging.sh`
 
 ## Legacy Compatibility
 

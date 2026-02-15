@@ -2122,6 +2122,20 @@ static void kb_toggle_scroll()
     }
 }
 
+void kb_set_scroll_lock_state(bool enabled)
+{
+    if (enabled) {
+        kb_lock_flags |= MODIFIER_KEY_STATE_SCROLL_LOCK;
+    } else {
+        kb_lock_flags &= ~MODIFIER_KEY_STATE_SCROLL_LOCK;
+    }
+}
+
+bool kb_get_scroll_lock_state()
+{
+    return (kb_lock_flags & MODIFIER_KEY_STATE_SCROLL_LOCK) != 0;
+}
+
 // 0x4BCD6C
 static int kb_buffer_put(key_data_t* key_data)
 {

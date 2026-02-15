@@ -53,7 +53,8 @@ Key options:
 Notes:
 
 - Device builds produce IPA output via CPack in `build-outputs/iOS/`.
-- `-test` embeds patched data/config into the app payload.
+- Both `-prod` and `-test` stage platform `fallout.cfg` + `f1_res.ini` into app payloads.
+- `-test` additionally embeds patched data payload (`master.dat`, `critter.dat`, `data/`).
 
 ### `scripts/build/build-install-game-data.sh`
 
@@ -151,6 +152,8 @@ Example:
 - `scripts/test/test-rebirth-refresh-validation.sh`
 - `scripts/test/test-rebirth-toggle-logging.sh`
 - `scripts/test/test-rme-config-surface.py`
+- `scripts/test/test-rme-config-compat.sh`
+- `scripts/test/test-rme-config-packaging.sh`
 
 Notes:
 
@@ -203,6 +206,13 @@ Fixtures/support data now live under:
 ./scripts/build/build-ios.sh -prod --simulator
 ./scripts/test/test-ios-headless.sh
 ./scripts/test/test-ios-simulator.sh
+```
+
+### Unattended full-pass loop
+
+```bash
+FALLOUT_GAMEFILES_ROOT=/path/to/gamefiles \
+dev/run-unattended-until-100.sh --track both --max-rounds 1 --runtime-timeout 10
 ```
 
 ### Build test-ready artifacts

@@ -5,3 +5,6 @@ round	selected_tracks	passed_tracks	total_tracks	percent	status	timestamp
 1	both	2	2	100	PASS	2026-02-15T06:12:32Z
 1	both	1	2	50	FAIL	2026-02-15T07:12:05Z
 1	both	2	2	100	PASS	2026-02-15T08:00:11Z
+1	both	1	2	50	FAIL	2026-02-15T15:34:43Z
+1	both	2	2	100	PASS	2026-02-15T15:45:50Z
+1	both	2	2	100	PASS	2026-02-15T16:03:04Z

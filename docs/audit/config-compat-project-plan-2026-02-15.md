@@ -1,5 +1,14 @@
 # Config Compatibility Project Plan - 2026-02-15
 
+## Completion Status
+
+Status: **Completed** (2026-02-15).
+
+Completion evidence:
+- Per-key matrix: `docs/audit/config-key-coverage-matrix-2026-02-15.md` (`61/61 PASS`)
+- Packaging alignment: `docs/audit/config-packaging-alignment-2026-02-15.md` (`PASS`)
+- Unattended proof: `dev/state/history.tsv` latest `PASS` row (`2026-02-15T16:03:04Z`)
+
 ## Objective
 Restore full config compatibility so the unpatched baseline files behave as expected:
 - `f1_res.ini`

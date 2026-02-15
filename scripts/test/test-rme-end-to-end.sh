@@ -36,10 +36,13 @@ APP="${APP:-$ROOT/build-macos/RelWithDebInfo/Fallout 1 Rebirth.app}"
 EXE="${EXE:-$APP/Contents/MacOS/fallout1-rebirth}"
 
 TIMEOUT="${TIMEOUT:-60}"
+RUNTIME_MAP_LIMIT="${RUNTIME_MAP_LIMIT:-0}"
 RUN_IOS="${RUN_IOS:-0}"
 REBUILD_PATCHED="${REBUILD_PATCHED:-0}"
 FORCE_PATCH="${FORCE_PATCH:-0}"
 SKIP_CHECKSUMS="${SKIP_CHECKSUMS:-0}"
+SKIP_REFRESH_VALIDATION="${SKIP_REFRESH_VALIDATION:-0}"
+SKIP_VALIDATE_DATA="${SKIP_VALIDATE_DATA:-0}"
 
 usage() {
     cat <<EOF
@@ -115,6 +118,10 @@ sync_platform_configs() {
 
 log "Audit runtime config surface and platform defaults"
 python3 "$ROOT/scripts/test/test-rme-config-surface.py"
+log "Run per-key config compatibility gate"
+"$ROOT/scripts/test/test-rme-config-compat.sh"
+log "Validate template/packaged config alignment gate"
+python3 "$ROOT/scripts/test/test-rme-config-packaging.py"
 
 if [[ ! -x "$EXE" ]]; then
     echo "[ERROR] App executable not found: $EXE" >&2
@@ -140,18 +147,26 @@ sync_platform_configs
 log "Ensure patched payload completeness"
 "$ROOT/scripts/test/test-rme-ensure-patched-data.sh" --patched-dir "$PATCHED_DIR" --quiet
 
-log "Refresh deterministic validation evidence"
-"$ROOT/scripts/test/test-rebirth-refresh-validation.sh" \
-  --unpatched "$BASE_DIR" \
-  --patched "$PATCHED_DIR" \
-  --rme "$RME_DIR" \
-  --out "$VALIDATION_DIR"
+if [[ "$SKIP_REFRESH_VALIDATION" != "1" ]]; then
+    log "Refresh deterministic validation evidence"
+    "$ROOT/scripts/test/test-rebirth-refresh-validation.sh" \
+      --unpatched "$BASE_DIR" \
+      --patched "$PATCHED_DIR" \
+      --rme "$RME_DIR" \
+      --out "$VALIDATION_DIR"
+else
+    log "Skip deterministic validation evidence refresh (SKIP_REFRESH_VALIDATION=1)"
+fi
 
-log "Validate patched output against payload/xdelta"
-"$ROOT/scripts/test/test-rebirth-validate-data.sh" \
-  --patched "$PATCHED_DIR" \
-  --base "$BASE_DIR" \
-  --rme "$RME_DIR"
+if [[ "$SKIP_VALIDATE_DATA" != "1" ]]; then
+    log "Validate patched output against payload/xdelta"
+    "$ROOT/scripts/test/test-rebirth-validate-data.sh" \
+      --patched "$PATCHED_DIR" \
+      --base "$BASE_DIR" \
+      --rme "$RME_DIR"
+else
+    log "Skip patched output overlay/xdelta validation (SKIP_VALIDATE_DATA=1)"
+fi
 
 log "Run full asset domain sweep (maps/audio/critters/proto/scripts/text/art)"
 python3 "$ROOT/scripts/test/test-rme-asset-sweep.py" \
@@ -162,14 +177,20 @@ log "Install/verify patched data into app bundle resources"
 "$ROOT/scripts/test/test-rme-ensure-patched-data.sh" --patched-dir "$PATCHED_DIR" --target-app "$APP"
 
 log "Run runtime MAP sweep with maximal logging"
+runtime_sweep_args=(
+  --exe "$EXE"
+  --data-root "$PATCHED_DIR"
+  --out-dir "$RUNTIME_DIR"
+  --timeout "$TIMEOUT"
+)
+if [[ "$RUNTIME_MAP_LIMIT" != "0" ]]; then
+    runtime_sweep_args+=(--limit "$RUNTIME_MAP_LIMIT")
+fi
 RME_LOG="${RME_LOG_TOPICS:-all}" \
 F1R_PATCHLOG=1 \
 F1R_PATCHLOG_VERBOSE="${F1R_PATCHLOG_VERBOSE:-0}" \
 python3 "$ROOT/scripts/test/test-rme-runtime-sweep.py" \
-  --exe "$EXE" \
-  --data-root "$PATCHED_DIR" \
-  --out-dir "$RUNTIME_DIR" \
-  --timeout "$TIMEOUT"
+  "${runtime_sweep_args[@]}"
 
 log "Run topic-by-topic logging sweep"
 LOG_DIR="$LOG_SWEEP_DIR" RUNTIME="${LOG_SWEEP_RUNTIME:-20}" "$ROOT/scripts/test/test-rme-log-sweep.sh"

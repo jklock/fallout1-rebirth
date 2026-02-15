@@ -1,6 +1,6 @@
 # scripts
 
-Last updated (UTC): 2026-02-14
+Last updated (UTC): 2026-02-15
 
 Automation entrypoints for build, patching, development checks, and testing.
 
@@ -29,10 +29,13 @@ Automation entrypoints for build, patching, development checks, and testing.
 - Full verify: `./scripts/dev/dev-verify.sh`
 - Build macOS (prod): `./scripts/build/build-macos.sh -prod`
 - Build iOS (prod): `./scripts/build/build-ios.sh -prod`
+- Stage iOS release IPA: `cp build-outputs/iOS/fallout1-rebirth.ipa releases/prod/iOS/fallout1-rebirth.ipa`
 - Build macOS (test payload): `./scripts/build/build-macos.sh -test`
 - Build iOS (test payload): `./scripts/build/build-ios.sh -test --both`
 - RME suite: `python3 scripts/test/rme/suite.py all`
 - Compile-time logging toggle: `./scripts/test/test-rebirth-toggle-logging.sh`
+- Per-key config gate: `./scripts/test/test-rme-config-compat.sh`
+- Template/package alignment gate: `./scripts/test/test-rme-config-packaging.sh`
 
 ## Notes
 - `scripts/hideall.sh` is the only script that toggles development ignore rules in `.gitignore`.

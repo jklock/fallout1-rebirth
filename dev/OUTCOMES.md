@@ -40,10 +40,11 @@ Done means all three outcomes are true in the same execution window:
 3. Combined unattended round: 100%
 
 ## Latest Proof Snapshot
-- Timestamp: `2026-02-15T08:00:11Z`
-- History row: `1	both	2	2	100	PASS	2026-02-15T08:00:11Z`
+- Timestamp: `2026-02-15T16:03:04Z`
+- History row: `1	both	2	2	100	PASS	2026-02-15T16:03:04Z`
 - Step summary:
   - `config/rme_quick`: `PASS`
   - `config/rme_full`: `PASS`
+  - `config/config_compat_gate`: `PASS`
   - `input/macos_headless`: `PASS`
   - `input/ios_headless`: `PASS`

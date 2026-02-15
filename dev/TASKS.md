@@ -50,8 +50,9 @@
 - [x] Verify app/ipa packaged configs match.
 
 ### B4. Automated Tests
-- [ ] Add per-key effect tests.
+- [x] Add per-key effect tests.
 - [x] Add config compatibility gate to unattended runner.
+- [x] Add template/package config alignment gate (`test-rme-config-packaging.sh`).
 
 ## Completion Gate (100%)
 - [x] Track A suite pass = 100%.

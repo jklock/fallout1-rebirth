@@ -33,6 +33,7 @@ Output:
 
 ```text
 build-macos/RelWithDebInfo/Fallout 1 Rebirth.app
+releases/prod/macOS/Fallout 1 Rebirth.app
 ```
 
 ### iOS build
@@ -54,6 +55,12 @@ Outputs:
 build-ios/<CONFIG>-iphoneos/fallout1-rebirth.app
 build-ios-sim/<CONFIG>-iphonesimulator/fallout1-rebirth.app
 build-outputs/iOS/*.ipa
+```
+
+For release staging used by this repo, copy the IPA into:
+
+```text
+releases/prod/iOS/fallout1-rebirth.ipa
 ```
 
 ## Build Script Options
@@ -135,6 +142,7 @@ This repository no longer provides a dedicated DMG script.
 
 - iOS IPA packaging is handled by `scripts/build/build-ios.sh` (device target).
 - macOS DMG packaging is manual (maintainer-managed).
+- Production iOS payloads include `fallout.cfg` and `f1_res.ini` from `gameconfig/ios/`.
 
 Example manual macOS package from an existing build directory:
 
@@ -148,9 +156,11 @@ cpack -C RelWithDebInfo
 1. Build local artifacts:
    - `./scripts/build/build-macos.sh -prod`
    - `./scripts/build/build-ios.sh -prod --device`
+   - `cp build-outputs/iOS/fallout1-rebirth.ipa releases/prod/iOS/fallout1-rebirth.ipa`
 2. Verify artifacts:
    - `./scripts/dev/dev-verify.sh --build-dir build-macos`
    - `./scripts/test/test-ios-headless.sh`
+   - `./scripts/test/test-rme-config-packaging.sh`
 3. Package macOS artifact manually (optional) and upload outputs to GitHub Releases.
 
 ## Troubleshooting

@@ -1349,6 +1349,7 @@ int game_quit_with_confirm()
 static int game_init_databases()
 {
     int hashing;
+    bool showLoadInfo = false;
     char* main_file_name;
     char* patch_file_name;
 
@@ -1356,7 +1357,9 @@ static int game_init_databases()
     main_file_name = NULL;
     patch_file_name = NULL;
 
-    if (config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_HASHING_KEY, &hashing)) {
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_LOAD_INFO_KEY, &showLoadInfo);
+
+    if (config_get_value(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_HASHING_KEY, &hashing) && hashing != 0) {
         db_enable_hash_table();
     }
 
@@ -1368,6 +1371,14 @@ static int game_init_databases()
     config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_MASTER_PATCHES_KEY, &patch_file_name);
     if (*patch_file_name == '\0') {
         patch_file_name = NULL;
+    }
+
+    if (showLoadInfo) {
+        rme_logf("config",
+            "db init master_dat=%s master_patches=%s hashing=%d",
+            main_file_name != NULL ? main_file_name : "(null)",
+            patch_file_name != NULL ? patch_file_name : "(null)",
+            hashing);
     }
 
     master_db_handle = db_init(main_file_name, NULL, patch_file_name, 1);
@@ -1384,6 +1395,13 @@ static int game_init_databases()
     config_get_string(&game_config, GAME_CONFIG_SYSTEM_KEY, GAME_CONFIG_CRITTER_PATCHES_KEY, &patch_file_name);
     if (*patch_file_name == '\0') {
         patch_file_name = NULL;
+    }
+
+    if (showLoadInfo) {
+        rme_logf("config",
+            "db init critter_dat=%s critter_patches=%s",
+            main_file_name != NULL ? main_file_name : "(null)",
+            patch_file_name != NULL ? patch_file_name : "(null)");
     }
 
     critter_db_handle = db_init(main_file_name, NULL, patch_file_name, 1);

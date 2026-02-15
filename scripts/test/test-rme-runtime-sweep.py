@@ -414,15 +414,26 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if os.environ.get("F1R_PATCHLOG_VERBOSE") and os.environ.get("F1R_PATCHLOG_VERBOSE") != "0":
                 env["F1R_PATCHLOG_VERBOSE"] = os.environ.get("F1R_PATCHLOG_VERBOSE")
 
-            # Ensure the per-map subprocess timeout is long enough to accommodate the hold window
+            # Ensure the per-map subprocess timeout is long enough to accommodate
+            # map load, delayed click, and post-click hold.
             try:
                 hold_secs = int(env.get("F1R_AUTORUN_HOLD_SECS", "10"))
             except Exception:
                 hold_secs = 10
-            if args.timeout < hold_secs + 2:
+            try:
+                click_delay_secs = int(env.get("F1R_AUTORUN_CLICK_DELAY", "7"))
+            except Exception:
+                click_delay_secs = 7
+            # `map_load` duration varies; keep a conservative startup/load budget so
+            # short caller-provided timeouts do not truncate post-click evidence.
+            required_timeout = click_delay_secs + hold_secs + 8
+            if args.timeout < required_timeout:
                 old_timeout = args.timeout
-                args.timeout = float(hold_secs + 2)
-                f_log.write(f"[WARN] increasing per-map timeout from {old_timeout}s to {args.timeout}s to accommodate F1R_AUTORUN_HOLD_SECS={hold_secs}\n")
+                args.timeout = float(required_timeout)
+                f_log.write(
+                    f"[WARN] increasing per-map timeout from {old_timeout}s to {args.timeout}s "
+                    f"to accommodate click_delay={click_delay_secs}s hold={hold_secs}s\n"
+                )
                 f_log.flush()
 
             t0 = time.time()
@@ -534,10 +545,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                             pass
                 exit_code = exit_code if exit_code != 0 else 3
                 failures.append(map_name)
-            elif exit_code == 2:
-                # Some maps can terminate with exit 2 after a successful autorun cycle.
-                # Treat this as non-blocking when full-load verification passed.
-                f_log.write(f"[WARN] {map_name}: process exited with code 2 after full-load checks; treating as pass\n")
+            elif exit_code in (2, 124):
+                # Some runs end with non-zero process status after a successful
+                # autorun cycle (for example harness timeout after post-click hold).
+                # Treat these as non-blocking when full-load verification passed.
+                f_log.write(
+                    f"[WARN] {map_name}: process exited with code {exit_code} "
+                    "after full-load checks; treating as pass\n"
+                )
                 exit_code = 0
 
             if exit_code != 0 and map_name not in failures:

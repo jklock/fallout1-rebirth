@@ -1,12 +1,34 @@
 # Input Investigation - 2026-02-15
 
-## 1) Exact Current State and Issues
+## Status Update (Post-Implementation)
+
+This document started as an investigation snapshot. Several items listed below are now resolved:
+
+- Baseline config compatibility is complete and validated:
+  - `fallout.cfg`: `55/55 PASS`
+  - `f1_res.ini`: `6/6 PASS`
+  - Combined: `61/61 PASS`
+- `VSYNC` and `FPS_LIMIT` are now wired and verified via per-key runtime-effect tests.
+- Release artifact status is now current:
+  - `releases/prod/macOS/Fallout 1 Rebirth.app` exists and is refreshed.
+  - `releases/prod/iOS/fallout1-rebirth.ipa` is refreshed and now includes `fallout.cfg` + `f1_res.ini`.
+- Template/package alignment is enforced by:
+  - `scripts/test/test-rme-config-packaging.sh`
+  - `docs/audit/config-packaging-alignment-2026-02-15.md`
+
+Authoritative pass/fail evidence is tracked in:
+- `docs/audit/results.md`
+- `docs/audit/config-key-coverage-matrix-2026-02-15.md`
+- `dev/state/latest-summary.tsv`
+- `dev/state/history.tsv`
+
+## 1) Historical Snapshot at Investigation Start
 
 ### Repository and build state
 - Branch/head: `RME-DEV` at `571d15d`.
 - Local modified file: `src/plib/gnw/winmain.cc` (iOS missing-files path exits via `exit(EXIT_FAILURE)` after the alert).
-- iOS release artifact present: `releases/prod/iOS/fallout1-rebirth.ipa` (SHA-256 `86bf8e721bc1ad1ba187598f6d8a758afd72b47f3e6629c2635159baed3da70c`).
-- macOS release folder currently has no packaged `.app` in `releases/prod/macOS/` (only `.DS_Store` currently visible from repo-side check).
+- At investigation start, iOS artifact was `releases/prod/iOS/fallout1-rebirth.ipa` (SHA-256 `86bf8e721bc1ad1ba187598f6d8a758afd72b47f3e6629c2635159baed3da70c`).
+- At investigation start, macOS release folder had no packaged `.app` in `releases/prod/macOS/`.
 
 ### User-facing issues currently tracked
 - iPad input regression: after latest IPA, user reports all input paths (touchpad, pencil, touch) non-functional.

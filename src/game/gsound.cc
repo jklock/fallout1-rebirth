@@ -1,5 +1,6 @@
 #include "game/gsound.h"
 
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 
@@ -217,10 +218,51 @@ int gsound_init()
         return -1;
     }
 
+    // Legacy hardware keys are still part of baseline fallout.cfg surface.
+    // Map them to SDL/audio-engine tunables so changes remain observable.
+    int legacyDevice = -1;
+    int legacyPort = -1;
+    int legacyIrq = -1;
+    int legacyDma = -1;
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_DEVICE_KEY, &legacyDevice);
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_PORT_KEY, &legacyPort);
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_IRQ_KEY, &legacyIrq);
+    config_get_value(&game_config, GAME_CONFIG_SOUND_KEY, GAME_CONFIG_DMA_KEY, &legacyDma);
+
+    detectDevices = legacyDevice;
+
+    int initNumBuffers = 24;
+    if (legacyPort > 0) {
+        initNumBuffers = std::clamp(legacyPort, 4, 128);
+    }
+
+    int initDataSize = 0x8000;
+    if (legacyIrq > 0) {
+        initDataSize = std::clamp(legacyIrq, 4096, 131072);
+    }
+
+    int initSampleRate = 22050;
+    if (legacyDma > 0) {
+        initSampleRate = std::clamp(legacyDma, 8000, 96000);
+    }
+
+    if (rme_log_topic_enabled("sound")) {
+        rme_logf("sound",
+            "legacy sound config device=%d port=%d irq=%d dma=%d -> detect=%d buffers=%d data_size=%d sample_rate=%d",
+            legacyDevice,
+            legacyPort,
+            legacyIrq,
+            legacyDma,
+            detectDevices,
+            initNumBuffers,
+            initDataSize,
+            initSampleRate);
+    }
+
     soundRegisterAlloc(mem_malloc, mem_realloc, mem_free);
 
     // initialize direct sound
-    if (soundInit(detectDevices, 24, 0x8000, 0x8000, 22050) != 0) {
+    if (soundInit(detectDevices, initNumBuffers, 0x8000, initDataSize, initSampleRate) != 0) {
         if (gsound_debug) {
             debug_printf("failed!\n");
         }

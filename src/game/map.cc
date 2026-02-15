@@ -1282,9 +1282,12 @@ void map_new_map()
 int map_load(char* file_name)
 {
     int rc;
+    bool showLoadInfo = false;
     DB_FILE* stream;
     char* extension;
     char* file_path;
+
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_LOAD_INFO_KEY, &showLoadInfo);
 
     if (patchlog_enabled()) {
         const char* requested_name = file_name != NULL ? file_name : "(null)";
@@ -1292,6 +1295,9 @@ int map_load(char* file_name)
     }
     if (rme_log_topic_enabled("map")) {
         rme_logf("map", "map_load request name=%s", file_name != NULL ? file_name : "(null)");
+    }
+    if (showLoadInfo) {
+        debug_printf("MAP_LOAD: request=%s\n", file_name != NULL ? file_name : "(null)");
     }
 
     compat_strupr(file_name);
@@ -1324,6 +1330,8 @@ int map_load(char* file_name)
             db_fclose(stream);
         } else if (patchlog_enabled()) {
             patchlog_write("MAP_OPEN_FAIL", "path=\"%s\"", file_path);
+        } else if (showLoadInfo) {
+            debug_printf("MAP_LOAD: open failed path=%s\n", file_path != NULL ? file_path : "(null)");
         }
 
         if (rc == 0) {
@@ -1360,11 +1368,16 @@ int map_load_file(DB_FILE* stream)
     int rc = 0;
     const char* error;
     bool autorun_active = false;
+    bool outputMapDataInfo = false;
+    bool showLoadInfo = false;
 
     const char* autorun_env = getenv("F1R_AUTORUN_MAP");
     if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
         autorun_active = true;
     }
+
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_OUTPUT_MAP_DATA_INFO_KEY, &outputMapDataInfo);
+    configGetBool(&game_config, GAME_CONFIG_DEBUG_KEY, GAME_CONFIG_SHOW_LOAD_INFO_KEY, &showLoadInfo);
 
     map_save_in_game(true);
     gsound_background_play("wind2", 12, 13, 16);
@@ -1385,6 +1398,19 @@ int map_load_file(DB_FILE* stream)
 
         error = "Error reading header";
         if (map_read_MapData(&map_data, stream) != 0) break;
+
+        if (outputMapDataInfo || showLoadInfo) {
+            rme_logf("map",
+                "map header name=%s version=%d flags=0x%X local_vars=%d global_vars=%d enter_tile=%d enter_elev=%d enter_rot=%d",
+                map_data.name,
+                map_data.version,
+                map_data.flags,
+                map_data.localVariablesCount,
+                map_data.globalVariablesCount,
+                map_data.enteringTile,
+                map_data.enteringElevation,
+                map_data.enteringRotation);
+        }
 
         error = "Invalid map version";
         if (map_data.version != 19) break;

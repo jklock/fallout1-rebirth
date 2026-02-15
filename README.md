@@ -4,7 +4,7 @@
 
 # Fallout 1 Rebirth
 
-Last updated: 2026-02-14
+Last updated: 2026-02-15
 
 **Play Fallout 1 on your Mac or iPad** — the classic 1997 RPG, rebuilt for Apple platforms.
 
@@ -22,8 +22,21 @@ Fallout 1 Rebirth is a modern engine reimplementation that lets you play Fallout
 - **Magic Keyboard/Trackpad** — Full mouse and keyboard support on iPad
 - **VSync & ProMotion** — Smooth 120Hz gameplay on compatible displays
 - **Retina display support** — Sharp 2X scaling for high-DPI screens
+- **Config compatibility complete** — Baseline `fallout.cfg` + `f1_res.ini` keys are wired and validated (`61/61 PASS`)
+- **Platform defaults enforced** — macOS starts windowed, iOS/iPadOS starts fullscreen
 - **Engine bug fixes** — Survivalist perk fix, combat improvements, and more
 - **Community improvements** — Object tooltips, combat enhancements, TeamX patch compatibility
+
+## Validation Status
+
+- Baseline key coverage: `61/61 PASS`
+  - Matrix: `docs/audit/config-key-coverage-matrix-2026-02-15.md`
+  - Machine output: `tmp/rme/config-compat/coverage-matrix.tsv`
+- Template/package alignment gate: `scripts/test/test-rme-config-packaging.sh` (`PASS`)
+- Latest unattended proof: `dev/state/history.tsv` row `2026-02-15T16:03:04Z` (`2/2`, `100%`, `PASS`)
+- Fresh release artifacts:
+  - `releases/prod/macOS/Fallout 1 Rebirth.app`
+  - `releases/prod/iOS/fallout1-rebirth.ipa`
 
 ---
 
@@ -107,6 +120,7 @@ Full mouse and keyboard support — works just like on Mac.
 | [Setup Guide](docs/setup_guide.md) | Complete installation walkthrough |
 | [Configuration](docs/configuration.md) | All settings explained |
 | [Features](docs/features.md) | Full list of improvements and fixes |
+| [Audit Results](docs/audit/results.md) | Latest config/input validation evidence |
 
 ---
 
