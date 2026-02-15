@@ -93,8 +93,8 @@ static void iOS_updateDestRect()
         return;
     }
 
-    int sdl_w = window_pw; // SDL's reported width (larger for portrait device)
-    int sdl_h = window_ph; // SDL's reported height (smaller for portrait device)
+    int sdl_w = window_pw;
+    int sdl_h = window_ph;
 
     SDL_Log("iOS_updateDestRect: SDL pixel size: %dx%d", sdl_w, sdl_h);
 

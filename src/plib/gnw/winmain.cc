@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <string>
 #include <unistd.h>
 
@@ -85,7 +86,33 @@ int main(int argc, char* argv[])
     // Use dedicated touch gesture handling; avoid synthetic touch->mouse events
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
-    chdir(iOSGetDocumentsPath());
+    const char* documentsPath = iOSGetDocumentsPath();
+    if (documentsPath != NULL) {
+        chdir(documentsPath);
+    }
+
+    struct stat dataStat;
+    const bool masterPresent = access("master.dat", R_OK) == 0;
+    const bool critterPresent = access("critter.dat", R_OK) == 0;
+    const bool dataDirPresent = stat("data", &dataStat) == 0 && S_ISDIR(dataStat.st_mode);
+
+    if (!(masterPresent && critterPresent && dataDirPresent)) {
+        if (rme_log_topic_enabled("config")) {
+            rme_logf("config",
+                "ios preflight missing data cwd=%s master.dat=%d critter.dat=%d data_dir=%d",
+                documentsPath != NULL ? documentsPath : "(null)",
+                masterPresent ? 1 : 0,
+                critterPresent ? 1 : 0,
+                dataDirPresent ? 1 : 0);
+        }
+
+        SDL_ShowSimpleMessageBox(
+            SDL_MESSAGEBOX_ERROR,
+            "Missing Game Files",
+            "Could not find the master datafile. Install master.dat, critter.dat, and the data folder in Files > Fallout 1 Rebirth > Documents.",
+            NULL);
+        return EXIT_FAILURE;
+    }
 #endif
 
 #if __APPLE__ && TARGET_OS_OSX

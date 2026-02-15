@@ -1107,7 +1107,7 @@ void GNW95_process_message()
         switch (e.type) {
         case SDL_EVENT_MOUSE_MOTION:
 #if defined(__APPLE__) && TARGET_OS_IOS
-            if (e.motion.which == SDL_TOUCH_MOUSEID) {
+            if (e.motion.which == SDL_TOUCH_MOUSEID || e.motion.which == SDL_PEN_MOUSEID) {
                 break;
             }
 #endif
@@ -1118,7 +1118,7 @@ void GNW95_process_message()
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
 #if defined(__APPLE__) && TARGET_OS_IOS
-            if (e.button.which == SDL_TOUCH_MOUSEID) {
+            if (e.button.which == SDL_TOUCH_MOUSEID || e.button.which == SDL_PEN_MOUSEID) {
                 break;
             }
 #endif
@@ -1129,7 +1129,7 @@ void GNW95_process_message()
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
 #if defined(__APPLE__) && TARGET_OS_IOS
-            if (e.button.which == SDL_TOUCH_MOUSEID) {
+            if (e.button.which == SDL_TOUCH_MOUSEID || e.button.which == SDL_PEN_MOUSEID) {
                 break;
             }
 #endif
@@ -1140,7 +1140,7 @@ void GNW95_process_message()
             break;
         case SDL_EVENT_MOUSE_WHEEL:
 #if defined(__APPLE__) && TARGET_OS_IOS
-            if (e.wheel.which == SDL_TOUCH_MOUSEID) {
+            if (e.wheel.which == SDL_TOUCH_MOUSEID || e.wheel.which == SDL_PEN_MOUSEID) {
                 break;
             }
 #endif

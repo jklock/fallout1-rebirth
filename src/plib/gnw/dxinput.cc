@@ -25,10 +25,6 @@ static bool last_input_was_mouse = false;
 static int last_system_x = -1;
 static int last_system_y = -1;
 static Uint32 last_mouse_buttons = 0;
-static bool g_iOS_relative_mouse_enabled = false;
-// Track button state from events since SDL_GetMouseState doesn't reflect touch-converted clicks
-static bool left_button_down = false;
-static bool right_button_down = false;
 #endif
 
 // 0x4E0400
@@ -85,38 +81,9 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_PumpEvents();
 
 #if defined(__APPLE__) && TARGET_OS_IOS
-    if (g_iOS_relative_mouse_enabled) {
-        float rel_x, rel_y;
-        SDL_MouseButtonFlags mouse_buttons = SDL_GetRelativeMouseState(&rel_x, &rel_y);
-        if (rel_x != 0.0f || rel_y != 0.0f || mouse_buttons != last_mouse_buttons) {
-            last_input_was_mouse = true;
-        }
-        last_mouse_buttons = mouse_buttons;
-
-        float dest_x = 0.0f;
-        float dest_y = 0.0f;
-        float dest_w = 0.0f;
-        float dest_h = 0.0f;
-        iOS_getDestRect(&dest_x, &dest_y, &dest_w, &dest_h);
-        float scale_x = (dest_w > 0.0f) ? (float)screenGetWidth() / dest_w : 1.0f;
-        float scale_y = (dest_h > 0.0f) ? (float)screenGetHeight() / dest_h : 1.0f;
-
-        mouseState->x = (int)(rel_x * scale_x);
-        mouseState->y = (int)(rel_y * scale_y);
-
-        bool left_down = left_button_down || (mouse_buttons & SDL_BUTTON_LMASK) != 0;
-        bool right_down = right_button_down || (mouse_buttons & SDL_BUTTON_RMASK) != 0;
-        mouseState->buttons[0] = left_down;
-        mouseState->buttons[1] = right_down;
-        mouseState->wheelX = gMouseWheelDeltaX;
-        mouseState->wheelY = gMouseWheelDeltaY;
-        gMouseWheelDeltaX = 0;
-        gMouseWheelDeltaY = 0;
-        return true;
-    }
-
     static int log_count = 0;
-    float system_x, system_y;
+    float system_x = 0.0f;
+    float system_y = 0.0f;
     SDL_MouseButtonFlags mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
     if (log_count < 20 || (log_count % 100 == 0)) {
         SDL_Log("DXINPUT: SDL_GetMouseState raw=(%.1f,%.1f) buttons=0x%x",
@@ -145,8 +112,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         render_y = system_y * scale_y;
     }
 
-    float pixel_x = render_x;
-    float pixel_y = render_y;
+    const float pixel_x = render_x;
+    const float pixel_y = render_y;
 
     bool mouse_activity = false;
     if (last_system_x == -1 && last_system_y == -1) {
@@ -172,8 +139,21 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouse_get_position(&game_x, &game_y);
 
         // Use our custom iOS coordinate conversion that accounts for the dest rect
-        int mapped_x, mapped_y;
-        iOS_screenToGameCoords(pixel_x, pixel_y, &mapped_x, &mapped_y);
+        int mapped_x = 0;
+        int mapped_y = 0;
+        bool in_bounds = iOS_screenToGameCoords(pixel_x, pixel_y, &mapped_x, &mapped_y);
+
+        if (!in_bounds) {
+            // If custom-rect mapping is not active, `iOS_screenToGameCoords` falls back
+            // to direct pixel mapping and returns false. Accept that fallback as valid.
+            int direct_x = (int)pixel_x;
+            int direct_y = (int)pixel_y;
+            if (direct_x >= 0 && direct_x < screenGetWidth()
+                && direct_y >= 0 && direct_y < screenGetHeight()
+                && mapped_x == direct_x && mapped_y == direct_y) {
+                in_bounds = true;
+            }
+        }
 
         int delta_x = mapped_x - game_x;
         int delta_y = mapped_y - game_y;
@@ -183,10 +163,12 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
                 pixel_x, pixel_y, mapped_x, mapped_y, game_x, game_y, delta_x, delta_y);
         }
 
-        if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
+        if (in_bounds) {
             mouseState->x = delta_x;
             mouseState->y = delta_y;
         } else {
+            // Ignore movement outside the active game content area to avoid
+            // snapping to clamped edges (for example, top-left corner).
             mouseState->x = 0;
             mouseState->y = 0;
         }
@@ -195,12 +177,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->y = 0;
     }
 
-    // Use tracked button state from events OR SDL button flags
-    // Event tracking catches button presses, SDL flags provide backup
-    bool left_down = left_button_down || (mouse_buttons & SDL_BUTTON_LMASK) != 0;
-    bool right_down = right_button_down || (mouse_buttons & SDL_BUTTON_RMASK) != 0;
-    mouseState->buttons[0] = left_down;
-    mouseState->buttons[1] = right_down;
+    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON_LMASK) != 0;
+    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON_RMASK) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;
@@ -360,20 +338,7 @@ void handleMouseEvent(SDL_Event* event)
     }
 
 #if defined(__APPLE__) && TARGET_OS_IOS
-    // Track button state from events for iOS
-    if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-        if (event->button.button == SDL_BUTTON_LEFT) {
-            left_button_down = true;
-        } else if (event->button.button == SDL_BUTTON_RIGHT) {
-            right_button_down = true;
-        }
-    } else if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
-        if (event->button.button == SDL_BUTTON_LEFT) {
-            left_button_down = false;
-        } else if (event->button.button == SDL_BUTTON_RIGHT) {
-            right_button_down = false;
-        }
-    }
+    (void)event;
 #endif
 }
 
@@ -381,11 +346,6 @@ void dxinput_notify_mouse()
 {
 #if defined(__APPLE__) && TARGET_OS_IOS
     last_input_was_mouse = true;
-    if (!g_iOS_relative_mouse_enabled) {
-        if (SDL_SetWindowRelativeMouseMode(gSdlWindow, true)) {
-            g_iOS_relative_mouse_enabled = true;
-        }
-    }
     static int mouse_event_count = 0;
     if (mouse_event_count < 5) {
         debug_printf("iOS: Mouse event received (count=%d)\n", ++mouse_event_count);
@@ -397,12 +357,8 @@ void dxinput_notify_touch()
 {
 #if defined(__APPLE__) && TARGET_OS_IOS
     last_input_was_mouse = false;
-    if (g_iOS_relative_mouse_enabled) {
-        SDL_SetWindowRelativeMouseMode(gSdlWindow, false);
-        g_iOS_relative_mouse_enabled = false;
-    }
-    left_button_down = false;
-    right_button_down = false;
+    last_system_x = -1;
+    last_system_y = -1;
     last_mouse_buttons = 0;
     static int touch_event_count = 0;
     if (touch_event_count < 5) {
