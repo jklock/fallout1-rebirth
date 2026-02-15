@@ -8,6 +8,7 @@
 #include "game/gconfig.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/button.h"
 #include "plib/gnw/dxinput.h"
 #include "plib/gnw/gnw.h"
@@ -59,6 +60,7 @@ static int default_pause_window();
 static void buf_blit(unsigned char* src, unsigned int src_pitch, unsigned int a3, unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned int dest_x, unsigned int dest_y);
 static void GNW95_build_key_map();
 static void GNW95_process_key(KeyboardData* data);
+static void maybe_run_touch_autotest();
 
 static void idleImpl();
 
@@ -135,6 +137,10 @@ static unsigned int bk_process_time;
 #if defined(__APPLE__) && TARGET_OS_IOS
 static bool g_iOS_keyboard_visible = false;
 static unsigned int g_iOS_keyboard_toggle_time = 0;
+
+static bool g_touch_autotest_initialized = false;
+static bool g_touch_autotest_done = false;
+static int g_touch_autotest_step = 0;
 #endif
 
 // 0x4B32C0
@@ -1094,6 +1100,118 @@ void GNW95_input_exit()
 {
 }
 
+static void maybe_run_touch_autotest()
+{
+#if defined(__APPLE__) && TARGET_OS_IOS
+    const char* enabled = getenv("F1R_TOUCH_AUTOTEST");
+    if (enabled == nullptr || enabled[0] == '\0' || enabled[0] == '0' || g_touch_autotest_done) {
+        return;
+    }
+
+    if (!g_touch_autotest_initialized) {
+        g_touch_autotest_initialized = true;
+        g_touch_autotest_step = 0;
+        if (patchlog_enabled()) {
+            patchlog_write("INPUT_AUTOTEST", "start");
+        }
+    }
+
+    auto injectTouch = [&](SDL_EventType type, Sint64 fingerId, float x, float y) {
+        SDL_TouchFingerEvent event;
+        SDL_zero(event);
+        event.type = type;
+        event.timestamp = SDL_GetTicksNS();
+        event.touchID = 1;
+        event.fingerID = fingerId;
+        event.x = x;
+        event.y = y;
+        event.pressure = 1.0f;
+
+        if (patchlog_enabled()) {
+            patchlog_write("INPUT_AUTOTEST", "step=%d event=%u finger=%lld x=%.4f y=%.4f",
+                g_touch_autotest_step,
+                static_cast<unsigned int>(type),
+                (long long)fingerId,
+                x,
+                y);
+        }
+
+        dxinput_notify_touch();
+        switch (type) {
+        case SDL_EVENT_FINGER_DOWN:
+            touch_handle_start(&event);
+            break;
+        case SDL_EVENT_FINGER_MOTION:
+            touch_handle_move(&event);
+            break;
+        case SDL_EVENT_FINGER_UP:
+            touch_handle_end(&event);
+            break;
+        default:
+            break;
+        }
+    };
+
+    struct TouchAutotestStep {
+        SDL_EventType type;
+        Sint64 fingerId;
+        float x;
+        float y;
+    };
+
+    static const TouchAutotestStep kSteps[] = {
+        { SDL_EVENT_FINGER_DOWN, 101, 0.20f, 0.20f },
+        { SDL_EVENT_FINGER_MOTION, 101, 0.28f, 0.32f },
+        { SDL_EVENT_FINGER_UP, 101, 0.28f, 0.32f },
+        { SDL_EVENT_FINGER_DOWN, 201, 0.60f, 0.60f },
+        { SDL_EVENT_FINGER_DOWN, 202, 0.70f, 0.60f },
+        { SDL_EVENT_FINGER_MOTION, 201, 0.62f, 0.64f },
+        { SDL_EVENT_FINGER_MOTION, 202, 0.72f, 0.64f },
+        { SDL_EVENT_FINGER_UP, 202, 0.72f, 0.64f },
+        { SDL_EVENT_FINGER_UP, 201, 0.62f, 0.64f },
+    };
+
+    while (g_touch_autotest_step < static_cast<int>(SDL_arraysize(kSteps))) {
+        const TouchAutotestStep& step = kSteps[g_touch_autotest_step];
+        injectTouch(step.type, step.fingerId, step.x, step.y);
+        g_touch_autotest_step++;
+    }
+
+    g_touch_autotest_done = true;
+    if (patchlog_enabled()) {
+        patchlog_write("INPUT_AUTOTEST", "done");
+    }
+
+    const char* shouldExit = getenv("F1R_TOUCH_AUTOTEST_EXIT");
+    const bool shouldExitNow = shouldExit != nullptr && shouldExit[0] != '\0' && shouldExit[0] != '0';
+    if (shouldExitNow) {
+        // Ensure deterministic autotest evidence without depending on the normal
+        // frame pump consuming touch actions before process exit.
+        touch_process_gesture();
+        touch_process_gesture();
+
+        TouchMouseEvent touchEvent;
+        while (touch_pop_mouse_event(&touchEvent)) {
+            if (!patchlog_enabled()) {
+                continue;
+            }
+
+            if (touchEvent.type == kTouchMouseEventPointer) {
+                patchlog_write("INPUT_AUTOTEST_MOUSE", "pointer x=%d y=%d buttons=0x%x",
+                    touchEvent.x,
+                    touchEvent.y,
+                    touchEvent.buttons);
+            } else if (touchEvent.type == kTouchMouseEventWheel) {
+                patchlog_write("INPUT_AUTOTEST_MOUSE", "wheel x=%d y=%d",
+                    touchEvent.wheelX,
+                    touchEvent.wheelY);
+            }
+        }
+        exit(0);
+    }
+#endif
+}
+
 // 0x4B4538
 void GNW95_process_message()
 {
@@ -1236,21 +1354,13 @@ void GNW95_process_message()
         }
     }
 
+    maybe_run_touch_autotest();
     touch_process_gesture();
 
 #if defined(__APPLE__) && TARGET_OS_IOS
-    // Poll for Apple Pencil body gestures (double-tap, squeeze)
-    // Only trigger right-click if pencil_right_click is enabled in config
-    int pencil_right_click_enabled = 1;
-    config_get_value(&game_config, GAME_CONFIG_INPUT_KEY, GAME_CONFIG_PENCIL_RIGHT_CLICK_KEY, &pencil_right_click_enabled);
-
-    PencilGestureType pencilGesture = pencil_poll_gesture();
-    if (pencil_right_click_enabled && (pencilGesture == PENCIL_GESTURE_DOUBLE_TAP || pencilGesture == PENCIL_GESTURE_SQUEEZE)) {
-        int cursorX = 0;
-        int cursorY = 0;
-        mouse_get_position(&cursorX, &cursorY);
-        touch_enqueue_secondary_click(cursorX, cursorY);
-    }
+    // Keep Pencil behavior generation-agnostic and deterministic:
+    // Pencil is left-click-only; body gestures are ignored.
+    (void)pencil_poll_gesture();
 #endif
 
     if (GNW95_isActive && !kb_is_disabled()) {

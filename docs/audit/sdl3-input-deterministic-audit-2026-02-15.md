@@ -32,6 +32,14 @@ Reviewed files:
 | `571d15d` | 2026-02-14 | iPad resolution/input follow-up adjustments. | Added pen synthetic filtering and out-of-bounds suppression. | Kept as baseline hardening; deterministic layer now unifies upstream behavior. |
 | current (working tree) | 2026-02-15 | Introduce `InputStateMachine` + `input_mapping`; rebuild touch/mouse bridge around FIFO events. | Deterministic ownership, unified mapping, automated validation coverage. | Target implementation. |
 
+### Post-Review Correction (2026-02-15)
+- Regression source identified from history comparison (`0c8f6c3` baseline vs `cea989d` changes):
+  - `cea989d` added `SDL_HINT_PEN_MOUSE_EVENTS=0` and `SDL_HINT_PEN_TOUCH_EVENTS=0` in `winmain.cc`; this can suppress Pencil event flow while no `SDL_EVENT_PEN_*` translation path exists.
+  - iOS touch activation depended on `inBounds=true` from `iOS_windowToGameCoords`; when custom letterbox mapping is not active yet, false was returned and the touch stream was dropped.
+- Applied correction:
+  - Removed `SDL_HINT_PEN_*` disabling in `src/plib/gnw/winmain.cc`.
+  - Hardened iOS mapping fallback in `src/plib/gnw/touch.cc` and `src/plib/gnw/svga.cc` so startup/fallback mapping does not discard touch-first input and does not rely on renderer logical conversion.
+
 ## Final Architecture (Implemented)
 - Deterministic translation core:
   - `src/plib/gnw/input_state_machine.h`
@@ -47,8 +55,8 @@ Reviewed files:
   - `src/plib/gnw/input.cc`
 - iOS mapping/safe-area/windowing path uses shared letterbox mapper:
   - `src/plib/gnw/svga.cc`
-- Synthetic pen->mouse/pen->touch events disabled at startup:
-  - `src/plib/gnw/winmain.cc`
+- SDL synthetic touch/pen mouse events are explicitly ignored in GNW event intake while preserving hardware mouse path:
+  - `src/plib/gnw/input.cc`
 
 ## Event/State Diagram
 ```mermaid
@@ -75,7 +83,7 @@ flowchart TD
 | Pencil down/up mismatch | Pencil tip uses same left-button state machine down/move/up sequence. | `test_pencil_precise_down_move_up`. |
 | OS pointer vs game cursor desync | Hardware absolute pointer translated through unified queue only when touch stream inactive. | `test_mouse_absolute_sync_no_touch`; headless mouse path checks. |
 | iPad orientation/window/safe-area mapping drift | Shared `input_compute_letterbox_rect` + `input_map_screen_to_game` used by iOS coordinate conversion. | `test_mapping_portrait_fullscreen`, `test_mapping_landscape_fullscreen`, `test_mapping_safe_area_insets`, `test_mapping_windowed_and_dynamic_bounds`. |
-| Gesture semantics mismatch | Explicit single-finger left and two-finger right mapping; secondary click queue for Pencil body gesture. | `test_single_finger_click_and_drag`, `test_two_finger_right_click`, `test_secondary_click_sequence`. |
+| Gesture semantics mismatch | Explicit single-finger left and two-finger right mapping; Pencil is deterministic left-click-only (body gestures ignored). | `test_single_finger_click_and_drag`, `test_two_finger_right_click`, `test_pencil_precise_down_move_up`. |
 
 ## Automated Validation Assets
 - Unit layer tests:
@@ -86,23 +94,23 @@ flowchart TD
 - Unattended gate:
   - `dev/run-unattended-until-100.sh`
 
+### Autotest Hardening (2026-02-15)
+- `maybe_run_touch_autotest` now injects the full scripted touch sequence in one pass to avoid frame-scheduling stalls.
+- In autotest-exit mode, translated touch mouse actions are drained and logged before exit under `INPUT_AUTOTEST_MOUSE` so evidence is deterministic.
+- `scripts/test/test-ios-headless.sh` wait-loop parsing was fixed to avoid `0\n0` arithmetic errors when checking process liveness.
+
 Evidence locations (latest run):
 - `dev/state/latest-summary.tsv`
 - `dev/state/history.tsv`
-- Latest history row: `1	input	1	1	100	PASS	2026-02-15T17:25:24Z`
-- `dev/state/logs/round-1-input-input_layer.log`
-- `dev/state/logs/round-1-input-macos_headless.log`
-- `dev/state/logs/round-1-input-ios_headless.log`
-- `dev/state/logs/screens/round-1-ios_headless/ios-headless-com-fallout1rebirth-game-20260215T172516Z.png`
+- Latest history row: `2	input	1	1	100	PASS	2026-02-15T20:48:57Z`
+- `dev/state/logs/round-2-input-input_layer-rerun.log`
+- `dev/state/logs/round-2-input-macos_headless-rerun.log`
+- `dev/state/logs/round-2-input-ios_headless-rerun.log`
+- `dev/state/logs/screens/ios-headless-com-fallout1rebirth-game-20260215T204510Z.png`
+- `dev/state/logs/ios-touch-autotest-20260215T204516Z.patchlog.txt`
 
-## Build Artifacts (Fresh)
-- macOS app: `releases/prod/macOS/Fallout 1 Rebirth.app`
-- iOS IPA: `releases/prod/iOS/fallout1-rebirth.ipa`
-
-Fingerprint evidence:
-- `releases/prod/macOS/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth`
-  - mtime: `2026-02-15 11:26:32`
-  - sha256: `6294c3431ec9f1d3448ebd840353a266717f02056bc82fbce72a963eb3ce8192`
-- `releases/prod/iOS/fallout1-rebirth.ipa`
-  - mtime: `2026-02-15 10:59:59`
-  - sha256: `68c27a63ee58ad6c4385614dcc02bfd68d47505e23c8562ddab62d185e8b2f7f`
+## Build Artifacts (This Validation Run)
+- macOS app: `build-macos/RelWithDebInfo/Fallout 1 Rebirth.app`
+- iOS simulator app: `build-ios-sim/RelWithDebInfo-iphonesimulator/fallout1-rebirth.app`
+- Release macOS app: `releases/prod/macOS/Fallout 1 Rebirth.app`
+- Release iOS IPA: `releases/prod/iOS/fallout1-rebirth.ipa`

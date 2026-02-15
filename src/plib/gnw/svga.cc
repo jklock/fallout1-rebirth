@@ -1019,7 +1019,8 @@ bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* ga
         if (*game_y < 0) *game_y = 0;
         if (*game_x >= g_iOS_gameWidth) *game_x = g_iOS_gameWidth - 1;
         if (*game_y >= g_iOS_gameHeight) *game_y = g_iOS_gameHeight - 1;
-        return false;
+        // No custom letterbox rect is active; direct mapping is authoritative.
+        return true;
     }
 
     InputLayoutRect rect{
@@ -1035,24 +1036,23 @@ bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* ga
 // Convert window coordinates (points) to game coordinates on iOS
 bool iOS_windowToGameCoords(float window_x, float window_y, int* game_x, int* game_y)
 {
-    float render_x = window_x;
-    float render_y = window_y;
-
-    if (gSdlRenderer != NULL) {
-        if (!SDL_RenderCoordinatesFromWindow(gSdlRenderer, window_x, window_y, &render_x, &render_y)) {
-            int window_w = 0;
-            int window_h = 0;
-            int window_pw = 0;
-            int window_ph = 0;
-            SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
-            SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
-
-            float scale_x = (window_w > 0) ? (float)window_pw / (float)window_w : 1.0f;
-            float scale_y = (window_h > 0) ? (float)window_ph / (float)window_h : 1.0f;
-            render_x = window_x * scale_x;
-            render_y = window_y * scale_y;
-        }
+    if (game_x == NULL || game_y == NULL || gSdlWindow == NULL) {
+        return false;
     }
+
+    // iOS touch events arrive in window points; convert points -> pixels
+    // explicitly so mapping remains deterministic across orientation/windowing.
+    int window_w = 0;
+    int window_h = 0;
+    int window_pw = 0;
+    int window_ph = 0;
+    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+
+    float scale_x = (window_w > 0) ? static_cast<float>(window_pw) / static_cast<float>(window_w) : 1.0f;
+    float scale_y = (window_h > 0) ? static_cast<float>(window_ph) / static_cast<float>(window_h) : 1.0f;
+    float render_x = window_x * scale_x;
+    float render_y = window_y * scale_y;
 
     return iOS_screenToGameCoords(render_x, render_y, game_x, game_y);
 }

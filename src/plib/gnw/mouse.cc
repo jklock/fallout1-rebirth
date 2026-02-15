@@ -1,8 +1,11 @@
 #include "plib/gnw/mouse.h"
 
+#include <stdlib.h>
+
 #include "game/config.h"
 #include "game/gconfig.h"
 #include "plib/color/color.h"
+#include "plib/db/patchlog.h"
 #include "plib/gnw/dxinput.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/input.h"
@@ -58,6 +61,16 @@ static double mouse_sensitivity = 1.0;
 
 // 0x539DDC
 static int last_buttons = 0;
+
+static bool mouse_input_autotest_logging_enabled()
+{
+    static int cached = -1;
+    if (cached == -1) {
+        const char* env = getenv("F1R_TOUCH_AUTOTEST");
+        cached = (env != nullptr && env[0] != '\0' && env[0] != '0') ? 1 : 0;
+    }
+    return cached == 1;
+}
 
 // 0x671F18
 static bool mouse_is_hidden;
@@ -525,9 +538,16 @@ void mouse_info()
         processedEvent = true;
 
         if (event.type == kTouchMouseEventWheel) {
+            if (patchlog_enabled() && mouse_input_autotest_logging_enabled()) {
+                patchlog_write("INPUT_AUTOTEST_MOUSE", "wheel wheelX=%d wheelY=%d", event.wheelX, event.wheelY);
+            }
             gMouseWheelX += event.wheelX;
             gMouseWheelY += event.wheelY;
             continue;
+        }
+
+        if (patchlog_enabled() && mouse_input_autotest_logging_enabled()) {
+            patchlog_write("INPUT_AUTOTEST_MOUSE", "pointer x=%d y=%d buttons=0x%x", event.x, event.y, event.buttons);
         }
 
         int cursorX = 0;
