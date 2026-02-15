@@ -11,13 +11,6 @@
 #include "plib/gnw/touch.h"
 #include "plib/gnw/vcr.h"
 
-#if defined(__APPLE__)
-#include <TargetConditionals.h>
-#if TARGET_OS_IOS
-#include "platform/ios/pencil.h"
-#endif
-#endif
-
 namespace fallout {
 
 static void mouse_colorize();
@@ -468,7 +461,6 @@ void mouse_hide()
 }
 
 // 0x4B4DD8
-// New version of mouse_info for touch devices
 void mouse_info()
 {
     if (!have_mouse) {
@@ -479,276 +471,78 @@ void mouse_info()
         return;
     }
 
-    static bool pending_tap_release = false;
-    bool released_this_frame = false;
-    if (pending_tap_release) {
-        // Release tap click on next tick so UI sees a distinct DOWN/UP.
-        mouse_simulate_input(0, 0, 0);
-        pending_tap_release = false;
-        released_this_frame = true;
-    }
+    gMouseWheelX = 0;
+    gMouseWheelY = 0;
 
-    // When using a physical mouse, update mouse state from dxinput
-    // This ensures mouse_buttons is kept in sync
-    if (dxinput_is_using_mouse()) {
-        // Get the current mouse state from dxinput
+    if (!touch_is_pointer_active()) {
+        int x = 0;
+        int y = 0;
+        int buttons = 0;
+        int wheelX = 0;
+        int wheelY = 0;
+
         MouseData mouseData;
         if (dxinput_get_mouse_state(&mouseData)) {
-            // Convert dxinput button state to game button state
-            int buttons = 0;
-            if (mouseData.buttons[0]) buttons |= MOUSE_STATE_LEFT_BUTTON_DOWN;
-            if (mouseData.buttons[1]) buttons |= MOUSE_STATE_RIGHT_BUTTON_DOWN;
+            x = mouseData.x;
+            y = mouseData.y;
+            wheelX = mouseData.wheelX;
+            wheelY = mouseData.wheelY;
 
-            // Update position and buttons via simulate_input
-            mouse_simulate_input(mouseData.x, mouseData.y, buttons);
-        }
-        return;
-    }
-
-    // On iOS, we process touch gestures even if the mouse cursor is hidden,
-    // because touch input is the primary input method.
-    Gesture gesture;
-    if (touch_get_gesture(&gesture)) {
-        int cur_x, cur_y;
-        mouse_get_position(&cur_x, &cur_y);
-        SDL_Log("GESTURE: type=%d(%s) state=%d(%s) fingers=%d pos=(%d,%d) cursor=(%d,%d)",
-            gesture.type,
-            gesture.type == kTap ? "TAP" : gesture.type == kPan ? "PAN"
-                : gesture.type == kLongPress                    ? "LONGPRESS"
-                                                                : "OTHER",
-            gesture.state,
-            gesture.state == kBegan ? "BEGAN" : gesture.state == kChanged ? "CHANGED"
-                : gesture.state == kEnded                                 ? "ENDED"
-                                                                          : "OTHER",
-            gesture.numberOfTouches, gesture.x, gesture.y, cur_x, cur_y);
-
-        // If mouse is hidden but we have a gesture, show it so input works
-        if (mouse_is_hidden) {
-            SDL_Log("GESTURE: mouse was hidden, showing it now");
-            mouse_show();
-        }
-
-        static int prevx;
-        static int prevy;
-        // Track if current pan/drag started near cursor (for click+drag) vs far (just positioning)
-        static bool pencil_dragging = false;
-
-#if defined(__APPLE__) && TARGET_OS_IOS
-        const bool pencil_active = pencil_is_active();
-        // Check if pencil right-click is enabled in config
-        int pencil_right_click_enabled = 1;
-        config_get_value(&game_config, GAME_CONFIG_INPUT_KEY, GAME_CONFIG_PENCIL_RIGHT_CLICK_KEY, &pencil_right_click_enabled);
-        // When pencil_right_click is disabled, treat pencil as left-click only (precise mode)
-        const bool pencil_precise_mode = pencil_active && !pencil_right_click_enabled;
-#else
-        const bool pencil_active = false;
-        const bool pencil_precise_mode = false;
-#endif
-
-        switch (gesture.type) {
-        case kUnrecognized:
-            break;
-        case kTap:
-            if (gesture.numberOfTouches == 1) {
-                // ALWAYS move cursor to exact tap position first, then click.
-                // This ensures the click happens at the tap location, not wherever
-                // the cursor happened to be due to mouse/trackpad movement.
-                int cursor_x, cursor_y;
-                mouse_get_position(&cursor_x, &cursor_y);
-                int dx = gesture.x - cursor_x;
-                int dy = gesture.y - cursor_y;
-
-                SDL_Log("TAP: cursor=(%d,%d) tap=(%d,%d) delta=(%d,%d)",
-                    cursor_x, cursor_y, gesture.x, gesture.y, dx, dy);
-
-                // Move cursor to tap position
-                if (dx != 0 || dy != 0) {
-                    mouse_simulate_input(dx, dy, 0);
-                }
-
-                // Then click at that exact position
-                // Send DOWN now; release next tick so UI can register it
-                mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                pending_tap_release = true;
-
-                SDL_Log("TAP CLICK: moved and clicked at tap position");
-            } else if (gesture.numberOfTouches == 2) {
-                // Two-finger tap = right-click at tap position
-                int cursor_x, cursor_y;
-                mouse_get_position(&cursor_x, &cursor_y);
-                int dx = gesture.x - cursor_x;
-                int dy = gesture.y - cursor_y;
-
-                // Move cursor to tap position first
-                if (dx != 0 || dy != 0) {
-                    mouse_simulate_input(dx, dy, 0);
-                }
-
-                // Then right-click at that position
-                mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
-                pending_tap_release = true;
-            } else if (gesture.numberOfTouches == 3) {
-                // Three-finger tap = left-click at tap position
-                int cursor_x, cursor_y;
-                mouse_get_position(&cursor_x, &cursor_y);
-                int dx = gesture.x - cursor_x;
-                int dy = gesture.y - cursor_y;
-
-                // Move cursor to tap position first
-                if (dx != 0 || dy != 0) {
-                    mouse_simulate_input(dx, dy, 0);
-                }
-
-                // Then left-click at that position
-                mouse_simulate_input(0, 0, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                pending_tap_release = true;
-            }
-            break;
-        case kLongPress:
-        case kPan:
-            if (gesture.state == kBegan) {
-                prevx = gesture.x;
-                prevy = gesture.y;
-
-                if (gesture.type == kPan && gesture.numberOfTouches == 1) {
-#if defined(__APPLE__) && TARGET_OS_IOS
-                    if (pencil_active) {
-                        // Pencil pan always starts a drag.
-                        pencil_dragging = true;
-                        int cursor_x, cursor_y;
-                        mouse_get_position(&cursor_x, &cursor_y);
-                        mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                    } else
-#endif
-                    {
-                        // Check if pan/drag started near cursor (determines if it's a drag or reposition)
-                        int cursor_x, cursor_y;
-                        mouse_get_position(&cursor_x, &cursor_y);
-                        int dx = gesture.x - cursor_x;
-                        int dy = gesture.y - cursor_y;
-                        int distance_sq = dx * dx + dy * dy;
-                        int screen_width = screenGetWidth();
-                        int radius = (40 * screen_width) / 640;
-                        int radius_sq = radius * radius;
-
-                        if (distance_sq < radius_sq) {
-                            // Started ON/NEAR cursor = this is a drag operation
-                            pencil_dragging = true;
-                        } else {
-                            // Started AWAY from cursor = just repositioning
-                            pencil_dragging = false;
-                            // Move cursor to touch position immediately
-                            mouse_simulate_input(dx, dy, 0);
-                        }
-                    }
-                }
+            if (mouseData.buttons[0] == 1) {
+                buttons |= MOUSE_STATE_LEFT_BUTTON_DOWN;
             }
 
-            if (gesture.type == kLongPress) {
-                if (gesture.numberOfTouches == 1 && gesture.state == kBegan) {
-                    // Single-finger long-press = LEFT-click drag (touch and pencil)
-                    int cursor_x, cursor_y;
-                    mouse_get_position(&cursor_x, &cursor_y);
-                    mouse_simulate_input(gesture.x - cursor_x, gesture.y - cursor_y, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                } else if (gesture.numberOfTouches == 1 && gesture.state == kChanged) {
-                    mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                } else if (gesture.numberOfTouches == 2 && (gesture.state == kBegan || gesture.state == kChanged)) {
-                    // Two-finger long-press = LEFT-click + drag
-                    mouse_simulate_input(gesture.x - prevx, gesture.y - prevy, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                }
+            if (mouseData.buttons[1] == 1) {
+                buttons |= MOUSE_STATE_RIGHT_BUTTON_DOWN;
+            }
+        }
 
-                if (gesture.state == kEnded) {
-                    mouse_simulate_input(0, 0, 0);
-                }
-            } else if (gesture.type == kPan) {
-                if (gesture.state == kEnded && gesture.numberOfTouches == 1 && pencil_dragging) {
-                    mouse_simulate_input(0, 0, 0);
-                    pencil_dragging = false;
-                }
+        x = (int)(x * mouse_sensitivity);
+        y = (int)(y * mouse_sensitivity);
 
-                if (gesture.numberOfTouches == 1) {
-                    // Use absolute positioning: cursor follows touch/pencil exactly
-                    int cursor_x, cursor_y;
-                    mouse_get_position(&cursor_x, &cursor_y);
-                    int dx = gesture.x - cursor_x;
-                    int dy = gesture.y - cursor_y;
-
-                    if (pencil_dragging) {
-                        // Dragging = cursor follows with left button held
-                        mouse_simulate_input(dx, dy, MOUSE_STATE_LEFT_BUTTON_DOWN);
-                    } else {
-                        // Just repositioning = cursor follows, no button
-                        mouse_simulate_input(dx, dy, 0);
-                    }
-                } else if (gesture.numberOfTouches == 2) {
-                    gMouseWheelX = (prevx - gesture.x) / 2;
-                    gMouseWheelY = (gesture.y - prevy) / 2;
-
-                    if (gMouseWheelX != 0 || gMouseWheelY != 0) {
-                        mouse_buttons |= MOUSE_EVENT_WHEEL;
-                        raw_buttons |= MOUSE_EVENT_WHEEL;
-                    }
-                }
+        if (vcr_state == VCR_STATE_PLAYING) {
+            if (((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_PRESS) != 0 && buttons != 0)
+                || ((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_MOVE) != 0 && (x != 0 || y != 0))) {
+                vcr_terminated_condition = VCR_PLAYBACK_COMPLETION_REASON_TERMINATED;
+                vcr_stop();
+                return;
             }
 
-            prevx = gesture.x;
-            prevy = gesture.y;
-            break;
+            x = 0;
+            y = 0;
+            buttons = last_buttons;
         }
 
-        return;
+        int cursorX = 0;
+        int cursorY = 0;
+        mouse_get_position(&cursorX, &cursorY);
+        touch_submit_mouse_state(cursorX + x, cursorY + y, buttons, wheelX, wheelY);
     }
 
-    int x;
-    int y;
-    int buttons = 0;
+    TouchMouseEvent event;
+    bool processedEvent = false;
+    while (touch_pop_mouse_event(&event)) {
+        processedEvent = true;
 
-    MouseData mouseData;
-    if (dxinput_get_mouse_state(&mouseData)) {
-        x = mouseData.x;
-        y = mouseData.y;
-
-        if (mouseData.buttons[0] == 1) {
-            buttons |= MOUSE_STATE_LEFT_BUTTON_DOWN;
+        if (event.type == kTouchMouseEventWheel) {
+            gMouseWheelX += event.wheelX;
+            gMouseWheelY += event.wheelY;
+            continue;
         }
 
-        if (mouseData.buttons[1] == 1) {
-            buttons |= MOUSE_STATE_RIGHT_BUTTON_DOWN;
-        }
-    } else {
-        x = 0;
-        y = 0;
+        int cursorX = 0;
+        int cursorY = 0;
+        mouse_get_position(&cursorX, &cursorY);
+        mouse_simulate_input(event.x - cursorX, event.y - cursorY, event.buttons);
     }
-
-    // Avoid clobbering the touch tap release event on frames with no gesture.
-    // Still allow mouse activation in the same frame if it happened.
-    if (released_this_frame && !dxinput_is_using_mouse()) {
-        return;
-    }
-
-    x = (int)(x * mouse_sensitivity);
-    y = (int)(y * mouse_sensitivity);
-
-    if (vcr_state == VCR_STATE_PLAYING) {
-        if (((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_PRESS) != 0 && buttons != 0)
-            || ((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_MOVE) != 0 && (x != 0 || y != 0))) {
-            vcr_terminated_condition = VCR_PLAYBACK_COMPLETION_REASON_TERMINATED;
-            vcr_stop();
-            return;
-        }
-        x = 0;
-        y = 0;
-        buttons = last_buttons;
-    }
-
-    mouse_simulate_input(x, y, buttons);
-
-    gMouseWheelX = mouseData.wheelX;
-    gMouseWheelY = mouseData.wheelY;
 
     if (gMouseWheelX != 0 || gMouseWheelY != 0) {
         mouse_buttons |= MOUSE_EVENT_WHEEL;
         raw_buttons |= MOUSE_EVENT_WHEEL;
+    }
+
+    if (processedEvent || touch_is_pointer_active()) {
+        return;
     }
 }
 
@@ -894,7 +688,7 @@ bool mouse_click_in(int left, int top, int right, int bottom)
     int offset_y = gClickOffsetY;
 #if defined(__APPLE__) && TARGET_OS_IOS
     // Do not apply touch offset when using a real mouse/trackpad.
-    if (dxinput_is_using_mouse()) {
+    if (!touch_is_pointer_active()) {
         offset_x = gClickOffsetMouseX;
         offset_y = gClickOffsetMouseY;
     }

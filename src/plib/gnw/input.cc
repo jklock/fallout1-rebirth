@@ -1246,8 +1246,10 @@ void GNW95_process_message()
 
     PencilGestureType pencilGesture = pencil_poll_gesture();
     if (pencil_right_click_enabled && (pencilGesture == PENCIL_GESTURE_DOUBLE_TAP || pencilGesture == PENCIL_GESTURE_SQUEEZE)) {
-        mouse_simulate_input(0, 0, MOUSE_STATE_RIGHT_BUTTON_DOWN);
-        mouse_simulate_input(0, 0, 0);
+        int cursorX = 0;
+        int cursorY = 0;
+        mouse_get_position(&cursorX, &cursorY);
+        touch_enqueue_secondary_click(cursorX, cursorY);
     }
 #endif
 

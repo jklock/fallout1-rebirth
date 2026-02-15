@@ -10,6 +10,7 @@
 #   - Binary architecture (arm64 for Apple Silicon, x86_64 for Intel)
 #   - Info.plist has all required iOS keys
 #   - Headless simulator boot, app install, brief launch, terminate, shutdown
+#   - Automated simulator screenshot evidence capture
 #   - Clean exit code verification
 #   - No lingering simulator processes
 #
@@ -22,6 +23,7 @@
 #   BUILD_DIR       - Build output directory (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
 #   SIMULATOR_NAME  - Simulator device name (default: auto-detect iPad)
+#   EVIDENCE_DIR    - Output dir for simulator screenshots (default: dev/state/logs/screens)
 #
 # EXIT CODES:
 #   0 - All tests passed
@@ -46,6 +48,7 @@ SIMULATOR_NAME="${SIMULATOR_NAME:-}"  # Auto-detect if empty
 GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 IOS_CONFIG_DIR="$ROOT_DIR/gameconfig/ios"
+EVIDENCE_DIR="${EVIDENCE_DIR:-$ROOT_DIR/dev/state/logs/screens}"
 
 # App details
 APP_NAME="fallout1-rebirth"
@@ -75,6 +78,7 @@ TESTS_SKIPPED=0
 # Simulator state
 SIM_UDID=""
 SIM_WAS_BOOTED=false
+LATEST_SCREENSHOT_PATH=""
 
 # -----------------------------------------------------------------------------
 # Helper functions
@@ -409,6 +413,15 @@ launch_app_briefly() {
     
     if [[ "$running_apps" -gt 0 ]]; then
         log_ok "App running after ${LAUNCH_TIMEOUT}s (no crash)"
+
+        mkdir -p "$EVIDENCE_DIR"
+        local screenshot_path="$EVIDENCE_DIR/ios-headless-${bundle_id//./-}-$(date -u +%Y%m%dT%H%M%SZ).png"
+        if xcrun simctl io "$udid" screenshot "$screenshot_path" >/dev/null 2>&1; then
+            LATEST_SCREENSHOT_PATH="$screenshot_path"
+            log_ok "Captured simulator screenshot: $screenshot_path"
+        else
+            log_warn "Failed to capture simulator screenshot"
+        fi
         
         # Terminate the app
         log_info "Terminating app..."
@@ -680,6 +693,9 @@ print_summary() {
     echo -e "    ${RED}Failed:${NC}  $TESTS_FAILED"
     if [[ $TESTS_SKIPPED -gt 0 ]]; then
         echo -e "    ${YELLOW}Skipped:${NC} $TESTS_SKIPPED"
+    fi
+    if [[ -n "$LATEST_SCREENSHOT_PATH" ]]; then
+        echo -e "    ${BOLD}Screenshot:${NC} $LATEST_SCREENSHOT_PATH"
     fi
     echo -e "    ${BOLD}Total:${NC}   $total"
     echo ""

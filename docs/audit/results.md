@@ -33,10 +33,30 @@ Last updated: 2026-02-15
     - `config/config_compat_gate: PASS`
     - `input/macos_headless: PASS`
     - `input/ios_headless: PASS`
+- `2026-02-15` `PASS` `scripts/test/test-input-layer.sh`
+  - Deterministic input layer scenarios passed (gesture semantics, stale-click prevention, drag stability, mapping invariants).
+  - Evidence log:
+    - `dev/state/logs/round-1-input-input_layer.log`
+- `2026-02-15` `PASS` `scripts/test/test-macos-headless.sh`
+  - macOS mouse/trackpad execution path validated via bundle + launch checks.
+  - Evidence log:
+    - `dev/state/logs/round-1-input-macos_headless.log`
+- `2026-02-15` `PASS` `scripts/test/test-ios-headless.sh`
+  - iOS simulator launch/input-path validation passed; automated screenshot captured.
+  - Evidence log:
+    - `dev/state/logs/round-1-input-ios_headless.log`
+  - Screenshot evidence:
+    - `dev/state/logs/screens/round-1-ios_headless/ios-headless-com-fallout1rebirth-game-20260215T172516Z.png`
+- `2026-02-15` `PASS` `dev/run-unattended-until-100.sh --track input`
+  - History row: `1	input	1	1	100	PASS	2026-02-15T17:25:24Z`
+  - Latest summary includes:
+    - `input/input_layer: PASS`
+    - `input/macos_headless: PASS`
+    - `input/ios_headless: PASS`
 - `2026-02-15` `INFO` release artifact fingerprints
   - `releases/prod/macOS/Fallout 1 Rebirth.app/Contents/MacOS/fallout1-rebirth`
-    - mtime: `2026-02-15 09:46:07`
-    - sha256: `8f90a81f2a8e7b31a1aaa6bf46048d1c07d65ffd195846c65f0f6bce882b9392`
+    - mtime: `2026-02-15 11:26:32`
+    - sha256: `6294c3431ec9f1d3448ebd840353a266717f02056bc82fbce72a963eb3ce8192`
   - `releases/prod/iOS/fallout1-rebirth.ipa`
-    - mtime: `2026-02-15 09:48:47`
-    - sha256: `d0a6eb8f354f1db5b66fb39e7c5a25a7e2ef926d67a1fde54f1307f1e87f608f`
+    - mtime: `2026-02-15 10:59:59`
+    - sha256: `68c27a63ee58ad6c4385614dcc02bfd68d47505e23c8562ddab62d185e8b2f7f`

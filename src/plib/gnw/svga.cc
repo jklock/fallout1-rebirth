@@ -4,6 +4,7 @@
 
 #include "plib/db/patchlog.h"
 #include <algorithm>
+#include <cmath>
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -12,6 +13,7 @@
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
+#include "plib/gnw/input_mapping.h"
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/winmain.h"
 
@@ -77,11 +79,14 @@ static int g_iOS_gameHeight = 480;
 static int g_iOS_last_window_pw = 0;
 static int g_iOS_last_window_ph = 0;
 
-static void iOS_updateDestRect()
+static bool iOS_updateDestRect()
 {
+    SDL_FRect previousDestRect = g_iOS_destRect;
+    bool previousUseCustomRect = g_iOS_useCustomRect;
+
     if (gSdlWindow == NULL) {
         g_iOS_useCustomRect = false;
-        return;
+        return previousUseCustomRect != g_iOS_useCustomRect;
     }
 
     int window_pw = 0;
@@ -90,43 +95,73 @@ static void iOS_updateDestRect()
 
     if (window_pw <= 0 || window_ph <= 0) {
         g_iOS_useCustomRect = false;
-        return;
+        return previousUseCustomRect != g_iOS_useCustomRect;
     }
 
-    int sdl_w = window_pw;
-    int sdl_h = window_ph;
+    g_iOS_last_window_pw = window_pw;
+    g_iOS_last_window_ph = window_ph;
 
-    SDL_Log("iOS_updateDestRect: SDL pixel size: %dx%d", sdl_w, sdl_h);
+    int safe_x = 0;
+    int safe_y = 0;
+    int safe_w = window_pw;
+    int safe_h = window_ph;
 
-    // Calculate in SDL's coordinate system
-    // The game needs to maintain 4:3 aspect ratio
-    float game_aspect = (float)g_iOS_gameWidth / (float)g_iOS_gameHeight; // 4:3 = 1.333
-    float sdl_aspect = (float)sdl_w / (float)sdl_h;
+    SDL_Rect safe_area_points;
+    if (SDL_GetWindowSafeArea(gSdlWindow, &safe_area_points)
+        && safe_area_points.w > 0
+        && safe_area_points.h > 0) {
+        int window_w_points = 0;
+        int window_h_points = 0;
+        SDL_GetWindowSize(gSdlWindow, &window_w_points, &window_h_points);
 
-    SDL_Log("iOS_updateDestRect: sdl_aspect=%.3f game_aspect=%.3f", sdl_aspect, game_aspect);
+        float scale_x = window_w_points > 0 ? static_cast<float>(window_pw) / static_cast<float>(window_w_points) : 1.0f;
+        float scale_y = window_h_points > 0 ? static_cast<float>(window_ph) / static_cast<float>(window_h_points) : 1.0f;
 
-    if (sdl_aspect > game_aspect) {
-        // SDL viewport is wider than game - constrain by height, add bars on sides
-        // This is the normal case for portrait iPad showing 4:3 game
-        int content_w = (int)(sdl_h * game_aspect);
-        g_iOS_destRect.x = (sdl_w - content_w) / 2.0f;
-        g_iOS_destRect.y = 0;
-        g_iOS_destRect.w = (float)content_w;
-        g_iOS_destRect.h = (float)sdl_h;
-        SDL_Log("iOS_updateDestRect: pillarbox in SDL space (bars on sides)");
+        safe_x = static_cast<int>(safe_area_points.x * scale_x + 0.5f);
+        safe_y = static_cast<int>(safe_area_points.y * scale_y + 0.5f);
+        safe_w = static_cast<int>(safe_area_points.w * scale_x + 0.5f);
+        safe_h = static_cast<int>(safe_area_points.h * scale_y + 0.5f);
+
+        if (safe_w <= 0 || safe_h <= 0) {
+            safe_x = 0;
+            safe_y = 0;
+            safe_w = window_pw;
+            safe_h = window_ph;
+        }
+    }
+
+    InputLayoutRect layout = input_compute_letterbox_rect(safe_x, safe_y, safe_w, safe_h, g_iOS_gameWidth, g_iOS_gameHeight);
+    if (!layout.valid) {
+        g_iOS_useCustomRect = false;
     } else {
-        // SDL viewport is taller than game - constrain by width, add bars top/bottom
-        int content_h = (int)(sdl_w / game_aspect);
-        g_iOS_destRect.x = 0;
-        g_iOS_destRect.y = (sdl_h - content_h) / 2.0f;
-        g_iOS_destRect.w = (float)sdl_w;
-        g_iOS_destRect.h = (float)content_h;
-        SDL_Log("iOS_updateDestRect: letterbox in SDL space (bars top/bottom)");
+        g_iOS_destRect.x = layout.x;
+        g_iOS_destRect.y = layout.y;
+        g_iOS_destRect.w = layout.w;
+        g_iOS_destRect.h = layout.h;
+        g_iOS_useCustomRect = true;
     }
-    g_iOS_useCustomRect = true;
 
-    SDL_Log("iOS_updateDestRect: dest rect: (%.0f, %.0f, %.0f, %.0f)",
-        g_iOS_destRect.x, g_iOS_destRect.y, g_iOS_destRect.w, g_iOS_destRect.h);
+    SDL_Log("iOS_updateDestRect: window_pixels=%dx%d safe_pixels=(%d,%d,%d,%d) dest=(%.1f,%.1f,%.1f,%.1f) useCustom=%d",
+        window_pw,
+        window_ph,
+        safe_x,
+        safe_y,
+        safe_w,
+        safe_h,
+        g_iOS_destRect.x,
+        g_iOS_destRect.y,
+        g_iOS_destRect.w,
+        g_iOS_destRect.h,
+        g_iOS_useCustomRect ? 1 : 0);
+
+    if (previousUseCustomRect != g_iOS_useCustomRect) {
+        return true;
+    }
+
+    return std::fabs(previousDestRect.x - g_iOS_destRect.x) > 0.25f
+        || std::fabs(previousDestRect.y - g_iOS_destRect.y) > 0.25f
+        || std::fabs(previousDestRect.w - g_iOS_destRect.w) > 0.25f
+        || std::fabs(previousDestRect.h - g_iOS_destRect.h) > 0.25f;
 }
 #endif
 
@@ -842,14 +877,7 @@ bool handleWindowSizeChanged()
         return false;
     }
 
-    if (window_pw == g_iOS_last_window_pw && window_ph == g_iOS_last_window_ph) {
-        return false;
-    }
-
-    g_iOS_last_window_pw = window_pw;
-    g_iOS_last_window_ph = window_ph;
-    iOS_updateDestRect();
-    return true;
+    return iOS_updateDestRect();
 #else
     destroyRenderer();
     createRenderer(screenGetWidth(), screenGetHeight());
@@ -984,53 +1012,24 @@ void renderPresent()
 // This accounts for the custom dest rect used on iOS
 bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* game_y)
 {
-    SDL_Log("iOS_screenToGameCoords: screen=(%.1f, %.1f)", screen_x, screen_y);
-
     if (!g_iOS_useCustomRect || g_iOS_destRect.w <= 0 || g_iOS_destRect.h <= 0) {
-        // Fallback: direct mapping
-        SDL_Log("iOS_screenToGameCoords: FALLBACK - no custom rect (useCustomRect=%d, destRect=%.0fx%.0f)",
-            g_iOS_useCustomRect, g_iOS_destRect.w, g_iOS_destRect.h);
-        *game_x = (int)screen_x;
-        *game_y = (int)screen_y;
+        *game_x = static_cast<int>(screen_x);
+        *game_y = static_cast<int>(screen_y);
+        if (*game_x < 0) *game_x = 0;
+        if (*game_y < 0) *game_y = 0;
+        if (*game_x >= g_iOS_gameWidth) *game_x = g_iOS_gameWidth - 1;
+        if (*game_y >= g_iOS_gameHeight) *game_y = g_iOS_gameHeight - 1;
         return false;
     }
 
-    SDL_Log("iOS_screenToGameCoords: destRect=(%.1f, %.1f, %.1f, %.1f) game=%dx%d",
-        g_iOS_destRect.x, g_iOS_destRect.y, g_iOS_destRect.w, g_iOS_destRect.h,
-        g_iOS_gameWidth, g_iOS_gameHeight);
-
-    // Check if the point is within the dest rect
-    float local_x = screen_x - g_iOS_destRect.x;
-    float local_y = screen_y - g_iOS_destRect.y;
-
-    SDL_Log("iOS_screenToGameCoords: local=(%.1f, %.1f)", local_x, local_y);
-
-    // Scale from dest rect size to game resolution
-    float scale_x = (float)g_iOS_gameWidth / g_iOS_destRect.w;
-    float scale_y = (float)g_iOS_gameHeight / g_iOS_destRect.h;
-
-    SDL_Log("iOS_screenToGameCoords: scale=(%.6f, %.6f)", scale_x, scale_y);
-
-    int result_x = (int)(local_x * scale_x);
-    int result_y = (int)(local_y * scale_y);
-
-    SDL_Log("iOS_screenToGameCoords: pre-clamp result=(%d, %d)", result_x, result_y);
-
-    // Clamp to game bounds
-    if (result_x < 0) result_x = 0;
-    if (result_x >= g_iOS_gameWidth) result_x = g_iOS_gameWidth - 1;
-    if (result_y < 0) result_y = 0;
-    if (result_y >= g_iOS_gameHeight) result_y = g_iOS_gameHeight - 1;
-
-    *game_x = result_x;
-    *game_y = result_y;
-
-    // Return true if the point was within the dest rect
-    bool in_bounds = (local_x >= 0 && local_x < g_iOS_destRect.w && local_y >= 0 && local_y < g_iOS_destRect.h);
-
-    SDL_Log("iOS_screenToGameCoords: RESULT=(%d, %d) in_bounds=%d", result_x, result_y, in_bounds);
-
-    return in_bounds;
+    InputLayoutRect rect{
+        g_iOS_destRect.x,
+        g_iOS_destRect.y,
+        g_iOS_destRect.w,
+        g_iOS_destRect.h,
+        true,
+    };
+    return input_map_screen_to_game(rect, g_iOS_gameWidth, g_iOS_gameHeight, screen_x, screen_y, game_x, game_y);
 }
 
 // Convert window coordinates (points) to game coordinates on iOS

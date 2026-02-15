@@ -293,9 +293,30 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/platform_compat.h"
     "src/pointer_registry.cc"
     "src/pointer_registry.h"
+    "src/plib/gnw/input_mapping.cc"
+    "src/plib/gnw/input_mapping.h"
+    "src/plib/gnw/input_state_machine.cc"
+    "src/plib/gnw/input_state_machine.h"
     "src/plib/gnw/touch.cc"
     "src/plib/gnw/touch.h"
 )
+
+if(NOT IOS)
+    add_executable(input_layer_tests
+        "src/plib/gnw/input_layer_test.cc"
+        "src/plib/gnw/input_mapping.cc"
+        "src/plib/gnw/input_state_machine.cc"
+    )
+    target_include_directories(input_layer_tests PRIVATE src)
+    set_target_properties(input_layer_tests PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "NO"
+        XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+    )
+endif()
 
 if(IOS)
     target_sources(${EXECUTABLE_NAME} PUBLIC

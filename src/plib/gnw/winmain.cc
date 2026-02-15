@@ -538,6 +538,8 @@ int main(int argc, char* argv[])
     // Use dedicated touch gesture handling; avoid synthetic touch->mouse events
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_PEN_MOUSE_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_PEN_TOUCH_EVENTS, "0");
     const char* documentsPath = iOSGetDocumentsPath();
     if (documentsPath != NULL) {
         chdir(documentsPath);
