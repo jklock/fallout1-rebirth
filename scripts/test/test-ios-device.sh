@@ -65,7 +65,67 @@ fi
 
 mkdir -p dev/state/logs
 
-echo "[iOS device test] Device=${DEVICE_NAME} Bundle=${BUNDLE_ID} Team=${DEVELOPMENT_TEAM:-<unset>}"
+# Resolve device identifier (prefer UDID when available)
+resolve_device_id() {
+  local name="$1"
+
+  # If the user passed a UDID-like string (xcode-style), return as-is
+  if [[ "$name" =~ ^[0-9A-Fa-f-]{8,}$ || "$name" =~ ^[0-9A-Fa-f]{8,}$ ]]; then
+    printf '%s' "$name"
+    return 0
+  fi
+
+  # 1) Try xcrun xctrace list devices (returns xcode-style UDID such as 00008103-...)
+  if cmd_exists xcrun; then
+    local xctrace_listing
+    xctrace_listing="$(xcrun xctrace list devices 2>/dev/null || true)"
+    if [[ -n "$xctrace_listing" ]]; then
+      # Match lines where the device name appears and capture the UDID in parentheses
+      local xc_udid
+      xc_udid="$(printf '%s\n' "$xctrace_listing" | grep -E "^${name} \(| ${name} \(" -i -m1 | grep -Eo '\([0-9A-Fa-f-]{8,}\)' | tr -d '()' || true)"
+      if [[ -n "$xc_udid" ]]; then
+        printf '%s' "$xc_udid"
+        return 0
+      fi
+      # loose match anywhere in listing then extract UDID
+      xc_udid="$(printf '%s\n' "$xctrace_listing" | grep -i "${name}" | grep -Eo '\([0-9A-Fa-f-]{8,}\)' | tr -d '()' | head -n1 || true)"
+      if [[ -n "$xc_udid" ]]; then
+        printf '%s' "$xc_udid"
+        return 0
+      fi
+    fi
+  fi
+
+  # 2) Fallback to devicectl list (returns a different identifier). Prefer the Identifier column when name matches.
+  if cmd_exists xcrun; then
+    local devicectl_listing
+    devicectl_listing="$(xcrun devicectl list devices 2>/dev/null || true)"
+    if [[ -n "$devicectl_listing" ]]; then
+      local id
+      id="$(printf '%s\n' "$devicectl_listing" | awk -v nm="$name" 'BEGIN{IGNORECASE=1} $1==nm {print $3; exit}')"
+      if [[ -n "$id" ]]; then
+        printf '%s' "$id"
+        return 0
+      fi
+      id="$(printf '%s\n' "$devicectl_listing" | grep -i "${name}" | grep -Eo '[0-9A-Fa-f-]{8,}' | head -n1 || true)"
+      if [[ -n "$id" ]]; then
+        printf '%s' "$id"
+        return 0
+      fi
+    fi
+  fi
+
+  return 1
+}
+
+DEVICE_UDID="$(resolve_device_id "$DEVICE_NAME" || true)"
+if [[ -n "$DEVICE_UDID" ]]; then
+  DEVICE_SPEC="id=${DEVICE_UDID}"
+else
+  DEVICE_SPEC="name=${DEVICE_NAME}"
+fi
+
+echo "[iOS device test] Device=${DEVICE_NAME} (${DEVICE_SPEC}) Bundle=${BUNDLE_ID} Team=${DEVELOPMENT_TEAM:-<unset>}"
 
 # 1) Build signed device app (uses new --codesign flag in build-ios.sh)
 export DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM"
@@ -79,10 +139,46 @@ fi
 
 # 2) Install app on device
 echo ">>> Installing app to device: $DEVICE_NAME"
-xcrun devicectl device install app --device "${DEVICE_NAME}" "$APP_PATH"
+if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
+  echo ">>> Installing via xcodebuild (signed install, DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM})"
+  xcodebuild -project build-ios/fallout1-rebirth.xcodeproj \
+    -scheme fallout1-rebirth \
+    -configuration "$BUILD_TYPE" \
+    -destination "${DEVICE_SPEC}" \
+    DEVELOPMENT_TEAM="${DEVELOPMENT_TEAM}" \
+    CODE_SIGN_STYLE=Automatic \
+    -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+    install
+else
+  echo ">>> Installing app via devicectl (unsigned app)"
+  xcrun devicectl device install app --device "${DEVICE_NAME}" "$APP_PATH"
+fi
 
 # 3) Copy game data into app Documents
+# Wait for the app to appear on the device (xcrun/devicectl may need a short moment)
+if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
+  DEV_CHECK_DEVICE="${DEVICE_UDID:-${DEVICE_NAME}}"
+else
+  DEV_CHECK_DEVICE="${DEVICE_NAME}"
+fi
+
+echo ">>> Waiting for app to be discoverable on device (bundle: ${BUNDLE_ID})"
+found=0
+for i in 1 2 3 4 5; do
+  sleep 1
+  apps_out="$(xcrun devicectl device info apps --device "${DEVICE_NAME}" --bundle-id "${BUNDLE_ID}" 2>/dev/null || true)"
+  if printf '%s' "$apps_out" | grep -q "${BUNDLE_ID}"; then
+    found=1
+    break
+  fi
+done
+
+if [[ "$found" -ne 1 ]]; then
+  echo "WARN: app not yet visible via devicectl; continuing and attempting copy (may fail)"
+fi
+
 echo ">>> Copying game files to app container (Documents)"
+# Use device name/udid that devicectl accepts (the script still passes ${DEVICE_NAME})
 xcrun devicectl device copy to \
   --device "${DEVICE_NAME}" \
   --domain-type appDataContainer \
