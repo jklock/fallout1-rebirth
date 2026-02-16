@@ -156,43 +156,69 @@ fi
 
 # 3) Copy game data into app Documents
 # Wait for the app to appear on the device (xcrun/devicectl may need a short moment)
-if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
-  DEV_CHECK_DEVICE="${DEVICE_UDID:-${DEVICE_NAME}}"
-else
-  DEV_CHECK_DEVICE="${DEVICE_NAME}"
-fi
+# prefer the resolved UDID for devicectl too
+DEVCTL_DEVICE="${DEVICE_UDID:-${DEVICE_NAME}}"
 
 echo ">>> Waiting for app to be discoverable on device (bundle: ${BUNDLE_ID})"
 found=0
-for i in 1 2 3 4 5; do
-  sleep 1
-  apps_out="$(xcrun devicectl device info apps --device "${DEVICE_NAME}" --bundle-id "${BUNDLE_ID}" 2>/dev/null || true)"
+max_wait=30
+for i in $(seq 1 $max_wait); do
+  apps_out="$(xcrun devicectl device info apps --device "${DEVCTL_DEVICE}" --bundle-id "${BUNDLE_ID}" 2>/dev/null || true)"
   if printf '%s' "$apps_out" | grep -q "${BUNDLE_ID}"; then
     found=1
     break
   fi
+  sleep 1
 done
 
 if [[ "$found" -ne 1 ]]; then
-  echo "WARN: app not yet visible via devicectl; continuing and attempting copy (may fail)"
+  echo "WARN: app not visible via devicectl after ${max_wait}s — attempting to launch the app once to force container creation"
+  # try to launch the app once (will be a no-op if not installed)
+  set +e
+  xcrun devicectl device process launch --device "${DEVCTL_DEVICE}" --terminate-existing "${BUNDLE_ID}" >/dev/null 2>&1 || true
+  set -e
+
+  # wait a short while for the container to appear
+  for i in 1 2 3 4 5; do
+    sleep 1
+    apps_out="$(xcrun devicectl device info apps --device "${DEVCTL_DEVICE}" --bundle-id "${BUNDLE_ID}" 2>/dev/null || true)"
+    if printf '%s' "$apps_out" | grep -q "${BUNDLE_ID}"; then
+      found=1
+      break
+    fi
+  done
+fi
+
+if [[ "$found" -ne 1 ]]; then
+  echo "ERROR: app container not found for ${BUNDLE_ID}; devicectl cannot copy files. Run 'xcrun devicectl device info apps --device ${DEVCTL_DEVICE}' to inspect"
+  exit 1
 fi
 
 echo ">>> Copying game files to app container (Documents)"
-# Use device name/udid that devicectl accepts (the script still passes ${DEVICE_NAME})
-xcrun devicectl device copy to \
-  --device "${DEVICE_NAME}" \
-  --domain-type appDataContainer \
-  --domain-identifier "${BUNDLE_ID}" \
-  --destination Documents \
-  --source "${GAME_DATA}/master.dat" \
-  --source "${GAME_DATA}/critter.dat"
+# Retry helper — devicectl copy can be flaky on device; retry a few times
+copy_with_retries() {
+  local -a args=("$@")
+  local attempts=0
+  local rc=1
+  while [[ $attempts -lt 5 ]]; do
+    attempts=$((attempts+1))
+    set +e
+    xcrun devicectl device copy to --device "${DEVCTL_DEVICE}" --domain-type appDataContainer --domain-identifier "${BUNDLE_ID}" --destination Documents "${args[@]}"
+    rc=$?
+    set -e
+    if [[ $rc -eq 0 ]]; then
+      return 0
+    fi
+    echo "  Copy attempt #$attempts failed (rc=$rc), retrying in 2s..."
+    sleep 2
+  done
+  return $rc
+}
 
-xcrun devicectl device copy to \
-  --device "${DEVICE_NAME}" \
-  --domain-type appDataContainer \
-  --domain-identifier "${BUNDLE_ID}" \
-  --destination Documents \
-  --source "${GAME_DATA}/data"
+# copy individual files first
+copy_with_retries --source "${GAME_DATA}/master.dat" --source "${GAME_DATA}/critter.dat"
+# copy data directory
+copy_with_retries --source "${GAME_DATA}/data"
 
 # optional config files
 if [[ -f "${GAME_DATA}/fallout.cfg" ]]; then
