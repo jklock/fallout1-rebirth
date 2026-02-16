@@ -30,6 +30,14 @@ option(ASAN "Enable address sanitizer" OFF)
 option(UBSAN "Enable undefined behaviour sanitizer" OFF)
 option(F1R_DISABLE_RME_LOGGING "Compile out Rebirth-specific diagnostic logging hooks (release/audit packaging)" OFF)
 
+# Instrumented builds: enable patchlog by default (compile-time opt-in)
+option(F1R_PATCHLOG_DEFAULT_ON "Enable patchlog by default for instrumented builds" OFF)
+# When enabled, also enable verbose patchlog by default for easier diagnostics
+if(F1R_PATCHLOG_DEFAULT_ON)
+    # Use a global compile-definition so the option can be passed at configure time
+    add_compile_definitions(F1R_PATCHLOG_DEFAULT_ON=1 F1R_PATCHLOG_DEFAULT_VERBOSE=1)
+endif()
+
 add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE)
 
 if(ASAN)
@@ -293,9 +301,30 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/platform_compat.h"
     "src/pointer_registry.cc"
     "src/pointer_registry.h"
+    "src/plib/gnw/input_mapping.cc"
+    "src/plib/gnw/input_mapping.h"
+    "src/plib/gnw/input_state_machine.cc"
+    "src/plib/gnw/input_state_machine.h"
     "src/plib/gnw/touch.cc"
     "src/plib/gnw/touch.h"
 )
+
+if(NOT IOS)
+    add_executable(input_layer_tests
+        "src/plib/gnw/input_layer_test.cc"
+        "src/plib/gnw/input_mapping.cc"
+        "src/plib/gnw/input_state_machine.cc"
+    )
+    target_include_directories(input_layer_tests PRIVATE src)
+    set_target_properties(input_layer_tests PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "NO"
+        XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+    )
+endif()
 
 if(IOS)
     target_sources(${EXECUTABLE_NAME} PUBLIC

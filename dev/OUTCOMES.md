@@ -48,3 +48,11 @@ Done means all three outcomes are true in the same execution window:
   - `config/config_compat_gate`: `PASS`
   - `input/macos_headless`: `PASS`
   - `input/ios_headless`: `PASS`
+
+## Latest Input-Only Snapshot
+- Timestamp: `2026-02-15T17:25:24Z`
+- History row: `1	input	1	1	100	PASS	2026-02-15T17:25:24Z`
+- Step summary:
+  - `input/input_layer`: `PASS`
+  - `input/macos_headless`: `PASS`
+  - `input/ios_headless`: `PASS`

@@ -155,8 +155,9 @@ run_input_track() {
   local total=0
 
   local -a steps=(
+    "input_layer|BUILD_DIR='${BUILD_DIR:-build-macos}' BUILD_TYPE='${BUILD_TYPE:-RelWithDebInfo}' '$ROOT_DIR/scripts/test/test-input-layer.sh'"
     "macos_headless|BUILD_DIR='${BUILD_DIR:-build-macos}' BUILD_TYPE='${BUILD_TYPE:-RelWithDebInfo}' '$ROOT_DIR/scripts/test/test-macos-headless.sh'"
-    "ios_headless|BUILD_DIR='${BUILD_DIR_IOS_SIM:-build-ios-sim}' BUILD_TYPE='${BUILD_TYPE_IOS_SIM:-RelWithDebInfo}' GAME_DATA='$PATCHED_DIR' '$ROOT_DIR/scripts/test/test-ios-headless.sh'"
+    "ios_headless|BUILD_DIR='${BUILD_DIR_IOS_SIM:-build-ios-sim}' BUILD_TYPE='${BUILD_TYPE_IOS_SIM:-RelWithDebInfo}' GAME_DATA='$PATCHED_DIR' EVIDENCE_DIR='$LOG_DIR/screens/round-${round}-ios_headless' '$ROOT_DIR/scripts/test/test-ios-headless.sh'"
   )
 
   if [[ "$RUN_IOS_SIM" == "1" ]]; then

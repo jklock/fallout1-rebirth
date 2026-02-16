@@ -276,7 +276,8 @@ long sfxc_cached_seek(int handle, long offset, int origin)
         assert(false && "Should be unreachable");
     }
 
-    long normalizedOffset = abs(offset);
+    /* abs operates on int; use labs for long to avoid narrowing. */
+    long normalizedOffset = labs(offset);
 
     if (offset >= 0) {
         long remainingSize = soundEffect->dataSize - soundEffect->position;

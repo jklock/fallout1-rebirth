@@ -38,6 +38,7 @@ JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 CLEAN="${CLEAN:-0}"
 BUILD_DIR_DEVICE="${BUILD_DIR_DEVICE:-build-ios}"
 BUILD_DIR_SIM="${BUILD_DIR_SIM:-build-ios-sim}"
+CODESIGN="${CODESIGN:-0}"
 TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
 DEPLOYMENT_TARGET_DEVICE="${DEPLOYMENT_TARGET_DEVICE:-26.0}"
 DEPLOYMENT_TARGET_SIM="${DEPLOYMENT_TARGET_SIM:-26.0}"
@@ -78,6 +79,8 @@ TARGET:
 OPTIONS:
   --game-data PATH     Patched data source (master.dat, critter.dat, data/)
                        Required in -test mode unless GAME_DATA or FALLOUT_GAMEFILES_ROOT is set.
+  --codesign           Enable code signing for device build (sets CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=YES).
+                       Use this when installing/running on a physical device.
   --help               Show this help
 
 EXAMPLES:
@@ -117,6 +120,10 @@ while [[ $# -gt 0 ]]; do
         --game-data)
             GAME_DATA="$2"
             shift 2
+            ;;
+        --codesign)
+            CODESIGN=1
+            shift
             ;;
         --help|-h)
             usage
@@ -244,7 +251,18 @@ configure_and_build_device() {
     fi
 
     log_info "Building iOS device target ($BUILD_TYPE)"
-    cmake --build "$build_dir" --config "$BUILD_TYPE" -j "$JOBS"
+    if [[ "${CODESIGN:-0}" == "1" ]]; then
+        log_info "Invoking signed build via xcodebuild (DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM:-<unset>})"
+        xcodebuild -project "$build_dir/$APP_NAME.xcodeproj" \
+            -scheme "$APP_NAME" \
+            -configuration "$BUILD_TYPE" \
+            -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+            DEVELOPMENT_TEAM="${DEVELOPMENT_TEAM:-}" \
+            CODE_SIGN_STYLE=Automatic \
+            build
+    else
+        cmake --build "$build_dir" --config "$BUILD_TYPE" -j "$JOBS"
+    fi
 
     local app_path="$build_dir/$BUILD_TYPE-iphoneos/$APP_NAME.app"
     local exe_path="$app_path/$APP_NAME"
@@ -353,6 +371,7 @@ echo " Target:          $TARGET"
 echo " Build type:      $BUILD_TYPE"
 echo " Device build:    $BUILD_DIR_DEVICE"
 echo " Simulator build: $BUILD_DIR_SIM"
+echo " Code signing:     $( [[ "${CODESIGN:-0}" == "1" ]] && printf 'ENABLED' || printf 'DISABLED' )"
 echo "=============================================="
 
 if [[ "$MODE" == "test" ]]; then

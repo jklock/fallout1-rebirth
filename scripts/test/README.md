@@ -6,7 +6,7 @@ All test and validation scripts live in this directory and follow `test-*` namin
 
 ## Core Platform Tests
 - `test-macos.sh`, `test-macos-headless.sh`
-- `test-ios-simulator.sh`, `test-ios-headless.sh`
+- `test-ios-simulator.sh`, `test-ios-headless.sh`, `test-ios-device.sh`
 - `test-shutdown-sanity.sh`
 
 ## Rebirth Data Validation Tests
