@@ -438,4 +438,29 @@ void touch_reset()
     }
 }
 
+// Minimal touch->mouse event adapter used by autotest + legacy callers.
+// The project previously implemented these via the InputStateMachine; the
+// state-machine was removed — provide light-weight stubs so callers/linking
+// succeed and autotest degrades gracefully.
+bool touch_pop_mouse_event(TouchMouseEvent* event)
+{
+    (void)event;
+    return false;
+}
+
+void touch_submit_mouse_state(int absoluteX, int absoluteY, int buttons, int wheelX, int wheelY)
+{
+    (void)absoluteX; (void)absoluteY; (void)buttons; (void)wheelX; (void)wheelY;
+}
+
+void touch_enqueue_secondary_click(int x, int y)
+{
+    (void)x; (void)y;
+}
+
+bool touch_is_pointer_active()
+{
+    return false;
+}
+
 } // namespace fallout
