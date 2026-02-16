@@ -207,7 +207,7 @@ void InputStateMachine::emitPendingReleaseNow()
 
 void InputStateMachine::getCurrentTarget(int* x, int* y, int* buttons) const
 {
-    std::array<int, kMaxTouches> active{};
+    std::array<int, kMaxTouches> active {};
     int activeCount = collectActiveTouchIndices(&active);
 
     if (activeCount <= 0) {

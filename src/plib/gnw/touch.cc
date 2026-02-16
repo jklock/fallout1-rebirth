@@ -19,120 +19,119 @@ namespace fallout {
 
 namespace {
 
-InputStateMachine gInputStateMachine;
-std::deque<Gesture> gGestureCompatQueue;
+    InputStateMachine gInputStateMachine;
+    std::deque<Gesture> gGestureCompatQueue;
 
-void fallback_touch_to_screen(SDL_TouchFingerEvent* event, int* outX, int* outY)
-{
-    int screenW = screenGetWidth();
-    int screenH = screenGetHeight();
-    if (screenW <= 0 || screenH <= 0) {
-        *outX = 0;
-        *outY = 0;
-        return;
+    void fallback_touch_to_screen(SDL_TouchFingerEvent* event, int* outX, int* outY)
+    {
+        int screenW = screenGetWidth();
+        int screenH = screenGetHeight();
+        if (screenW <= 0 || screenH <= 0) {
+            *outX = 0;
+            *outY = 0;
+            return;
+        }
+
+        int x = static_cast<int>(event->x * static_cast<float>(screenW));
+        int y = static_cast<int>(event->y * static_cast<float>(screenH));
+        *outX = std::clamp(x, 0, screenW - 1);
+        *outY = std::clamp(y, 0, screenH - 1);
     }
 
-    int x = static_cast<int>(event->x * static_cast<float>(screenW));
-    int y = static_cast<int>(event->y * static_cast<float>(screenH));
-    *outX = std::clamp(x, 0, screenW - 1);
-    *outY = std::clamp(y, 0, screenH - 1);
-}
+    bool convert_touch_to_logical(SDL_TouchFingerEvent* event, int* outX, int* outY)
+    {
+        if (event == nullptr || outX == nullptr || outY == nullptr) {
+            return false;
+        }
 
-bool convert_touch_to_logical(SDL_TouchFingerEvent* event, int* outX, int* outY)
-{
-    if (event == nullptr || outX == nullptr || outY == nullptr) {
+        if (gSdlWindow == NULL) {
+            // Defensive fallback for early iOS event delivery before window wiring.
+            fallback_touch_to_screen(event, outX, outY);
+            return true;
+        }
+
+        int windowW = 0;
+        int windowH = 0;
+        SDL_GetWindowSize(gSdlWindow, &windowW, &windowH);
+
+        if (windowW <= 0 || windowH <= 0) {
+            fallback_touch_to_screen(event, outX, outY);
+            return true;
+        }
+
+        float windowX = event->x * static_cast<float>(windowW);
+        float windowY = event->y * static_cast<float>(windowH);
+
+#if defined(__APPLE__) && TARGET_OS_IOS
+        bool inBounds = iOS_windowToGameCoords(windowX, windowY, outX, outY);
+        if (inBounds) {
+            return true;
+        }
+
+        // `iOS_windowToGameCoords` returns false when custom letterbox mapping is
+        // not active yet. In that startup/fallback state, keep touch input alive
+        // using normalized -> logical mapping instead of dropping the entire stream.
+        float destX = 0.0f;
+        float destY = 0.0f;
+        float destW = 0.0f;
+        float destH = 0.0f;
+        iOS_getDestRect(&destX, &destY, &destW, &destH);
+
+        const bool mappingFallbackActive = static_cast<int>(destX + 0.5f) == 0
+            && static_cast<int>(destY + 0.5f) == 0
+            && static_cast<int>(destW + 0.5f) == screenGetWidth()
+            && static_cast<int>(destH + 0.5f) == screenGetHeight();
+
+        if (mappingFallbackActive) {
+            fallback_touch_to_screen(event, outX, outY);
+            return true;
+        }
+
         return false;
-    }
-
-    if (gSdlWindow == NULL) {
-        // Defensive fallback for early iOS event delivery before window wiring.
-        fallback_touch_to_screen(event, outX, outY);
-        return true;
-    }
-
-    int windowW = 0;
-    int windowH = 0;
-    SDL_GetWindowSize(gSdlWindow, &windowW, &windowH);
-
-    if (windowW <= 0 || windowH <= 0) {
-        fallback_touch_to_screen(event, outX, outY);
-        return true;
-    }
-
-    float windowX = event->x * static_cast<float>(windowW);
-    float windowY = event->y * static_cast<float>(windowH);
-
-#if defined(__APPLE__) && TARGET_OS_IOS
-    bool inBounds = iOS_windowToGameCoords(windowX, windowY, outX, outY);
-    if (inBounds) {
-        return true;
-    }
-
-    // `iOS_windowToGameCoords` returns false when custom letterbox mapping is
-    // not active yet. In that startup/fallback state, keep touch input alive
-    // using normalized -> logical mapping instead of dropping the entire stream.
-    float destX = 0.0f;
-    float destY = 0.0f;
-    float destW = 0.0f;
-    float destH = 0.0f;
-    iOS_getDestRect(&destX, &destY, &destW, &destH);
-
-    const bool mappingFallbackActive =
-        static_cast<int>(destX + 0.5f) == 0
-        && static_cast<int>(destY + 0.5f) == 0
-        && static_cast<int>(destW + 0.5f) == screenGetWidth()
-        && static_cast<int>(destH + 0.5f) == screenGetHeight();
-
-    if (mappingFallbackActive) {
-        fallback_touch_to_screen(event, outX, outY);
-        return true;
-    }
-
-    return false;
 #else
-    float logicalX = windowX;
-    float logicalY = windowY;
-    if (!SDL_RenderCoordinatesFromWindow(gSdlRenderer, windowX, windowY, &logicalX, &logicalY)) {
-        *outX = static_cast<int>(event->x * static_cast<float>(screenGetWidth()));
-        *outY = static_cast<int>(event->y * static_cast<float>(screenGetHeight()));
-    } else {
-        *outX = static_cast<int>(logicalX);
-        *outY = static_cast<int>(logicalY);
+        float logicalX = windowX;
+        float logicalY = windowY;
+        if (!SDL_RenderCoordinatesFromWindow(gSdlRenderer, windowX, windowY, &logicalX, &logicalY)) {
+            *outX = static_cast<int>(event->x * static_cast<float>(screenGetWidth()));
+            *outY = static_cast<int>(event->y * static_cast<float>(screenGetHeight()));
+        } else {
+            *outX = static_cast<int>(logicalX);
+            *outY = static_cast<int>(logicalY);
+        }
+
+        if (*outX < 0) *outX = 0;
+        if (*outY < 0) *outY = 0;
+        if (*outX >= screenGetWidth()) *outX = screenGetWidth() - 1;
+        if (*outY >= screenGetHeight()) *outY = screenGetHeight() - 1;
+
+        return true;
+#endif
     }
 
-    if (*outX < 0) *outX = 0;
-    if (*outY < 0) *outY = 0;
-    if (*outX >= screenGetWidth()) *outX = screenGetWidth() - 1;
-    if (*outY >= screenGetHeight()) *outY = screenGetHeight() - 1;
-
-    return true;
-#endif
-}
-
-PointerDeviceKind classify_pointer_device()
-{
+    PointerDeviceKind classify_pointer_device()
+    {
 #if defined(__APPLE__) && TARGET_OS_IOS
-    if (pencil_is_touching()) {
-        return PointerDeviceKind::kPencil;
-    }
+        if (pencil_is_touching()) {
+            return PointerDeviceKind::kPencil;
+        }
 
-    if (pencil_is_active() && gInputStateMachine.getActiveTouchCount() == 0) {
-        return PointerDeviceKind::kPencil;
-    }
+        if (pencil_is_active() && gInputStateMachine.getActiveTouchCount() == 0) {
+            return PointerDeviceKind::kPencil;
+        }
 #endif
-    return PointerDeviceKind::kFinger;
-}
+        return PointerDeviceKind::kFinger;
+    }
 
-void push_compat_ended_gesture(int x, int y)
-{
-    Gesture gesture;
-    gesture.type = kTap;
-    gesture.state = kEnded;
-    gesture.numberOfTouches = 1;
-    gesture.x = x;
-    gesture.y = y;
-    gGestureCompatQueue.push_back(gesture);
-}
+    void push_compat_ended_gesture(int x, int y)
+    {
+        Gesture gesture;
+        gesture.type = kTap;
+        gesture.state = kEnded;
+        gesture.numberOfTouches = 1;
+        gesture.x = x;
+        gesture.y = y;
+        gGestureCompatQueue.push_back(gesture);
+    }
 
 } // namespace
 

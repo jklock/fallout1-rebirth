@@ -45,7 +45,7 @@ void expect_float_close(float actual, float expected, float epsilon, const std::
 std::vector<InputAction> drain_actions(InputStateMachine* stateMachine)
 {
     std::vector<InputAction> actions;
-    InputAction action{};
+    InputAction action {};
     while (stateMachine->popAction(&action)) {
         actions.push_back(action);
     }

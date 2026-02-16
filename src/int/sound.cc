@@ -341,7 +341,8 @@ static void refreshSoundBuffers(Sound* sound)
         } else {
             int bytesToRead = sound->dataSize;
             if (sound->field_58 != -1) {
-                int pos = sound->io.tell(sound->io.fd);
+                /* compat_tell returns long - store in long to avoid narrowing */
+                long pos = sound->io.tell(sound->io.fd);
                 if (bytesToRead + pos > sound->field_58) {
                     bytesToRead = sound->field_58 - pos;
                 }
@@ -381,7 +382,8 @@ static void refreshSoundBuffers(Sound* sound)
                         if (sound->field_58 == -1) {
                             bytesToRead = sound->dataSize - bytesRead;
                         } else {
-                            int pos = sound->io.tell(sound->io.fd);
+                            /* compat_tell returns long - store in long to avoid narrowing */
+                            long pos = sound->io.tell(sound->io.fd);
                             if (sound->dataSize + bytesRead + pos <= sound->field_58) {
                                 bytesToRead = sound->dataSize - bytesRead;
                             } else {

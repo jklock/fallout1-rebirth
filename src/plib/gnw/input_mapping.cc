@@ -6,7 +6,7 @@ namespace fallout {
 
 InputLayoutRect input_compute_letterbox_rect(int containerX, int containerY, int containerW, int containerH, int gameW, int gameH)
 {
-    InputLayoutRect rect{};
+    InputLayoutRect rect {};
     rect.x = static_cast<float>(containerX);
     rect.y = static_cast<float>(containerY);
     rect.w = 0.0f;

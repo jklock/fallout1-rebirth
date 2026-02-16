@@ -1023,7 +1023,7 @@ bool iOS_screenToGameCoords(float screen_x, float screen_y, int* game_x, int* ga
         return true;
     }
 
-    InputLayoutRect rect{
+    InputLayoutRect rect {
         g_iOS_destRect.x,
         g_iOS_destRect.y,
         g_iOS_destRect.w,
