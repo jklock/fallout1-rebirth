@@ -1,6 +1,12 @@
 # JOURNAL: scripts
 
-Last updated (UTC): 2026-02-15
+Last updated (UTC): 2026-02-16
+
+## 2026-02-16
+- Added `--codesign` option to `scripts/build/build-ios.sh` to allow signed device builds without changing default packaging behavior.
+- Added `scripts/test/test-ios-device.sh` — scripted signed device deploy, data-stage, launch-with-patchlog, and log/crash collection.
+- Updated `scripts/test/README.md`, `docs/audit/ios-device-deploy-and-log-collection-2026-02-16.md` and `docs/audit/README.md` to reference the new automation flow.
+
 
 ## 2026-02-14
 - Consolidated RME validation tooling under `scripts/test`.
@@ -32,4 +38,3 @@ Last updated (UTC): 2026-02-15
 - LLM handoff summary commit: `fdc0f05f559c1d2f79706d395b6eae4b9ae4d48d`.
 - Automated input evidence is recorded in `dev/state/latest-summary.tsv` and `dev/state/history.tsv` (latest PASS row: `2026-02-15T20:48:57Z`).
 - iOS scripted touch evidence: `dev/state/logs/round-2-input-ios_headless-rerun.log`, `dev/state/logs/ios-touch-autotest-20260215T204516Z.patchlog.txt`, and screenshot `dev/state/logs/screens/ios-headless-com-fallout1rebirth-game-20260215T204510Z.png`.
-- `scripts/build/build-ios.sh`: added `--codesign` and automatic `DEVELOPMENT_TEAM` detection to enable signed device builds for physical iPad testing.

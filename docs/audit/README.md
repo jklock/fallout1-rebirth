@@ -13,3 +13,6 @@ This folder contains the final codebase audit framework, findings, and evidence.
 - `config-compat-project-plan-2026-02-15.md`: implementation plan with completion status notes.
 - `input-investigation-2026-02-15.md`: initial SDL3 input investigation baseline and hypotheses.
 - `sdl3-input-deterministic-audit-2026-02-15.md`: deterministic input implementation audit (history, architecture, diagrams, failure-mode closure, evidence).
+- `ios-device-deploy-and-log-collection-2026-02-16.md`: physical iPad deploy/log collection runbook (Xcode + CLI `devicectl`) with signing and data-container steps.
+
+See also: `scripts/test/test-ios-device.sh` — automated device deploy + log collection.
