@@ -71,6 +71,9 @@ Combat changes require manual testing with game assets. Load a save near combat 
 - Damage calculations match expected values
 - AI behaves appropriately
 
+### 2026-02-16
+- Fixed an iOS watchdog hang where `gmovie_play()` could block the event loop while waiting for mouse/button release. The wait loop now pumps SDL events and throttles via `sharedFpsLimiter` so the app remains responsive to termination/events. (See `src/game/gmovie.cc`)
+
 ## 2026-02-15 Repository Sync
 - Synced this journal to current repository state after deterministic SDL3 input hardening.
 - Core input implementation commit: `c1accdf27927603e1d6b4c115dded9bac08c0a72`.
