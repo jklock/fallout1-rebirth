@@ -228,32 +228,14 @@ configure_and_build_device() {
     else
         cached_flag="$(grep '^F1R_DISABLE_RME_LOGGING:BOOL=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
         cached_platform="$(grep '^PLATFORM:STRING=' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
-        cached_codesign="$(grep '^CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED' "$build_dir/CMakeCache.txt" | head -n1 | cut -d'=' -f2 || true)"
         cached_flag_upper="$(printf '%s' "$cached_flag" | tr '[:lower:]' '[:upper:]')"
-        expected_codesign_val="NO"
-        if [[ "${CODESIGN:-0}" == "1" ]]; then
-            expected_codesign_val="YES"
-        fi
-        if [[ "$cached_flag_upper" != "$RME_LOGGING_CMAKE_UPPER" || "$cached_platform" != "OS64" || "$cached_codesign" != "$expected_codesign_val" ]]; then
+        if [[ "$cached_flag_upper" != "$RME_LOGGING_CMAKE_UPPER" || "$cached_platform" != "OS64" ]]; then
             needs_config=1
         fi
     fi
 
     if [[ "$needs_config" == "1" ]]; then
         log_info "Configuring iOS device build"
-
-        # Determine desired signing state for the generated Xcode project.
-        if [[ "${CODESIGN:-0}" == "1" ]]; then
-            CMAKE_SIGNING_ALLOWED="YES"
-        else
-            CMAKE_SIGNING_ALLOWED="NO"
-        fi
-
-        DEV_TEAM_ARG=""
-        if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
-            DEV_TEAM_ARG="-D CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM}"
-        fi
-
         cmake -B "$build_dir" \
             -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
             -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
@@ -263,14 +245,26 @@ configure_and_build_device() {
             -D DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET_DEVICE" \
             -G Xcode \
             -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="$CMAKE_SIGNING_ALLOWED" \
-            $DEV_TEAM_ARG
+            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO
     else
         log_info "Using existing iOS device CMake configuration"
     fi
 
     log_info "Building iOS device target ($BUILD_TYPE)"
-    cmake --build "$build_dir" --config "$BUILD_TYPE" -j "$JOBS"
+    if [[ "${CODESIGN:-0}" == "1" ]]; then
+        log_info "Invoking signed build via xcodebuild (DEVELOPMENT_TEAM=${DEVELOPMENT_TEAM:-<unset>})"
+        xcodebuild -project "$build_dir/$APP_NAME.xcodeproj" \
+            -scheme "$APP_NAME" \
+            -configuration "$BUILD_TYPE" \
+            -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+            DEVELOPMENT_TEAM="${DEVELOPMENT_TEAM:-}" \
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGNING_ALLOWED=YES \
+            CODE_SIGNING_REQUIRED=YES \
+            build
+    else
+        cmake --build "$build_dir" --config "$BUILD_TYPE" -j "$JOBS"
+    fi
 
     local app_path="$build_dir/$BUILD_TYPE-iphoneos/$APP_NAME.app"
     local exe_path="$app_path/$APP_NAME"
