@@ -32,3 +32,4 @@ Last updated (UTC): 2026-02-15
 - LLM handoff summary commit: `fdc0f05f559c1d2f79706d395b6eae4b9ae4d48d`.
 - Automated input evidence is recorded in `dev/state/latest-summary.tsv` and `dev/state/history.tsv` (latest PASS row: `2026-02-15T20:48:57Z`).
 - iOS scripted touch evidence: `dev/state/logs/round-2-input-ios_headless-rerun.log`, `dev/state/logs/ios-touch-autotest-20260215T204516Z.patchlog.txt`, and screenshot `dev/state/logs/screens/ios-headless-com-fallout1rebirth-game-20260215T204510Z.png`.
+- `scripts/build/build-ios.sh`: added `--codesign` and automatic `DEVELOPMENT_TEAM` detection to enable signed device builds for physical iPad testing.

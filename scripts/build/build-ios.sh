@@ -36,6 +36,7 @@ TARGET="device"
 BUILD_TYPE="${BUILD_TYPE:-RelWithDebInfo}"
 JOBS="${JOBS:-$(sysctl -n hw.physicalcpu)}"
 CLEAN="${CLEAN:-0}"
+ALLOW_CODESIGN="${ALLOW_CODESIGN:-0}"
 BUILD_DIR_DEVICE="${BUILD_DIR_DEVICE:-build-ios}"
 BUILD_DIR_SIM="${BUILD_DIR_SIM:-build-ios-sim}"
 TOOLCHAIN="cmake/toolchain/ios.toolchain.cmake"
@@ -78,10 +79,12 @@ TARGET:
 OPTIONS:
   --game-data PATH     Patched data source (master.dat, critter.dat, data/)
                        Required in -test mode unless GAME_DATA or FALLOUT_GAMEFILES_ROOT is set.
+  --codesign           Enable code signing for device builds (DEVELOPMENT_TEAM env also enables signing)
   --help               Show this help
 
 EXAMPLES:
   ./scripts/build/build-ios.sh -prod
+  ./scripts/build/build-ios.sh -prod --device --codesign
   ./scripts/build/build-ios.sh -test --device --game-data /path/to/patchedfiles
   ./scripts/build/build-ios.sh -test --both
 USAGE
@@ -110,6 +113,10 @@ while [[ $# -gt 0 ]]; do
             TARGET="simulator"
             shift
             ;;
+        --codesign)
+            ALLOW_CODESIGN=1
+            shift
+            ;;
         --both)
             TARGET="both"
             shift
@@ -129,6 +136,11 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Enable code-signing automatically when DEVELOPMENT_TEAM is provided
+if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
+    ALLOW_CODESIGN=1
+fi
 
 if [[ ! -f "$TOOLCHAIN" ]]; then
     log_error "iOS toolchain not found: $TOOLCHAIN"
@@ -229,6 +241,26 @@ configure_and_build_device() {
 
     if [[ "$needs_config" == "1" ]]; then
         log_info "Configuring iOS device build"
+
+        # Determine signing args: default = unsigned (NO). Enable signing when
+        # --codesign provided or DEVELOPMENT_TEAM is set in the environment.
+        if [[ "${ALLOW_CODESIGN}" == "1" ]]; then
+            log_info "Enabling Xcode automatic code signing for device build"
+            CMAKE_SIGNING_ARGS=(
+                -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
+                -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=YES
+                -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_STYLE=Automatic
+            )
+            if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
+                CMAKE_SIGNING_ARGS+=( -D CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM="${DEVELOPMENT_TEAM}" )
+            fi
+        else
+            CMAKE_SIGNING_ARGS=(
+                -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=''
+                -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO
+            )
+        fi
+
         cmake -B "$build_dir" \
             -D CMAKE_BUILD_TYPE="$BUILD_TYPE" \
             -D CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
@@ -237,8 +269,7 @@ configure_and_build_device() {
             -D PLATFORM=OS64 \
             -D DEPLOYMENT_TARGET="$DEPLOYMENT_TARGET_DEVICE" \
             -G Xcode \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY='' \
-            -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO
+            "${CMAKE_SIGNING_ARGS[@]}"
     else
         log_info "Using existing iOS device CMake configuration"
     fi
