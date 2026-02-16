@@ -259,8 +259,6 @@ configure_and_build_device() {
             -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
             DEVELOPMENT_TEAM="${DEVELOPMENT_TEAM:-}" \
             CODE_SIGN_STYLE=Automatic \
-            CODE_SIGNING_ALLOWED=YES \
-            CODE_SIGNING_REQUIRED=YES \
             build
     else
         cmake --build "$build_dir" --config "$BUILD_TYPE" -j "$JOBS"
