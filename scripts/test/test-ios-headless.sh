@@ -10,22 +10,18 @@
 #   - Binary architecture (arm64 for Apple Silicon, x86_64 for Intel)
 #   - Info.plist has all required iOS keys
 #   - Headless simulator boot, app install, brief launch, terminate, shutdown
-#   - Automated simulator screenshot evidence capture
 #   - Clean exit code verification
 #   - No lingering simulator processes
 #
 # USAGE:
 #   ./scripts/test/test-ios-headless.sh              # Full test cycle on existing build
 #   ./scripts/test/test-ios-headless.sh --skip-sim   # Skip simulator tests
-#   ./scripts/test/test-ios-headless.sh --skip-touch-autotest # Skip scripted touch sequence
 #   ./scripts/test/test-ios-headless.sh --help       # Show usage
 #
 # CONFIGURATION (environment variables):
 #   BUILD_DIR       - Build output directory (default: "build-ios-sim")
 #   BUILD_TYPE      - Debug/Release/RelWithDebInfo (default: "RelWithDebInfo")
 #   SIMULATOR_NAME  - Simulator device name (default: auto-detect iPad)
-#   EVIDENCE_DIR    - Output dir for simulator screenshots (default: dev/state/logs/screens)
-#   RUN_TOUCH_AUTOTEST - Run scripted touch->mouse validation in simulator (default: 1)
 #
 # EXIT CODES:
 #   0 - All tests passed
@@ -50,9 +46,6 @@ SIMULATOR_NAME="${SIMULATOR_NAME:-}"  # Auto-detect if empty
 GAME_DATA="${GAME_DATA:-}"
 GAMEFILES_ROOT="${FALLOUT_GAMEFILES_ROOT:-${GAMEFILES_ROOT:-}}"
 IOS_CONFIG_DIR="$ROOT_DIR/gameconfig/ios"
-EVIDENCE_DIR="${EVIDENCE_DIR:-$ROOT_DIR/dev/state/logs/screens}"
-TOUCH_EVIDENCE_DIR="${TOUCH_EVIDENCE_DIR:-$ROOT_DIR/dev/state/logs}"
-RUN_TOUCH_AUTOTEST="${RUN_TOUCH_AUTOTEST:-1}"
 
 # App details
 APP_NAME="fallout1-rebirth"
@@ -82,7 +75,6 @@ TESTS_SKIPPED=0
 # Simulator state
 SIM_UDID=""
 SIM_WAS_BOOTED=false
-LATEST_SCREENSHOT_PATH=""
 
 # -----------------------------------------------------------------------------
 # Helper functions
@@ -144,7 +136,6 @@ Headless validation tests for the iOS Simulator app bundle.
 
 OPTIONS:
     --skip-sim    Skip simulator launch tests (bundle validation only)
-    --skip-touch-autotest Skip scripted simulator touch sequence validation
     --help        Show this help message
 
 ENVIRONMENT VARIABLES:
@@ -152,7 +143,6 @@ ENVIRONMENT VARIABLES:
     BUILD_TYPE      Build type (default: RelWithDebInfo)
     SIMULATOR_NAME  Simulator name (default: auto-detect iPad)
     GAME_DATA       Path to game data (master.dat, critter.dat, data/)
-    RUN_TOUCH_AUTOTEST  Run scripted touch sequence test (default: 1)
     FALLOUT_GAMEFILES_ROOT Optional root containing patchedfiles/
 
 EXAMPLES:
@@ -419,15 +409,6 @@ launch_app_briefly() {
     
     if [[ "$running_apps" -gt 0 ]]; then
         log_ok "App running after ${LAUNCH_TIMEOUT}s (no crash)"
-
-        mkdir -p "$EVIDENCE_DIR"
-        local screenshot_path="$EVIDENCE_DIR/ios-headless-${bundle_id//./-}-$(date -u +%Y%m%dT%H%M%SZ).png"
-        if xcrun simctl io "$udid" screenshot "$screenshot_path" >/dev/null 2>&1; then
-            LATEST_SCREENSHOT_PATH="$screenshot_path"
-            log_ok "Captured simulator screenshot: $screenshot_path"
-        else
-            log_warn "Failed to capture simulator screenshot"
-        fi
         
         # Terminate the app
         log_info "Terminating app..."
@@ -449,79 +430,6 @@ launch_app_briefly() {
             return 0
         fi
     fi
-}
-
-run_touch_autotest() {
-    local udid="$1"
-    local bundle_id="$2"
-
-    log_info "Running scripted simulator touch sequence autotest..."
-
-    local container
-    container=$(xcrun simctl get_app_container "$udid" "$bundle_id" data 2>/dev/null || true)
-    if [[ -z "$container" ]]; then
-        log_error "Could not resolve app data container for touch autotest"
-        return 1
-    fi
-
-    local patchlog_path="$container/Documents/input-touch-autotest.patchlog.txt"
-    rm -f "$patchlog_path"
-
-    local launch_out
-    if ! launch_out=$(
-        SIMCTL_CHILD_F1R_TOUCH_AUTOTEST=1 \
-        SIMCTL_CHILD_F1R_TOUCH_AUTOTEST_EXIT=1 \
-        SIMCTL_CHILD_F1R_PATCHLOG=1 \
-        SIMCTL_CHILD_F1R_PATCHLOG_PATH="$patchlog_path" \
-        xcrun simctl launch "$udid" "$bundle_id" 2>&1
-    ); then
-        log_error "Touch autotest launch failed: $launch_out"
-        return 1
-    fi
-
-    local waited=0
-    while [[ $waited -lt 20 ]]; do
-        local running_apps
-        running_apps=$(xcrun simctl spawn "$udid" launchctl list 2>/dev/null | awk -v bid="$bundle_id" 'index($0, bid) { c++ } END { print c + 0 }')
-        if [[ "$running_apps" -eq 0 ]]; then
-            break
-        fi
-        sleep 1
-        waited=$((waited + 1))
-    done
-
-    if [[ ! -f "$patchlog_path" ]]; then
-        log_error "Touch autotest patchlog missing: $patchlog_path"
-        return 1
-    fi
-
-    if ! grep -q "INPUT_AUTOTEST] start" "$patchlog_path"; then
-        log_error "Touch autotest start marker missing"
-        return 1
-    fi
-    if ! grep -q "INPUT_AUTOTEST] done" "$patchlog_path"; then
-        log_error "Touch autotest completion marker missing"
-        return 1
-    fi
-    if ! grep -q "INPUT_AUTOTEST_MOUSE] pointer .*buttons=0x1" "$patchlog_path"; then
-        log_error "Touch autotest left-click pointer evidence missing"
-        return 1
-    fi
-    if ! grep -q "INPUT_AUTOTEST_MOUSE] pointer .*buttons=0x2" "$patchlog_path"; then
-        log_error "Touch autotest two-finger right-click evidence missing"
-        return 1
-    fi
-
-    mkdir -p "$TOUCH_EVIDENCE_DIR"
-    local archived_patchlog="$TOUCH_EVIDENCE_DIR/ios-touch-autotest-$(date -u +%Y%m%dT%H%M%SZ).patchlog.txt"
-    if cp -f "$patchlog_path" "$archived_patchlog"; then
-        log_ok "Archived touch autotest patchlog: $archived_patchlog"
-    else
-        log_warn "Failed to archive touch autotest patchlog to $archived_patchlog"
-    fi
-
-    log_ok "Touch sequence autotest passed: $patchlog_path"
-    return 0
 }
 
 # Uninstall app from simulator
@@ -735,16 +643,6 @@ test_simulator_launch() {
         log_error "App launch test failed"
         ((TESTS_FAILED++))
     fi
-
-    if [[ "$RUN_TOUCH_AUTOTEST" != "0" ]]; then
-        if run_touch_autotest "$SIM_UDID" "$APP_BUNDLE_ID"; then
-            ((TESTS_PASSED++))
-        else
-            ((TESTS_FAILED++))
-        fi
-    else
-        log_info "Touch autotest disabled (RUN_TOUCH_AUTOTEST=0)"
-    fi
     
     # Cleanup: uninstall and shutdown
     log_info "Cleaning up simulator..."
@@ -783,9 +681,6 @@ print_summary() {
     if [[ $TESTS_SKIPPED -gt 0 ]]; then
         echo -e "    ${YELLOW}Skipped:${NC} $TESTS_SKIPPED"
     fi
-    if [[ -n "$LATEST_SCREENSHOT_PATH" ]]; then
-        echo -e "    ${BOLD}Screenshot:${NC} $LATEST_SCREENSHOT_PATH"
-    fi
     echo -e "    ${BOLD}Total:${NC}   $total"
     echo ""
     
@@ -809,10 +704,6 @@ main() {
         case "$1" in
             --skip-sim)
                 skip_sim=true
-                shift
-                ;;
-            --skip-touch-autotest)
-                RUN_TOUCH_AUTOTEST=0
                 shift
                 ;;
             --help|-h)

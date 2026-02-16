@@ -1,6 +1,6 @@
 # JOURNAL: Third-Party Dependencies
 
-Last Updated: 2026-02-15
+Last Updated: 2026-02-14
 
 ## Purpose
 
@@ -80,10 +80,3 @@ FetchContent_Declare(sdl3
 ./scripts/test/test-macos.sh   # macOS validation
 ./scripts/test/test-ios-simulator.sh  # iOS validation
 ```
-
-## 2026-02-15 Repository Sync
-- Synced this journal to current repository state after deterministic SDL3 input hardening.
-- Core input implementation commit: `c1accdf27927603e1d6b4c115dded9bac08c0a72`.
-- LLM handoff summary commit: `fdc0f05f559c1d2f79706d395b6eae4b9ae4d48d`.
-- Automated input evidence is recorded in `dev/state/latest-summary.tsv` and `dev/state/history.tsv` (latest PASS row: `2026-02-15T20:48:57Z`).
-- iOS scripted touch evidence: `dev/state/logs/round-2-input-ios_headless-rerun.log`, `dev/state/logs/ios-touch-autotest-20260215T204516Z.patchlog.txt`, and screenshot `dev/state/logs/screens/ios-headless-com-fallout1rebirth-game-20260215T204510Z.png`.

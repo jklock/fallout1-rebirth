@@ -36,9 +36,6 @@
     <string>LaunchScreen</string>
     <key>UIStatusBarHidden</key>
     <true/>
-    <!-- Require full screen on iPad so we may restrict supported orientations -->
-    <key>UIRequiresFullScreen</key>
-    <true/>
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationLandscapeLeft</string>

@@ -8,28 +8,28 @@
 ## Track A - Input State Machine
 
 ### A1. Scaffold
-- [x] Add state-machine module and event contracts.
+- [ ] Add state-machine module and event contracts.
 - [ ] Add config/flag for legacy vs state-machine mode.
 - [ ] Add deterministic event trace logs.
 
 ### A2. Source Ownership
-- [x] Hardware mouse/trackpad path isolated.
-- [x] Finger path translated only by state machine.
-- [x] Pencil path translated only by state machine + optional body gestures.
-- [x] Remove duplicate button down/up ownership.
+- [ ] Hardware mouse/trackpad path isolated.
+- [ ] Finger path translated only by state machine.
+- [ ] Pencil path translated only by state machine + optional body gestures.
+- [ ] Remove duplicate button down/up ownership.
 
 ### A3. Coordinate and Bounds
-- [x] One canonical transform for touch/pen -> game coords.
-- [x] Explicit in-bounds/out-of-bounds policy.
-- [x] No cursor snap at bars/edge transitions.
+- [ ] One canonical transform for touch/pen -> game coords.
+- [ ] Explicit in-bounds/out-of-bounds policy.
+- [ ] No cursor snap at bars/edge transitions.
 
 ### A4. Behavior Completion
-- [x] Two-finger right-click deterministic.
-- [x] Click+drag deterministic.
-- [x] Pencil move/tap/drag deterministic.
+- [ ] Two-finger right-click deterministic.
+- [ ] Click+drag deterministic.
+- [ ] Pencil move/tap/drag deterministic.
 
 ### A5. Automated Tests
-- [x] Add/update iOS input regression scripts.
+- [ ] Add/update iOS input regression scripts.
 - [ ] Add simulator scenario replay tests.
 - [x] Add pass/fail signal to unattended runner.
 

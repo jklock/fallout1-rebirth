@@ -48,17 +48,9 @@ Root of the Apple-only Fallout 1 Rebirth repository (macOS + iOS/iPadOS).
   - `releases/prod/macOS/Fallout 1 Rebirth.app`
   - `releases/prod/iOS/fallout1-rebirth.ipa`
 - Updated docs/audit evidence set with new coverage, packaging, and proof snapshots.
-- Added compile-time option `F1R_PATCHLOG_DEFAULT_ON` to produce an instrumented iOS build with patchlog + verbose touch traces enabled by default; instrumented IPA produced at `build-ios/fallout1-rebirth.ipa` and committed (3689fd5). Files changed: `CMakeLists.txt`, `src/plib/db/patchlog.cc`. Purpose: simplify physical-device input validation and deterministic evidence capture.
 
 ## Notes for Agents
 
 - If a directory has `JOURNAL.md`, read it before editing files there.
 - After changing files in that directory, update that directory journal in the same change set.
 - Keep `README.md` and `JOURNAL.md` aligned with current file layout and script names.
-
-## 2026-02-15 Repository Sync
-- Synced this journal to current repository state after deterministic SDL3 input hardening.
-- Core input implementation commit: `c1accdf27927603e1d6b4c115dded9bac08c0a72`.
-- LLM handoff summary commit: `fdc0f05f559c1d2f79706d395b6eae4b9ae4d48d`.
-- Automated input evidence is recorded in `dev/state/latest-summary.tsv` and `dev/state/history.tsv` (latest PASS row: `2026-02-15T20:48:57Z`).
-- iOS scripted touch evidence: `dev/state/logs/round-2-input-ios_headless-rerun.log`, `dev/state/logs/ios-touch-autotest-20260215T204516Z.patchlog.txt`, and screenshot `dev/state/logs/screens/ios-headless-com-fallout1rebirth-game-20260215T204510Z.png`.

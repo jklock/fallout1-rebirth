@@ -219,15 +219,8 @@ int gmovie_play(int game_movie, int game_movie_flags)
     unsigned int movieStartTicks = get_time();
     bool screenshotTaken = false;
 
-    // Wait for any existing mouse/button presses to be released before
-    // starting the movie. Use the normal event pump + FPS throttle here so
-    // the main thread remains responsive (prevents iOS watchdog kills when
-    // input state is stuck and SDL events are not being processed).
     while (mouse_get_buttons() != 0) {
-        sharedFpsLimiter.mark();
-        (void)get_input();
-        renderPresent();
-        sharedFpsLimiter.throttle();
+        mouse_info();
     }
 
     mouse_hide();

@@ -58,29 +58,8 @@ static void patchlog_init()
     }
 
     patchlog_checked = true;
-
-    /*
-     * Respect explicit environment override first. If the environment variable
-     * is not present, allow a compile-time default for instrumented builds.
-     */
-    const char* env = getenv("F1R_PATCHLOG");
-    if (env != NULL) {
-        patchlog_is_enabled = (env[0] != '0' && env[0] != '\0');
-    } else {
-#ifdef F1R_PATCHLOG_DEFAULT_ON
-        patchlog_is_enabled = true;
-#else
-        patchlog_is_enabled = false;
-#endif
-    }
-
-    /* Verbose flag: environment wins; otherwise fall back to compile-time default. */
+    patchlog_is_enabled = patchlog_env_enabled();
     patchlog_is_verbose = patchlog_env_verbose();
-#ifdef F1R_PATCHLOG_DEFAULT_VERBOSE
-    if (!patchlog_is_verbose) {
-        patchlog_is_verbose = true;
-    }
-#endif
 
     if (!patchlog_is_enabled) {
         return;

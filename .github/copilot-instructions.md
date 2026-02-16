@@ -35,32 +35,6 @@ The scripts handle simulator management, proper build configs, and cleanup. Igno
 
 If a rebase is detected (detached `HEAD`, `.git/rebase-*` present), **stop and ask** before running any `--continue/--abort/--skip` unless the user explicitly requested it.
 
-## Latest SDL3 Input Status (2026-02-15)
-
-Current input hardening baseline (branch `RME-DEV`):
-- Implementation commit: `c1accdf27927603e1d6b4c115dded9bac08c0a72`
-- Handoff summary commit: `fdc0f05f559c1d2f79706d395b6eae4b9ae4d48d`
-- Primary audit: `docs/audit/sdl3-input-deterministic-audit-2026-02-15.md`
-- LLM handoff doc: `docs/audit/llm-handoff-sdl3-input-2026-02-15.md`
-
-Latest automated input proof:
-- `dev/state/latest-summary.tsv`
-- `dev/state/history.tsv` latest PASS row: `2026-02-15T20:48:57Z`
-- `dev/state/logs/round-2-input-input_layer-rerun.log`
-- `dev/state/logs/round-2-input-macos_headless-rerun.log`
-- `dev/state/logs/round-2-input-ios_headless-rerun.log`
-- `dev/state/logs/ios-touch-autotest-20260215T204516Z.patchlog.txt`
-- `dev/state/logs/screens/ios-headless-com-fallout1rebirth-game-20260215T204510Z.png`
-
-Gesture semantics currently required:
-- Single-finger touch: left click/drag
-- Two-finger touch: right click/right-drag
-- Apple Pencil: left-click-only (ignore body-gesture right-click behavior)
-
-Release artifacts currently staged:
-- `releases/prod/macOS/Fallout 1 Rebirth.app`
-- `releases/prod/iOS/fallout1-rebirth.ipa`
-
 ## Project Status
 
 All development phases are complete:

@@ -392,8 +392,7 @@ int db_dir_entry(const char* name, dir_entry* de)
         if (stream != NULL) {
             de->flags = 4;
             de->offset = 0;
-            /* getFileSize returns long; cast to int for de->length */
-            de->length = static_cast<int>(getFileSize(stream));
+            de->length = getFileSize(stream);
             de->field_C = 0;
             fclose(stream);
             return 0;
@@ -475,12 +474,10 @@ int db_read_to_buf(const char* filename, unsigned char* buf)
         }
 
         if (stream != NULL) {
-            /* getFileSize returns long; cast to int for local 'size' */
-            size = static_cast<int>(getFileSize(stream));
+            size = getFileSize(stream);
             if (read_callback != NULL) {
-                /* Use size_t for sizes to avoid implicit narrowing */
-                remaining_size = static_cast<size_t>(size);
-                chunk_size = read_threshold - read_count;
+                remaining_size = size;
+                chunk_size = static_cast<int>(read_threshold - read_count);
 
                 while (remaining_size >= chunk_size) {
                     bytes_read = fread(buf, 1, chunk_size, stream);
@@ -832,8 +829,8 @@ int db_fclose(DB_FILE* stream)
 // 0x4AFD50
 size_t db_fread(void* ptr, size_t size, size_t count, DB_FILE* stream)
 {
-    size_t remaining_size;
-    size_t chunk_size;
+    int remaining_size;
+    int chunk_size;
     size_t bytes_read;
     unsigned char* buf;
     size_t elements_read;
@@ -1260,7 +1257,7 @@ int db_fseek(DB_FILE* stream, long offset, int origin)
                         stream->field_10 -= stream->field_1C - (stream->field_20 - 0x4000);
                         stream->field_20 = stream->field_1C + 0x4000;
                         db_preload_buffer(stream);
-                        chunks = static_cast<int>((offset - db_ftell(stream)) / 0x4000);
+                        chunks = (offset - db_ftell(stream)) / 0x4000;
                     }
 
                     while (chunks > 0) {
