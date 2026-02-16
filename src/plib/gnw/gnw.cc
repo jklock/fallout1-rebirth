@@ -1486,8 +1486,7 @@ static void* colorOpen(const char* path)
 // 0x4C4298
 static int colorRead(void* handle, void* buf, size_t count)
 {
-    /* db_fread returns size_t; caller expects int — make conversion explicit */
-    return static_cast<int>(db_fread(buf, 1, count, reinterpret_cast<DB_FILE*>(handle)));
+    return db_fread(buf, 1, count, reinterpret_cast<DB_FILE*>(handle));
 }
 
 // 0x4C42A0

@@ -25,10 +25,6 @@ static bool last_input_was_mouse = false;
 static int last_system_x = -1;
 static int last_system_y = -1;
 static Uint32 last_mouse_buttons = 0;
-// Track button state from events since SDL_GetMouseState doesn't reflect
-// touch-converted clicks on some platforms (Simulator/converted touches).
-static bool left_button_down = false;
-static bool right_button_down = false;
 #endif
 
 // 0x4E0400
@@ -181,11 +177,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         mouseState->y = 0;
     }
 
-    // Prefer event-tracked state (captures converted clicks) OR SDL flags
-    bool left_down = left_button_down || ((mouse_buttons & SDL_BUTTON_LMASK) != 0);
-    bool right_down = right_button_down || ((mouse_buttons & SDL_BUTTON_RMASK) != 0);
-    mouseState->buttons[0] = left_down;
-    mouseState->buttons[1] = right_down;
+    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON_LMASK) != 0;
+    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON_RMASK) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
     mouseState->wheelY = gMouseWheelDeltaY;
     gMouseWheelDeltaX = 0;
@@ -345,21 +338,7 @@ void handleMouseEvent(SDL_Event* event)
     }
 
 #if defined(__APPLE__) && TARGET_OS_IOS
-    // Track button state from events for iOS — SDL_GetMouseState can miss
-    // touch->mouse conversions; keep event-tracked state as a reliable source.
-    if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-        if (event->button.button == SDL_BUTTON_LEFT) {
-            left_button_down = true;
-        } else if (event->button.button == SDL_BUTTON_RIGHT) {
-            right_button_down = true;
-        }
-    } else if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
-        if (event->button.button == SDL_BUTTON_LEFT) {
-            left_button_down = false;
-        } else if (event->button.button == SDL_BUTTON_RIGHT) {
-            right_button_down = false;
-        }
-    }
+    (void)event;
 #endif
 }
 
@@ -381,10 +360,6 @@ void dxinput_notify_touch()
     last_system_x = -1;
     last_system_y = -1;
     last_mouse_buttons = 0;
-    // Clear event-tracked button state on touch so stale event state doesn't
-    // persist across input modality changes.
-    left_button_down = false;
-    right_button_down = false;
     static int touch_event_count = 0;
     if (touch_event_count < 5) {
         debug_printf("iOS: Touch event received (count=%d)\n", ++touch_event_count);
